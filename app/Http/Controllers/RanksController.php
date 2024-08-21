@@ -45,7 +45,7 @@ class RanksController extends Controller
     {
         $dataInsert = [
             "title"=> $request->title,
-            "desciption"=> $request->desciption,
+            "description"=> $request->description,
             "status"=> $request->status,
         ];
         RanksModel::create($dataInsert);
@@ -110,7 +110,7 @@ class RanksController extends Controller
         // Cập nhật dữ liệu
         $dataUpdate = [
             "title"=> $request->title,
-            "desciption"=> $request->desciption ?? null,
+            "description"=> $request->description ?? null,
             "status"=> $request->status,
             'created_at' => $request->created_at ?? $rank->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
