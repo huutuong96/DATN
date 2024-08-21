@@ -41,15 +41,15 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
             Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
             Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
-
+            Route::resource('banners', BannerController::class);
+Route::resource('faqs', FAQController::class);
+Route::resource('taxs', TaxController::class);
+Route::resource('ranks', RanksController::class);
 
 });
 
 //tường làm
-Route::resource('banners', BannerController::class);
-Route::resource('faqs', FAQController::class);
-Route::resource('taxs', TaxController::class);
-Route::resource('ranks', RanksController::class);
+
 
 
 
