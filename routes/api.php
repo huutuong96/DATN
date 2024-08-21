@@ -35,16 +35,16 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::post('user/me', [AuthenController::class, "me"]);
 
             Route::resource('role', RolesController::class);
-            Route::resource('rank', RanksController::class);
+            
             Route::resource('address', AddressController::class);
             Route::resource('permission', PermissionsController::class);
 
             Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
             Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
             Route::resource('banners', BannerController::class);
-Route::resource('faqs', FAQController::class);
-Route::resource('taxs', TaxController::class);
-Route::resource('ranks', RanksController::class);
+            Route::resource('faqs', FAQController::class);
+            Route::resource('taxs', TaxController::class);
+            Route::resource('ranks', RanksController::class);
 
 });
 
