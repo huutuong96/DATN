@@ -7,6 +7,9 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\RanksController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\FAQController;
+use App\Http\Controllers\TaxController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,11 +27,16 @@ Route::group(['middleware' => 'checkToken'], function () {
     Route::post('user/me', [AuthenController::class, "me"]);
 
     Route::resource('role', RolesController::class);
-    Route::resource('rank', RanksController::class);
+    
     Route::resource('address', AddressController::class);
 
 });
 
+//tường làm
+Route::resource('banners', BannerController::class);
+Route::resource('faqs', FAQController::class);
+Route::resource('taxs', TaxController::class);
+Route::resource('ranks', RanksController::class);
 
 
 

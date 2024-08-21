@@ -1,23 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\RanksModel;
-use App\Http\Requests\RankRequest;
-use Illuminate\Http\Request;
 
-class RanksController extends Controller
+use Illuminate\Http\Request;
+use App\Http\Requests\TaxRequest;
+use App\Models\Tax;
+
+class TaxController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $ranks = RanksModel::all();
-        if($ranks->isEmpty()){
+        $taxs = Tax::all();
+        if($taxs->isEmpty()){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại rank nào",
+                    'message' => "Không tồn tại tax nào",
                 ]
             );
         }
@@ -25,7 +26,7 @@ class RanksController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $ranks,
+                'data' => $taxs,
             ]
         );
     }
@@ -41,20 +42,34 @@ class RanksController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RankRequest $request)
+    public function store(TaxRequest $rqt)
     {
         $dataInsert = [
-            "title"=> $request->title,
-            "desciption"=> $request->desciption,
-            "status"=> $request->status,
+            'title' => $rqt->title,
+            'type' => $rqt->type,
+            'tax_number' => $rqt->tax_number,
+            'status' => $rqt->status,
         ];
-        RanksModel::create($dataInsert);
-        $dataDone = [
-            'status' => true,
-            'message' => "Rank Đã được lưu",
-            'Ranks' => RanksModel::all(),
-        ];
-        return response()->json($dataDone, 200);
+       
+        try {
+            $tax = Tax::create( $dataInsert );
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm tax thành công",
+                    'data' => $tax,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm tax không thành công",
+                    'error' => $th->getMessage(),
+                ]
+            );
+        }
     }
 
     /**
@@ -62,12 +77,12 @@ class RanksController extends Controller
      */
     public function show(string $id)
     {
-        $rank = RanksModel::find($id);
-        if(!$rank){
+        $tax = Tax::find($id);
+        if(!$tax){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại rank nào",
+                    'message' => "Không tồn tại tax nào",
                 ]
             );
         }
@@ -75,7 +90,7 @@ class RanksController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $rank,
+                'data' => $tax,
             ]
         );
     }
@@ -91,17 +106,17 @@ class RanksController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RankRequest $request, string $id)
+    public function update(taxRequest $rqt, string $id)
     {
-        // Tìm rank theo ID
-        $rank = RanksModel::find($id);
+        // Tìm tax theo ID
+        $tax = Tax::find($id);
         
         // Kiểm tra xem rqt có tồn tại không
-        if (!$rank) {
+        if (!$tax) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "rank không tồn tại",
+                    'message' => "tax không tồn tại",
                 ],
                 404
             );
@@ -109,28 +124,29 @@ class RanksController extends Controller
     
         // Cập nhật dữ liệu
         $dataUpdate = [
-            "title"=> $request->title,
-            "desciption"=> $request->desciption ?? null,
-            "status"=> $request->status,
-            'created_at' => $request->created_at ?? $rank->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+            'title' => $rqt->title,
+            'type' => $rqt->type,
+            'tax_number' => $rqt->tax_number,
+            'status' => $rqt->status,
+            'created_at' => $rqt->created_at ?? $tax->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
     
         try {
             // Cập nhật bản ghi
-            $rank->update($dataUpdate);
+            $tax->update($dataUpdate);
     
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Cập nhật rank thành công",
-                    'data' => $rank,
+                    'message' => "Cập nhật Tax thành công",
+                    'data' => $tax,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật rank không thành công",
+                    'message' => "Cập nhật tax không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -143,27 +159,27 @@ class RanksController extends Controller
     public function destroy(string $id)
     {
         try {
-            $rank = RanksModel::find($id);
+            $tax = Tax::find($id);
            
-            if (!$rank) {
+            if (!$tax) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'rank không tồn tại',
+                    'message' => 'tax không tồn tại',
                 ], 404);
             }
 
             // Xóa bản ghi
-            $rank->delete();
+            $tax->delete();
 
              return response()->json([
                     'status' => true,
-                    'message' => 'Xóa rank thành công',
+                    'message' => 'Xóa tax thành công',
                 ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa rank không thành công",
+                    'message' => "xóa tax không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
