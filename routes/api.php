@@ -31,7 +31,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::post('user/me', [AuthenController::class, "me"]);
 
             Route::resource('role', RolesController::class);
-            // Route::resource('rank', RanksController::class);
             Route::resource('address', AddressController::class);
             Route::resource('permission', PermissionsController::class);
 
