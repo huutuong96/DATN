@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use App\Http\Requests\BannerRequest;
 use App\Models\Banner;
@@ -43,17 +44,24 @@ class BannerController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(BannerRequest $rqt )
-    {   
+    {
+        $image = $rqt->file('image');
+        $cloudinary = new Cloudinary();
+
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+
+
+
         $dataInsert = [
             'title' => $rqt->title,
             'content' => $rqt->content,
-            'URL' => $rqt->URL,
+            'URL' => $uploadedImage['secure_url'],
             'status' => $rqt->status,
             'index' => $rqt->index,
             // 'create_by',
             // 'update_by',
         ];
-       
+
         try {
             $banner = Banner::create( $dataInsert );
 
@@ -114,7 +122,6 @@ class BannerController extends Controller
     {
         // Tìm banner theo ID
         $banner = Banner::find($id);
-        
         // Kiểm tra xem banner có tồn tại không
         if (!$banner) {
             return response()->json(
@@ -125,7 +132,6 @@ class BannerController extends Controller
                 404
             );
         }
-    
         // Cập nhật dữ liệu
         $dataUpdate = [
             'title' => $rqt->title,
@@ -135,11 +141,11 @@ class BannerController extends Controller
             'index' => $rqt->index,
             'created_at' => $rqt->created_at ?? $banner->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
-    
+
+
         try {
             // Cập nhật bản ghi
             $banner->update($dataUpdate);
-    
             return response()->json(
                 [
                     'status' => true,
@@ -163,10 +169,11 @@ class BannerController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
+
         try {
             $banner = Banner::find($id);
-           
+
             if (!$banner) {
                 return response()->json([
                     'status' => false,

@@ -26,7 +26,7 @@ class BannerRequest extends FormRequest
         return [
             'title' => 'required|string',
             'content' => 'required|string',
-            'URL' => 'nullable|required|url',
+            // 'URL' => 'nullable|required|url',
             'status' => 'numeric',
             'index' => 'numeric'
         ];
@@ -39,8 +39,8 @@ class BannerRequest extends FormRequest
                 'content.required' => 'Vui lòng nhập nội dung cho content',
                 'content.string' => 'Nội dung của content bắt buộc phải là một chuỗi',
 
-                'URL.required' => 'vui lòng nhập đường dẫn cho url',
-                'URL.url' => 'dữ liệu nhập vào không có định dạng của một đường dẫn',
+                // 'URL.required' => 'vui lòng nhập đường dẫn cho url',
+                // 'URL.url' => 'dữ liệu nhập vào không có định dạng của một đường dẫn',
 
                 'status.numeric' => 'Kiểu dữ liệu của status phải là một số',
 
