@@ -5,8 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\RanksController;
+use App\Http\Controllers\LearnController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategorilearnsController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +26,9 @@ Route::group(['middleware' => 'checkToken'], function () {
     Route::resource('user', AuthenController::class);
     Route::post('user/me', [AuthenController::class, "me"]);
 
-    Route::resource('role', RolesController::class);
+
     Route::resource('rank', RanksController::class);
-    Route::resource('address', AddressController::class);
+   
 
 });
 
@@ -40,3 +43,14 @@ Route::post('user/login', [AuthenController::class, "login"]);
 // });
 
 Route::resource('users', UserController::class);
+
+// categori learns
+Route::resource('categori_learns', CategorilearnsController::class);
+// address
+Route::resource('address', AddressController::class);
+
+//Role
+Route::resource('role', RolesController::class);
+//LEARN
+Route::resource('learn', LearnController::class);
+
