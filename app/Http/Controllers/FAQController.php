@@ -50,7 +50,7 @@ class FAQController extends Controller
             'status' => $rqt->status,
             'index' => $rqt->index,
         ];
-       
+
         try {
             $faq = FAQ::create( $dataInsert );
 
@@ -110,7 +110,7 @@ class FAQController extends Controller
     {
         // Tìm faq theo ID
         $faq = FAQ::find($id);
-        
+
         // Kiểm tra xem rqt có tồn tại không
         if (!$faq) {
             return response()->json(
@@ -121,7 +121,7 @@ class FAQController extends Controller
                 404
             );
         }
-    
+
         // Cập nhật dữ liệu
         $dataUpdate = [
             'title' => $rqt->title,
@@ -130,11 +130,11 @@ class FAQController extends Controller
             'index' => $rqt->index,
             'created_at' => $rqt->created_at ?? $faq->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
-    
+
         try {
             // Cập nhật bản ghi
             $faq->update($dataUpdate);
-    
+
             return response()->json(
                 [
                     'status' => true,
@@ -160,7 +160,7 @@ class FAQController extends Controller
     {
         try {
             $faq = FAQ::find($id);
-           
+
             if (!$faq) {
                 return response()->json([
                     'status' => false,

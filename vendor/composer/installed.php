@@ -1,15 +1,14 @@
 <?php return array(
     'root' => array(
-    'name' => 'laravel/laravel',
-    'pretty_version' => 'dev-main',
-    'version' => 'dev-main',
-    'reference' => '2a57d3a425c95f6e1eb8dd2f5f9a7f8a24f7340b', // Chọn reference bạn muốn giữ lại
-    'type' => 'project',
-    'install_path' => __DIR__ . '/../../',
-    'aliases' => array(),
-    'dev' => true,
+        'name' => 'laravel/laravel',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '4483ed5bc5e2713b71336e3d449d42c8e7a8d29b',
+        'type' => 'project',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
     ),
-
     'versions' => array(
         'brick/math' => array(
             'pretty_version' => '0.12.1',
@@ -26,6 +25,33 @@
             'reference' => '99f76ffa36cce3b70a4a6abce41dba15ca2e84cb',
             'type' => 'library',
             'install_path' => __DIR__ . '/../carbonphp/carbon-doctrine-types',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'cloudinary-labs/cloudinary-laravel' => array(
+            'pretty_version' => '2.2.1',
+            'version' => '2.2.1.0',
+            'reference' => '434bb1fff2ef54e68bf5e4e05dbf8cf6bb3cf37b',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../cloudinary-labs/cloudinary-laravel',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'cloudinary/cloudinary_php' => array(
+            'pretty_version' => '2.14.0',
+            'version' => '2.14.0.0',
+            'reference' => '5967558bbf5d88e851ebd554559e850ac45b9236',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../cloudinary/cloudinary_php',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'cloudinary/transformation-builder-sdk' => array(
+            'pretty_version' => '1.5.0',
+            'version' => '1.5.0.0',
+            'reference' => '8c225472e96291a7af23ddf8947bdf31baac403e',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../cloudinary/transformation-builder-sdk',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -381,15 +407,14 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-    'pretty_version' => 'dev-main',
-    'version' => 'dev-main',
-    'reference' => '2a57d3a425c95f6e1eb8dd2f5f9a7f8a24f7340b', // Hoặc giá trị bạn chọn
-    'type' => 'project',
-    'install_path' => __DIR__ . '/../../',
-    'aliases' => array(),
-    'dev_requirement' => false,
-),
-
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '4483ed5bc5e2713b71336e3d449d42c8e7a8d29b',
+            'type' => 'project',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'laravel/pint' => array(
             'pretty_version' => 'v1.17.2',
             'version' => '1.17.2.0',

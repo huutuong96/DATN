@@ -95,7 +95,7 @@ class RanksController extends Controller
     {
         // Tìm rank theo ID
         $rank = RanksModel::find($id);
-        
+
         // Kiểm tra xem rqt có tồn tại không
         if (!$rank) {
             return response()->json(
@@ -106,7 +106,7 @@ class RanksController extends Controller
                 404
             );
         }
-    
+
         // Cập nhật dữ liệu
         $dataUpdate = [
             "title"=> $request->title,
@@ -114,11 +114,11 @@ class RanksController extends Controller
             "status"=> $request->status,
             'created_at' => $request->created_at ?? $rank->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
-    
+
         try {
             // Cập nhật bản ghi
             $rank->update($dataUpdate);
-    
+
             return response()->json(
                 [
                     'status' => true,
@@ -144,7 +144,7 @@ class RanksController extends Controller
     {
         try {
             $rank = RanksModel::find($id);
-           
+
             if (!$rank) {
                 return response()->json([
                     'status' => false,
