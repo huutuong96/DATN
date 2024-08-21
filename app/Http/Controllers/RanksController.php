@@ -12,7 +12,22 @@ class RanksController extends Controller
      */
     public function index()
     {
-        //
+        $ranks = RanksModel::all();
+        if($ranks->isEmpty()){
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Không tồn tại rank nào",
+                ]
+            );
+        }
+        return response()->json(
+            [
+                'status' => true,
+                'message' => "Lấy dữ liệu thành công",
+                'data' => $ranks,
+            ]
+        );
     }
 
     /**
@@ -32,8 +47,6 @@ class RanksController extends Controller
             "title"=> $request->title,
             "description"=> $request->description,
             "status"=> $request->status,
-            "create_by"=> $request->create_by,
-            "created_at"=> now(),
         ];
         RanksModel::create($dataInsert);
         $dataDone = [
@@ -49,7 +62,22 @@ class RanksController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $rank = RanksModel::find($id);
+        if(!$rank){
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Không tồn tại rank nào",
+                ]
+            );
+        }
+        return response()->json(
+            [
+                'status' => true,
+                'message' => "Lấy dữ liệu thành công",
+                'data' => $rank,
+            ]
+        );
     }
 
     /**
@@ -63,9 +91,50 @@ class RanksController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(RankRequest $request, string $id)
     {
-        //
+        // Tìm rank theo ID
+        $rank = RanksModel::find($id);
+
+        // Kiểm tra xem rqt có tồn tại không
+        if (!$rank) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "rank không tồn tại",
+                ],
+                404
+            );
+        }
+
+        // Cập nhật dữ liệu
+        $dataUpdate = [
+            "title"=> $request->title,
+            "description"=> $request->description ?? null,
+            "status"=> $request->status,
+            'created_at' => $request->created_at ?? $rank->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+        ];
+
+        try {
+            // Cập nhật bản ghi
+            $rank->update($dataUpdate);
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Cập nhật rank thành công",
+                    'data' => $rank,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "Cập nhật rank không thành công",
+                    'error' => $th->getMessage(),
+                ]
+            );
+        }
     }
 
     /**
@@ -73,6 +142,31 @@ class RanksController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $rank = RanksModel::find($id);
+
+            if (!$rank) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'rank không tồn tại',
+                ], 404);
+            }
+
+            // Xóa bản ghi
+            $rank->delete();
+
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Xóa rank thành công',
+                ]);
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "xóa rank không thành công",
+                    'error' => $th->getMessage(),
+                ]
+            );
+        }
     }
 }

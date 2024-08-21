@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('desciption')->nullable();
             $table->integer('status')->default(1);
-            $table->integer('create_by');
+            $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
             $table->timestamps();
         });
