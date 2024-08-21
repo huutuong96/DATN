@@ -1,23 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\RanksModel;
-use App\Http\Requests\RankRequest;
-use Illuminate\Http\Request;
 
-class RanksController extends Controller
+use Illuminate\Http\Request;
+use App\Http\Requests\BannerRequest;
+use App\Models\Banner;
+
+class BannerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $ranks = RanksModel::all();
-        if($ranks->isEmpty()){
+        $banners = Banner::all();
+        if($banners->isEmpty()){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại rank nào",
+                    'message' => "Không tồn tại banner nào",
                 ]
             );
         }
@@ -25,7 +26,7 @@ class RanksController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $ranks,
+                'data' => $banners,
             ]
         );
     }
@@ -41,20 +42,37 @@ class RanksController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RankRequest $request)
-    {
+    public function store(BannerRequest $rqt )
+    {   
         $dataInsert = [
-            "title"=> $request->title,
-            "description"=> $request->description,
-            "status"=> $request->status,
+            'title' => $rqt->title,
+            'content' => $rqt->content,
+            'URL' => $rqt->URL,
+            'status' => $rqt->status,
+            'index' => $rqt->index,
+            // 'create_by',
+            // 'update_by',
         ];
-        RanksModel::create($dataInsert);
-        $dataDone = [
-            'status' => true,
-            'message' => "Rank Đã được lưu",
-            'Ranks' => RanksModel::all(),
-        ];
-        return response()->json($dataDone, 200);
+       
+        try {
+            $banner = Banner::create( $dataInsert );
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm banner thành công",
+                    'data' => $banner,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm banner không thành công",
+                    'error' => $th->getMessage(),
+                ]
+            );
+        }
     }
 
     /**
@@ -62,12 +80,13 @@ class RanksController extends Controller
      */
     public function show(string $id)
     {
-        $rank = RanksModel::find($id);
-        if(!$rank){
+        $banner = Banner::find($id);
+
+        if(!$banner){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại rank nào",
+                    'message' => "Không tồn tại banner nào",
                 ]
             );
         }
@@ -75,7 +94,7 @@ class RanksController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $rank,
+                'data' => $banner,
             ]
         );
     }
@@ -91,46 +110,48 @@ class RanksController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RankRequest $request, string $id)
+    public function update(Request $rqt, $id)
     {
-        // Tìm rank theo ID
-        $rank = RanksModel::find($id);
-
-        // Kiểm tra xem rqt có tồn tại không
-        if (!$rank) {
+        // Tìm banner theo ID
+        $banner = Banner::find($id);
+        
+        // Kiểm tra xem banner có tồn tại không
+        if (!$banner) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "rank không tồn tại",
+                    'message' => "Banner không tồn tại",
                 ],
                 404
             );
         }
-
+    
         // Cập nhật dữ liệu
         $dataUpdate = [
-            "title"=> $request->title,
-            "description"=> $request->description ?? null,
-            "status"=> $request->status,
-            'created_at' => $request->created_at ?? $rank->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+            'title' => $rqt->title,
+            'content' => $rqt->content,
+            'URL' => $rqt->URL,
+            'status' => $rqt->status,
+            'index' => $rqt->index,
+            'created_at' => $rqt->created_at ?? $banner->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
-
+    
         try {
             // Cập nhật bản ghi
-            $rank->update($dataUpdate);
-
+            $banner->update($dataUpdate);
+    
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Cập nhật rank thành công",
-                    'data' => $rank,
+                    'message' => "Cập nhật banner thành công",
+                    'data' => $banner,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật rank không thành công",
+                    'message' => "Cập nhật banner không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -142,28 +163,29 @@ class RanksController extends Controller
      */
     public function destroy(string $id)
     {
+        
         try {
-            $rank = RanksModel::find($id);
-
-            if (!$rank) {
+            $banner = Banner::find($id);
+           
+            if (!$banner) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'rank không tồn tại',
+                    'message' => 'Banner không tồn tại',
                 ], 404);
             }
 
             // Xóa bản ghi
-            $rank->delete();
+            $banner->delete();
 
              return response()->json([
                     'status' => true,
-                    'message' => 'Xóa rank thành công',
+                    'message' => 'Xóa banner thành công',
                 ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa rank không thành công",
+                    'message' => "xóa banner không thành công",
                     'error' => $th->getMessage(),
                 ]
             );

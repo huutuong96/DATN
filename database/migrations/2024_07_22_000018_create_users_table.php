@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('refesh_token')->nullable();
             $table->datetime('login_at');
             $table->timestamps();
+            $table->integer('status')->default(1);
             $table->unsignedBigInteger('rank_id');
             $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('address_id');
