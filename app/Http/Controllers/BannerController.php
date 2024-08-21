@@ -45,7 +45,6 @@ class BannerController extends Controller
      */
     public function store(BannerRequest $rqt )
     {
-
         $image = $rqt->file('image');
         $cloudinary = new Cloudinary();
 
@@ -62,6 +61,7 @@ class BannerController extends Controller
             // 'create_by',
             // 'update_by',
         ];
+
         try {
             $banner = Banner::create( $dataInsert );
 
