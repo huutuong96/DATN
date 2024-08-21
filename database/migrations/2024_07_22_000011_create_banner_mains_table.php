@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('content')->nullable();
-            $table->string('URL')->nullable();
+            $table->text('URL')->nullable();
             $table->integer('status')->default(1);
             $table->integer('index')->nullable();
-            $table->integer('create_by');
+            $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
             $table->timestamps();
         });

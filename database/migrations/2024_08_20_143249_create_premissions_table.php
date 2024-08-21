@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('premissions', function (Blueprint $table) {
             $table->id();
             $table->string('premissionName');
-            $table->integer('status');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

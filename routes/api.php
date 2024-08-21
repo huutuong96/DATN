@@ -7,6 +7,10 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\RanksController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\FAQController;
+use App\Http\Controllers\TaxController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,15 +23,32 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::group(['middleware' => 'checkToken'], function () {
-    Route::resource('user', AuthenController::class);
-    Route::post('user/me', [AuthenController::class, "me"]);
+Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
+
 
     Route::resource('role', RolesController::class);
-    Route::resource('rank', RanksController::class);
+    
     Route::resource('address', AddressController::class);
 
+
+            Route::resource('user', AuthenController::class);
+            Route::post('user/me', [AuthenController::class, "me"]);
+
+            Route::resource('role', RolesController::class);
+            
+            Route::resource('address', AddressController::class);
+            Route::resource('permission', PermissionsController::class);
+
+            Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
+            Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
+            Route::resource('banners', BannerController::class);
+            Route::resource('faqs', FAQController::class);
+            Route::resource('taxs', TaxController::class);
+            Route::resource('ranks', RanksController::class);
+
 });
+
+//tường làm
 
 
 
@@ -39,4 +60,4 @@ Route::post('user/login', [AuthenController::class, "login"]);
 //     return $request->user();
 // });
 
-Route::resource('users', UserController::class);
+// Route::resource('users', UserController::class);

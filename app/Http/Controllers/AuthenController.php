@@ -11,9 +11,6 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthenController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         try {
@@ -94,7 +91,28 @@ class AuthenController extends Controller
 
     public function show(string $id)
     {
-        // Code for showing a specific resource
+        try {
+            // Xác thực người dùng bằng token JWT
+            $user = UsersModel::where('id', $id)->first();
+            // dd($user);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Lấy dữ liệu thành công',
+                'data' => $user,
+            ], 200);
+        } catch (JWTException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token không hợp lệ hoặc không tồn tại',
+                'error' => $e->getMessage(),
+            ], 401); // Sử dụng 401 cho lỗi xác thực
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Lấy dữ liệu thất bại',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function me(Request $request)
@@ -122,21 +140,30 @@ class AuthenController extends Controller
             ], 500);
         }
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(UserRequest $request, string $id)
     {
-        // Code for editing a specific resource
-    }
+        $dataUpdate = [
+            "fullname"=> $request->fullname,
+            "password"=> $request->password,
+            "phone"=> $request->phone,
+            "email"=> $request->email,
+            "description"=> $request->description,
+            "genre"=> $request->genre,
+            "datebirth"=> $request->datebirth,
+            "avatar"=> $request->avatar,
+            "rank_id"=> $request->rank_id,
+            "role_id"=> $request->role_id,
+            "address_id"=> $request->address_id,
+            "login_at"=> now(),
+        ];
+        $user = UsersModel::where('id', $id)->update($dataUpdate);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        // Code for updating a specific resource
+        $dataDone = [
+            'status' => true,
+            'message' => "user Đã được cập nhật",
+            'users' => UsersModel::all(),
+        ];
+        return response()->json($dataDone, 200);
     }
 
     /**
@@ -144,6 +171,16 @@ class AuthenController extends Controller
      */
     public function destroy(string $id)
     {
-        // Code for deleting a specific resource
+        $dataUpdate = [
+            "status"=> 4,
+        ];
+        $user = UsersModel::where('id', $id)->update($dataUpdate);
+
+        $dataDone = [
+            'status' => true,
+            'message' => "user đã được vô hiệu hóa",
+            'users' => UsersModel::all(),
+        ];
+        return response()->json($dataDone, 200);
     }
 }
