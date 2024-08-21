@@ -42,8 +42,4 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 Route::post('user/register', [AuthenController::class, "register"]);
 Route::post('user/login', [AuthenController::class, "login"]);
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 
-// Route::resource('users', UserController::class);
