@@ -1,14 +1,13 @@
 <?php
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\UsersModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
-
-use Illuminate\Http\Request;
 
 class AuthenController extends Controller
 {
@@ -40,6 +39,7 @@ class AuthenController extends Controller
             ], 500);
         }
     }
+
     public function register(UserRequest $request)
     {
         $dataInsert = [
@@ -69,7 +69,8 @@ class AuthenController extends Controller
         return response()->json($dataDone, 200);
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $user = UsersModel::where('email', $request->email)->first();
         if (!$user) {
             return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
@@ -89,15 +90,13 @@ class AuthenController extends Controller
             ];
             return response()->json($dataDone, 200);
         }
-
     }
-
-
 
     public function show(string $id)
     {
-
+        // Code for showing a specific resource
     }
+
     public function me(Request $request)
     {
         try {
@@ -129,7 +128,7 @@ class AuthenController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        // Code for editing a specific resource
     }
 
     /**
@@ -137,7 +136,7 @@ class AuthenController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Code for updating a specific resource
     }
 
     /**
@@ -145,6 +144,6 @@ class AuthenController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // Code for deleting a specific resource
     }
 }
