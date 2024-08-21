@@ -1,23 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\RanksModel;
-use App\Http\Requests\RankRequest;
-use Illuminate\Http\Request;
 
-class RanksController extends Controller
+use Illuminate\Http\Request;
+use App\Http\Requests\FAQRequest;
+use App\Models\FAQ;
+
+class FAQController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $ranks = RanksModel::all();
-        if($ranks->isEmpty()){
+        $faqs = FAQ::all();
+        if($faqs->isEmpty()){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại rank nào",
+                    'message' => "Không tồn tại faq nào",
                 ]
             );
         }
@@ -25,7 +26,7 @@ class RanksController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $ranks,
+                'data' => $faqs,
             ]
         );
     }
@@ -41,20 +42,34 @@ class RanksController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RankRequest $request)
+    public function store(FAQRequest $rqt)
     {
         $dataInsert = [
-            "title"=> $request->title,
-            "desciption"=> $request->desciption,
-            "status"=> $request->status,
+            'title' => $rqt->title,
+            'content' => $rqt->content,
+            'status' => $rqt->status,
+            'index' => $rqt->index,
         ];
-        RanksModel::create($dataInsert);
-        $dataDone = [
-            'status' => true,
-            'message' => "Rank Đã được lưu",
-            'Ranks' => RanksModel::all(),
-        ];
-        return response()->json($dataDone, 200);
+       
+        try {
+            $faq = FAQ::create( $dataInsert );
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm FAQ thành công",
+                    'data' => $faq,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm FAQ không thành công",
+                    'error' => $th->getMessage(),
+                ]
+            );
+        }
     }
 
     /**
@@ -62,12 +77,12 @@ class RanksController extends Controller
      */
     public function show(string $id)
     {
-        $rank = RanksModel::find($id);
-        if(!$rank){
+        $faq = FAQ::find($id);
+        if(!$faq){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại rank nào",
+                    'message' => "Không tồn tại faq nào",
                 ]
             );
         }
@@ -75,7 +90,7 @@ class RanksController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $rank,
+                'data' => $faq,
             ]
         );
     }
@@ -91,17 +106,17 @@ class RanksController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RankRequest $request, string $id)
+    public function update(FAQRequest $rqt, string $id)
     {
-        // Tìm rank theo ID
-        $rank = RanksModel::find($id);
+        // Tìm faq theo ID
+        $faq = FAQ::find($id);
         
         // Kiểm tra xem rqt có tồn tại không
-        if (!$rank) {
+        if (!$faq) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "rank không tồn tại",
+                    'message' => "faq không tồn tại",
                 ],
                 404
             );
@@ -109,28 +124,29 @@ class RanksController extends Controller
     
         // Cập nhật dữ liệu
         $dataUpdate = [
-            "title"=> $request->title,
-            "desciption"=> $request->desciption ?? null,
-            "status"=> $request->status,
-            'created_at' => $request->created_at ?? $rank->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+            'title' => $rqt->title,
+            'content' => $rqt->content,
+            'status' => $rqt->status,
+            'index' => $rqt->index,
+            'created_at' => $rqt->created_at ?? $faq->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
     
         try {
             // Cập nhật bản ghi
-            $rank->update($dataUpdate);
+            $faq->update($dataUpdate);
     
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Cập nhật rank thành công",
-                    'data' => $rank,
+                    'message' => "Cập nhật rqt thành công",
+                    'data' => $faq,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật rank không thành công",
+                    'message' => "Cập nhật faq không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -143,27 +159,27 @@ class RanksController extends Controller
     public function destroy(string $id)
     {
         try {
-            $rank = RanksModel::find($id);
+            $faq = FAQ::find($id);
            
-            if (!$rank) {
+            if (!$faq) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'rank không tồn tại',
+                    'message' => 'faq không tồn tại',
                 ], 404);
             }
 
             // Xóa bản ghi
-            $rank->delete();
+            $faq->delete();
 
              return response()->json([
                     'status' => true,
-                    'message' => 'Xóa rank thành công',
+                    'message' => 'Xóa faq thành công',
                 ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa rank không thành công",
+                    'message' => "xóa faq không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
