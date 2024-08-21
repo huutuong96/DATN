@@ -44,6 +44,7 @@ class BannerController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(BannerRequest $rqt )
+    {
 
         $image = $rqt->file('image');
         $cloudinary = new Cloudinary();
