@@ -9,7 +9,11 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\BrandsController;
+use App\Http\Controllers\ColorsController;
 use App\Http\Controllers\FAQController;
+use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\ShipsController;
 use App\Http\Controllers\TaxController;
 
 /*
@@ -50,8 +54,11 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
 //tường làm
 
-
-
+//Thy làm
+Route::resource('ships',ShipsController::class);
+Route::resource('payments',PaymentsController::class);
+Route::resource('brands',BrandsController::class);
+Route::resource('colors',ColorsController::class);
 
 Route::post('user/register', [AuthenController::class, "register"]);
 Route::post('user/login', [AuthenController::class, "login"]);
