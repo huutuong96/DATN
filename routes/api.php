@@ -11,6 +11,7 @@ use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
+use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ShipsController;
@@ -53,6 +54,9 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
 
 });
+
+// Thêm Route coupons(Thy)
+Route::resource('coupons',CouponsController::class);
 
 Route::post('user/register', [AuthenController::class, "register"]);
 Route::post('user/login', [AuthenController::class, "login"]);
