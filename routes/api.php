@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Notification_to_mainController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenController;
@@ -71,6 +72,9 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
 // Thêm Route coupons(Thy)
 Route::resource('coupons',CouponsController::class);
+Route::resource('notification_to_main', Notification_to_mainController::class);
+
+
 
 Route::post('user/register', [AuthenController::class, "register"]);
 Route::post('user/login', [AuthenController::class, "login"]);
