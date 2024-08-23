@@ -135,6 +135,7 @@ class ShopController extends Controller
                 404
             );
         }
+<<<<<<< HEAD
        // Check xem co anh moi duoc tai len khong
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
@@ -145,6 +146,18 @@ class ShopController extends Controller
                 // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
                 $imageUrl = $brands->image;
             }
+=======
+
+        $image = $rqt->file('image');
+
+        $cloudinary = new Cloudinary();
+        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
+
+        // $user = JWTAuth::parseToken()->authenticate();
+        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
+
+
+>>>>>>> 2813359a5b5a277c62459ea612e573f263e2a16e
 
         $dataInsert = [
             'shop_name' => $rqt->shop_name,
