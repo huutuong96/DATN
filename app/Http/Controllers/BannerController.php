@@ -116,6 +116,11 @@ class BannerController extends Controller
      */
     public function update(Request $rqt, $id)
     {
+        $image = $rqt->file('image');
+        if ($image) {
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        }
         // Tìm banner theo ID
         $banner = Banner::find($id);
         // Kiểm tra xem banner có tồn tại không
@@ -130,11 +135,11 @@ class BannerController extends Controller
         }
         // Cập nhật dữ liệu
         $dataUpdate = [
-            'title' => $rqt->title,
-            'content' => $rqt->content,
-            'URL' => $rqt->URL,
-            'status' => $rqt->status,
-            'index' => $rqt->index,
+            'title' => $rqt->title ?? $banner->title,
+            'content' => $rqt->content ?? $banner->content,
+            'URL' => $uploadedImage['secure_url'] ?? $banner->URL,
+            'status' => $rqt->status ?? $banner->status,
+            'index' => $rqt->index ?? $banner->index,
             'created_at' => $rqt->created_at ?? $banner->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
 
