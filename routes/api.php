@@ -19,6 +19,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\LearnController;
+use App\Http\Controllers\ShopController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ use App\Http\Controllers\LearnController;
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
 
-            Route::resource('user', AuthenController::class);
+            Route::resource('users', AuthenController::class);
             Route::post('user/me', [AuthenController::class, "me"]);
             Route::resource('role', RolesController::class);
             Route::resource('address', AddressController::class);
@@ -60,6 +61,10 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('address', AddressController::class);
             Route::resource('messages', MessageController::class);
 
+
+            Route::resource('role', RolesController::class);
+            Route::resource('shops', ShopController::class);
+
             Route::resource('voucher_main', VoucherToMainController::class);
 
 
@@ -67,7 +72,8 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
 });
 
-Route::post('user/register', [AuthenController::class, "register"]);
-Route::post('user/login', [AuthenController::class, "login"]);
+Route::post('users/register', [AuthenController::class, "register"]);
+Route::post('users/login', [AuthenController::class, "login"]);
+
 
 
