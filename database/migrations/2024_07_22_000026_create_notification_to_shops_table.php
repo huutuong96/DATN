@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->integer('status')->default(1);
             $table->unsignedBigInteger('shop_id');
-            $table->integer('create_by');
+            $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
             $table->timestamps();
 

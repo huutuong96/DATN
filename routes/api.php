@@ -15,6 +15,8 @@ use App\Http\Controllers\FAQController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ShipsController;
 use App\Http\Controllers\TaxController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ShopController;
@@ -46,24 +48,25 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('ranks', RanksController::class);
 
 
-            
-            // categori learns
-            Route::resource('categori_learns', CategorilearnsController::class);
-            // address
-            Route::resource('address', AddressController::class);
-
-            //Role
-            Route::resource('role', RolesController::class);
-            //LEARN
-            Route::resource('learn', LearnController::class);
-
             Route::resource('ships',ShipsController::class);
             Route::resource('payments',PaymentsController::class);
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
 
+
+            Route::resource('categori_learns', CategorilearnsController::class);
+            Route::resource('address', AddressController::class);
             Route::resource('role', RolesController::class);
- 
+            Route::resource('learn', LearnController::class);
+
+            Route::resource('address', AddressController::class);
+            Route::resource('messages', MessageController::class);
+
+
+            Route::resource('role', RolesController::class);
+            Route::resource('shops', ShopController::class);
+
+            Route::resource('voucher_main', VoucherToMainController::class);
 
 
 
@@ -73,15 +76,5 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 
-// categori learns
-Route::resource('categori_learns', CategorilearnsController::class);
-// address
-Route::resource('address', AddressController::class);
 
-//Role
-Route::resource('role', RolesController::class);
-//LEARN
-Route::resource('learn', LearnController::class);
 
-// tường làm ngày 23/8
-Route::resource('shops', ShopController::class);
