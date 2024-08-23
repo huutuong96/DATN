@@ -136,21 +136,22 @@ class ShopController extends Controller
             );
         }
 
-        $image = $rqt->file('image');
-
-        $cloudinary = new Cloudinary();
-        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
-
-        // $user = JWTAuth::parseToken()->authenticate(); 
-        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
-
-        
+       // Check xem co anh moi duoc tai len khong
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $cloudinary = new Cloudinary();
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $imageUrl = $uploadedImage['secure_url'];
+            } else {
+                // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
+                $imageUrl = $brands->image;
+            }
 
         $dataInsert = [
             'shop_name' => $rqt->shop_name,
             'pick_up_address' => $rqt->pick_up_address ,
             'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
-            'image' => $uploadedImage['secure_url'] ?? "",// thêm ?? để tranh lỗi khi test băng post man
+            'image' => $imageUrl,
             'cccd' => $rqt->cccd,
             'status' => $rqt->status ,
             'tax_id' => $rqt->tax_id,
