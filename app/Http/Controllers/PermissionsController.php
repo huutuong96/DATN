@@ -129,7 +129,6 @@ class PermissionsController extends Controller
     public function delete_access(Request $request)
     {
 
-
             $roleExist = RolesModel::where('id', $request->role_id)->first();
             if (!$roleExist) {
                 return response()->json([
@@ -137,6 +136,7 @@ class PermissionsController extends Controller
                     'message' => 'Role này không tồn tại',
                 ], 404);
             }
+
             // Kiểm tra xem quyền đã tồn tại cho role chưa
             $permissionExist = role_permissionModel::where([
                 ['role_id', '=', $request->role_id],

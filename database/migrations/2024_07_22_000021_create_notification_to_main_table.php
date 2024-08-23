@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('image')->nullable();
             $table->integer('status')->default(1);
-            $table->integer('create_by');
+            $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
             $table->timestamps();
         });

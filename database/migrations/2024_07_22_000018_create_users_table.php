@@ -28,7 +28,7 @@ return new class extends Migration
             $table->integer('status')->default(1);
             $table->unsignedBigInteger('rank_id');
             $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('address_id');
+            $table->unsignedBigInteger('address_id')->nullable();
 
             $table->foreign('rank_id')->references('id')->on('ranks')->onDelete('restrict')->onUpdate('restrict');
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('restrict')->onUpdate('restrict');
