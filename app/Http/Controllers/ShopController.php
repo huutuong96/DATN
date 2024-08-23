@@ -50,7 +50,7 @@ class ShopController extends Controller
         $image = $rqt->file('image');
 
         $cloudinary = new Cloudinary();
-        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
 
         // $user = JWTAuth::parseToken()->authenticate();
         // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
