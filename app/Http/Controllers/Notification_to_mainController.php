@@ -127,9 +127,10 @@ class Notification_to_mainController extends Controller
                 ], 404);
             }
 
+            $image = $request->file('image');
+
             // Check xem co anh moi duoc tai len khong
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
+            if ($image) {
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $imageUrl = $uploadedImage['secure_url'];

@@ -128,9 +128,10 @@ class ColorsController extends Controller
                 ], 404);
             }
 
+            $image = $request->file('image');
+
             // Check xem co anh moi duoc tai len khong
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
+            if ($image) {
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $imageUrl = $uploadedImage['secure_url'];
@@ -140,11 +141,11 @@ class ColorsController extends Controller
             }
 
             $dataUpdate = [
-                'title' => $request->title,
-                'index' => $request->index,
-                'image' => $imageUrl,
-                'status' => $request->status,
-                'update_by' => $request->update_by,
+                'title' => $request->title ?? $colors->title,
+                'index' => $request->index ?? $colors->index,
+                'image' => $imageUrl ?? $colors->image,
+                'status' => $request->status ?? $colors->status,
+                'update_by' => $request->update_by ?? $colors->update_by,
                 'updated_at' => now(),
             ];
 
