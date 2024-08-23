@@ -16,6 +16,8 @@ use App\Http\Controllers\FAQController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ShipsController;
 use App\Http\Controllers\TaxController;
+use App\Http\Controllers\CategorilearnsController;
+use App\Http\Controllers\LearnController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +45,18 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('taxs', TaxController::class);
             Route::resource('ranks', RanksController::class);
 
+
+            
+            // categori learns
+            Route::resource('categori_learns', CategorilearnsController::class);
+            // address
+            Route::resource('address', AddressController::class);
+
+            //Role
+            Route::resource('role', RolesController::class);
+            //LEARN
+            Route::resource('learn', LearnController::class);
+
             Route::resource('ships',ShipsController::class);
             Route::resource('payments',PaymentsController::class);
             Route::resource('brands',BrandsController::class);
@@ -50,7 +64,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
     Route::resource('role', RolesController::class);
 
-    Route::resource('address', AddressController::class);
+
 
 
 });
@@ -61,4 +75,12 @@ Route::resource('coupons',CouponsController::class);
 Route::post('user/register', [AuthenController::class, "register"]);
 Route::post('user/login', [AuthenController::class, "login"]);
 
+// categori learns
+Route::resource('categori_learns', CategorilearnsController::class);
+// address
+Route::resource('address', AddressController::class);
 
+//Role
+Route::resource('role', RolesController::class);
+//LEARN
+Route::resource('learn', LearnController::class);
