@@ -52,7 +52,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
 
-
             Route::resource('categori_learns', CategorilearnsController::class);
             Route::resource('address', AddressController::class);
             Route::resource('role', RolesController::class);
@@ -60,7 +59,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
             Route::resource('address', AddressController::class);
             Route::resource('messages', MessageController::class);
-
 
             Route::resource('voucher_main', VoucherToMainController::class);
 
