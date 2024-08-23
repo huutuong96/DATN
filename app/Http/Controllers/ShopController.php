@@ -39,7 +39,7 @@ class ShopController extends Controller
      */
     public function create(ShopRequest $rqt)
     {
-        
+
     }
 
     /**
@@ -50,12 +50,12 @@ class ShopController extends Controller
         $image = $rqt->file('image');
 
         $cloudinary = new Cloudinary();
-        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
 
-        // $user = JWTAuth::parseToken()->authenticate(); 
+        // $user = JWTAuth::parseToken()->authenticate();
         // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
 
-        
+
 
         $dataInsert = [
             'shop_name' => $rqt->shop_name,
@@ -135,7 +135,6 @@ class ShopController extends Controller
                 404
             );
         }
-
        // Check xem co anh moi duoc tai len khong
             if ($request->hasFile('image')) {
                 $image = $request->file('image');

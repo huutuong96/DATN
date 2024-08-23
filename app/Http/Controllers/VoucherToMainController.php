@@ -1,25 +1,27 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\voucher_to_main;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
+use App\Http\Requests\VoucherRequest;
 
-use Cloudinary\Cloudinary;
+
 use Illuminate\Http\Request;
-use App\Http\Requests\BannerRequest;
-use App\Models\Banner;
 
-class BannerController extends Controller
+class VoucherToMainController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $banners = Banner::all();
-        if($banners->isEmpty()){
+        $voucherMain = voucher_to_main::all();
+        if($voucherMain->isEmpty()){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại banner nào",
+                    'message' => "Không tồn tại voucher main nào",
                 ]
             );
         }
@@ -27,7 +29,7 @@ class BannerController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $banners,
+                'data' => $taxs,
             ]
         );
     }
@@ -43,36 +45,34 @@ class BannerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BannerRequest $rqt )
+    public function store(VoucherRequest $request)
     {
-        $image = $rqt->file('image');
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
         $dataInsert = [
-            'title' => $rqt->title,
-            'content' => $rqt->content,
-            'URL' => $uploadedImage['secure_url'],
-            'status' => $rqt->status,
-            'index' => $rqt->index,
-            // 'create_by',
-            // 'update_by',
+            'title' => $request->title,
+            'description' => $request->description,
+            'quantity' => $request->quantity,
+            'condition' => $request->condition,
+            'ratio' => $request->ratio,
+            'code' => $request->code,
+            'status' => $request->status,
         ];
 
+
         try {
-            $banner = Banner::create( $dataInsert );
+            $voucherMain = voucher_to_main::create( $dataInsert );
 
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Thêm banner thành công",
-                    'data' => $banner,
+                    'message' => "Thêm voucherMain thành công",
+                    'data' => $voucherMain,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Thêm banner không thành công",
+                    'message' => "Thêm voucherMain không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -84,13 +84,12 @@ class BannerController extends Controller
      */
     public function show(string $id)
     {
-        $banner = Banner::find($id);
-
-        if(!$banner){
+        $voucherMain = voucher_to_main::find($id);
+        if(!$voucherMain){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại banner nào",
+                    'message' => "Không tồn tại voucher Main nào",
                 ]
             );
         }
@@ -98,7 +97,7 @@ class BannerController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $banner,
+                'data' => $voucherMain,
             ]
         );
     }
@@ -114,51 +113,48 @@ class BannerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $rqt, $id)
+    public function update(VoucherRequest $request, string $id)
     {
-        $image = $rqt->file('image');
-        if ($image) {
-            $cloudinary = new Cloudinary();
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        }
-        // Tìm banner theo ID
-        $banner = Banner::find($id);
-        // Kiểm tra xem banner có tồn tại không
-        if (!$banner) {
+        $voucherMain = voucher_to_main::find($id);
+
+        // Kiểm tra xem rqt có tồn tại không
+        if (!$voucherMain) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Banner không tồn tại",
+                    'message' => "voucher main không tồn tại",
                 ],
                 404
             );
         }
+
         // Cập nhật dữ liệu
         $dataUpdate = [
-            'title' => $rqt->title ?? $banner->title,
-            'content' => $rqt->content ?? $banner->content,
-            'URL' => $uploadedImage['secure_url'] ?? $banner->URL,
-            'status' => $rqt->status ?? $banner->status,
-            'index' => $rqt->index ?? $banner->index,
-            'created_at' => $rqt->created_at ?? $banner->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+            'title' => $request->title,
+            'description' => $request->description,
+            'quantity' => $request->quantity,
+            'condition' => $request->condition,
+            'ratio' => $request->ratio,
+            'code' => $request->code,
+            'status' => $request->status,
         ];
-
 
         try {
             // Cập nhật bản ghi
-            $banner->update($dataUpdate);
+            $voucherMain->update($dataUpdate);
+
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Cập nhật banner thành công",
-                    'data' => $banner,
+                    'message' => "Cập nhật voucher main thành công",
+                    'data' => $voucherMain,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật banner không thành công",
+                    'message' => "Cập nhật voucher main không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -170,30 +166,28 @@ class BannerController extends Controller
      */
     public function destroy(string $id)
     {
-
-
         try {
-            $banner = Banner::find($id);
+            $voucherMain = voucher_to_main::find($id);
 
-            if (!$banner) {
+            if (!$voucherMain) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Banner không tồn tại',
+                    'message' => 'voucher main không tồn tại',
                 ], 404);
             }
 
             // Xóa bản ghi
-            $banner->delete();
+            $voucherMain->delete();
 
              return response()->json([
                     'status' => true,
-                    'message' => 'Xóa banner thành công',
+                    'message' => 'Xóa voucher main thành công',
                 ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa banner không thành công",
+                    'message' => "xóa voucher main không thành công",
                     'error' => $th->getMessage(),
                 ]
             );

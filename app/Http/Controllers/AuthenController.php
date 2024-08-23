@@ -120,7 +120,7 @@ class AuthenController extends Controller
         try {
             // Xác thực người dùng bằng token JWT
             $user = JWTAuth::parseToken()->authenticate();
-
+            // dd($user);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
