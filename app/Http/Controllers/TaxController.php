@@ -50,7 +50,7 @@ class TaxController extends Controller
             'tax_number' => $rqt->tax_number,
             'status' => $rqt->status,
         ];
-       
+
         try {
             $tax = Tax::create( $dataInsert );
 
@@ -110,7 +110,7 @@ class TaxController extends Controller
     {
         // Tìm tax theo ID
         $tax = Tax::find($id);
-        
+
         // Kiểm tra xem rqt có tồn tại không
         if (!$tax) {
             return response()->json(
@@ -121,7 +121,7 @@ class TaxController extends Controller
                 404
             );
         }
-    
+
         // Cập nhật dữ liệu
         $dataUpdate = [
             'title' => $rqt->title,
@@ -130,11 +130,11 @@ class TaxController extends Controller
             'status' => $rqt->status,
             'created_at' => $rqt->created_at ?? $tax->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
-    
+
         try {
             // Cập nhật bản ghi
             $tax->update($dataUpdate);
-    
+
             return response()->json(
                 [
                     'status' => true,
@@ -160,7 +160,7 @@ class TaxController extends Controller
     {
         try {
             $tax = Tax::find($id);
-           
+
             if (!$tax) {
                 return response()->json([
                     'status' => false,

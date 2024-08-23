@@ -4,22 +4,24 @@ namespace App\Http\Controllers;
 
 use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
-use App\Http\Requests\BannerRequest;
-use App\Models\Banner;
+use App\Http\Requests\ShopRequest;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\Shop;
+use Illuminate\Support\Str;
 
-class BannerController extends Controller
+class ShopController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $banners = Banner::all();
-        if($banners->isEmpty()){
+        $Shops = Shop::all();
+        if($Shops->isEmpty()){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại banner nào",
+                    'message' => "Không tồn tại Shops nào",
                 ]
             );
         }
@@ -27,7 +29,7 @@ class BannerController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $banners,
+                'data' => $Shops,
             ]
         );
     }
@@ -35,44 +37,50 @@ class BannerController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(ShopRequest $rqt)
     {
-        //
+
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BannerRequest $rqt )
+    public function store(Request $rqt)
     {
         $image = $rqt->file('image');
+
         $cloudinary = new Cloudinary();
         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        $dataInsert = [
-            'title' => $rqt->title,
-            'content' => $rqt->content,
-            'URL' => $uploadedImage['secure_url'],
-            'status' => $rqt->status,
-            'index' => $rqt->index,
-            // 'create_by',
-            // 'update_by',
-        ];
 
+        // $user = JWTAuth::parseToken()->authenticate();
+        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
+
+
+
+        $dataInsert = [
+            'shop_name' => $rqt->shop_name,
+            'pick_up_address' => $rqt->pick_up_address ,
+            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
+            'image' => $uploadedImage['secure_url'] ?? "",// thêm ?? để tranh lỗi khi test băng post man
+            'cccd' => $rqt->cccd,
+            'status' => $rqt->status ,
+            'tax_id' => $rqt->tax_id,
+        ];
         try {
-            $banner = Banner::create( $dataInsert );
+            $Shop = Shop::create( $dataInsert );
 
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Thêm banner thành công",
-                    'data' => $banner,
+                    'message' => "Thêm Shop thành công",
+                    'data' => $Shop,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Thêm banner không thành công",
+                    'message' => "Thêm Shop không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -84,13 +92,13 @@ class BannerController extends Controller
      */
     public function show(string $id)
     {
-        $banner = Banner::find($id);
+        $Shops = Shop::find($id);
 
-        if(!$banner){
+        if(!$Shops){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại banner nào",
+                    'message' => "Không tồn tại Shop nào",
                 ]
             );
         }
@@ -98,7 +106,7 @@ class BannerController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $banner,
+                'data' => $Shops,
             ]
         );
     }
@@ -114,46 +122,55 @@ class BannerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $rqt, $id)
+    public function update(Request $rqt, string $id)
     {
-        // Tìm banner theo ID
-        $banner = Banner::find($id);
-        // Kiểm tra xem banner có tồn tại không
-        if (!$banner) {
+        $shop = Shop::find($id);
+
+        if (!$shop) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Banner không tồn tại",
+                    'message' => "shop không tồn tại",
                 ],
                 404
             );
         }
-        // Cập nhật dữ liệu
-        $dataUpdate = [
-            'title' => $rqt->title,
-            'content' => $rqt->content,
-            'URL' => $rqt->URL,
-            'status' => $rqt->status,
-            'index' => $rqt->index,
-            'created_at' => $rqt->created_at ?? $banner->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+
+        $image = $rqt->file('image');
+
+        $cloudinary = new Cloudinary();
+        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
+
+        // $user = JWTAuth::parseToken()->authenticate();
+        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
+
+
+
+        $dataInsert = [
+            'shop_name' => $rqt->shop_name,
+            'pick_up_address' => $rqt->pick_up_address ,
+            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
+            'image' => $uploadedImage['secure_url'] ?? "",// thêm ?? để tranh lỗi khi test băng post man
+            'cccd' => $rqt->cccd,
+            'status' => $rqt->status ,
+            'tax_id' => $rqt->tax_id,
+            'created_at' => $rqt->created_at ?? $shop->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
-
-
         try {
-            // Cập nhật bản ghi
-            $banner->update($dataUpdate);
+            $shop->update($dataInsert);
+
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Cập nhật banner thành công",
-                    'data' => $banner,
+                    'message' => "cập nhật thông tin Shop thành công",
+                    'data' => $shop,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
-                    'status' => false,
-                    'message' => "Cập nhật banner không thành công",
+                    'status' => true,
+                    'message' => "cập nhật thông tin Shop không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -165,30 +182,28 @@ class BannerController extends Controller
      */
     public function destroy(string $id)
     {
-
-
         try {
-            $banner = Banner::find($id);
+            $shop = Shop::find($id);
 
-            if (!$banner) {
+            if (!$shop) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Banner không tồn tại',
+                    'message' => 'shop không tồn tại',
                 ], 404);
             }
 
             // Xóa bản ghi
-            $banner->delete();
+            $shop->delete();
 
              return response()->json([
                     'status' => true,
-                    'message' => 'Xóa banner thành công',
+                    'message' => 'Xóa shop thành công',
                 ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa banner không thành công",
+                    'message' => "xóa shop không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
