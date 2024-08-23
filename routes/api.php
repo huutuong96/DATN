@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Notification_to_mainController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
+use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ShipsController;
@@ -53,7 +55,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
 
-
             Route::resource('categori_learns', CategorilearnsController::class);
             Route::resource('address', AddressController::class);
             Route::resource('role', RolesController::class);
@@ -68,13 +69,20 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
             Route::resource('voucher_main', VoucherToMainController::class);
 
-
+            Route::resource('coupons',CouponsController::class);
+            Route::resource('notification_to_main', Notification_to_mainController::class);
 
 
 });
 
+
+
+
+
+=======
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
+
 
 
 

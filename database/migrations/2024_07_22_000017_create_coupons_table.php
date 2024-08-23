@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(1);
-            $table->float('% coupon')->nullable();
+            $table->float('coupon_percentage')->nullable();
             $table->string('condition');
-            $table->integer('create_by');
+            $table->integer('create_by')->nullable();
             $table->timestamps();
         });
     }

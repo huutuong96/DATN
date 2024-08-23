@@ -24,7 +24,7 @@ class ShopRequest extends FormRequest
         return [
             'shop_name' => 'required|string',
             'pickup_address' => 'string',
-            'image' => 'required|url',
+            // 'image' => 'required|url',
             'tax_id' => 'required|number',
             'cccd' => 'required|string',
             'status' => 'number|required',
