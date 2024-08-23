@@ -17,6 +17,8 @@ use App\Http\Controllers\ShipsController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\VoucherToMainController;
+use App\Http\Controllers\CategorilearnsController;
+use App\Http\Controllers\LearnController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,18 +46,24 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('taxs', TaxController::class);
             Route::resource('ranks', RanksController::class);
 
+
             Route::resource('ships',ShipsController::class);
             Route::resource('payments',PaymentsController::class);
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
 
+
+            Route::resource('categori_learns', CategorilearnsController::class);
+            Route::resource('address', AddressController::class);
             Route::resource('role', RolesController::class);
+            Route::resource('learn', LearnController::class);
 
             Route::resource('address', AddressController::class);
             Route::resource('messages', MessageController::class);
 
 
             Route::resource('voucher_main', VoucherToMainController::class);
+
 
 
 
