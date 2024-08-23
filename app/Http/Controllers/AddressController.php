@@ -11,7 +11,20 @@ class AddressController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $Address = AddressModel::all();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dữ liệu được lấy thành công',
+                'data' =>  $Address ,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 500);
+        }
     }
 
     /**
@@ -27,11 +40,15 @@ class AddressController extends Controller
      */
     public function store(AddressRequest $request)
     {
-        $dataInsert = [
+        $Address = [
             "address"=> $request->address,
-            "create_by"=> $request->create_by,
+            "type"=> $request->type,
+            "status"=> $request->status,
+            "default"=> $request->default,
+            'create_by' => $request->input('create_by') ?? null,
+           
         ];
-        AddressModel::create($dataInsert);
+        AddressModel::create($Address);
         $dataDone = [
             'status' => true,
             'message' => "address Đã được lưu",
@@ -45,7 +62,20 @@ class AddressController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $Address = AddressModel::findOrFail($id);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Lấy dữ liệu thành công',
+                'data' => $Address,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 400);
+        }
     }
 
     /**
@@ -59,9 +89,25 @@ class AddressController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(AddressRequest $request, string $id)
     {
-        //
+        $Address = AddressModel::findOrFail($id);
+
+        $Address->update([
+            "address"=> $request->address,
+            "type"=> $request->type,
+            "status"=> $request->status,
+            "default"=> $request->default,
+            'create_by' => $request->input('create_by') ?? null,
+            "updated_at"=> now(),
+        ]);
+    
+        $dataDone = [
+            'status' => true,
+            'message' => "đã lưu Address",
+            'roles' => AddressModel::all(),
+        ];
+        return response()->json($dataDone, 200);
     }
 
     /**
@@ -69,6 +115,20 @@ class AddressController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $Address = AddressModel::findOrFail($id);
+            $Address->delete();
+            return response()->json([
+                'status' => "success",
+                'message' => 'Xóa thành công',
+                'data' => null,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 500);
+        }
     }
 }

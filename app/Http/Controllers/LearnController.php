@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\RolesModel;
-use App\Http\Requests\RoleRequest;
+
+use App\Http\Requests\LearnRequest;
+use App\Models\LearnModel;
 
 use Illuminate\Http\Request;
 
-class RolesController extends Controller
+class LearnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,11 +15,11 @@ class RolesController extends Controller
     public function index()
     {
         try {
-            $Roles = RolesModel::all();
+            $Learn = LearnModel::all();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Roles ,
+                'data' =>  $Learn ,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -40,20 +41,22 @@ class RolesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoleRequest $request)
+    public function store(Request $request)
     {
+       
         $dataInsert = [
             "title"=> $request->title,
-            "description"=> $request->description,
+            "content"=> $request->content,
             "status"=> $request->status,
-            "create_by"=> $request->create_by,
+            "category_id"=> $request->category_id,
+            'create_by' => $request->input('create_by') ?? null,
             "created_at"=> now(),
         ];
-        RolesModel::create($dataInsert);
+        LearnModel::create($dataInsert);
         $dataDone = [
             'status' => true,
-            'message' => "Role Đã được lưu",
-            'roles' => RolesModel::all(),
+            'message' => "đã lưu Learn",
+            'data' => LearnModel::all(),
         ];
         return response()->json($dataDone, 200);
     }
@@ -64,11 +67,11 @@ class RolesController extends Controller
     public function show(string $id)
     {
         try {
-            $Role = RolesModel::findOrFail($id);
+            $Learn = LearnModel::findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $Role,
+                'data' => $Learn,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -90,25 +93,25 @@ class RolesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RoleRequest $request, string $id)
-    {
-        $Role = RolesModel::findOrFail($id);
+    public function update(LearnRequest $request, string $id)
+{
+    $Learn = LearnModel::findOrFail($id);
 
-        $Role->update([
-            "title"=> $request->title,
-            "description"=> $request->description,
-            "status"=> $request->status,
-            "create_by"=> $request->create_by,
-            "updated_at"=> now(),
-        ]);
-    
-        $dataDone = [
-            'status' => true,
-            'message' => "đã lưu Role",
-            'roles' => RolesModel::all(),
-        ];
-        return response()->json($dataDone, 200);
-    }
+    $Learn->update([
+        "title" => $request->title,
+        "status" => $request->status,
+        "category_id"=>$request->category_id,
+        'create_by' => $request->input('create_by') ?? null,
+        "updated_at" => now(),
+    ]);
+
+    $dataDone = [
+        'status' => true,
+        'message' => "đã lưu Learn",
+        'roles' => LearnModel::all(),
+    ];
+    return response()->json($dataDone, 200);
+}
 
     /**
      * Remove the specified resource from storage.
@@ -116,8 +119,8 @@ class RolesController extends Controller
     public function destroy(string $id)
     {
         try {
-            $Role = RolesModel::findOrFail($id);
-            $Role->delete();
+            $Learn = LearnModel::findOrFail($id);
+            $Learn->delete();
             return response()->json([
                 'status' => "success",
                 'message' => 'Xóa thành công',
