@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('type')->nullalbe();
             $table->integer('status')->default(1);
-            $table->integer('create_by');
+            $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
             $table->timestamps();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('code');
+            // $table->unsignedBigInteger('user_id');
+            $table->string('code');
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
-            $table->foreign('code')->references('id')->on('voucher_to_main')->onDelete('restrict')->onUpdate('restrict');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
+            // $table->foreign('code')->references('id')->on('voucher_to_main')->onDelete('restrict')->onUpdate('restrict');
             // $table->foreign('code')->references('id')->on('voucher_to_shops')->onDelete('restrict')->onUpdate('restrict');
         });
     }
