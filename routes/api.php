@@ -22,6 +22,10 @@ use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\VoucherToShopController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\BannerShopController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +72,10 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('shops', ShopController::class);
 
             Route::resource('voucher_main', VoucherToMainController::class);
+            Route::resource('voucher-shops', VoucherToShopController::class);
+            Route::resource('banner-shops', BannerShopController::class);
+            Route::resource('products', ProductController::class);
+            Route::resource('images', ImageToShopController::class);
 
             Route::resource('coupons',CouponsController::class);
             Route::resource('notification_to_main', Notification_to_mainController::class);
@@ -76,10 +84,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 });
 
 
-
-
-
-=======
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 

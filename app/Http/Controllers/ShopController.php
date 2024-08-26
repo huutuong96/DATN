@@ -47,17 +47,21 @@ class ShopController extends Controller
      */
     public function store(Request $rqt)
     {
-        $image = $rqt->file('image');
+        // Check xem co anh moi duoc tai len khong
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $imageUrl = $uploadedImage['secure_url'];
+        } else {
+            // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
+            $imageUrl = $brands->image;
+        }
 
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-
-        // $user = JWTAuth::parseToken()->authenticate();
-        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
-
-
+        $user = JWTAuth::parseToken()->authenticate();
 
         $dataInsert = [
+            'Owner_id' => $rqt->Owner_id ?? $user->id,
             'shop_name' => $rqt->shop_name,
             'pick_up_address' => $rqt->pick_up_address ,
             'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
@@ -135,7 +139,6 @@ class ShopController extends Controller
                 404
             );
         }
-<<<<<<< HEAD
        // Check xem co anh moi duoc tai len khong
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
@@ -146,20 +149,13 @@ class ShopController extends Controller
                 // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
                 $imageUrl = $brands->image;
             }
-=======
-
-        $image = $rqt->file('image');
-
-        $cloudinary = new Cloudinary();
-        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
-
-        // $user = JWTAuth::parseToken()->authenticate();
-        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
 
 
->>>>>>> 2813359a5b5a277c62459ea612e573f263e2a16e
-
+        $user = JWTAuth::parseToken()->authenticate();
+        
         $dataInsert = [
+            'Owner_id' => $rqt->Owner_id ?? $user->id,
+            'Owner_id' => $rqt->Owner_id,
             'shop_name' => $rqt->shop_name,
             'pick_up_address' => $rqt->pick_up_address ,
             'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
