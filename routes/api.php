@@ -11,6 +11,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
+use App\Http\Controllers\Cart_to_userController;
+use App\Http\Controllers\Categori_ShopsController;
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ColorsController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\FAQController;
@@ -24,6 +27,7 @@ use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\ProgrameController;
 use App\Http\Controllers\Notification_to_shopController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\VoucherController;
 
 
@@ -41,39 +45,48 @@ use App\Http\Controllers\VoucherController;
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
 
-            Route::resource('users', AuthenController::class);
-            Route::post('user/me', [AuthenController::class, "me"]);
-            Route::resource('role', RolesController::class);
-            Route::resource('address', AddressController::class);
-            Route::resource('permission', PermissionsController::class);
-            Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
-            Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
-            Route::resource('banners', BannerController::class);
-            Route::resource('faqs', FAQController::class);
-            Route::resource('taxs', TaxController::class);
-            Route::resource('ranks', RanksController::class);
-            Route::resource('ships',ShipsController::class);
-            Route::resource('payments',PaymentsController::class);
-            Route::resource('brands',BrandsController::class);
-            Route::resource('colors',ColorsController::class);
-            Route::resource('categori_learns', CategorilearnsController::class);
-            Route::resource('address', AddressController::class);
-            Route::resource('role', RolesController::class);
-            Route::resource('learn', LearnController::class);
-            Route::resource('address', AddressController::class);
-            Route::resource('messages', MessageController::class);
-            Route::resource('role', RolesController::class);
-            Route::resource('shops', ShopController::class);
-            Route::resource('voucher_main', VoucherToMainController::class);
-            Route::resource('coupons',CouponsController::class);
-            Route::resource('notification_to_main', Notification_to_mainController::class);
-            Route::resource('programes', ProgrameController::class);
-            Route::resource('notification_to_shops', Notification_to_shopController::class);
-            Route::resource('vouchers', VoucherController::class);
-
-
-
+    Route::resource('users', AuthenController::class);
+    Route::post('user/me', [AuthenController::class, "me"]);
+    Route::resource('role', RolesController::class);
+    Route::resource('address', AddressController::class);
+    Route::resource('permission', PermissionsController::class);
+    Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
+    Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
+    Route::resource('banners', BannerController::class);
+    Route::resource('faqs', FAQController::class);
+    Route::resource('taxs', TaxController::class);
+    Route::resource('ranks', RanksController::class);
+    Route::resource('ships', ShipsController::class);
+    Route::resource('payments', PaymentsController::class);
+    Route::resource('brands', BrandsController::class);
+    Route::resource('colors', ColorsController::class);
+    Route::resource('categori_learns', CategorilearnsController::class);
+    Route::resource('address', AddressController::class);
+    Route::resource('role', RolesController::class);
+    Route::resource('learn', LearnController::class);
+    Route::resource('address', AddressController::class);
+    Route::resource('messages', MessageController::class);
+    Route::resource('role', RolesController::class);
+    Route::resource('shops', ShopController::class);
+    Route::resource('voucher_main', VoucherToMainController::class);
+    Route::resource('coupons', CouponsController::class);
+    Route::resource('notification_to_main', Notification_to_mainController::class);
+    Route::resource('programes', ProgrameController::class);
+    Route::resource('notification_to_shops', Notification_to_shopController::class);
+    Route::resource('vouchers', VoucherController::class);
 });
+
+// CRUD của Thy (26/08)
+Route::resource('orders', OrdersController::class);
+Route::resource('cart_to_user', Cart_to_userController::class);
+Route::resource('categories', CategoriesController::class);
+Route::resource('categori_shops', Categori_ShopsController::class);
+
+Route::resource('voucher-shops', VoucherToShopController::class);
+Route::resource('banner-shops', BannerShopController::class);
+Route::resource('products', ProductController::class);
+Route::resource('images', ImageToShopController::class);
+
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
