@@ -16,9 +16,9 @@ return new class extends Migration
             $table->timestamps();
             $table->string('title');
             $table->text('content');
-            $table->integer('create_by');
+            $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
-            $table->unsignedBigInteger('programme_id');
+            // $table->unsignedBigInteger('programme_id');
         });
     }
 
