@@ -22,11 +22,18 @@ use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ShopController;
+<<<<<<< HEAD
+use App\Http\Controllers\VoucherToShopController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\BannerShopController;
+=======
 use App\Http\Controllers\ProgrameController;
 use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\VoucherController;
 
 
+>>>>>>> 022f4c81d4caa4bebb417f53647897d02b383477
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +72,14 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('role', RolesController::class);
             Route::resource('shops', ShopController::class);
             Route::resource('voucher_main', VoucherToMainController::class);
+<<<<<<< HEAD
+            Route::resource('voucher-shops', VoucherToShopController::class);
+            Route::resource('banner-shops', BannerShopController::class);
+            Route::resource('products', ProductController::class);
+            Route::resource('images', ImageToShopController::class);
+
+=======
+>>>>>>> 022f4c81d4caa4bebb417f53647897d02b383477
             Route::resource('coupons',CouponsController::class);
             Route::resource('notification_to_main', Notification_to_mainController::class);
             Route::resource('programes', ProgrameController::class);
@@ -75,5 +90,9 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
 });
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 022f4c81d4caa4bebb417f53647897d02b383477
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);

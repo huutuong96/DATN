@@ -5,16 +5,16 @@ namespace App\Http\Controllers;
 use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use App\Http\Requests\BannerRequest;
-use App\Models\Banner;
+use App\Models\BannerShop;
 
-class BannerController extends Controller
+class BannerShopController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $banners = Banner::all();
+        $banners = BannerShop::all();
         if($banners->isEmpty()){
             return response()->json(
                 [
@@ -43,10 +43,10 @@ class BannerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BannerRequest $rqt )
+    public function store(BannerRequest $rqt)
     {
-         // Check xem co anh moi duoc tai len khong
-         if ($request->hasFile('image')) {
+       // Check xem co anh moi duoc tai len khong
+       if ($request->hasFile('image')) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
@@ -57,6 +57,7 @@ class BannerController extends Controller
         }
 
         $dataInsert = [
+            'shop_id'=>$rqt->shop_id,
             'title' => $rqt->title,
             'content' => $rqt->content,
             'URL' => $imageUrl,
@@ -65,7 +66,7 @@ class BannerController extends Controller
         ];
 
         try {
-            $banner = Banner::create( $dataInsert );
+            $banner = BannerShop::create( $dataInsert );
 
             return response()->json(
                 [
@@ -90,7 +91,7 @@ class BannerController extends Controller
      */
     public function show(string $id)
     {
-        $banner = Banner::find($id);
+        $banner = BannerShop::find($id);
 
         if(!$banner){
             return response()->json(
@@ -123,7 +124,7 @@ class BannerController extends Controller
     public function update(BannerRequest $rqt, $id)
     {
         // Tìm banner theo ID
-        $banner = Banner::find($id);
+        $banner = BannerShop::find($id);
         // Kiểm tra xem banner có tồn tại không
         if (!$banner) {
             return response()->json(
@@ -134,8 +135,9 @@ class BannerController extends Controller
                 404
             );
         }
-        // Check xem co anh moi duoc tai len khong
-        if ($request->hasFile('image')) {
+
+         // Check xem co anh moi duoc tai len khong
+         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
@@ -145,8 +147,10 @@ class BannerController extends Controller
             $imageUrl = $brands->image;
         }
 
+
         // Cập nhật dữ liệu
         $dataUpdate = [
+            'shop_id'=>$rqt->shop_id,
             'title' => $rqt->title ?? $banner->title,
             'content' => $rqt->content ?? $banner->content,
             'URL' => $imageUrl,
@@ -182,10 +186,8 @@ class BannerController extends Controller
      */
     public function destroy(string $id)
     {
-
-
         try {
-            $banner = Banner::find($id);
+            $banner = BannerShop::find($id);
 
             if (!$banner) {
                 return response()->json([
