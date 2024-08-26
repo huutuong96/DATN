@@ -60,6 +60,7 @@ class ShopController extends Controller
 
         $user = JWTAuth::parseToken()->authenticate();
 
+
         $dataInsert = [
             'Owner_id' => $rqt->Owner_id ?? $user->id,
             'shop_name' => $rqt->shop_name,
