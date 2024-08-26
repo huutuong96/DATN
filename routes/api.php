@@ -62,6 +62,9 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('learn', LearnController::class);
             Route::resource('address', AddressController::class);
             Route::resource('messages', MessageController::class);
+            Route::post('messages/detail', [MessageController::class, "store_message_detail"]);
+            Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
+            Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
             Route::resource('role', RolesController::class);
             Route::resource('shops', ShopController::class);
             Route::resource('voucher_main', VoucherToMainController::class);
