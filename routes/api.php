@@ -22,6 +22,11 @@ use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\ProgrameController;
+use App\Http\Controllers\Notification_to_shopController;
+use App\Http\Controllers\VoucherController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -43,43 +48,33 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('permission', PermissionsController::class);
             Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
             Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
-
             Route::resource('banners', BannerController::class);
             Route::resource('faqs', FAQController::class);
             Route::resource('taxs', TaxController::class);
             Route::resource('ranks', RanksController::class);
-
-
             Route::resource('ships',ShipsController::class);
             Route::resource('payments',PaymentsController::class);
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
-
             Route::resource('categori_learns', CategorilearnsController::class);
             Route::resource('address', AddressController::class);
             Route::resource('role', RolesController::class);
             Route::resource('learn', LearnController::class);
-
             Route::resource('address', AddressController::class);
             Route::resource('messages', MessageController::class);
-
-
             Route::resource('role', RolesController::class);
             Route::resource('shops', ShopController::class);
-
             Route::resource('voucher_main', VoucherToMainController::class);
-
             Route::resource('coupons',CouponsController::class);
             Route::resource('notification_to_main', Notification_to_mainController::class);
+            Route::resource('programes', ProgrameController::class);
+            Route::resource('notification_to_shops', Notification_to_shopController::class);
+            Route::resource('vouchers', VoucherController::class);
+
 
 
 });
 
-
-
-
-
-=======
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 

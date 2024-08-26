@@ -48,15 +48,8 @@ class ShopController extends Controller
     public function store(Request $rqt)
     {
         $image = $rqt->file('image');
-
         $cloudinary = new Cloudinary();
         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-
-        // $user = JWTAuth::parseToken()->authenticate();
-        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
-
-
-
         $dataInsert = [
             'shop_name' => $rqt->shop_name,
             'pick_up_address' => $rqt->pick_up_address ,
