@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthenController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\RanksController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\CategoriessupportmainController;
+
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\BannerController;
@@ -38,30 +40,30 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('permission', PermissionsController::class);
             Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
             Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
-
             Route::resource('banners', BannerController::class);
             Route::resource('faqs', FAQController::class);
             Route::resource('taxs', TaxController::class);
             Route::resource('ranks', RanksController::class);
-
-
             
             // categori learns
             Route::resource('categori_learns', CategorilearnsController::class);
             // address
             Route::resource('address', AddressController::class);
-
             //Role
-            Route::resource('role', RolesController::class);
+            Route::resource('roles', RolesController::class);
             //LEARN
-            Route::resource('learn', LearnController::class);
+            Route::resource('learns', LearnController::class);
+
+            Route::resource('Categoriessupportmains', CategoriessupportmainController::class);
+           
+
 
             Route::resource('ships',ShipsController::class);
             Route::resource('payments',PaymentsController::class);
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
 
-    Route::resource('role', RolesController::class);
+ 
 
 
 
@@ -71,12 +73,3 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 Route::post('user/register', [AuthenController::class, "register"]);
 Route::post('user/login', [AuthenController::class, "login"]);
 
-// categori learns
-Route::resource('categori_learns', CategorilearnsController::class);
-// address
-Route::resource('address', AddressController::class);
-
-//Role
-Route::resource('role', RolesController::class);
-//LEARN
-Route::resource('learn', LearnController::class);
