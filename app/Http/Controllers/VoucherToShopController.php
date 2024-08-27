@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\voucherToShop;
+use App\Models\VoucherToShop;
 use App\Http\Requests\VoucherRequest;
 
 class VoucherToShopController extends Controller
@@ -13,22 +13,18 @@ class VoucherToShopController extends Controller
      */
     public function index()
     {
-        $voucherMain = voucherToShop::all();
-        if($voucherMain->isEmpty()){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại voucher main nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
+        $voucherMain = VoucherToShop::all(); // Sửa tên class từ 'voucherToShop' thành 'VoucherToShop'
+        if ($voucherMain->isEmpty()) {
+            return response()->json([
                 'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $voucherMain,
-            ]
-        );
+                'message' => "Không tồn tại voucher main nào",
+            ]);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $voucherMain,
+        ]);
     }
 
     /**
@@ -51,29 +47,24 @@ class VoucherToShopController extends Controller
             'condition' => $request->condition,
             'ratio' => $request->ratio,
             'code' => $request->code,
-            'shop_id'=> $request->shop_id,
+            'shop_id' => $request->shop_id,
             'status' => $request->status,
         ];
 
-
         try {
-            $voucherMain = voucherToShop::create( $dataInsert );
+            $voucherMain = VoucherToShop::create($dataInsert); // Sửa tên class từ 'voucherToShop' thành 'VoucherToShop'
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm voucherMain thành công",
-                    'data' => $voucherMain,
-                ]
-            );
+            return response()->json([
+                'status' => true,
+                'message' => "Thêm voucher main thành công",
+                'data' => $voucherMain,
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm voucherMain không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false, // Sửa lại 'status' thành false để thể hiện lỗi
+                'message' => "Thêm voucher main không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 
@@ -82,22 +73,18 @@ class VoucherToShopController extends Controller
      */
     public function show(string $id)
     {
-        $voucherMain = voucherToShop::find($id);
-        if(!$voucherMain){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại voucher Main nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
+        $voucherMain = VoucherToShop::find($id); // Sửa tên class từ 'voucherToShop' thành 'VoucherToShop'
+        if (!$voucherMain) {
+            return response()->json([
                 'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $voucherMain,
-            ]
-        );
+                'message' => "Không tồn tại voucher main nào",
+            ]);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $voucherMain,
+        ]);
     }
 
     /**
@@ -113,20 +100,15 @@ class VoucherToShopController extends Controller
      */
     public function update(VoucherRequest $request, string $id)
     {
-        $voucherMain = voucherToShop::find($id);
+        $voucherMain = VoucherToShop::find($id); // Sửa tên class từ 'voucherToShop' thành 'VoucherToShop'
 
-        // Kiểm tra xem rqt có tồn tại không
         if (!$voucherMain) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "voucher main không tồn tại",
-                ],
-                404
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "voucher main không tồn tại",
+            ], 404);
         }
 
-        // Cập nhật dữ liệu
         $dataUpdate = [
             'title' => $request->title,
             'description' => $request->description,
@@ -134,29 +116,24 @@ class VoucherToShopController extends Controller
             'condition' => $request->condition,
             'ratio' => $request->ratio,
             'code' => $request->code,
-            'shop_id'=> $request->shop_id,
+            'shop_id' => $request->shop_id,
             'status' => $request->status,
         ];
 
         try {
-            // Cập nhật bản ghi
             $voucherMain->update($dataUpdate);
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật voucher main thành công",
-                    'data' => $voucherMain,
-                ]
-            );
+            return response()->json([
+                'status' => true,
+                'message' => "Cập nhật voucher main thành công",
+                'data' => $voucherMain,
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật voucher main không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật voucher main không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 
@@ -166,7 +143,7 @@ class VoucherToShopController extends Controller
     public function destroy(string $id)
     {
         try {
-            $voucherMain = voucherToShop::find($id);
+            $voucherMain = VoucherToShop::find($id); // Sửa tên class từ 'voucherToShop' thành 'VoucherToShop'
 
             if (!$voucherMain) {
                 return response()->json([
@@ -175,21 +152,18 @@ class VoucherToShopController extends Controller
                 ], 404);
             }
 
-            // Xóa bản ghi
             $voucherMain->delete();
 
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa voucher main thành công',
-                ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Xóa voucher main thành công',
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa voucher main không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Xóa voucher main không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 }

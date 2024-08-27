@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
-use App\Http\Requests\ShopRequest;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Shop;
 use Illuminate\Support\Str;
@@ -16,63 +15,62 @@ class ShopController extends Controller
      */
     public function index()
     {
-        $Shops = Shop::all();
-        if ($Shops->isEmpty()) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại Shops nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
+        $shops = Shop::all();
+        if ($shops->isEmpty()) {
+            return response()->json([
                 'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $Shops,
-            ]
-        );
+                'message' => "Không tồn tại Shops nào",
+            ]);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $shops,
+        ]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(ShopRequest $rqt) {}
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $rqt)
+    public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
-        $dataInsert = [
-            'Owner_id' => $rqt->Owner_id ?? $user->id,
-            'shop_name' => $rqt->shop_name,
-            'pick_up_address' => $rqt->pick_up_address,
-            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
-            'image' => $uploadedImage['secure_url'] ?? "", // thêm ?? để tranh lỗi khi test băng post man
-            'cccd' => $rqt->cccd,
-            'status' => $rqt->status,
-            'tax_id' => $rqt->tax_id,
-        ];
-        try {
-            $Shop = Shop::create($dataInsert);
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm Shop thành công",
-                    'data' => $Shop,
-                ]
-            );
+        // Handle image upload if provided
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $imageUrl = $uploadedImage['secure_url'];
+        } else {
+            $imageUrl = null; // Default to null if no image is provided
+        }
+
+        $dataInsert = [
+            'Owner_id' => $request->Owner_id ?? $user->id,
+            'shop_name' => $request->shop_name,
+            'pick_up_address' => $request->pick_up_address,
+            'slug' => $request->slug ?? Str::slug($request->shop_name, '-'),
+            'image' => $imageUrl,
+            'cccd' => $request->cccd,
+            'status' => $request->status,
+            'tax_id' => $request->tax_id,
+        ];
+
+        try {
+            $shop = Shop::create($dataInsert);
+
+            return response()->json([
+                'status' => true,
+                'message' => "Thêm Shop thành công",
+                'data' => $shop,
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm Shop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm Shop không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 
@@ -81,92 +79,74 @@ class ShopController extends Controller
      */
     public function show(string $id)
     {
-        $Shops = Shop::find($id);
+        $shop = Shop::find($id);
 
-        if (!$Shops) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại Shop nào",
-                ]
-            );
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại Shop nào",
+            ], 404);
         }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $Shops,
-            ]
-        );
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $shop,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $rqt, string $id)
+    public function update(Request $request, string $id)
     {
         $shop = Shop::find($id);
 
         if (!$shop) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "shop không tồn tại",
-                ],
-                404
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Shop không tồn tại",
+            ], 404);
         }
-        // Check xem co anh moi duoc tai len khong
-        if ($rqt->hasFile('image')) {
-            $image = $rqt->file('image');
+
+        // Handle image upload if provided
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
             $imageUrl = $uploadedImage['secure_url'];
         } else {
-            // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
-            $imageUrl = $shop->image;
+            $imageUrl = $shop->image; // Keep the existing image if no new image is uploaded
         }
-
 
         $user = JWTAuth::parseToken()->authenticate();
 
-        $dataInsert = [
-            'Owner_id' => $rqt->Owner_id ?? $user->id,
-            'shop_name' => $rqt->shop_name,
-            'pick_up_address' => $rqt->pick_up_address,
-            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
+        $dataUpdate = [
+            'Owner_id' => $request->Owner_id ?? $user->id,
+            'shop_name' => $request->shop_name,
+            'pick_up_address' => $request->pick_up_address,
+            'slug' => $request->slug ?? Str::slug($request->shop_name, '-'),
             'image' => $imageUrl,
-            'cccd' => $rqt->cccd,
-            'status' => $rqt->status,
-            'tax_id' => $rqt->tax_id,
-            'created_at' => $rqt->created_at ?? $shop->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+            'cccd' => $request->cccd,
+            'status' => $request->status,
+            'tax_id' => $request->tax_id,
+            'created_at' => $request->created_at ?? $shop->created_at, // Preserve the original creation date
         ];
-        try {
-            $shop->update($dataInsert);
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "cập nhật thông tin Shop thành công",
-                    'data' => $shop,
-                ]
-            );
+        try {
+            $shop->update($dataUpdate);
+
+            return response()->json([
+                'status' => true,
+                'message' => "Cập nhật thông tin Shop thành công",
+                'data' => $shop,
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "cập nhật thông tin Shop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật thông tin Shop không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 
@@ -175,31 +155,28 @@ class ShopController extends Controller
      */
     public function destroy(string $id)
     {
+        $shop = Shop::find($id);
+
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+        }
+
         try {
-            $shop = Shop::find($id);
-
-            if (!$shop) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'shop không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
             $shop->delete();
 
             return response()->json([
                 'status' => true,
-                'message' => 'Xóa shop thành công',
+                'message' => 'Xóa Shop thành công',
             ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa shop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Xóa Shop không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 }

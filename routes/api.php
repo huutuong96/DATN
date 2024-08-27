@@ -1,6 +1,5 @@
 <?php
 
-use to;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
@@ -48,7 +47,6 @@ use App\Http\Controllers\Categori_ShopsController;
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
 
-
     Route::resource('users', AuthenController::class);
     Route::post('user/me', [AuthenController::class, "me"]);
     Route::resource('role', RolesController::class);
@@ -65,12 +63,8 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
     Route::resource('brands', BrandsController::class);
     Route::resource('colors', ColorsController::class);
     Route::resource('categori_learns', CategorilearnsController::class);
-    Route::resource('address', AddressController::class);
-    Route::resource('role', RolesController::class);
     Route::resource('learn', LearnController::class);
-    Route::resource('address', AddressController::class);
     Route::resource('messages', MessageController::class);
-    Route::resource('role', RolesController::class);
     Route::resource('shops', ShopController::class);
     Route::resource('voucher_main', VoucherToMainController::class);
     Route::resource('coupons', CouponsController::class);
@@ -78,21 +72,18 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
     Route::resource('programes', ProgrameController::class);
     Route::resource('notification_to_shops', Notification_to_shopController::class);
     Route::resource('vouchers', VoucherController::class);
+    Route::resource('voucher-shops', VoucherToShopController::class);
+    Route::resource('banner-shops', BannerShopController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('images', ImageController::class);
+
+    // CRUD của Thy (26/08)
+    Route::resource('orders', OrdersController::class);
+    Route::resource('cart_to_users', Cart_to_userController::class);
+    Route::resource('categories', CategoriesController::class);
+    Route::resource('categori_shops', Categori_ShopsController::class);
 });
 
-
-Route::resource('voucher-shops', VoucherToShopController::class);
-Route::resource('banner-shops', BannerShopController::class);
-Route::resource('products', ProductController::class);
-Route::resource('images', ImageController::class);
-
-
-// CRUD của Thy (26/08)
-Route::resource('orders', OrdersController::class);
-Route::resource('cart_to_users', Cart_to_userController::class);
-Route::resource('categories', CategoriesController::class);
-Route::resource('categori_shops', Categori_ShopsController::class);
-
-
+// Đăng ký và đăng nhập người dùng
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
