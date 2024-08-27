@@ -17,7 +17,7 @@ class ShopController extends Controller
     public function index()
     {
         $Shops = Shop::all();
-        if($Shops->isEmpty()){
+        if ($Shops->isEmpty()) {
             return response()->json(
                 [
                     'status' => true,
@@ -37,30 +37,26 @@ class ShopController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(ShopRequest $rqt)
-    {
-
-    }
+    public function create(ShopRequest $rqt) {}
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $rqt)
     {
-        $image = $rqt->file('image');
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $user = JWTAuth::parseToken()->authenticate();
         $dataInsert = [
+            'Owner_id' => $rqt->Owner_id ?? $user->id,
             'shop_name' => $rqt->shop_name,
-            'pick_up_address' => $rqt->pick_up_address ,
+            'pick_up_address' => $rqt->pick_up_address,
             'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
-            'image' => $uploadedImage['secure_url'] ?? "",// thêm ?? để tranh lỗi khi test băng post man
+            'image' => $uploadedImage['secure_url'] ?? "", // thêm ?? để tranh lỗi khi test băng post man
             'cccd' => $rqt->cccd,
-            'status' => $rqt->status ,
+            'status' => $rqt->status,
             'tax_id' => $rqt->tax_id,
         ];
         try {
-            $Shop = Shop::create( $dataInsert );
+            $Shop = Shop::create($dataInsert);
 
             return response()->json(
                 [
@@ -87,7 +83,7 @@ class ShopController extends Controller
     {
         $Shops = Shop::find($id);
 
-        if(!$Shops){
+        if (!$Shops) {
             return response()->json(
                 [
                     'status' => true,
@@ -128,24 +124,28 @@ class ShopController extends Controller
                 404
             );
         }
+        // Check xem co anh moi duoc tai len khong
+        if ($rqt->hasFile('image')) {
+            $image = $rqt->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $imageUrl = $uploadedImage['secure_url'];
+        } else {
+            // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
+            $imageUrl = $shop->image;
+        }
 
-        $image = $rqt->file('image');
 
-        $cloudinary = new Cloudinary();
-        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
-
-        // $user = JWTAuth::parseToken()->authenticate();
-        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
-
-
+        $user = JWTAuth::parseToken()->authenticate();
 
         $dataInsert = [
+            'Owner_id' => $rqt->Owner_id ?? $user->id,
             'shop_name' => $rqt->shop_name,
-            'pick_up_address' => $rqt->pick_up_address ,
+            'pick_up_address' => $rqt->pick_up_address,
             'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
-            'image' => $uploadedImage['secure_url'] ?? "",// thêm ?? để tranh lỗi khi test băng post man
+            'image' => $imageUrl,
             'cccd' => $rqt->cccd,
-            'status' => $rqt->status ,
+            'status' => $rqt->status,
             'tax_id' => $rqt->tax_id,
             'created_at' => $rqt->created_at ?? $shop->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
@@ -188,10 +188,10 @@ class ShopController extends Controller
             // Xóa bản ghi
             $shop->delete();
 
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa shop thành công',
-                ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Xóa shop thành công',
+            ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [

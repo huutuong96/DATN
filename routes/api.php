@@ -1,34 +1,38 @@
 <?php
 
-use App\Http\Controllers\Notification_to_mainController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthenController;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\RanksController;
-use App\Http\Controllers\AddressController;
+use App\Http\Controllers\FAQController;
+use App\Http\Controllers\TaxController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\LearnController;
+use App\Http\Controllers\RanksController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\ShipsController;
+use App\Http\Controllers\AuthenController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
-use App\Http\Controllers\Cart_to_userController;
-use App\Http\Controllers\Categori_ShopsController;
-use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ColorsController;
-use App\Http\Controllers\CouponsController;
-use App\Http\Controllers\FAQController;
-use App\Http\Controllers\PaymentsController;
-use App\Http\Controllers\ShipsController;
-use App\Http\Controllers\TaxController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\VoucherToMainController;
-use App\Http\Controllers\CategorilearnsController;
-use App\Http\Controllers\LearnController;
-use App\Http\Controllers\ShopController;
-use App\Http\Controllers\ProgrameController;
-use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\CouponsController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\ProgrameController;
+use App\Http\Controllers\BannerShopController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\Cart_to_userController;
+use App\Http\Controllers\VoucherToMainController;
+use App\Http\Controllers\VoucherToShopController;
+use App\Http\Controllers\Categori_ShopsController;
+use App\Http\Controllers\CategorilearnsController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\Notification_to_mainController;
+use App\Http\Controllers\Notification_to_shopController;
 
 
 
@@ -76,17 +80,18 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
     Route::resource('vouchers', VoucherController::class);
 });
 
-// CRUD của Thy (26/08)
-Route::resource('orders', OrdersController::class);
-Route::resource('cart_to_user', Cart_to_userController::class);
-Route::resource('categories', CategoriesController::class);
-Route::resource('categori_shops', Categori_ShopsController::class);
 
 Route::resource('voucher-shops', VoucherToShopController::class);
 Route::resource('banner-shops', BannerShopController::class);
 Route::resource('products', ProductController::class);
-Route::resource('images', ImageToShopController::class);
+Route::resource('images', ImageController::class);
 
+
+// CRUD của Thy (26/08)
+Route::resource('orders', OrdersController::class);
+Route::resource('cart_to_users', Cart_to_userController::class);
+Route::resource('categories', CategoriesController::class);
+Route::resource('categori_shops', Categori_ShopsController::class);
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);

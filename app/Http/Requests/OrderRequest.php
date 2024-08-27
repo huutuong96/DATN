@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class Categori_ShopRequest extends FormRequest
+class OrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,16 @@ class Categori_ShopRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'status' => 'required|integer|in:0,1',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'status.required' => 'Trạng thái là bắt buộc.',
+            'status.integer' => 'Trạng thái phải là số nguyên.',
+            'status.in' => 'Trạng thái chỉ có thể là 0 hoặc 1.',
         ];
     }
 }

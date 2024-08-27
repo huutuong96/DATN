@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('shops', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('Owner_id');
             $table->string('shop_name');
             $table->string('slug');
             $table->string('pick_up_address');
@@ -24,11 +25,12 @@ return new class extends Migration
             $table->timestamps();
             $table->unsignedBigInteger('tax_id');
 
+            $table->foreign('Owner_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
             $table->foreign('tax_id')->references('id')->on('taxs')->onDelete('restrict')->onUpdate('restrict');
         });
     }
 
-    /**
+    /** 
      * Reverse the migrations.
      */
     public function down(): void
