@@ -1,11 +1,13 @@
 <?php
 
+use to;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\RanksController;
 use App\Http\Controllers\RolesController;
@@ -28,13 +30,10 @@ use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\Cart_to_userController;
 use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\VoucherToShopController;
-use App\Http\Controllers\Categori_ShopsController;
 use App\Http\Controllers\CategorilearnsController;
-use App\Http\Controllers\ImageController;
-use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
-
-
+use App\Http\Controllers\Notification_to_mainController;
+use App\Http\Controllers\Categori_ShopsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +47,7 @@ use App\Http\Controllers\Notification_to_shopController;
 */
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
+
 
     Route::resource('users', AuthenController::class);
     Route::post('user/me', [AuthenController::class, "me"]);
@@ -92,6 +92,7 @@ Route::resource('orders', OrdersController::class);
 Route::resource('cart_to_users', Cart_to_userController::class);
 Route::resource('categories', CategoriesController::class);
 Route::resource('categori_shops', Categori_ShopsController::class);
+
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
