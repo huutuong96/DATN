@@ -40,6 +40,15 @@ class StreamHandler
             \usleep($options['delay'] * 1000);
         }
 
+<<<<<<< HEAD
+=======
+        $protocolVersion = $request->getProtocolVersion();
+
+        if ('1.0' !== $protocolVersion && '1.1' !== $protocolVersion) {
+            throw new ConnectException(sprintf('HTTP/%s is not supported by the stream handler.', $protocolVersion), $request);
+        }
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         $startTime = isset($options['on_stats']) ? Utils::currentTime() : null;
 
         try {
@@ -83,8 +92,13 @@ class StreamHandler
         array $options,
         RequestInterface $request,
         ?float $startTime,
+<<<<<<< HEAD
         ResponseInterface $response = null,
         \Throwable $error = null
+=======
+        ?ResponseInterface $response = null,
+        ?\Throwable $error = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ): void {
         if (isset($options['on_stats'])) {
             $stats = new TransferStats($request, $response, Utils::currentTime() - $startTime, $error, []);
@@ -273,7 +287,11 @@ class StreamHandler
 
         // HTTP/1.1 streams using the PHP stream wrapper require a
         // Connection: close header
+<<<<<<< HEAD
         if ($request->getProtocolVersion() == '1.1'
+=======
+        if ($request->getProtocolVersion() === '1.1'
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             && !$request->hasHeader('Connection')
         ) {
             $request = $request->withHeader('Connection', 'close');

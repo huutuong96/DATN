@@ -40,7 +40,11 @@ class RetryMiddleware
      *                                                                         and returns the number of
      *                                                                         milliseconds to delay.
      */
+<<<<<<< HEAD
     public function __construct(callable $decider, callable $nextHandler, callable $delay = null)
+=======
+    public function __construct(callable $decider, callable $nextHandler, ?callable $delay = null)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $this->decider = $decider;
         $this->nextHandler = $nextHandler;
@@ -110,7 +114,11 @@ class RetryMiddleware
         };
     }
 
+<<<<<<< HEAD
     private function doRetry(RequestInterface $request, array $options, ResponseInterface $response = null): PromiseInterface
+=======
+    private function doRetry(RequestInterface $request, array $options, ?ResponseInterface $response = null): PromiseInterface
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $options['delay'] = ($this->delay)(++$options['retries'], $response, $request);
 

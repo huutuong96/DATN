@@ -12,6 +12,10 @@ namespace PHPUnit\Logging;
 use const FILE_APPEND;
 use const LOCK_EX;
 use const PHP_EOL;
+<<<<<<< HEAD
+=======
+use const PHP_OS_FAMILY;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function file_put_contents;
 use function implode;
 use function preg_split;
@@ -21,6 +25,11 @@ use PHPUnit\Event\Event;
 use PHPUnit\Event\Tracer\Tracer;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class EventLogger implements Tracer

@@ -346,6 +346,11 @@ final class MockBuilder
      * @return $this
      *
      * @deprecated https://github.com/sebastianbergmann/phpunit/issues/5309
+<<<<<<< HEAD
+=======
+     *
+     * @codeCoverageIgnore
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      */
     public function disableAutoload(): self
     {
@@ -402,6 +407,11 @@ final class MockBuilder
      * @return $this
      *
      * @deprecated https://github.com/sebastianbergmann/phpunit/issues/5307
+<<<<<<< HEAD
+=======
+     *
+     * @codeCoverageIgnore
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      */
     public function enableProxyingToOriginalMethods(): self
     {
@@ -431,6 +441,11 @@ final class MockBuilder
      * @return $this
      *
      * @deprecated https://github.com/sebastianbergmann/phpunit/issues/5307
+<<<<<<< HEAD
+=======
+     *
+     * @codeCoverageIgnore
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      */
     public function setProxyTarget(object $object): self
     {

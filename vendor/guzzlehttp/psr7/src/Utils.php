@@ -231,7 +231,11 @@ final class Utils
      * @param StreamInterface $stream    Stream to read from
      * @param int|null        $maxLength Maximum buffer length
      */
+<<<<<<< HEAD
     public static function readLine(StreamInterface $stream, int $maxLength = null): string
+=======
+    public static function readLine(StreamInterface $stream, ?int $maxLength = null): string
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $buffer = '';
         $size = 0;
@@ -251,6 +255,23 @@ final class Utils
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Redact the password in the user info part of a URI.
+     */
+    public static function redactUserInfo(UriInterface $uri): UriInterface
+    {
+        $userInfo = $uri->getUserInfo();
+
+        if (false !== ($pos = \strpos($userInfo, ':'))) {
+            return $uri->withUserInfo(\substr($userInfo, 0, $pos), '***');
+        }
+
+        return $uri;
+    }
+
+    /**
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      * Create a new stream based on the input type.
      *
      * Options is an associative array that can contain the following keys:

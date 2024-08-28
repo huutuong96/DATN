@@ -9,6 +9,10 @@
  */
 namespace SebastianBergmann\Comparator;
 
+<<<<<<< HEAD
+=======
+use function array_is_list;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function array_key_exists;
 use function assert;
 use function is_array;
@@ -39,8 +43,18 @@ class ArrayComparator extends Comparator
         assert(is_array($actual));
 
         if ($canonicalize) {
+<<<<<<< HEAD
             sort($expected);
             sort($actual);
+=======
+            if (array_is_list($expected)) {
+                sort($expected);
+            }
+
+            if (array_is_list($actual)) {
+                sort($actual);
+            }
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
 
         $remaining        = $actual;
@@ -56,7 +70,11 @@ class ArrayComparator extends Comparator
                 $expectedAsString .= sprintf(
                     "    %s => %s\n",
                     $exporter->export($key),
+<<<<<<< HEAD
                     $exporter->shortenedExport($value)
+=======
+                    $exporter->shortenedExport($value),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
 
                 $equal = false;
@@ -71,25 +89,41 @@ class ArrayComparator extends Comparator
                 $expectedAsString .= sprintf(
                     "    %s => %s\n",
                     $exporter->export($key),
+<<<<<<< HEAD
                     $exporter->shortenedExport($value)
+=======
+                    $exporter->shortenedExport($value),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
 
                 $actualAsString .= sprintf(
                     "    %s => %s\n",
                     $exporter->export($key),
+<<<<<<< HEAD
                     $exporter->shortenedExport($actual[$key])
+=======
+                    $exporter->shortenedExport($actual[$key]),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
             } catch (ComparisonFailure $e) {
                 $expectedAsString .= sprintf(
                     "    %s => %s\n",
                     $exporter->export($key),
+<<<<<<< HEAD
                     $e->getExpectedAsString() ? $this->indent($e->getExpectedAsString()) : $exporter->shortenedExport($e->getExpected())
+=======
+                    $e->getExpectedAsString() ? $this->indent($e->getExpectedAsString()) : $exporter->shortenedExport($e->getExpected()),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
 
                 $actualAsString .= sprintf(
                     "    %s => %s\n",
                     $exporter->export($key),
+<<<<<<< HEAD
                     $e->getActualAsString() ? $this->indent($e->getActualAsString()) : $exporter->shortenedExport($e->getActual())
+=======
+                    $e->getActualAsString() ? $this->indent($e->getActualAsString()) : $exporter->shortenedExport($e->getActual()),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
 
                 $equal = false;
@@ -100,7 +134,11 @@ class ArrayComparator extends Comparator
             $actualAsString .= sprintf(
                 "    %s => %s\n",
                 $exporter->export($key),
+<<<<<<< HEAD
                 $exporter->shortenedExport($value)
+=======
+                $exporter->shortenedExport($value),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             );
 
             $equal = false;
@@ -115,7 +153,11 @@ class ArrayComparator extends Comparator
                 $actual,
                 $expectedAsString,
                 $actualAsString,
+<<<<<<< HEAD
                 'Failed asserting that two arrays are equal.'
+=======
+                'Failed asserting that two arrays are equal.',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             );
         }
     }

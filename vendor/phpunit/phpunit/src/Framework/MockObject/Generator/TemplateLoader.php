@@ -12,6 +12,11 @@ namespace PHPUnit\Framework\MockObject\Generator;
 use SebastianBergmann\Template\Template;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This trait is not covered by the backward compatibility promise for PHPUnit
  */
 trait TemplateLoader

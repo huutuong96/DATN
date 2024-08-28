@@ -181,6 +181,12 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+<<<<<<< HEAD
+=======
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 
         /*
          * Package Service Providers...
@@ -210,6 +216,12 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+<<<<<<< HEAD
+=======
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ])->toArray(),
 
 ];

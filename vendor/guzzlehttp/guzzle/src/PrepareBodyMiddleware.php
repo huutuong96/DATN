@@ -76,8 +76,13 @@ class PrepareBodyMiddleware
 
         $expect = $options['expect'] ?? null;
 
+<<<<<<< HEAD
         // Return if disabled or if you're not using HTTP/1.1 or HTTP/2.0
         if ($expect === false || $request->getProtocolVersion() < 1.1) {
+=======
+        // Return if disabled or using HTTP/1.0
+        if ($expect === false || $request->getProtocolVersion() === '1.0') {
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             return;
         }
 

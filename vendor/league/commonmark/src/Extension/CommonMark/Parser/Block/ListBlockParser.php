@@ -27,10 +27,13 @@ final class ListBlockParser extends AbstractBlockContinueParser
     /** @psalm-readonly */
     private ListBlock $block;
 
+<<<<<<< HEAD
     private bool $hadBlankLine = false;
 
     private int $linesAfterBlank = 0;
 
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     public function __construct(ListData $listData)
     {
         $this->block = new ListBlock($listData);
@@ -48,6 +51,7 @@ final class ListBlockParser extends AbstractBlockContinueParser
 
     public function canContain(AbstractBlock $childBlock): bool
     {
+<<<<<<< HEAD
         if (! $childBlock instanceof ListItem) {
             return false;
         }
@@ -61,10 +65,14 @@ final class ListBlockParser extends AbstractBlockContinueParser
         }
 
         return true;
+=======
+        return $childBlock instanceof ListItem;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     }
 
     public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
     {
+<<<<<<< HEAD
         if ($cursor->isBlank()) {
             $this->hadBlankLine    = true;
             $this->linesAfterBlank = 0;
@@ -72,8 +80,50 @@ final class ListBlockParser extends AbstractBlockContinueParser
             $this->linesAfterBlank++;
         }
 
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         // List blocks themselves don't have any markers, only list items. So try to stay in the list.
         // If there is a block start other than list item, canContain makes sure that this list is closed.
         return BlockContinue::at($cursor);
     }
+<<<<<<< HEAD
+=======
+
+    public function closeBlock(): void
+    {
+        $item = $this->block->firstChild();
+        while ($item instanceof AbstractBlock) {
+            // check for non-final list item ending with blank line:
+            if ($item->next() !== null && self::endsWithBlankLine($item)) {
+                $this->block->setTight(false);
+                break;
+            }
+
+            // recurse into children of list item, to see if there are spaces between any of them
+            $subitem = $item->firstChild();
+            while ($subitem instanceof AbstractBlock) {
+                if ($subitem->next() && self::endsWithBlankLine($subitem)) {
+                    $this->block->setTight(false);
+                    break 2;
+                }
+
+                $subitem = $subitem->next();
+            }
+
+            $item = $item->next();
+        }
+
+        $lastChild = $this->block->lastChild();
+        if ($lastChild instanceof AbstractBlock) {
+            $this->block->setEndLine($lastChild->getEndLine());
+        }
+    }
+
+    private static function endsWithBlankLine(AbstractBlock $block): bool
+    {
+        $next = $block->next();
+
+        return $next instanceof AbstractBlock && $block->getEndLine() !== $next->getStartLine() - 1;
+    }
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 }

@@ -21,8 +21,19 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+<<<<<<< HEAD
     ];
 
+=======
+
+
+    ];
+    protected $routeMiddleware = [
+        // Các middleware khác...
+        'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
+
+    ];
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     /**
      * The application's route middleware groups.
      *
@@ -63,5 +74,13 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+<<<<<<< HEAD
+=======
+        'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+        'checkToken' => \App\Http\Middleware\checkToken::class,
+        'CheckStatusUser' => \App\Http\Middleware\CheckStatusUser::class,
+        'CheckRole' => \App\Http\Middleware\CheckRole::class,
+        'CheckPermission' => \App\Http\Middleware\CheckPermission::class,
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ];
 }

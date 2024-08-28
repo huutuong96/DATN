@@ -65,7 +65,11 @@ final class RepositoryBuilder
      *
      * @return void
      */
+<<<<<<< HEAD
     private function __construct(array $readers = [], array $writers = [], bool $immutable = false, array $allowList = null)
+=======
+    private function __construct(array $readers = [], array $writers = [], bool $immutable = false, ?array $allowList = null)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $this->readers = $readers;
         $this->writers = $writers;
@@ -244,7 +248,11 @@ final class RepositoryBuilder
      *
      * @return \Dotenv\Repository\RepositoryBuilder
      */
+<<<<<<< HEAD
     public function allowList(array $allowList = null)
+=======
+    public function allowList(?array $allowList = null)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         return new self($this->readers, $this->writers, $this->immutable, $allowList);
     }

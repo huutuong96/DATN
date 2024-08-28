@@ -48,6 +48,11 @@ use ReflectionObject;
 use SebastianBergmann\Exporter\Exporter;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class NamePrettifier

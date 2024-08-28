@@ -32,7 +32,11 @@ final class MultipartStream implements StreamInterface
      *
      * @throws \InvalidArgumentException
      */
+<<<<<<< HEAD
     public function __construct(array $elements = [], string $boundary = null)
+=======
+    public function __construct(array $elements = [], ?string $boundary = null)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $this->boundary = $boundary ?: bin2hex(random_bytes(20));
         $this->stream = $this->createStream($elements);

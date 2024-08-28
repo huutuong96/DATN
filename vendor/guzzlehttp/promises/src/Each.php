@@ -23,8 +23,13 @@ final class Each
      */
     public static function of(
         $iterable,
+<<<<<<< HEAD
         callable $onFulfilled = null,
         callable $onRejected = null
+=======
+        ?callable $onFulfilled = null,
+        ?callable $onRejected = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ): PromiseInterface {
         return (new EachPromise($iterable, [
             'fulfilled' => $onFulfilled,
@@ -46,8 +51,13 @@ final class Each
     public static function ofLimit(
         $iterable,
         $concurrency,
+<<<<<<< HEAD
         callable $onFulfilled = null,
         callable $onRejected = null
+=======
+        ?callable $onFulfilled = null,
+        ?callable $onRejected = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ): PromiseInterface {
         return (new EachPromise($iterable, [
             'fulfilled' => $onFulfilled,
@@ -67,7 +77,11 @@ final class Each
     public static function ofLimitAll(
         $iterable,
         $concurrency,
+<<<<<<< HEAD
         callable $onFulfilled = null
+=======
+        ?callable $onFulfilled = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ): PromiseInterface {
         return self::ofLimit(
             $iterable,

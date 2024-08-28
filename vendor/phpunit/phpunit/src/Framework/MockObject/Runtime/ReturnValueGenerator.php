@@ -25,6 +25,11 @@ use stdClass;
 use Throwable;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class ReturnValueGenerator
@@ -182,6 +187,10 @@ final class ReturnValueGenerator
     {
         try {
             return (new ReflectionClass($stubClassName))->newInstanceWithoutConstructor();
+<<<<<<< HEAD
+=======
+            // @codeCoverageIgnoreStart
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         } catch (Throwable $t) {
             throw new RuntimeException(
                 sprintf(
@@ -191,6 +200,10 @@ final class ReturnValueGenerator
                     $t->getMessage(),
                 ),
             );
+<<<<<<< HEAD
+=======
+            // @codeCoverageIgnoreEnd
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
     }
 
@@ -205,6 +218,10 @@ final class ReturnValueGenerator
     {
         try {
             return (new Generator)->testDouble($type, false, [], [], '', false);
+<<<<<<< HEAD
+=======
+            // @codeCoverageIgnoreStart
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         } catch (Throwable $t) {
             throw new RuntimeException(
                 sprintf(
@@ -214,6 +231,10 @@ final class ReturnValueGenerator
                     $t->getMessage(),
                 ),
             );
+<<<<<<< HEAD
+=======
+            // @codeCoverageIgnoreEnd
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
     }
 
@@ -228,6 +249,10 @@ final class ReturnValueGenerator
     {
         try {
             return (new Generator)->testDoubleForInterfaceIntersection($types, false);
+<<<<<<< HEAD
+=======
+            // @codeCoverageIgnoreStart
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         } catch (Throwable $t) {
             throw new RuntimeException(
                 sprintf(
@@ -237,6 +262,10 @@ final class ReturnValueGenerator
                     $t->getMessage(),
                 ),
             );
+<<<<<<< HEAD
+=======
+            // @codeCoverageIgnoreEnd
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
     }
 }

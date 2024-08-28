@@ -24,12 +24,27 @@ use League\CommonMark\Util\RegexHelper;
 
 final class QuoteParser implements InlineParserInterface
 {
+<<<<<<< HEAD
     public const DOUBLE_QUOTES = [Quote::DOUBLE_QUOTE, Quote::DOUBLE_QUOTE_OPENER, Quote::DOUBLE_QUOTE_CLOSER];
+=======
+    /**
+     * @deprecated This constant is no longer used and will be removed in a future major release
+     */
+    public const DOUBLE_QUOTES = [Quote::DOUBLE_QUOTE, Quote::DOUBLE_QUOTE_OPENER, Quote::DOUBLE_QUOTE_CLOSER];
+
+    /**
+     * @deprecated This constant is no longer used and will be removed in a future major release
+     */
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     public const SINGLE_QUOTES = [Quote::SINGLE_QUOTE, Quote::SINGLE_QUOTE_OPENER, Quote::SINGLE_QUOTE_CLOSER];
 
     public function getMatchDefinition(): InlineParserMatch
     {
+<<<<<<< HEAD
         return InlineParserMatch::oneOf(...[...self::DOUBLE_QUOTES, ...self::SINGLE_QUOTES]);
+=======
+        return InlineParserMatch::oneOf(Quote::SINGLE_QUOTE, Quote::DOUBLE_QUOTE);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     }
 
     /**
@@ -40,8 +55,11 @@ final class QuoteParser implements InlineParserInterface
         $char   = $inlineContext->getFullMatch();
         $cursor = $inlineContext->getCursor();
 
+<<<<<<< HEAD
         $normalizedCharacter = $this->getNormalizedQuoteCharacter($char);
 
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         $charBefore = $cursor->peek(-1);
         if ($charBefore === null) {
             $charBefore = "\n";
@@ -58,15 +76,24 @@ final class QuoteParser implements InlineParserInterface
         $canOpen                        = $leftFlanking && ! $rightFlanking;
         $canClose                       = $rightFlanking;
 
+<<<<<<< HEAD
         $node = new Quote($normalizedCharacter, ['delim' => true]);
         $inlineContext->getContainer()->appendChild($node);
 
         // Add entry to stack to this opener
         $inlineContext->getDelimiterStack()->push(new Delimiter($normalizedCharacter, 1, $node, $canOpen, $canClose));
+=======
+        $node = new Quote($char, ['delim' => true]);
+        $inlineContext->getContainer()->appendChild($node);
+
+        // Add entry to stack to this opener
+        $inlineContext->getDelimiterStack()->push(new Delimiter($char, 1, $node, $canOpen, $canClose));
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 
         return true;
     }
 
+<<<<<<< HEAD
     private function getNormalizedQuoteCharacter(string $character): string
     {
         if (\in_array($character, self::DOUBLE_QUOTES, true)) {
@@ -80,6 +107,8 @@ final class QuoteParser implements InlineParserInterface
         return $character;
     }
 
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     /**
      * @return bool[]
      */

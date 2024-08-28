@@ -155,7 +155,11 @@ abstract class AbstractUnicodeString extends AbstractString
     public function camel(): static
     {
         $str = clone $this;
+<<<<<<< HEAD
         $str->string = str_replace(' ', '', preg_replace_callback('/\b.(?![A-Z]{2,})/u', static function ($m) {
+=======
+        $str->string = str_replace(' ', '', preg_replace_callback('/\b.(?!\p{Lu})/u', static function ($m) {
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             static $i = 0;
 
             return 1 === ++$i ? ('İ' === $m[0] ? 'i̇' : mb_strtolower($m[0], 'UTF-8')) : mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8');
@@ -361,8 +365,13 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function snake(): static
     {
+<<<<<<< HEAD
         $str = clone $this;
         $str->string = str_replace(' ', '_', mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1 \2', $str->string), 'UTF-8'));
+=======
+        $str = $this->camel();
+        $str->string = mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $str->string), 'UTF-8');
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 
         return $str;
     }

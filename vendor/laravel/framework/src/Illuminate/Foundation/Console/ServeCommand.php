@@ -295,7 +295,11 @@ class ServeCommand extends Command
 
                 $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
                 $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
+<<<<<<< HEAD
             } elseif (str($line)->contains(['Closed without sending a request'])) {
+=======
+            } elseif (str($line)->contains(['Closed without sending a request', 'Failed to poll event'])) {
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 // ...
             } elseif (! empty($line)) {
                 $position = strpos($line, '] ');

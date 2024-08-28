@@ -94,7 +94,11 @@ final class Callback
 		}
 
 		if (is_string($callable) && str_contains($callable, '::')) {
+<<<<<<< HEAD
 			return new ReflectionMethod($callable);
+=======
+			return new ReflectionMethod(...explode('::', $callable, 2));
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 		} elseif (is_array($callable)) {
 			return new ReflectionMethod($callable[0], $callable[1]);
 		} elseif (is_object($callable) && !$callable instanceof \Closure) {

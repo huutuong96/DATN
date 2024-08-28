@@ -37,7 +37,11 @@ final class SplObjectStorageComparator extends Comparator
                     $actual,
                     $exporter->export($expected),
                     $exporter->export($actual),
+<<<<<<< HEAD
                     'Failed asserting that two objects are equal.'
+=======
+                    'Failed asserting that two objects are equal.',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
             }
         }
@@ -49,7 +53,11 @@ final class SplObjectStorageComparator extends Comparator
                     $actual,
                     $exporter->export($expected),
                     $exporter->export($actual),
+<<<<<<< HEAD
                     'Failed asserting that two objects are equal.'
+=======
+                    'Failed asserting that two objects are equal.',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
             }
         }

@@ -2,6 +2,15 @@
 
 All notable changes are documented in this file using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+<<<<<<< HEAD
+=======
+## [5.0.2] - 2024-08-12
+
+### Fixed
+
+* [#112](https://github.com/sebastianbergmann/comparator/issues/112): Arrays with different keys and the same values are considered equal in canonicalize mode
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 ## [5.0.1] - 2023-08-14
 
 ### Fixed
@@ -144,6 +153,10 @@ All notable changes are documented in this file using the [Keep a CHANGELOG](htt
 * Added `SebastianBergmann\Comparator\Factory::reset()` to unregister all non-default comparators
 * Added support for `phpunit/phpunit-mock-objects` version `^5.0`
 
+<<<<<<< HEAD
+=======
+[5.0.2]: https://github.com/sebastianbergmann/comparator/compare/5.0.1...5.0.2
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 [5.0.1]: https://github.com/sebastianbergmann/comparator/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/sebastianbergmann/comparator/compare/4.0.8...5.0.0
 [4.0.8]: https://github.com/sebastianbergmann/comparator/compare/4.0.7...4.0.8

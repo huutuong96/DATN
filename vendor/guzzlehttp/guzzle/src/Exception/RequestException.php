@@ -7,7 +7,10 @@ use GuzzleHttp\BodySummarizerInterface;
 use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+<<<<<<< HEAD
 use Psr\Http\Message\UriInterface;
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 
 /**
  * HTTP Request exception
@@ -32,8 +35,13 @@ class RequestException extends TransferException implements RequestExceptionInte
     public function __construct(
         string $message,
         RequestInterface $request,
+<<<<<<< HEAD
         ResponseInterface $response = null,
         \Throwable $previous = null,
+=======
+        ?ResponseInterface $response = null,
+        ?\Throwable $previous = null,
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         array $handlerContext = []
     ) {
         // Set the code of the exception if the response is set and not future.
@@ -63,10 +71,17 @@ class RequestException extends TransferException implements RequestExceptionInte
      */
     public static function create(
         RequestInterface $request,
+<<<<<<< HEAD
         ResponseInterface $response = null,
         \Throwable $previous = null,
         array $handlerContext = [],
         BodySummarizerInterface $bodySummarizer = null
+=======
+        ?ResponseInterface $response = null,
+        ?\Throwable $previous = null,
+        array $handlerContext = [],
+        ?BodySummarizerInterface $bodySummarizer = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ): self {
         if (!$response) {
             return new self(
@@ -90,8 +105,12 @@ class RequestException extends TransferException implements RequestExceptionInte
             $className = __CLASS__;
         }
 
+<<<<<<< HEAD
         $uri = $request->getUri();
         $uri = static::obfuscateUri($uri);
+=======
+        $uri = \GuzzleHttp\Psr7\Utils::redactUserInfo($request->getUri());
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 
         // Client Error: `GET /` resulted in a `404 Not Found` response:
         // <html> ... (truncated)
@@ -114,6 +133,7 @@ class RequestException extends TransferException implements RequestExceptionInte
     }
 
     /**
+<<<<<<< HEAD
      * Obfuscates URI if there is a username and a password present
      */
     private static function obfuscateUri(UriInterface $uri): UriInterface
@@ -128,6 +148,8 @@ class RequestException extends TransferException implements RequestExceptionInte
     }
 
     /**
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      * Get the request that caused the exception
      */
     public function getRequest(): RequestInterface

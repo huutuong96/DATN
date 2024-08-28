@@ -31,6 +31,10 @@ class OpenAiSolutionProvider implements HasSolutionsForThrowable
             cacheTtlInSeconds: 60,
             applicationType: 'Laravel ' . Str::before(app()->version(), '.'),
             applicationPath: base_path(),
+<<<<<<< HEAD
+=======
+            openAiModel: config('error-solutions.open_ai_model', 'gpt-3.5-turbo'),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         );
 
         return $solutionProvider->getSolutions($throwable);

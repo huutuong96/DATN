@@ -44,7 +44,11 @@ class HandlerStack
      *                                                                            handler is provided, the best handler for your
      *                                                                            system will be utilized.
      */
+<<<<<<< HEAD
     public static function create(callable $handler = null): self
+=======
+    public static function create(?callable $handler = null): self
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $stack = new self($handler ?: Utils::chooseHandler());
         $stack->push(Middleware::httpErrors(), 'http_errors');
@@ -58,7 +62,11 @@ class HandlerStack
     /**
      * @param (callable(RequestInterface, array): PromiseInterface)|null $handler Underlying HTTP handler.
      */
+<<<<<<< HEAD
     public function __construct(callable $handler = null)
+=======
+    public function __construct(?callable $handler = null)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $this->handler = $handler;
     }
@@ -131,7 +139,11 @@ class HandlerStack
      * @param callable(callable): callable $middleware Middleware function
      * @param string                       $name       Name to register for this middleware.
      */
+<<<<<<< HEAD
     public function unshift(callable $middleware, string $name = null): void
+=======
+    public function unshift(callable $middleware, ?string $name = null): void
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         \array_unshift($this->stack, [$middleware, $name]);
         $this->cached = null;

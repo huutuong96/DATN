@@ -63,6 +63,7 @@ final class IndentedCodeParser extends AbstractBlockContinueParser
 
     public function closeBlock(): void
     {
+<<<<<<< HEAD
         $reversed = \array_reverse($this->strings->toArray(), true);
         foreach ($reversed as $index => $line) {
             if ($line !== '' && $line !== "\n" && ! \preg_match('/^(\n *)$/', $line)) {
@@ -79,5 +80,16 @@ final class IndentedCodeParser extends AbstractBlockContinueParser
         }
 
         $this->block->setLiteral($tmp);
+=======
+        $lines = $this->strings->toArray();
+
+        // Note that indented code block cannot be empty, so $lines will always have at least one non-empty element
+        while (\preg_match('/^[ \t]*$/', \end($lines))) { // @phpstan-ignore-line
+            \array_pop($lines);
+        }
+
+        $this->block->setLiteral(\implode("\n", $lines) . "\n");
+        $this->block->setEndLine($this->block->getStartLine() + \count($lines) - 1);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     }
 }

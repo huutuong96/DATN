@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "e06728e5442edec84af96f94a889b4a7",
+=======
+    "content-hash": "9ed18efde2d64b100c617b290b183726",
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     "packages": [
         {
             "name": "myclabs/deep-copy",
@@ -733,6 +737,7 @@
         },
         {
             "name": "sebastian/comparator",
+<<<<<<< HEAD
             "version": "5.0.1",
             "source": {
                 "type": "git",
@@ -743,6 +748,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/2db5010a484d53ebf536087a70b4a5423c102372",
                 "reference": "2db5010a484d53ebf536087a70b4a5423c102372",
+=======
+            "version": "5.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/comparator.git",
+                "reference": "2d3e04c3b4c1e84a5e7382221ad8883c8fbc4f53"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/2d3e04c3b4c1e84a5e7382221ad8883c8fbc4f53",
+                "reference": "2d3e04c3b4c1e84a5e7382221ad8883c8fbc4f53",
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 "shasum": ""
             },
             "require": {
@@ -753,7 +770,11 @@
                 "sebastian/exporter": "^5.0"
             },
             "require-dev": {
+<<<<<<< HEAD
                 "phpunit/phpunit": "^10.3"
+=======
+                "phpunit/phpunit": "^10.4"
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             },
             "type": "library",
             "extra": {
@@ -798,7 +819,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/comparator/issues",
                 "security": "https://github.com/sebastianbergmann/comparator/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/comparator/tree/5.0.1"
+=======
+                "source": "https://github.com/sebastianbergmann/comparator/tree/5.0.2"
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             },
             "funding": [
                 {
@@ -806,7 +831,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2023-08-14T13:18:12+00:00"
+=======
+            "time": "2024-08-12T06:03:08+00:00"
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         },
         {
             "name": "sebastian/complexity",

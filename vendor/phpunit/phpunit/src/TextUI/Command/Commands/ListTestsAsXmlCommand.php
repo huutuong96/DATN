@@ -9,6 +9,10 @@
  */
 namespace PHPUnit\TextUI\Command;
 
+<<<<<<< HEAD
+=======
+use const PHP_EOL;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function file_put_contents;
 use function implode;
 use function sprintf;
@@ -21,6 +25,11 @@ use RecursiveIteratorIterator;
 use XMLWriter;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class ListTestsAsXmlCommand implements Command

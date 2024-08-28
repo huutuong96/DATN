@@ -10,14 +10,25 @@
 namespace PHPUnit\Framework\MockObject\Stub;
 
 use function array_shift;
+<<<<<<< HEAD
 use PHPUnit\Framework\MockObject\Invocation;
 
 /**
+=======
+use function count;
+use PHPUnit\Framework\MockObject\Invocation;
+use PHPUnit\Framework\MockObject\NoMoreReturnValuesConfiguredException;
+
+/**
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class ConsecutiveCalls implements Stub
 {
     private array $stack;
+<<<<<<< HEAD
 
     public function __construct(array $stack)
     {
@@ -26,6 +37,28 @@ final class ConsecutiveCalls implements Stub
 
     public function invoke(Invocation $invocation): mixed
     {
+=======
+    private int $numberOfConfiguredReturnValues;
+
+    public function __construct(array $stack)
+    {
+        $this->stack                          = $stack;
+        $this->numberOfConfiguredReturnValues = count($stack);
+    }
+
+    /**
+     * @throws NoMoreReturnValuesConfiguredException
+     */
+    public function invoke(Invocation $invocation): mixed
+    {
+        if (empty($this->stack)) {
+            throw new NoMoreReturnValuesConfiguredException(
+                $invocation,
+                $this->numberOfConfiguredReturnValues,
+            );
+        }
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         $value = array_shift($this->stack);
 
         if ($value instanceof Stub) {

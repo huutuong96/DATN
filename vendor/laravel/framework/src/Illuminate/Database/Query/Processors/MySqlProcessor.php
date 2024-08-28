@@ -2,6 +2,11 @@
 
 namespace Illuminate\Database\Query\Processors;
 
+<<<<<<< HEAD
+=======
+use Illuminate\Database\Query\Builder;
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 class MySqlProcessor extends Processor
 {
     /**
@@ -20,6 +25,27 @@ class MySqlProcessor extends Processor
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Process an  "insert get ID" query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sql
+     * @param  array  $values
+     * @param  string|null  $sequence
+     * @return int
+     */
+    public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
+    {
+        $query->getConnection()->insert($sql, $values, $sequence);
+
+        $id = $query->getConnection()->getLastInsertId();
+
+        return is_numeric($id) ? (int) $id : $id;
+    }
+
+    /**
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      * Process the results of a columns query.
      *
      * @param  array  $results

@@ -80,5 +80,9 @@ interface ClientInterface
      *
      * @deprecated ClientInterface::getConfig will be removed in guzzlehttp/guzzle:8.0.
      */
+<<<<<<< HEAD
     public function getConfig(string $option = null);
+=======
+    public function getConfig(?string $option = null);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 }

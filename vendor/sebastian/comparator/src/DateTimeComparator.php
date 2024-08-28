@@ -54,7 +54,11 @@ final class DateTimeComparator extends ObjectComparator
                 $actual,
                 $this->dateTimeToString($expected),
                 $this->dateTimeToString($actual),
+<<<<<<< HEAD
                 'Failed asserting that two DateTime objects are equal.'
+=======
+                'Failed asserting that two DateTime objects are equal.',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             );
         }
     }

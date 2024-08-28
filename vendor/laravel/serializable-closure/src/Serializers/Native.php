@@ -378,6 +378,13 @@ class Native implements Serializable
                         continue;
                     }
 
+<<<<<<< HEAD
+=======
+                    if (PHP_VERSION >= 8.1 && $property->isReadOnly()) {
+                        continue;
+                    }
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                     $item = $property->getValue($data);
 
                     if ($item instanceof SerializableClosure || $item instanceof UnsignedSerializableClosure || ($item instanceof SelfReference && $item->hash === $this->code['self'])) {

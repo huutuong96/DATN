@@ -35,7 +35,11 @@
         "ext-mbstring": "*"
     },
     "require-dev": {
+<<<<<<< HEAD
         "phpunit/phpunit": "^10.3"
+=======
+        "phpunit/phpunit": "^10.4"
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     },
     "config": {
         "platform": {

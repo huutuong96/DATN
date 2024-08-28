@@ -145,7 +145,11 @@ class Backtrace
             $options = $options | DEBUG_BACKTRACE_IGNORE_ARGS;
         }
 
+<<<<<<< HEAD
         if ($this->withObject()) {
+=======
+        if ($this->withObject) {
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             $options = $options | DEBUG_BACKTRACE_PROVIDE_OBJECT;
         }
 

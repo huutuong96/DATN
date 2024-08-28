@@ -621,7 +621,11 @@ class CliDumper extends AbstractDumper
         }
 
         // Follow https://no-color.org/
+<<<<<<< HEAD
         if (isset($_SERVER['NO_COLOR']) || false !== getenv('NO_COLOR')) {
+=======
+        if ('' !== ($_SERVER['NO_COLOR'] ?? getenv('NO_COLOR') ?: '')) {
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             return false;
         }
 

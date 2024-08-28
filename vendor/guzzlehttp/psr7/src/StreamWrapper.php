@@ -69,7 +69,11 @@ final class StreamWrapper
         }
     }
 
+<<<<<<< HEAD
     public function stream_open(string $path, string $mode, int $options, string &$opened_path = null): bool
+=======
+    public function stream_open(string $path, string $mode, int $options, ?string &$opened_path = null): bool
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $options = stream_context_get_options($this->context);
 
@@ -136,10 +140,21 @@ final class StreamWrapper
      *   ctime: int,
      *   blksize: int,
      *   blocks: int
+<<<<<<< HEAD
      * }
      */
     public function stream_stat(): array
     {
+=======
+     * }|false
+     */
+    public function stream_stat()
+    {
+        if ($this->stream->getSize() === null) {
+            return false;
+        }
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         static $modeMap = [
             'r' => 33060,
             'rb' => 33060,

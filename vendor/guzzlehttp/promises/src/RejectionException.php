@@ -18,7 +18,11 @@ class RejectionException extends \RuntimeException
      * @param mixed       $reason      Rejection reason.
      * @param string|null $description Optional description.
      */
+<<<<<<< HEAD
     public function __construct($reason, string $description = null)
+=======
+    public function __construct($reason, ?string $description = null)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $this->reason = $reason;
 

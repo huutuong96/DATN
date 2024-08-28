@@ -196,7 +196,10 @@
         <xs:attribute name="beStrictAboutChangesToGlobalState" type="xs:boolean" default="false"/>
         <xs:attribute name="beStrictAboutOutputDuringTests" type="xs:boolean" default="false"/>
         <xs:attribute name="beStrictAboutTestsThatDoNotTestAnything" type="xs:boolean" default="true"/>
+<<<<<<< HEAD
         <xs:attribute name="beStrictAboutTodoAnnotatedTests" type="xs:boolean" default="false"/>
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         <xs:attribute name="beStrictAboutCoverageMetadata" type="xs:boolean" default="false"/>
         <xs:attribute name="defaultTimeLimit" type="xs:integer" default="0"/>
         <xs:attribute name="enforceTimeLimit" type="xs:boolean" default="false"/>

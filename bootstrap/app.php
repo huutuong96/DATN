@@ -41,6 +41,13 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+<<<<<<< HEAD
+=======
+$app->register(App\Providers\AuthServiceProvider::class);
+
+
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 /*
 |--------------------------------------------------------------------------
 | Return The Application

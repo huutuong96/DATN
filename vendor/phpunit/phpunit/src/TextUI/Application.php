@@ -10,6 +10,10 @@
 namespace PHPUnit\TextUI;
 
 use const PHP_EOL;
+<<<<<<< HEAD
+=======
+use const PHP_VERSION;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function is_file;
 use function is_readable;
 use function printf;
@@ -77,6 +81,11 @@ use SebastianBergmann\Timer\Timer;
 use Throwable;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class Application
@@ -287,15 +296,49 @@ final class Application
         // @codeCoverageIgnoreEnd
     }
 
+<<<<<<< HEAD
     private function execute(Command\Command $command): never
     {
+=======
+    private function execute(Command\Command $command, bool $requiresResultCollectedFromEvents = false): never
+    {
+        if ($requiresResultCollectedFromEvents) {
+            try {
+                TestResultFacade::init();
+                EventFacade::instance()->seal();
+
+                $resultCollectedFromEvents = TestResultFacade::result();
+            } catch (EventFacadeIsSealedException|UnknownSubscriberTypeException) {
+            }
+        }
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         print Version::getVersionString() . PHP_EOL . PHP_EOL;
 
         $result = $command->execute();
 
         print $result->output();
 
+<<<<<<< HEAD
         exit($result->shellExitCode());
+=======
+        $shellExitCode = $result->shellExitCode();
+
+        if (isset($resultCollectedFromEvents) &&
+            $resultCollectedFromEvents->hasTestTriggeredPhpunitErrorEvents()) {
+            $shellExitCode = Result::EXCEPTION;
+
+            print PHP_EOL . PHP_EOL . 'There were errors:' . PHP_EOL;
+
+            foreach ($resultCollectedFromEvents->testTriggeredPhpunitErrorEvents() as $events) {
+                foreach ($events as $event) {
+                    print PHP_EOL . trim($event->message()) . PHP_EOL;
+                }
+            }
+        }
+
+        exit($shellExitCode);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     }
 
     private function loadBootstrapScript(string $filename): void
@@ -435,11 +478,19 @@ final class Application
     private function executeCommandsThatRequireCliConfigurationAndTestSuite(CliConfiguration $cliConfiguration, TestSuite $testSuite): void
     {
         if ($cliConfiguration->listGroups()) {
+<<<<<<< HEAD
             $this->execute(new ListGroupsCommand($testSuite));
         }
 
         if ($cliConfiguration->listTests()) {
             $this->execute(new ListTestsAsTextCommand($testSuite));
+=======
+            $this->execute(new ListGroupsCommand($testSuite), true);
+        }
+
+        if ($cliConfiguration->listTests()) {
+            $this->execute(new ListTestsAsTextCommand($testSuite), true);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
 
         if ($cliConfiguration->hasListTestsXml()) {
@@ -448,6 +499,10 @@ final class Application
                     $cliConfiguration->listTestsXml(),
                     $testSuite,
                 ),
+<<<<<<< HEAD
+=======
+                true,
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             );
         }
     }

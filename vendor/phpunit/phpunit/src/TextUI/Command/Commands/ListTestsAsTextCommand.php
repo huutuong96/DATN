@@ -9,6 +9,10 @@
  */
 namespace PHPUnit\TextUI\Command;
 
+<<<<<<< HEAD
+=======
+use const PHP_EOL;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function sprintf;
 use function str_replace;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +22,11 @@ use PHPUnit\TextUI\Configuration\Registry;
 use RecursiveIteratorIterator;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class ListTestsAsTextCommand implements Command

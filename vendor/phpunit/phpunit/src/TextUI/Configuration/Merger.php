@@ -10,6 +10,10 @@
 namespace PHPUnit\TextUI\Configuration;
 
 use const DIRECTORY_SEPARATOR;
+<<<<<<< HEAD
+=======
+use const PATH_SEPARATOR;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function array_diff;
 use function assert;
 use function dirname;
@@ -31,6 +35,11 @@ use SebastianBergmann\Environment\Console;
 use SebastianBergmann\Invoker\Invoker;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class Merger

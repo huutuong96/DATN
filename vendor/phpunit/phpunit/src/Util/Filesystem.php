@@ -9,6 +9,10 @@
  */
 namespace PHPUnit\Util;
 
+<<<<<<< HEAD
+=======
+use const DIRECTORY_SEPARATOR;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function basename;
 use function dirname;
 use function is_dir;
@@ -17,6 +21,11 @@ use function realpath;
 use function str_starts_with;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class Filesystem

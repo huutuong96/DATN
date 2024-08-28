@@ -12,6 +12,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+<<<<<<< HEAD
+=======
+use JsonException;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use JsonSerializable;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
@@ -144,10 +148,17 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toJson($options = 0)
     {
+<<<<<<< HEAD
         $json = json_encode($this->jsonSerialize(), $options);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw JsonEncodingException::forResource($this, json_last_error_msg());
+=======
+        try {
+            $json = json_encode($this->jsonSerialize(), $options | JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw JsonEncodingException::forResource($this, $e->getMessage());
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
 
         return $json;

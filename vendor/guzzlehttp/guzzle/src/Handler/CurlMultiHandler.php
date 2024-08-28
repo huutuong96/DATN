@@ -2,6 +2,10 @@
 
 namespace GuzzleHttp\Handler;
 
+<<<<<<< HEAD
+=======
+use Closure;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use GuzzleHttp\Promise as P;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -159,6 +163,12 @@ class CurlMultiHandler
             }
         }
 
+<<<<<<< HEAD
+=======
+        // Run curl_multi_exec in the queue to enable other async tasks to run
+        P\Utils::queue()->add(Closure::fromCallable([$this, 'tickInQueue']));
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         // Step through the task queue which may add additional requests.
         P\Utils::queue()->run();
 
@@ -169,12 +179,31 @@ class CurlMultiHandler
         }
 
         while (\curl_multi_exec($this->_mh, $this->active) === \CURLM_CALL_MULTI_PERFORM) {
+<<<<<<< HEAD
+=======
+            // Prevent busy looping for slow HTTP requests.
+            \curl_multi_select($this->_mh, $this->selectTimeout);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
 
         $this->processMessages();
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Runs \curl_multi_exec() inside the event loop, to prevent busy looping
+     */
+    private function tickInQueue(): void
+    {
+        if (\curl_multi_exec($this->_mh, $this->active) === \CURLM_CALL_MULTI_PERFORM) {
+            \curl_multi_select($this->_mh, 0);
+            P\Utils::queue()->add(Closure::fromCallable([$this, 'tickInQueue']));
+        }
+    }
+
+    /**
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      * Runs until all outstanding connections have completed.
      */
     public function execute(): void

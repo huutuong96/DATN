@@ -6,10 +6,19 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+<<<<<<< HEAD
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8"
+=======
+        "cloudinary-labs/cloudinary-laravel": "^2.2",
+        "guzzlehttp/guzzle": "^7.2",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.2",
+        "laravel/tinker": "^2.8",
+        "tymon/jwt-auth": "^2.1"
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

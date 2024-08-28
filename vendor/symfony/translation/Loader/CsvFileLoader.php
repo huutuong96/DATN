@@ -22,7 +22,11 @@ class CsvFileLoader extends FileLoader
 {
     private string $delimiter = ';';
     private string $enclosure = '"';
+<<<<<<< HEAD
     private string $escape = '\\';
+=======
+    private string $escape = '';
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 
     protected function loadResource(string $resource): array
     {
@@ -55,7 +59,11 @@ class CsvFileLoader extends FileLoader
      *
      * @return void
      */
+<<<<<<< HEAD
     public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = '\\')
+=======
+    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = '')
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;

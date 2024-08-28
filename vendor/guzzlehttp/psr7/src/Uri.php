@@ -279,7 +279,11 @@ class Uri implements UriInterface, \JsonSerializable
      *
      * @see https://datatracker.ietf.org/doc/html/rfc3986#section-4.4
      */
+<<<<<<< HEAD
     public static function isSameDocumentReference(UriInterface $uri, UriInterface $base = null): bool
+=======
+    public static function isSameDocumentReference(UriInterface $uri, ?UriInterface $base = null): bool
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         if ($base !== null) {
             $uri = UriResolver::resolve($base, $uri);

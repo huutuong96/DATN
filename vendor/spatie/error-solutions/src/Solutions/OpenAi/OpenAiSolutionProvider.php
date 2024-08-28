@@ -9,11 +9,20 @@ use Throwable;
 class OpenAiSolutionProvider implements HasSolutionsForThrowable
 {
     public function __construct(
+<<<<<<< HEAD
         protected string $openAiKey,
         protected ?CacheInterface $cache = null,
         protected int $cacheTtlInSeconds = 60 * 60,
         protected string|null $applicationType = null,
         protected string|null $applicationPath = null,
+=======
+        protected string            $openAiKey,
+        protected ?CacheInterface   $cache = null,
+        protected int               $cacheTtlInSeconds = 60 * 60,
+        protected string|null       $applicationType = null,
+        protected string|null       $applicationPath = null,
+        protected string            $openAiModel = 'gpt-3.5-turbo',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ) {
         $this->cache ??= new DummyCache();
     }
@@ -33,6 +42,10 @@ class OpenAiSolutionProvider implements HasSolutionsForThrowable
                 $this->cacheTtlInSeconds,
                 $this->applicationType,
                 $this->applicationPath,
+<<<<<<< HEAD
+=======
+                $this->openAiModel
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             ),
         ];
     }

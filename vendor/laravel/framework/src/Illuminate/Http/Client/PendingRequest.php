@@ -911,11 +911,23 @@ class PendingRequest
                             $response->throw($this->throwCallback);
                         }
 
+<<<<<<< HEAD
                         if ($attempt < $this->tries && $shouldRetry) {
                             $response->throw();
                         }
 
                         if ($this->tries > 1 && $this->retryThrow) {
+=======
+                        $potentialTries = is_array($this->tries)
+                            ? count($this->tries) + 1
+                            : $this->tries;
+
+                        if ($attempt < $potentialTries && $shouldRetry) {
+                            $response->throw();
+                        }
+
+                        if ($potentialTries > 1 && $this->retryThrow) {
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                             $response->throw();
                         }
                     }

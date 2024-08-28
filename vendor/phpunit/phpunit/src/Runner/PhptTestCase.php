@@ -67,6 +67,11 @@ use SebastianBergmann\Template\Template;
 use Throwable;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class PhptTestCase implements Reorderable, SelfDescribing, Test
@@ -199,6 +204,11 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
             );
         }
 
+<<<<<<< HEAD
+=======
+        $passed = true;
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         try {
             $this->assertPhptExpectation($sections, $this->output);
         } catch (AssertionFailedError $e) {
@@ -232,8 +242,21 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
             } else {
                 $emitter->testFailed($this->valueObjectForEvents(), ThrowableBuilder::from($failure), null);
             }
+<<<<<<< HEAD
         } catch (Throwable $t) {
             $emitter->testErrored($this->valueObjectForEvents(), ThrowableBuilder::from($t));
+=======
+
+            $passed = false;
+        } catch (Throwable $t) {
+            $emitter->testErrored($this->valueObjectForEvents(), ThrowableBuilder::from($t));
+
+            $passed = false;
+        }
+
+        if ($passed) {
+            $emitter->testPassed($this->valueObjectForEvents());
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
 
         $this->runClean($sections, CodeCoverage::instance()->isActive());

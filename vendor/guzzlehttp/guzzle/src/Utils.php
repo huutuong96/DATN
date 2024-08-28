@@ -71,7 +71,11 @@ final class Utils
             return \STDOUT;
         }
 
+<<<<<<< HEAD
         return \GuzzleHttp\Psr7\Utils::tryFopen('php://output', 'w');
+=======
+        return Psr7\Utils::tryFopen('php://output', 'w');
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     }
 
     /**
@@ -87,7 +91,11 @@ final class Utils
     {
         $handler = null;
 
+<<<<<<< HEAD
         if (\defined('CURLOPT_CUSTOMREQUEST')) {
+=======
+        if (\defined('CURLOPT_CUSTOMREQUEST') && \function_exists('curl_version') && version_compare(curl_version()['version'], '7.21.2') >= 0) {
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             if (\function_exists('curl_multi_exec') && \function_exists('curl_exec')) {
                 $handler = Proxy::wrapSync(new CurlMultiHandler(), new CurlHandler());
             } elseif (\function_exists('curl_exec')) {

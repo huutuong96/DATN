@@ -76,11 +76,19 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     private static array $freshCache = [];
 
+<<<<<<< HEAD
     public const VERSION = '6.4.9';
     public const VERSION_ID = 60409;
     public const MAJOR_VERSION = 6;
     public const MINOR_VERSION = 4;
     public const RELEASE_VERSION = 9;
+=======
+    public const VERSION = '6.4.10';
+    public const VERSION_ID = 60410;
+    public const MAJOR_VERSION = 6;
+    public const MINOR_VERSION = 4;
+    public const RELEASE_VERSION = 10;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     public const EXTRA_VERSION = '';
 
     public const END_OF_MAINTENANCE = '11/2026';
@@ -539,6 +547,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             touch($oldContainerDir.'.legacy');
         }
 
+<<<<<<< HEAD
+=======
+        $buildDir = $this->container->getParameter('kernel.build_dir');
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         $cacheDir = $this->container->getParameter('kernel.cache_dir');
         $preload = $this instanceof WarmableInterface ? (array) $this->warmUp($cacheDir, $buildDir) : [];
 

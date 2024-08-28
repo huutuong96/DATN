@@ -42,8 +42,13 @@ class ObjectComparator extends ArrayComparator
                 sprintf(
                     '%s is not instance of expected class "%s".',
                     $exporter->export($actual),
+<<<<<<< HEAD
                     $expected::class
                 )
+=======
+                    $expected::class,
+                ),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             );
         }
 
@@ -66,7 +71,11 @@ class ObjectComparator extends ArrayComparator
                     $delta,
                     $canonicalize,
                     $ignoreCase,
+<<<<<<< HEAD
                     $processed
+=======
+                    $processed,
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
             } catch (ComparisonFailure $e) {
                 throw new ComparisonFailure(
@@ -75,7 +84,11 @@ class ObjectComparator extends ArrayComparator
                     // replace "Array" with "MyClass object"
                     substr_replace($e->getExpectedAsString(), $expected::class . ' Object', 0, 5),
                     substr_replace($e->getActualAsString(), $actual::class . ' Object', 0, 5),
+<<<<<<< HEAD
                     'Failed asserting that two objects are equal.'
+=======
+                    'Failed asserting that two objects are equal.',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 );
             }
         }

@@ -272,6 +272,10 @@ class Router implements RouterInterface, RequestMatcherInterface
                 }
 
                 $cache->write($dumper->dump(), $this->getRouteCollection()->getResources());
+<<<<<<< HEAD
+=======
+                unset(self::$cache[$cache->getPath()]);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             }
         );
 
@@ -301,6 +305,10 @@ class Router implements RouterInterface, RequestMatcherInterface
                     $dumper = $this->getGeneratorDumperInstance();
 
                     $cache->write($dumper->dump(), $this->getRouteCollection()->getResources());
+<<<<<<< HEAD
+=======
+                    unset(self::$cache[$cache->getPath()]);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 }
             );
 

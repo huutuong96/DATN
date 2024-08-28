@@ -21,7 +21,11 @@ final class Utils
      *
      * @param TaskQueueInterface|null $assign Optionally specify a new queue instance.
      */
+<<<<<<< HEAD
     public static function queue(TaskQueueInterface $assign = null): TaskQueueInterface
+=======
+    public static function queue(?TaskQueueInterface $assign = null): TaskQueueInterface
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         static $queue;
 

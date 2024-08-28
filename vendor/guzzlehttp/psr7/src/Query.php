@@ -63,12 +63,24 @@ final class Query
      * string. This function does not modify the provided keys when an array is
      * encountered (like `http_build_query()` would).
      *
+<<<<<<< HEAD
      * @param array     $params   Query string parameters.
      * @param int|false $encoding Set to false to not encode, PHP_QUERY_RFC3986
      *                            to encode using RFC3986, or PHP_QUERY_RFC1738
      *                            to encode using RFC1738.
      */
     public static function build(array $params, $encoding = PHP_QUERY_RFC3986): string
+=======
+     * @param array     $params           Query string parameters.
+     * @param int|false $encoding         Set to false to not encode,
+     *                                    PHP_QUERY_RFC3986 to encode using
+     *                                    RFC3986, or PHP_QUERY_RFC1738 to
+     *                                    encode using RFC1738.
+     * @param bool      $treatBoolsAsInts Set to true to encode as 0/1, and
+     *                                    false as false/true.
+     */
+    public static function build(array $params, $encoding = PHP_QUERY_RFC3986, bool $treatBoolsAsInts = true): string
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         if (!$params) {
             return '';
@@ -86,12 +98,21 @@ final class Query
             throw new \InvalidArgumentException('Invalid type');
         }
 
+<<<<<<< HEAD
+=======
+        $castBool = $treatBoolsAsInts ? static function ($v) { return (int) $v; } : static function ($v) { return $v ? 'true' : 'false'; };
+
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         $qs = '';
         foreach ($params as $k => $v) {
             $k = $encoder((string) $k);
             if (!is_array($v)) {
                 $qs .= $k;
+<<<<<<< HEAD
                 $v = is_bool($v) ? (int) $v : $v;
+=======
+                $v = is_bool($v) ? $castBool($v) : $v;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                 if ($v !== null) {
                     $qs .= '='.$encoder((string) $v);
                 }
@@ -99,7 +120,11 @@ final class Query
             } else {
                 foreach ($v as $vv) {
                     $qs .= $k;
+<<<<<<< HEAD
                     $vv = is_bool($vv) ? (int) $vv : $vv;
+=======
+                    $vv = is_bool($vv) ? $castBool($vv) : $vv;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                     if ($vv !== null) {
                         $qs .= '='.$encoder((string) $vv);
                     }

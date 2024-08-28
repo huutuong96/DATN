@@ -122,10 +122,18 @@ class Arrays
 
 	/**
 	 * Returns the first item (matching the specified predicate if given). If there is no such item, it returns result of invoking $else or null.
+<<<<<<< HEAD
 	 * The $predicate has the signature `function (mixed $value, int|string $key, array $array): bool`.
 	 * @template T
 	 * @param  array<T>  $array
 	 * @return ?T
+=======
+	 * @template K of int|string
+	 * @template V
+	 * @param  array<K, V>  $array
+	 * @param  ?callable(V, K, array<K, V>): bool  $predicate
+	 * @return ?V
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 */
 	public static function first(array $array, ?callable $predicate = null, ?callable $else = null): mixed
 	{
@@ -138,10 +146,18 @@ class Arrays
 
 	/**
 	 * Returns the last item (matching the specified predicate if given). If there is no such item, it returns result of invoking $else or null.
+<<<<<<< HEAD
 	 * The $predicate has the signature `function (mixed $value, int|string $key, array $array): bool`.
 	 * @template T
 	 * @param  array<T>  $array
 	 * @return ?T
+=======
+	 * @template K of int|string
+	 * @template V
+	 * @param  array<K, V>  $array
+	 * @param  ?callable(V, K, array<K, V>): bool  $predicate
+	 * @return ?V
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 */
 	public static function last(array $array, ?callable $predicate = null, ?callable $else = null): mixed
 	{
@@ -154,7 +170,15 @@ class Arrays
 
 	/**
 	 * Returns the key of first item (matching the specified predicate if given) or null if there is no such item.
+<<<<<<< HEAD
 	 * The $predicate has the signature `function (mixed $value, int|string $key, array $array): bool`.
+=======
+	 * @template K of int|string
+	 * @template V
+	 * @param  array<K, V>  $array
+	 * @param  ?callable(V, K, array<K, V>): bool  $predicate
+	 * @return ?K
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 */
 	public static function firstKey(array $array, ?callable $predicate = null): int|string|null
 	{
@@ -172,7 +196,15 @@ class Arrays
 
 	/**
 	 * Returns the key of last item (matching the specified predicate if given) or null if there is no such item.
+<<<<<<< HEAD
 	 * The $predicate has the signature `function (mixed $value, int|string $key, array $array): bool`.
+=======
+	 * @template K of int|string
+	 * @template V
+	 * @param  array<K, V>  $array
+	 * @param  ?callable(V, K, array<K, V>): bool  $predicate
+	 * @return ?K
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 */
 	public static function lastKey(array $array, ?callable $predicate = null): int|string|null
 	{
@@ -368,12 +400,20 @@ class Arrays
 
 
 	/**
+<<<<<<< HEAD
 	 * Tests whether at least one element in the array passes the test implemented by the provided function,
 	 * which has the signature `function ($value, $key, array $array): bool`.
 	 * @template K
 	 * @template V
 	 * @param  iterable<K, V> $array
 	 * @param  callable(V, K, ($array is array ? array<K, V> : iterable<K, V>)): bool $predicate
+=======
+	 * Tests whether at least one element in the array passes the test implemented by the provided function.
+	 * @template K of int|string
+	 * @template V
+	 * @param  array<K, V>  $array
+	 * @param  callable(V, K, array<K, V>): bool  $predicate
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 */
 	public static function some(iterable $array, callable $predicate): bool
 	{
@@ -388,12 +428,20 @@ class Arrays
 
 
 	/**
+<<<<<<< HEAD
 	 * Tests whether all elements in the array pass the test implemented by the provided function,
 	 * which has the signature `function ($value, $key, array $array): bool`.
 	 * @template K
 	 * @template V
 	 * @param  iterable<K, V> $array
 	 * @param  callable(V, K, ($array is array ? array<K, V> : iterable<K, V>)): bool $predicate
+=======
+	 * Tests whether all elements in the array pass the test implemented by the provided function.
+	 * @template K of int|string
+	 * @template V
+	 * @param  array<K, V>  $array
+	 * @param  callable(V, K, array<K, V>): bool  $predicate
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 */
 	public static function every(iterable $array, callable $predicate): bool
 	{
@@ -409,11 +457,18 @@ class Arrays
 
 	/**
 	 * Returns a new array containing all key-value pairs matching the given $predicate.
+<<<<<<< HEAD
 	 * The callback has the signature `function (mixed $value, int|string $key, array $array): bool`.
 	 * @template K of array-key
 	 * @template V
 	 * @param  array<K, V> $array
 	 * @param  callable(V, K, array<K, V>): bool $predicate
+=======
+	 * @template K of int|string
+	 * @template V
+	 * @param  array<K, V>  $array
+	 * @param  callable(V, K, array<K, V>): bool  $predicate
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 * @return array<K, V>
 	 */
 	public static function filter(array $array, callable $predicate): array
@@ -430,12 +485,20 @@ class Arrays
 
 	/**
 	 * Returns an array containing the original keys and results of applying the given transform function to each element.
+<<<<<<< HEAD
 	 * The function has signature `function ($value, $key, array $array): mixed`.
 	 * @template K of array-key
 	 * @template V
 	 * @template R
 	 * @param  iterable<K, V> $array
 	 * @param  callable(V, K, ($array is array ? array<K, V> : iterable<K, V>)): R $transformer
+=======
+	 * @template K of int|string
+	 * @template V
+	 * @template R
+	 * @param  array<K, V>  $array
+	 * @param  callable(V, K, array<K, V>): R  $transformer
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 * @return array<K, R>
 	 */
 	public static function map(iterable $array, callable $transformer): array
@@ -450,6 +513,34 @@ class Arrays
 
 
 	/**
+<<<<<<< HEAD
+=======
+	 * Returns an array containing new keys and values generated by applying the given transform function to each element.
+	 * If the function returns null, the element is skipped.
+	 * @template K of int|string
+	 * @template V
+	 * @template ResK of int|string
+	 * @template ResV
+	 * @param  array<K, V>  $array
+	 * @param  callable(V, K, array<K, V>): ?array{ResK, ResV}  $transformer
+	 * @return array<ResK, ResV>
+	 */
+	public static function mapWithKeys(array $array, callable $transformer): array
+	{
+		$res = [];
+		foreach ($array as $k => $v) {
+			$pair = $transformer($v, $k, $array);
+			if ($pair) {
+				$res[$pair[0]] = $pair[1];
+			}
+		}
+
+		return $res;
+	}
+
+
+	/**
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	 * Invokes all callbacks and returns array of results.
 	 * @param  callable[]  $callbacks
 	 */

@@ -31,6 +31,7 @@ class CachingIterator extends \CachingIterator implements \Countable
 	private int $counter = 0;
 
 
+<<<<<<< HEAD
 	public function __construct($iterator)
 	{
 		if (is_array($iterator) || $iterator instanceof \stdClass) {
@@ -51,6 +52,14 @@ class CachingIterator extends \CachingIterator implements \Countable
 		}
 
 		parent::__construct($iterator, 0);
+=======
+	public function __construct(iterable|\stdClass $iterable)
+	{
+		$iterable = $iterable instanceof \stdClass
+			? new \ArrayIterator($iterable)
+			: Nette\Utils\Iterables::toIterator($iterable);
+		parent::__construct($iterable, 0);
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 	}
 
 

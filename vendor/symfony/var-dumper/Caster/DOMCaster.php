@@ -23,7 +23,11 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 class DOMCaster
 {
     private const ERROR_CODES = [
+<<<<<<< HEAD
         \DOM_PHP_ERR => 'DOM_PHP_ERR',
+=======
+        0 => 'DOM_PHP_ERR',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         \DOM_INDEX_SIZE_ERR => 'DOM_INDEX_SIZE_ERR',
         \DOMSTRING_SIZE_ERR => 'DOMSTRING_SIZE_ERR',
         \DOM_HIERARCHY_REQUEST_ERR => 'DOM_HIERARCHY_REQUEST_ERR',
@@ -156,6 +160,7 @@ class DOMCaster
             'doctype' => $dom->doctype,
             'implementation' => $dom->implementation,
             'documentElement' => new CutStub($dom->documentElement),
+<<<<<<< HEAD
             'actualEncoding' => $dom->actualEncoding,
             'encoding' => $dom->encoding,
             'xmlEncoding' => $dom->xmlEncoding,
@@ -166,6 +171,14 @@ class DOMCaster
             'strictErrorChecking' => $dom->strictErrorChecking,
             'documentURI' => $dom->documentURI ? new LinkStub($dom->documentURI) : $dom->documentURI,
             'config' => $dom->config,
+=======
+            'encoding' => $dom->encoding,
+            'xmlEncoding' => $dom->xmlEncoding,
+            'xmlStandalone' => $dom->xmlStandalone,
+            'xmlVersion' => $dom->xmlVersion,
+            'strictErrorChecking' => $dom->strictErrorChecking,
+            'documentURI' => $dom->documentURI ? new LinkStub($dom->documentURI) : $dom->documentURI,
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             'formatOutput' => $dom->formatOutput,
             'validateOnParse' => $dom->validateOnParse,
             'resolveExternals' => $dom->resolveExternals,
@@ -277,9 +290,12 @@ class DOMCaster
             'publicId' => $dom->publicId,
             'systemId' => $dom->systemId,
             'notationName' => $dom->notationName,
+<<<<<<< HEAD
             'actualEncoding' => $dom->actualEncoding,
             'encoding' => $dom->encoding,
             'version' => $dom->version,
+=======
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         ];
 
         return $a;

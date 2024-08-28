@@ -9,14 +9,28 @@
  */
 namespace PHPUnit\TextUI\Command;
 
+<<<<<<< HEAD
 use function fgets;
 use function file_put_contents;
 use function getcwd;
+=======
+use const PHP_EOL;
+use const STDIN;
+use function fgets;
+use function file_put_contents;
+use function getcwd;
+use function sprintf;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use function trim;
 use PHPUnit\Runner\Version;
 use PHPUnit\TextUI\XmlConfiguration\Generator;
 
 /**
+<<<<<<< HEAD
+=======
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ *
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class GenerateConfigurationCommand implements Command
@@ -58,7 +72,11 @@ final class GenerateConfigurationCommand implements Command
 
         $generator = new Generator;
 
+<<<<<<< HEAD
         file_put_contents(
+=======
+        $result = @file_put_contents(
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             'phpunit.xml',
             $generator->generateDefaultConfiguration(
                 Version::series(),
@@ -69,11 +87,34 @@ final class GenerateConfigurationCommand implements Command
             ),
         );
 
+<<<<<<< HEAD
         /* @noinspection MissingDirectorySeparatorInspection */
         print PHP_EOL . 'Generated phpunit.xml in ' . getcwd() . '.' . PHP_EOL;
         print 'Make sure to exclude the ' . $cacheDirectory . ' directory from version control.' . PHP_EOL;
 
         return Result::from();
+=======
+        if ($result !== false) {
+            return Result::from(
+                sprintf(
+                    PHP_EOL . 'Generated phpunit.xml in %s.' . PHP_EOL .
+                    'Make sure to exclude the %s directory from version control.' . PHP_EOL,
+                    getcwd(),
+                    $cacheDirectory,
+                ),
+            );
+        }
+
+        // @codeCoverageIgnoreStart
+        return Result::from(
+            sprintf(
+                PHP_EOL . 'Could not write phpunit.xml in %s.' . PHP_EOL,
+                getcwd(),
+            ),
+            Result::EXCEPTION,
+        );
+        // @codeCoverageIgnoreEnd
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     }
 
     private function read(): string

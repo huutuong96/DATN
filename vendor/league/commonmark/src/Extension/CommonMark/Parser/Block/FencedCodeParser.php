@@ -44,7 +44,11 @@ final class FencedCodeParser extends AbstractBlockContinueParser
     {
         // Check for closing code fence
         if (! $cursor->isIndented() && $cursor->getNextNonSpaceCharacter() === $this->block->getChar()) {
+<<<<<<< HEAD
             $match = RegexHelper::matchFirst('/^(?:`{3,}|~{3,})(?= *$)/', $cursor->getLine(), $cursor->getNextNonSpacePosition());
+=======
+            $match = RegexHelper::matchFirst('/^(?:`{3,}|~{3,})(?=[ \t]*$)/', $cursor->getLine(), $cursor->getNextNonSpacePosition());
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             if ($match !== null && \strlen($match[0]) >= $this->block->getLength()) {
                 // closing fence - we're at end of line, so we can finalize now
                 return BlockContinue::finished();

@@ -52,21 +52,33 @@ class MockHandler implements \Countable
      * @param callable|null $onFulfilled Callback to invoke when the return value is fulfilled.
      * @param callable|null $onRejected  Callback to invoke when the return value is rejected.
      */
+<<<<<<< HEAD
     public static function createWithMiddleware(array $queue = null, callable $onFulfilled = null, callable $onRejected = null): HandlerStack
+=======
+    public static function createWithMiddleware(?array $queue = null, ?callable $onFulfilled = null, ?callable $onRejected = null): HandlerStack
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         return HandlerStack::create(new self($queue, $onFulfilled, $onRejected));
     }
 
     /**
      * The passed in value must be an array of
+<<<<<<< HEAD
      * {@see \Psr\Http\Message\ResponseInterface} objects, Exceptions,
+=======
+     * {@see ResponseInterface} objects, Exceptions,
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
      * callables, or Promises.
      *
      * @param array<int, mixed>|null $queue       The parameters to be passed to the append function, as an indexed array.
      * @param callable|null          $onFulfilled Callback to invoke when the return value is fulfilled.
      * @param callable|null          $onRejected  Callback to invoke when the return value is rejected.
      */
+<<<<<<< HEAD
     public function __construct(array $queue = null, callable $onFulfilled = null, callable $onRejected = null)
+=======
+    public function __construct(?array $queue = null, ?callable $onFulfilled = null, ?callable $onRejected = null)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     {
         $this->onFulfilled = $onFulfilled;
         $this->onRejected = $onRejected;
@@ -200,7 +212,11 @@ class MockHandler implements \Countable
     private function invokeStats(
         RequestInterface $request,
         array $options,
+<<<<<<< HEAD
         ResponseInterface $response = null,
+=======
+        ?ResponseInterface $response = null,
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         $reason = null
     ): void {
         if (isset($options['on_stats'])) {

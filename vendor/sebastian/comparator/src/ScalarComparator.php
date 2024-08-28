@@ -59,7 +59,11 @@ class ScalarComparator extends Comparator
                 $actual,
                 $exporter->export($expected),
                 $exporter->export($actual),
+<<<<<<< HEAD
                 'Failed asserting that two strings are equal.'
+=======
+                'Failed asserting that two strings are equal.',
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             );
         }
 
@@ -73,8 +77,13 @@ class ScalarComparator extends Comparator
                 sprintf(
                     'Failed asserting that %s matches expected %s.',
                     $exporter->export($actual),
+<<<<<<< HEAD
                     $exporter->export($expected)
                 )
+=======
+                    $exporter->export($expected),
+                ),
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
             );
         }
     }

@@ -3016,10 +3016,17 @@ class Builder implements BuilderContract
                 ->get()->all();
         }
 
+<<<<<<< HEAD
         $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
 
         return $this->cloneWithout($without)
                     ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
+=======
+        $without = $this->unions ? ['unionOrders', 'unionLimit', 'unionOffset'] : ['columns', 'orders', 'limit', 'offset'];
+
+        return $this->cloneWithout($without)
+                    ->cloneWithoutBindings($this->unions ? ['unionOrder'] : ['select', 'order'])
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
                     ->setAggregate('count', $this->withoutSelectAliases($columns))
                     ->get()->all();
     }

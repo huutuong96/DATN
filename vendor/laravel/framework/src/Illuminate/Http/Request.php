@@ -404,7 +404,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function json($key = null, $default = null)
     {
         if (! isset($this->json)) {
+<<<<<<< HEAD
             $this->json = new InputBag((array) json_decode($this->getContent(), true));
+=======
+            $this->json = new InputBag((array) json_decode($this->getContent() ?: '[]', true));
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
         }
 
         if (is_null($key)) {

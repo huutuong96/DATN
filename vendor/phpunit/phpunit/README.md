@@ -1,8 +1,13 @@
 # PHPUnit
 
+<<<<<<< HEAD
 [![Latest Stable Version](https://poser.pugx.org/phpunit/phpunit/v/stable.png)](https://packagist.org/packages/phpunit/phpunit)
 [![CI Status](https://github.com/sebastianbergmann/phpunit/workflows/CI/badge.svg)](https://github.com/sebastianbergmann/phpunit/actions)
 [![Type Coverage](https://shepherd.dev/github/sebastianbergmann/phpunit/coverage.svg)](https://shepherd.dev/github/sebastianbergmann/phpunit)
+=======
+[![Latest Stable Version](https://poser.pugx.org/phpunit/phpunit/v)](https://packagist.org/packages/phpunit/phpunit)
+[![CI Status](https://github.com/sebastianbergmann/phpunit/workflows/CI/badge.svg)](https://github.com/sebastianbergmann/phpunit/actions)
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 [![codecov](https://codecov.io/gh/sebastianbergmann/phpunit/branch/main/graph/badge.svg)](https://codecov.io/gh/sebastianbergmann/phpunit)
 
 PHPUnit is a programmer-oriented testing framework for PHP. It is an instance of the xUnit architecture for unit testing frameworks.

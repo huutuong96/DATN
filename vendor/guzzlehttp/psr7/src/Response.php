@@ -96,7 +96,11 @@ class Response implements ResponseInterface
         array $headers = [],
         $body = null,
         string $version = '1.1',
+<<<<<<< HEAD
         string $reason = null
+=======
+        ?string $reason = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ) {
         $this->assertStatusCodeRange($status);
 

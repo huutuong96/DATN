@@ -15,6 +15,10 @@ namespace League\CommonMark\Parser\Block;
 
 use League\CommonMark\Node\Block\AbstractBlock;
 use League\CommonMark\Node\Block\Document;
+<<<<<<< HEAD
+=======
+use League\CommonMark\Node\Block\Paragraph;
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Reference\ReferenceMapInterface;
 
@@ -50,4 +54,33 @@ final class DocumentBlockParser extends AbstractBlockContinueParser
     {
         return BlockContinue::at($cursor);
     }
+<<<<<<< HEAD
+=======
+
+    public function closeBlock(): void
+    {
+        $this->removeLinkReferenceDefinitions();
+    }
+
+    private function removeLinkReferenceDefinitions(): void
+    {
+        $emptyNodes = [];
+
+        $walker = $this->document->walker();
+        while ($event = $walker->next()) {
+            $node = $event->getNode();
+            // TODO for v3: It would be great if we could find an alternate way to identify such paragraphs.
+            // Unfortunately, we can't simply check for empty paragraphs here because inlines haven't been processed yet,
+            // meaning all paragraphs will appear blank here, and we don't have a way to check the status of the reference parser
+            // which is attached to the (already-closed) paragraph parser.
+            if ($event->isEntering() && $node instanceof Paragraph && $node->onlyContainsLinkReferenceDefinitions) {
+                $emptyNodes[] = $node;
+            }
+        }
+
+        foreach ($emptyNodes as $node) {
+            $node->detach();
+        }
+    }
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
 }

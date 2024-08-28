@@ -25,16 +25,26 @@ class Promise implements PromiseInterface
      * @param callable $cancelFn Fn that when invoked cancels the promise.
      */
     public function __construct(
+<<<<<<< HEAD
         callable $waitFn = null,
         callable $cancelFn = null
+=======
+        ?callable $waitFn = null,
+        ?callable $cancelFn = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ) {
         $this->waitFn = $waitFn;
         $this->cancelFn = $cancelFn;
     }
 
     public function then(
+<<<<<<< HEAD
         callable $onFulfilled = null,
         callable $onRejected = null
+=======
+        ?callable $onFulfilled = null,
+        ?callable $onRejected = null
+>>>>>>> 64449045de4953f33495614cf40cae6b40a0b6ec
     ): PromiseInterface {
         if ($this->state === self::PENDING) {
             $p = new Promise(null, [$this, 'cancel']);
