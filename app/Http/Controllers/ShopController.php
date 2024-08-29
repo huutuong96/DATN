@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ShopRequest;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Shop;
+use App\Models\Shop_manager;
 use Illuminate\Support\Str;
+use App\Models\UsersModel;
 
 class ShopController extends Controller
 {
@@ -34,18 +36,41 @@ class ShopController extends Controller
         );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(ShopRequest $rqt)
-    {
 
-    }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $rqt)
+    public function shop_manager_store(Request $rqt)
+    {
+        $dataInsert = [
+            'status' => $rqt->status,
+            'user_id' => $rqt->user_id,
+            'shop_id' => $rqt->shop_id,
+            'role' => $rqt->role,
+        ];
+        try {
+            $Shop_manager = Shop_manager::create( $dataInsert );
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm thành công",
+                    'data' => $Shop_manager,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Thêm không thành công",
+                    'error' => $th->getMessage(),
+                ]
+            );
+        }
+    }
+
+    public function store(ShopRequest $rqt)
     {
         $image = $rqt->file('image');
         $cloudinary = new Cloudinary();
@@ -83,6 +108,36 @@ class ShopController extends Controller
     /**
      * Display the specified resource.
      */
+    public function show_shop_members(string $id)
+    {
+        $member = Shop_manager::where('shop_id', $id)->pluck('user_id');
+
+        if(!$member){
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Không tồn tại Shop nào",
+                ]
+            );
+        }
+        $user = JWTAuth::parseToken()->authenticate();
+        $check_member = false;
+
+        foreach ($member as $user_id) {
+            if ($user_id == $user->id) {
+                $check_member = true;
+            }
+        }
+
+        return response()->json(
+            [
+                'status' => true,
+                'message' => "Lấy dữ liệu thành viên shop $id thành công",
+                'data' => $user,
+            ]
+        );
+    }
+
     public function show(string $id)
     {
         $Shops = Shop::find($id);
@@ -105,16 +160,30 @@ class ShopController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
+    public function update_shop_members(Request $rqt, string $id)
+    {
+        $member = Shop_manager::where('id', $id)->first();
+        if(!$member){
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Không tồn tại thành viên trong hóp này",
+                ]
+            );
+        }
+        $member->update([
+            'role' => $rqt->role,
+        ]);
+        return response()->json(
+            [
+                'status' => true,
+                'message' => "cập nhật thành viên shop $id thành công",
+                'data' => $member,
+            ]
+        );
+    }
     public function update(Request $rqt, string $id)
     {
         $shop = Shop::find($id);
@@ -128,9 +197,7 @@ class ShopController extends Controller
                 404
             );
         }
-
         $image = $rqt->file('image');
-
         $cloudinary = new Cloudinary();
         // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
 
@@ -197,6 +264,35 @@ class ShopController extends Controller
                 [
                     'status' => false,
                     'message' => "xóa shop không thành công",
+                    'error' => $th->getMessage(),
+                ]
+            );
+        }
+    }
+    public function destroy_members(string $id)
+    {
+        try {
+            $member = Shop_manager::find($id);
+
+            if (!$member) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'thành viên không tồn tại',
+                ], 404);
+            }
+
+            // Xóa bản ghi
+            $member->delete();
+
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Xóa thành viên thành công',
+                ]);
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "xóa thành viên không thành công",
                     'error' => $th->getMessage(),
                 ]
             );

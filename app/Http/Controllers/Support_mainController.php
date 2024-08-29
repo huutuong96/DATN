@@ -1,22 +1,22 @@
 <?php
-namespace App\Http\Controllers;
-use App\Models\Voucher;
-use App\Http\Requests\Vouchers;
-use Illuminate\Http\Request;
 
-class VoucherController extends Controller
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\support_main;
+class Support_mainController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $voucher = Voucher::all();
-        if($voucher->isEmpty()){
+        $supports = support_main::all();
+        if($supports->isEmpty()){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại voucher nào",
+                    'message' => "Không tồn tại hỗ trợ nào",
                 ]
             );
         }
@@ -24,7 +24,7 @@ class VoucherController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $voucher,
+                'data' => $supports,
             ]
         );
     }
@@ -40,32 +40,30 @@ class VoucherController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Vouchers $request)
+    public function store(Request $request)
     {
         $dataInsert = [
-            'type' => $request->type,
+            'content' => $request->content,
             'status' => $request->status,
-            // 'URL' => $uploadedImage['secure_url'],
-            'code' => $request->code,
-            // 'create_by',
-            // 'update_by',
+            'index' => $request->index,
+            'category_support_id' => $request->category_support_id,
         ];
 
         try {
-            $voucher = Voucher::create( $dataInsert );
+            $support = support_main::create( $dataInsert );
 
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Thêm voucher thành công",
-                    'data' => $voucher,
+                    'message' => "Thêm hỗ trợ thành công",
+                    'data' => $support,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Thêm voucher không thành công",
+                    'message' => "Thêm hỗ trợ không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -77,13 +75,12 @@ class VoucherController extends Controller
      */
     public function show(string $id)
     {
-        $voucher = Voucher::find($id);
-
-        if(!$voucher){
+        $support = support_main::find($id);
+        if(!$support){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại voucher nào",
+                    'message' => "Không tồn tại support nào",
                 ]
             );
         }
@@ -91,7 +88,7 @@ class VoucherController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $voucher,
+                'data' => $support,
             ]
         );
     }
@@ -109,47 +106,42 @@ class VoucherController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // $image = $rqt->file('image');
-        // if ($image) {
-        //     $cloudinary = new Cloudinary();
-        //     $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        // }
-        // Tìm voucher theo ID
-        $voucher = Voucher::find($id);
-        // Kiểm tra xem voucher có tồn tại không
-        if (!$voucher) {
+        // Tìm banner theo ID
+        $support = support_main::find($id);
+        // Kiểm tra xem support_main có tồn tại không
+        if (!$support) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "voucher không tồn tại",
+                    'message' => "support không tồn tại",
                 ],
                 404
             );
         }
         // Cập nhật dữ liệu
         $dataUpdate = [
-            'type' => $request->type ?? $voucher->type,
-            'status' => $request->status ?? $voucher->status,
-            'code' => $request->code ?? $voucher->code,
-            'update_at' => now(), // Đặt giá trị mặc định nếu không có trong yêu cầu
+            'content' => $request->content ?? $support->content,
+            'status' => $request->status ?? $support->status,
+            'index' => $request->index ?? $support->index,
+            'category_support_id' => $request->category_support_id ?? $support->category_support_id,
         ];
 
 
         try {
             // Cập nhật bản ghi
-            $voucher->update($dataUpdate);
+            $support->update($dataUpdate);
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Cập nhật voucher thành công",
-                    'data' => $voucher,
+                    'message' => "Cập nhật support thành công",
+                    'data' => $support,
                 ]
             );
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật voucher không thành công",
+                    'message' => "Cập nhật support không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -162,27 +154,27 @@ class VoucherController extends Controller
     public function destroy(string $id)
     {
         try {
-            $voucher = Voucher::find($id);
+            $support = support_main::find($id);
 
-            if (!$voucher) {
+            if (!$support) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'voucher không tồn tại',
+                    'message' => 'support không tồn tại',
                 ], 404);
             }
 
             // Xóa bản ghi
-            $voucher->delete();
+            $support->delete();
 
              return response()->json([
                     'status' => true,
-                    'message' => 'Xóa voucher thành công',
+                    'message' => 'Xóa support thành công',
                 ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa voucher không thành công",
+                    'message' => "xóa support không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
