@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ShipRequest;
-use App\Models\ShipsModel;
+use App\Http\Requests\Cart_to_userRequest;
+use App\Models\Cart_to_usersModel;
 use Illuminate\Http\Request;
 
-class ShipsController extends Controller
+class Cart_to_userController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $cart_to_user = Cart_to_usersModel::all();
 
-        $ships = ShipsModel::all();
-
-        if($ships->isEmpty()){
+        if($cart_to_user->isEmpty()){
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Không tồn tại Ship nào",
+                    'message' => "Không tồn tại Cart_to_user nào",
                 ]
             );
         }
@@ -28,7 +27,7 @@ class ShipsController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Lấy dữ liệu thành công',
-            'data' => $ships
+            'data' => $cart_to_user
         ], 200);
     }
 
@@ -43,52 +42,49 @@ class ShipsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ShipRequest $request)
+    public function store(Cart_to_userRequest $request)
     {
-
         $dataInsert = [
-            "name" => $request->name,
-            "description" => $request->description,
-            "status" => $request->status,
+            'status' => $request->status,
+            'user_id' => $request->user_id
         ];
 
         try {
-            $ships = ShipsModel::create($dataInsert);
+            $cart_to_user = Cart_to_usersModel::create($dataInsert);
             $dataDone = [
                 'status' => true,
-                'message' => "Thêm Ship thành công",
-                'data' => $ships
+                'message' => "Thêm Cart_to_user thành công",
+                'data' => $cart_to_user
             ];
             return response()->json($dataDone, 200);
         } catch (\Throwable $th) {
             $dataDone = [
                 'status' => false,
-                'message' => "Thêm Ship không thành công",
+                'message' => "Thêm Cart_to_user không thành công",
                 'error' => $th->getMessage()
             ];
             return response()->json($dataDone);
         }
-        
     }
+
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
+        $cart_to_user = Cart_to_usersModel::find($id);
 
-        $ships = ShipsModel::find($id);
-
-        if (!$ships) {
+        if (!$cart_to_user) {
             return response()->json([
                 'status' => false,
-                'message' => "Ship không tồn tại"
+                'message' => "Cart_to_user không tồn tại"
             ], 404);
         }
 
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
-            'data' => $ships
+            'data' => $cart_to_user
         ], 200);
     }
 
@@ -103,12 +99,11 @@ class ShipsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ShipRequest $request, string $id)
+    public function update(Cart_to_userRequest $request, string $id)
     {
+        $cart_to_user = Cart_to_usersModel::find($id);
 
-        $ships = ShipsModel::find($id);
-
-        if (!$ships) {
+        if (!$cart_to_user) {
             return response()->json([
                 'status' => false,
                 'message' => "Ship không tồn tại"
@@ -116,57 +111,54 @@ class ShipsController extends Controller
         }
 
         $dataUpdate = [
-            "name" => $request->name ?? $ships->name,
-            "description" => $request->description ?? $ships->description,
-            "status" => $request->status ?? $ships->status,
+            "status" => $request->status ?? $cart_to_user->status,
+            "user_id" => $request->user_id ?? $cart_to_user->user_id,
         ];
 
         try {
-            $ships->update($dataUpdate);
+            $cart_to_user->update($dataUpdate);
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Ship đã được cập nhật",
-                    'data' => $ships
+                    'message' => "Cart_to_user đã được cập nhật",
+                    'data' => $cart_to_user
                 ], 200);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật Ship không thành công",
+                    'message' => "Cập nhật Cart_to_user không thành công",
                     'error' => $th->getMessage()
                 ]);
         }
-        
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-
-        $ships = ShipsModel::find($id);
+        $cart_to_user = Cart_to_usersModel::find($id);
 
         try {
-            if (!$ships) {
+            if (!$cart_to_user) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Ship không tồn tại"
+                    'message' => "Cart_to_user không tồn tại"
                 ], 404);
             }
     
-            $ships->delete();
+            $cart_to_user->delete();
     
             return response()->json([
                 'status' => true,
-                'message' => "Ship đã được xóa"
+                'message' => "Cart_to_user đã được xóa"
             ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa Ship không thành công",
+                    'message' => "xóa Cart_to_user không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
