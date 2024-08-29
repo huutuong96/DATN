@@ -1,33 +1,35 @@
 <?php
 
+use App\Http\Controllers\Learning_sellerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Notification_to_mainController;
-use App\Http\Controllers\AuthenController;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\RanksController;
-use App\Http\Controllers\AddressController;
+use App\Http\Controllers\FAQController;
+use App\Http\Controllers\Notifications;
+use App\Http\Controllers\TaxController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\LearnController;
+use App\Http\Controllers\RanksController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\ShipsController;
+use App\Http\Controllers\AuthenController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CouponsController;
-use App\Http\Controllers\FAQController;
-use App\Http\Controllers\PaymentsController;
-use App\Http\Controllers\ShipsController;
-use App\Http\Controllers\TaxController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\ProgrameController;
+use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\FollowToShopController;
+use App\Http\Controllers\Support_mainController;
 use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
-use App\Http\Controllers\LearnController;
-use App\Http\Controllers\ShopController;
-use App\Http\Controllers\ProgrameController;
+use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
-use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\FollowToShopController;
-use App\Http\Controllers\Notifications;
-use App\Http\Controllers\Support_mainController;
+use App\Http\Controllers\CategoriessupportmainController;
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
 
@@ -73,6 +75,11 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('follows', FollowToShopController::class);
             Route::resource('support_main', Support_mainController::class);
 });
+
+//CRUD Thy (29/08)
+Route::resource('learning_seller', Learning_sellerController::class);
+// Route::resource('momo', MomoController::class);
+
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
