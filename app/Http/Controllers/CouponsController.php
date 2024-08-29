@@ -205,10 +205,10 @@ class CouponsController extends Controller
         }
 
         $dataUpdate = [
-            "status" => $request->status,
-            "coupon_percentage" => $request->coupon_percentage,
-            "condition" => $request->condition,
-            "create_by" => $request->create_by,
+            "status" => $request->status ?? $coupons->status,
+            "coupon_percentage" => $request->coupon_percentage ?? $coupons->coupon_percentage,
+            "condition" => $request->condition ?? $coupons->condition,
+            "create_by" => $request->create_by ?? $coupons->create_by,
         ];
 
         try {

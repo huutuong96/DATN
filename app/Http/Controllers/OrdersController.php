@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ShipRequest;
-use App\Models\ShipsModel;
+use App\Http\Requests\OrderRequest;
+use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 
-class ShipsController extends Controller
+class OrdersController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $orders = OrdersModel::all();
 
-        $ships = ShipsModel::all();
-
-        if($ships->isEmpty()){
+        if($orders->isEmpty()){
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Không tồn tại Ship nào",
+                    'message' => "Không tồn tại Order nào",
                 ]
             );
         }
@@ -28,7 +27,7 @@ class ShipsController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Lấy dữ liệu thành công',
-            'data' => $ships
+            'data' => $orders
         ], 200);
     }
 
@@ -43,52 +42,54 @@ class ShipsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ShipRequest $request)
+    public function store(OrderRequest $request)
     {
-
         $dataInsert = [
-            "name" => $request->name,
-            "description" => $request->description,
-            "status" => $request->status,
+            'payment_id' => $request->payment_id,
+            'ship_id' => $request->ship_id,
+            'voucher_id' => $request->voucher_id,
+            'user_id' => $request->user_id,
+            'shop_id' => $request->shop_id,
+            'status' => $request->status,
+            'create_by' => $request->create_by
         ];
 
         try {
-            $ships = ShipsModel::create($dataInsert);
+            $orders = OrdersModel::create($dataInsert);
             $dataDone = [
                 'status' => true,
-                'message' => "Thêm Ship thành công",
-                'data' => $ships
+                'message' => "Thêm Order thành công",
+                'data' => $orders
             ];
             return response()->json($dataDone, 200);
         } catch (\Throwable $th) {
             $dataDone = [
                 'status' => false,
-                'message' => "Thêm Ship không thành công",
+                'message' => "Thêm Order không thành công",
                 'error' => $th->getMessage()
             ];
             return response()->json($dataDone);
         }
-        
     }
+
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
+        $orders = OrdersModel::find($id);
 
-        $ships = ShipsModel::find($id);
-
-        if (!$ships) {
+        if (!$orders) {
             return response()->json([
                 'status' => false,
-                'message' => "Ship không tồn tại"
+                'message' => "Order không tồn tại"
             ], 404);
         }
 
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
-            'data' => $ships
+            'data' => $orders
         ], 200);
     }
 
@@ -103,70 +104,71 @@ class ShipsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ShipRequest $request, string $id)
+    public function update(OrderRequest $request, string $id)
     {
+        $orders = OrdersModel::find($id);
 
-        $ships = ShipsModel::find($id);
-
-        if (!$ships) {
+        if (!$orders) {
             return response()->json([
                 'status' => false,
-                'message' => "Ship không tồn tại"
+                'message' => "Order không tồn tại"
             ], 404);
         }
 
         $dataUpdate = [
-            "name" => $request->name ?? $ships->name,
-            "description" => $request->description ?? $ships->description,
-            "status" => $request->status ?? $ships->status,
+            'payment_id' => $request->payment_id ?? $orders->payment_id,
+            'ship_id' => $request->ship_id ?? $orders->ship_id,
+            'voucher_id' => $request->voucher_id ?? $orders->voucher_id,
+            'user_id' => $request->user_id ?? $orders->user_id,
+            'shop_id' => $request->shop_id ?? $orders->shop_id,
+            'status' => $request->status ?? $orders->status,
+            'update_by' => $request->update_by
         ];
 
         try {
-            $ships->update($dataUpdate);
+            $orders->update($dataUpdate);
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Ship đã được cập nhật",
-                    'data' => $ships
+                    'message' => "Order đã được cập nhật",
+                    'data' => $orders
                 ], 200);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật Ship không thành công",
+                    'message' => "Cập nhật Order không thành công",
                     'error' => $th->getMessage()
                 ]);
         }
-        
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-
-        $ships = ShipsModel::find($id);
+        $orders = OrdersModel::find($id);
 
         try {
-            if (!$ships) {
+            if (!$orders) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Ship không tồn tại"
+                    'message' => "Order không tồn tại"
                 ], 404);
             }
     
-            $ships->delete();
+            $orders->delete();
     
             return response()->json([
                 'status' => true,
-                'message' => "Ship đã được xóa"
+                'message' => "Order đã được xóa"
             ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa Ship không thành công",
+                    'message' => "xóa Order không thành công",
                     'error' => $th->getMessage(),
                 ]
             );

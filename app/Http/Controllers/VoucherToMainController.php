@@ -29,7 +29,7 @@ class VoucherToMainController extends Controller
             [
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
-                'data' => $taxs,
+                'data' => $voucherMain,
             ]
         );
     }

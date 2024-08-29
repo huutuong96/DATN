@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('sold_count')->default(0);
             $table->integer('view_count')->default(0);
             $table->integer('parent_id')->nullable();
-            $table->date('create_by');
+            $table->date('create_by')->nullable();
             $table->date('update_by')->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('category_id');
