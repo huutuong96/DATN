@@ -3,31 +3,32 @@
 namespace App\Http\Controllers;
 
 use Cloudinary\Cloudinary;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\Notification_to_mainModel;
-use App\Http\Requests\Notification_to_mainRequest;
+use App\Models\CategoriesModel;
+use App\Http\Requests\CategoriesRequest;
 
-class Notification_to_mainController extends Controller
+class CategoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $notification_to_main = Notification_to_mainModel::all();
+        $categories = CategoriesModel::all();
 
-        if ($notification_to_main->isEmpty()) {
+        if ($categories->isEmpty()) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Không tồn tại Notification nào"
+                    'message' => "Không tồn tại Categories nào"
                 ]
             );
         }
         return response()->json([
             'status' => true,
             'message' => 'Lấy dữ liệu thành công',
-            'data' => $notification_to_main
+            'data' => $categories
         ], 200);
     }
 
@@ -42,7 +43,7 @@ class Notification_to_mainController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Notification_to_mainRequest $request)
+    public function store(CategoriesRequest $request)
     {
         $image = $request->file('image');
         $cloudinary = new Cloudinary();
@@ -52,24 +53,25 @@ class Notification_to_mainController extends Controller
 
             $dataInsert = [
                 'title' => $request->title,
-                'description' => $request->description,
+                'slug' => Str::slug($request->title),
+                'index' => $request->index,
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
-                'create_by' => $request->create_by,
-                'update_by' => $request->update_by
+                'parent_id' => $request->parent_id,
+                'create_by' => $request->create_by
             ];
 
-            $notification_to_main = Notification_to_mainModel::create($dataInsert);
+            $categories = CategoriesModel::create($dataInsert);
 
             return response()->json([
                 'status' => true,
-                'message' => "Thêm Notification thành công",
-                'data' => $notification_to_main,
+                'message' => "Thêm Categories thành công",
+                'data' => $categories,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Thêm Notification không thành công",
+                'message' => "Thêm Categories không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -81,24 +83,24 @@ class Notification_to_mainController extends Controller
     public function show(string $id)
     {
         try {
-            $notification_to_main = Notification_to_mainModel::find($id);
+            $categories = CategoriesModel::find($id);
 
-            if (!$notification_to_main) {
+            if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Notification không tồn tại",
+                    'message' => "Categories không tồn tại",
                 ], 404);
             }
 
             return response()->json([
                 'status' => true,
-                'message' => "Lấy thông tin Notification thành công",
-                'data' => $notification_to_main,
+                'message' => "Lấy thông tin Categories thành công",
+                'data' => $categories,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Lỗi khi lấy thông tin Notification",
+                'message' => "Lỗi khi lấy thông tin Categories",
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -115,15 +117,15 @@ class Notification_to_mainController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Notification_to_mainRequest $request, string $id)
+    public function update(CategoriesRequest $request, string $id)
     {
         try {
-            $notification_to_main = Notification_to_mainModel::find($id);
+            $categories = CategoriesModel::find($id);
 
-            if (!$notification_to_main) {
+            if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Notification không tồn tại",
+                    'message' => "Categories không tồn tại",
                 ], 404);
             }
 
@@ -136,29 +138,31 @@ class Notification_to_mainController extends Controller
                 $imageUrl = $uploadedImage['secure_url'];
             } else {
                 // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
-                $imageUrl = $notification_to_main->image;
+                $imageUrl = $categories->image;
             }
 
             $dataUpdate = [
-                'title' => $request->title,
-                'description' => $request->description ?? $notification_to_main->description,
-                'image' => $imageUrl ?? $notification_to_main->image,
-                'status' => $request->status,
-                'update_by' => $request->update_by ?? $notification_to_main->update_by,
+                'title' => $request->title ?? $categories->title,
+                'slug' => Str::slug($request->title),
+                'index' => $request->index ?? $categories->index,
+                'image' => $imageUrl ?? $categories->image,
+                'status' => $request->status ?? $categories->status,
+                'parent_id' => $request->parent_id ?? $categories->parent_id,
+                'update_by' => $request->update_by ?? $categories->update_by,
                 'updated_at' => now(),
             ];
 
-            $notification_to_main->update($dataUpdate);
+            $categories->update($dataUpdate);
 
             return response()->json([
                 'status' => true,
-                'message' => "Cập nhật Notification thành công",
-                'data' => $notification_to_main,
+                'message' => "Cập nhật Categories thành công",
+                'data' => $categories,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Cập nhật Notification không thành công",
+                'message' => "Cập nhật Categories không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -170,25 +174,25 @@ class Notification_to_mainController extends Controller
     public function destroy(string $id)
     {
         try {
-            $notification_to_main = Notification_to_mainModel::find($id);
+            $categories = CategoriesModel::find($id);
 
-            if (!$notification_to_main) {
+            if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Notification không tồn tại",
+                    'message' => "Categories không tồn tại",
                 ], 404);
             }
 
-            $notification_to_main->delete();
+            $categories->delete();
 
             return response()->json([
                 'status' => true,
-                'message' => "Xóa Notification thành công",
+                'message' => "Xóa Categories thành công",
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Xóa Notification không thành công",
+                'message' => "Xóa Categories không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }

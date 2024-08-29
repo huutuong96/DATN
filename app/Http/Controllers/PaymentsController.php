@@ -116,10 +116,10 @@ class PaymentsController extends Controller
             ], 404);
         }
 
-        $dataUpdate = [
-            "name" => $request->name,
-            "description" => $request->description,
-            "status" => $request->status,
+        $dataUpdate = [ 
+            "name" => $request->name ?? $payments->name,
+            "description" => $request->description ?? $payments->description,
+            "status" => $request->status ?? $payments->status,
         ];
 
         try {

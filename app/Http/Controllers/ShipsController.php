@@ -116,9 +116,9 @@ class ShipsController extends Controller
         }
 
         $dataUpdate = [
-            "name" => $request->name,
-            "description" => $request->description,
-            "status" => $request->status,
+            "name" => $request->name ?? $ships->name,
+            "description" => $request->description ?? $ships->description,
+            "status" => $request->status ?? $ships->status,
         ];
 
         try {

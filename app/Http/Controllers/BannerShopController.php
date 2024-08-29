@@ -15,21 +15,17 @@ class BannerShopController extends Controller
     public function index()
     {
         $banners = BannerShop::all();
-        if($banners->isEmpty()){
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Không tồn tại banner nào",
-                ]
-            );
+        if ($banners->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại banner nào",
+            ]);
         }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $banners,
-            ]
-        );
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $banners,
+        ]);
     }
 
     /**
@@ -45,44 +41,34 @@ class BannerShopController extends Controller
      */
     public function store(BannerRequest $rqt)
     {
-       // Check xem co anh moi duoc tai len khong
-       if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $cloudinary = new Cloudinary();
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $imageUrl = $uploadedImage['secure_url'];
-        } else {
-            // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
-            $imageUrl = $brands->image;
-        }
-
-        $dataInsert = [
-            'shop_id'=>$rqt->shop_id,
-            'title' => $rqt->title,
-            'content' => $rqt->content,
-            'URL' => $imageUrl,
-            'status' => $rqt->status,
-            'index' => $rqt->index,
-        ];
+        $image = $rqt->file('image');
+        $cloudinary = new Cloudinary();
 
         try {
-            $banner = BannerShop::create( $dataInsert );
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm banner thành công",
-                    'data' => $banner,
-                ]
-            );
+            $dataInsert = [
+                'shop_id' => $rqt->shop_id,
+                'title' => $rqt->title,
+                'content' => $rqt->content,
+                'URL' => $uploadedImage['secure_url'],
+                'status' => $rqt->status,
+                'index' => $rqt->index,
+            ];
+
+            $banners = BannerShop::create($dataInsert);
+
+            return response()->json([
+                'status' => true,
+                'message' => "Thêm BannerShop thành công",
+                'data' => $banners,
+            ], 200);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm banner không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm BannerShop không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
         }
     }
 
@@ -93,21 +79,17 @@ class BannerShopController extends Controller
     {
         $banner = BannerShop::find($id);
 
-        if(!$banner){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại banner nào",
-                ]
-            );
+        if (!$banner) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại banner nào",
+            ]);
         }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $banner,
-            ]
-        );
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $banner,
+        ]);
     }
 
     /**
@@ -121,63 +103,53 @@ class BannerShopController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(BannerRequest $rqt, $id)
+    public function update(BannerRequest $rqt, string $id)
     {
         // Tìm banner theo ID
         $banner = BannerShop::find($id);
         // Kiểm tra xem banner có tồn tại không
         if (!$banner) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Banner không tồn tại",
-                ],
-                404
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Banner không tồn tại",
+            ], 404);
         }
 
-         // Check xem co anh moi duoc tai len khong
-         if ($request->hasFile('image')) {
-            $image = $request->file('image');
+        // Kiểm tra xem có ảnh mới được tải lên không
+        if ($rqt->hasFile('image')) {
+            $image = $rqt->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
             $imageUrl = $uploadedImage['secure_url'];
         } else {
-            // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
-            $imageUrl = $brands->image;
+            // Nếu không có ảnh mới thì giữ nguyên URL của ảnh hiện tại
+            $imageUrl = $banner->URL; // Sửa lại từ `$brands->image` thành `$banner->URL`
         }
-
 
         // Cập nhật dữ liệu
         $dataUpdate = [
-            'shop_id'=>$rqt->shop_id,
+            'shop_id' => $rqt->shop_id,
             'title' => $rqt->title ?? $banner->title,
             'content' => $rqt->content ?? $banner->content,
             'URL' => $imageUrl,
             'status' => $rqt->status ?? $banner->status,
             'index' => $rqt->index ?? $banner->index,
-            'created_at' => $rqt->created_at ?? $banner->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
         ];
-
 
         try {
             // Cập nhật bản ghi
             $banner->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật banner thành công",
-                    'data' => $banner,
-                ]
-            );
+            return response()->json([
+                'status' => true,
+                'message' => "Cập nhật banner thành công",
+                'data' => $banner,
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật banner không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật banner không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 
@@ -199,18 +171,16 @@ class BannerShopController extends Controller
             // Xóa bản ghi
             $banner->delete();
 
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa banner thành công',
-                ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Xóa banner thành công',
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa banner không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Xóa banner không thành công",
+                'error' => $th->getMessage(),
+            ]);
         }
     }
 }

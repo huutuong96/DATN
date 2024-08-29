@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CouponRequest;
-use App\Models\CouponsModel;
+use App\Http\Requests\OrderRequest;
+use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 
-class CouponsController extends Controller
+class OrdersController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $coupons = CouponsModel::all();
+        $orders = OrdersModel::all();
 
-        if ($coupons->isEmpty()) {
+        if($orders->isEmpty()){
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Không tồn tại Coupon nào",
+                    'message' => "Không tồn tại Order nào",
                 ]
             );
         }
@@ -27,7 +27,7 @@ class CouponsController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Lấy dữ liệu thành công',
-            'data' => $coupons
+            'data' => $orders
         ], 200);
     }
 
@@ -42,27 +42,30 @@ class CouponsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CouponRequest $request)
+    public function store(OrderRequest $request)
     {
         $dataInsert = [
-            "status" => $request->status,
-            "coupon_percentage" => $request->coupon_percentage,
-            "condition" => $request->condition,
-            "create_by" => $request->create_by,
+            'payment_id' => $request->payment_id,
+            'ship_id' => $request->ship_id,
+            'voucher_id' => $request->voucher_id,
+            'user_id' => $request->user_id,
+            'shop_id' => $request->shop_id,
+            'status' => $request->status,
+            'create_by' => $request->create_by
         ];
 
         try {
-            $coupons = CouponsModel::create($dataInsert);
+            $orders = OrdersModel::create($dataInsert);
             $dataDone = [
                 'status' => true,
-                'message' => "Thêm Coupon thành công",
-                'data' => $coupons
+                'message' => "Thêm Order thành công",
+                'data' => $orders
             ];
             return response()->json($dataDone, 200);
         } catch (\Throwable $th) {
             $dataDone = [
                 'status' => false,
-                'message' => "Thêm Coupon không thành công",
+                'message' => "Thêm Order không thành công",
                 'error' => $th->getMessage()
             ];
             return response()->json($dataDone);
@@ -74,19 +77,19 @@ class CouponsController extends Controller
      */
     public function show(string $id)
     {
-        $coupons = CouponsModel::find($id);
+        $orders = OrdersModel::find($id);
 
-        if (!$coupons) {
+        if (!$orders) {
             return response()->json([
                 'status' => false,
-                'message' => "Coupon không tồn tại"
+                'message' => "Order không tồn tại"
             ], 404);
         }
 
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
-            'data' => $coupons
+            'data' => $orders
         ], 200);
     }
 
@@ -101,42 +104,42 @@ class CouponsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CouponRequest $request, string $id)
+    public function update(OrderRequest $request, string $id)
     {
-        $coupons = CouponsModel::find($id);
+        $orders = OrdersModel::find($id);
 
-        if (!$coupons) {
+        if (!$orders) {
             return response()->json([
                 'status' => false,
-                'message' => "Coupon không tồn tại"
+                'message' => "Order không tồn tại"
             ], 404);
         }
 
         $dataUpdate = [
-            "status" => $request->status ?? $coupons->status,
-            "coupon_percentage" => $request->coupon_percentage ?? $coupons->coupon_percentage,
-            "condition" => $request->condition ?? $coupons->condition,
-            "create_by" => $request->create_by ?? $coupons->create_by,
+            'payment_id' => $request->payment_id ?? $orders->payment_id,
+            'ship_id' => $request->ship_id ?? $orders->ship_id,
+            'voucher_id' => $request->voucher_id ?? $orders->voucher_id,
+            'user_id' => $request->user_id ?? $orders->user_id,
+            'shop_id' => $request->shop_id ?? $orders->shop_id,
+            'status' => $request->status ?? $orders->status,
+            'update_by' => $request->update_by
         ];
 
         try {
-            $coupons->update($dataUpdate);
+            $orders->update($dataUpdate);
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Coupon đã được cập nhật",
-                    'data' => $coupons
-                ],
-                200
-            );
+                    'message' => "Order đã được cập nhật",
+                    'data' => $orders
+                ], 200);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Cập nhật Coupon không thành công",
+                    'message' => "Cập nhật Order không thành công",
                     'error' => $th->getMessage()
-                ]
-            );
+                ]);
         }
     }
 
@@ -145,27 +148,27 @@ class CouponsController extends Controller
      */
     public function destroy(string $id)
     {
-        $coupons = CouponsModel::find($id);
+        $orders = OrdersModel::find($id);
 
         try {
-            if (!$coupons) {
+            if (!$orders) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Coupon không tồn tại"
+                    'message' => "Order không tồn tại"
                 ], 404);
             }
-
-            $coupons->delete();
-
+    
+            $orders->delete();
+    
             return response()->json([
                 'status' => true,
-                'message' => "Coupon đã được xóa"
+                'message' => "Order đã được xóa"
             ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa Coupon không thành công",
+                    'message' => "xóa Order không thành công",
                     'error' => $th->getMessage(),
                 ]
             );

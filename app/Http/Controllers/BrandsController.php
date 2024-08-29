@@ -131,9 +131,10 @@ class BrandsController extends Controller
                 ], 404);
             }
 
+            $image = $request->file('image');
+
             // Check xem co anh moi duoc tai len khong
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
+            if ($image) {
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $imageUrl = $uploadedImage['secure_url'];
@@ -143,12 +144,12 @@ class BrandsController extends Controller
             }
 
             $dataUpdate = [
-                'title' => $request->title,
+                'title' => $request->title ?? $brands->title,
                 'slug' => Str::slug($request->title),
-                'image' => $imageUrl,
-                'status' => $request->status,
-                'parent_id' => $request->parent_id,
-                'update_by' => $request->update_by,
+                'image' => $imageUrl ?? $brands->image,
+                'status' => $request->status ?? $brands->status,
+                'parent_id' => $request->parent_id ?? $brands->parent_id,
+                'update_by' => $request->update_by ?? $brands->update_by,
                 'updated_at' => now(),
             ];
 
