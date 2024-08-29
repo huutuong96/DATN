@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Image extends Model
+class message_detail extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'product_id',
-        'url',
+        'mes_id',
+        'content',
+        'send_by',
         'status',
-        'create_at',
-        'update_at',
     ];
+
 }

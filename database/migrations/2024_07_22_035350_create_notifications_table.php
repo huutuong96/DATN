@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('id_notification');
 
-            $table->foreign('user_id')->references('id')->on('voucher_to_main')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
             $table->foreign('id_notification')->references('id')->on('notification_to_main')->onDelete('restrict')->onUpdate('restrict');
             // $table->foreign('id_notification')->references('id')->on('notification_to_shops')->onDelete('restrict')->onUpdate('restrict');
         });

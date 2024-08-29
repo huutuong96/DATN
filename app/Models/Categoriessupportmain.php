@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Image extends Model
+class Categoriessupportmain extends Model
 {
     use HasFactory;
+    protected $table = 'categories_support_main'; // Khai báo tên bảng
 
     protected $fillable = [
-        'product_id',
-        'url',
+        'content',
         'status',
-        'create_at',
-        'update_at',
+        'index',
+        'create_by',
+        'update_by',
     ];
 }
