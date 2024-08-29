@@ -135,12 +135,6 @@ class CouponsController extends Controller
                 'message' => "Coupon không tồn tại"
             ], 404);
         }
-        $dataUpdate = [
-            "status" => $request->status,
-            "coupon_id" => $request->coupon_id,
-            "shop_id" => $id,
-        ];
-        $coupons->update();
         // Coupon_to_shop::where('id', $id)->first();
         return response()->json([
             'status' => true,
