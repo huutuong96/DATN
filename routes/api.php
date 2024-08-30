@@ -18,24 +18,28 @@ use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CouponsController;
+use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ProgrameController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\FollowToShopController;
 use App\Http\Controllers\Support_mainController;
+use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ProducttoshopController;
+use App\Http\Controllers\ProducttocartController;
 use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
-use App\Http\Controllers\CategoriessupportmainController;
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
 
             Route::resource('users', AuthenController::class);
             Route::post('user/me', [AuthenController::class, "me"]);
-            Route::resource('role', RolesController::class);
+            Route::resource('roles', RolesController::class);
             Route::resource('address', AddressController::class);
             Route::resource('permission', PermissionsController::class);
             Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
@@ -50,7 +54,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('colors',ColorsController::class);
             Route::resource('categori_learns', CategorilearnsController::class);
             Route::resource('Categoriessupportmains', CategoriessupportmainController::class);
-            Route::resource('learn', LearnController::class);
+            Route::resource('learns', LearnController::class);
             Route::resource('messages', MessageController::class);
             Route::post('messages/detail', [MessageController::class, "store_message_detail"]);
             Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
@@ -74,16 +78,18 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('vouchers', VoucherController::class);
             Route::resource('follows', FollowToShopController::class);
             Route::resource('support_main', Support_mainController::class);
+            Route::resource('Comments', CommentsController::class);
+            Route::resource('Wishlists', WishlistController::class);
+            Route::resource('Product_to_shops', ProducttoshopController::class);
+            Route::resource('Product_to_carts', ProducttocartController::class);
+            Route::resource('learning_seller', Learning_sellerController::class);
+  
 });
 
 //CRUD Thy (29/08)
-Route::resource('learning_seller', Learning_sellerController::class);
 // Route::resource('momo', MomoController::class);
-
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
-
-
 
 
