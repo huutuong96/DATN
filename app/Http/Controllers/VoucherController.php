@@ -42,31 +42,44 @@ class VoucherController extends Controller
      */
     public function store(Vouchers $request)
     {
-        $dataInsert = [
-            'type' => $request->type,
-            'status' => $request->status,
-            // 'URL' => $uploadedImage['secure_url'],
-            'code' => $request->code,
-            // 'create_by',
-            // 'update_by',
-        ];
 
-        try {
-            $voucher = Voucher::create( $dataInsert );
+        $checkVoucherToMain = voucher_to_main::where('code', $request->code)->first();
+        $checkVoucherToShop = VoucherToShop::where('code', $request->code)->first();
 
+        if ($checkVoucherToMain || $checkVoucherToShop) {
+            $dataInsert = [
+                'type' => $request->type,
+                'status' => $request->status,
+                // 'URL' => $uploadedImage['secure_url'],
+                'code' => $request->code,
+                // 'create_by',
+                // 'update_by',
+            ];
+
+            try {
+                $voucher = Voucher::create($dataInsert);
+
+                return response()->json(
+                    [
+                        'status' => true,
+                        'message' => "Thêm voucher thành công",
+                        'data' => $voucher,
+                    ]
+                );
+            } catch (\Throwable $th) {
+                return response()->json(
+                    [
+                        'status' => true,
+                        'message' => "Thêm voucher không thành công",
+                        'error' => $th->getMessage(),
+                    ]
+                );
+            }
+        } else {
             return response()->json(
                 [
-                    'status' => true,
-                    'message' => "Thêm voucher thành công",
-                    'data' => $voucher,
-                ]
-            );
-        } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm voucher không thành công",
-                    'error' => $th->getMessage(),
+                    'status' => false,
+                    'message' => "Mã voucher không khớp với bất kỳ voucher nào của shop hoặc sàn.",
                 ]
             );
         }

@@ -46,6 +46,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();

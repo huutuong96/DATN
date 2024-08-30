@@ -30,10 +30,12 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('brand_id');
             $table->unsignedBigInteger('color_id');
+            $table->unsignedBigInteger('shop_id');
 
             $table->foreign('category_id')->references('id')->on('categori_shops')->onDelete('restrict')->onUpdate('restrict');
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('restrict')->onUpdate('restrict');
             $table->foreign('color_id')->references('id')->on('colors')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreign('shop_id')->references('id')->on('shops')->onDelete('restrict')->onUpdate('restrict');
         });
     }
 
