@@ -18,35 +18,24 @@ class PurchaseController extends Controller
 {
     public function purchase(Request $request)
     {
-        // $request->validate([
-        //     'product_id' => 'required|exists:products,id',
-        //     'quantity' => 'required|integer|min:1',
-        //     'payment_id' => 'required',
-        //     'ship_id' => 'required|exists:ships,id',
-        // ]);
+        try {
+            // Validate dữ liệu từ request
+            $validatedData = $request->validate([
+                'product_id' => 'required|exists:products,id',
+                'quantity' => 'required|integer|min:1',
+                'payment_id' => 'required',
+                'ship_id' => 'required|exists:ships,id'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+            
         DB::beginTransaction();
         try {
-            $voucherToMain = voucher::where("code", $request->voucherToMainCode)->where("quantity", ">=", 1)->where("status", 1)->first();
-            if($voucherToMain){
-                $voucherToMainCode = $voucherToMain->code;
-            }else{
-                $voucherToMainCode = null;
-            }
-
-            $voucherToShop = voucher::where("code", $request->voucherToShopCode)->where("quantity", ">=", 1)->where("status", 1)->first();
-            if($voucherToShop){
-                $voucherToShopCode = $voucherToShop->code;
-            }else{
-                $voucherToShopCode = null;
-            }
-
-        // dd($voucherToMainCode, $voucherToShopCode);
-        
-
-        
-            // $product = Product::findOrFail($request->product_id);
-            // $productToShop = ProducttoshopModel::where('product_id', $product->id)->firstOrFail();
-            // $shopId = $productToShop->shop_id;
 
             $product = Product::where('shop_id', $request->shop_id)
                    ->where('id', $request->product_id)
@@ -54,35 +43,49 @@ class PurchaseController extends Controller
             
             if ($product->quantity < $request->quantity) {
                 throw new \Exception('Không đủ hàng');
-            }
+            };
 
             $price = $product->sale_price && $product->sale_price < $product->price
                 ? $product->sale_price
                 : $product->price;
             $totalPrice = $price * $request->quantity;
-            
-            //combine voucher
+            $voucher_id = [];
+            if($request->voucherToMainCode){
+                //combine voucher
+                $voucher = voucher::where("code", $request->voucherToMainCode )->where("quantity", ">=", 1)->where("status", 1)->first();
+                $voucherToMainCode = $voucher->code ?? null;
+                $checkVoucherToMain = voucher_to_main::where('code', $voucherToMainCode)->where("status", 1)->first();
+                if($checkVoucherToMain){
+                    $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToMain->ratio / 100);
+                    $voucher_id["main"] = $voucher->id;
 
-            $checkVoucherToMain = voucher_to_main::where('code', $voucherToMainCode)->where("status", 1)->first();
-            $checkVoucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where("status", 1)->first();
-
-            if($checkVoucherToMain){
-                $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToMain->ratio / 100);
+                    $myVoucher = voucher::where("code", $checkVoucherToMain->code)->first();
+                    $myVoucher->quantity -= 1;
+                    if($myVoucher->quantity <= 0){
+                        $myVoucher->status = 0;
+                    }
+                    $myVoucher->save();
+                };
+                
             };
-            if($checkVoucherToShop){
-                $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToShop->ratio / 100);
-            };
+           
+            if( $request->voucherToShopCode){
+                $voucher = voucher::where("code", $request->voucherToShopCode)->where("quantity", ">=", 1)->where("status", 1)->first();
+                $voucherToShopCode = $voucher->code ?? null;
+                $checkVoucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where("status", 1)->first();
+                if($checkVoucherToShop){
+                    $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToShop->ratio / 100);
+                    $voucher_id["shop"] = $voucher->id;
 
-            // Create payment
-            // $payment = PaymentsModel::create([
-            //     'name' => $request->payment_method,
-            //     'status' => 1,
-            // ]);
-            $voucher_id = [
-                "main"=>($checkVoucherToMain->id ?? null),
-                "shop"=>($checkVoucherToShop->id ?? null)
-            ];
-
+                    $myVoucher = voucher::where("code", $checkVoucherToShop->code)->first();
+                    $myVoucher->quantity -= 1;
+                    if($myVoucher->quantity <= 0){
+                        $myVoucher->status = 0;
+                    }
+                    $myVoucher->save();
+                };
+                };
+                
             // Create order
             $order = OrdersModel::create([
                 'payment_id' => $request->payment_id,
@@ -105,25 +108,8 @@ class PurchaseController extends Controller
 
             // Update product quantity
             $product->decrement('quantity', $request->quantity);
-
             DB::commit();
-            // Update voucher quantity
-            if ($checkVoucherToMain) {
-                $myVoucher = voucher::where("code", $checkVoucherToMain->code)->first();
-                $myVoucher->quantity -= 1;
-                if($myVoucher->quantity <= 0){
-                    $myVoucher->status = 0;
-                }
-                $myVoucher->save();
-            }
-            if ($checkVoucherToShop) {
-                $myVoucher = voucher::where("code", $checkVoucherToShop->code)->first();
-                $myVoucher->quantity -= 1;
-                if($myVoucher->quantity <= 0){
-                    $myVoucher->status = 0;
-                }
-                $myVoucher->save();
-            }
+            
 
             return response()->json([
                 'status' => true,
