@@ -9,6 +9,7 @@ use App\Http\Controllers\Notifications;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PremissionsController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\RanksController;
 use App\Http\Controllers\RolesController;
@@ -41,7 +42,8 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\Categori_ShopsController;
 use App\Http\Controllers\PurchaseController;
 
-Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
+
+Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
             Route::resource('users', AuthenController::class);
             Route::resource('categories', CategoriesController::class);
@@ -49,9 +51,9 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::post('user/me', [AuthenController::class, "me"]);
             Route::resource('roles', RolesController::class);
             Route::resource('address', AddressController::class);
-            Route::resource('permission', PermissionsController::class);
-            Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
-            Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
+            Route::resource('permission', PremissionsController::class);
+            Route::post('permission/grant_access', [PremissionsController::class, "grant_access"]);
+            Route::post('permission/delete_access', [PremissionsController::class, "delete_access"]);
             Route::resource('banners', BannerController::class);
             Route::resource('products', ProductController::class);
             Route::resource('faqs', FAQController::class);

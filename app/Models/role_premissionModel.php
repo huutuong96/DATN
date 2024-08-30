@@ -5,16 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PermissionsModel extends Model
+class role_premissionModel extends Model
 {
     use HasFactory;
-    protected $table = 'premissions'; // Thay đổi tên bảng nếu cần
+    protected $table = 'role_premissions'; // Thay đổi tên bảng nếu cần
 
     // Các trường có thể được gán hàng loạt
     protected $fillable = [
-        'premissionName',
+        'role_id',
+        'premission_id',
         'status',
-        'create_by',
+        'created_at',
         'update_by',
     ];
 }
+

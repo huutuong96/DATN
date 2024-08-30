@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\PermissionsModel;
+use App\Models\PremissionsModel;
 use App\Models\role_permissionModel;
 use App\Models\RolesModel;
 use Illuminate\Http\Request;
 use App\Http\Requests\PermissionsRequest;
-class PermissionsController extends Controller
+class PremissionsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,7 +20,7 @@ class PermissionsController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => PermissionsModel::all(),
+                'data' => PremissionsModel::all(),
             ], 200);
         } catch (JWTException $e) {
             return response()->json([
@@ -43,11 +43,11 @@ class PermissionsController extends Controller
             "premissionName"=> $request->premissionName,
             "create_at"=> now(),
         ];
-        $permission = PermissionsModel::create($dataInsert);
+        $permission = PremissionsModel::create($dataInsert);
         $dataDone = [
             'status' => true,
             'message' => "Quyền truy cập Đã được lưu",
-            'permissions' => PermissionsModel::all(),
+            'permissions' => PremissionsModel::all(),
         ];
         return response()->json($dataDone, 200);
     }
@@ -59,7 +59,7 @@ class PermissionsController extends Controller
     {
         try {
             // Xác thực người dùng bằng token JWT
-            $permission = PermissionsModel::where('id', $id)->first();
+            $permission = PremissionsModel::where('id', $id)->first();
             // dd($permission);
             return response()->json([
                 'status' => 'success',
