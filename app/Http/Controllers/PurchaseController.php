@@ -21,19 +21,21 @@ class PurchaseController extends Controller
         //     'payment_id' => 'required',
         //     'ship_id' => 'required|exists:ships,id',
         // ]);
-        if ($request->voucherToMainCode) {
-            $myVoucher = voucher::where("code", $request->voucherToMainCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
-            if(!$myVoucher){
+            $voucherToMain = voucher::where("code", $request->voucherToMainCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
+            if($voucherToMain){
+                $voucherToMainCode = $voucherToMain->code;
+            }else{
                 $voucherToMainCode = null;
             }
-        }
-        if ($request->voucherToShopCode) {
-            $myVoucher = voucher::where("code", $request->voucherToShopCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
-            if(!$myVoucher){
+
+            $voucherToShop = voucher::where("code", $request->voucherToShopCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
+            if($voucherToShop){
+                $voucherToShopCode = $voucherToShop->code;
+            }else{
                 $voucherToShopCode = null;
             }
-        }
-        
+
+        // dd($voucherToMainCode, $voucherToShopCode);
         DB::beginTransaction();
 
         try {
@@ -103,11 +105,17 @@ class PurchaseController extends Controller
             if ($checkVoucherToMain) {
                 $myVoucher = voucher::where("code", $checkVoucherToMain->code)->first();
                 $myVoucher->quantity -= 1;
+                if($myVoucher->quantity <= 0){
+                    $myVoucher->status = 0;
+                }
                 $myVoucher->save();
             }
             if ($checkVoucherToShop) {
                 $myVoucher = voucher::where("code", $checkVoucherToShop->code)->first();
                 $myVoucher->quantity -= 1;
+                if($myVoucher->quantity <= 0){
+                    $myVoucher->status = 0;
+                }
                 $myVoucher->save();
             }
 
