@@ -108,3 +108,4 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
+Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');

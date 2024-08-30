@@ -57,6 +57,10 @@ class AuthenController extends Controller
             "login_at"=> now(),
         ];
         $user = UsersModel::create($dataInsert);
+        $token = JWTAuth::fromUser($user);
+            $user->update([
+                'refesh_token' => $token,
+            ]);
         // Send confirm mail
         $confirmMail = [
             'title' => 'Vui lòng xác nhận đăng ký tài khoản',
@@ -76,9 +80,31 @@ class AuthenController extends Controller
             'notification' => $notification,
             'notification_to_main' => $notification_to_main,
         ];
-        Mail::to($user->email)->send(new ConfirmMail($user, $confirmMail));
+        Mail::to($user->email)->send(new ConfirmMail($user, $confirmMail, $token));
         return response()->json($dataDone, 201);
     }
+
+    public function confirm($token)
+    {
+        $user = UsersModel::where('refesh_token', $token)->first();
+        if ($user) {
+            $user->update([
+                'status' => 1,
+            ]);
+            $activeDone = [
+                'status' => true,
+                'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
+            ];
+            return response()->json($activeDone, 200);
+        } else {
+            $activeFail = [
+                'status' => true,
+                'message' => "Tài khoản không tồn tại, Vui lòng đăng ký lại",
+            ];
+            return response()->json($activeFail, 200);
+        }
+    }
+
 
     public function login(Request $request)
     {

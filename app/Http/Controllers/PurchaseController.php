@@ -8,11 +8,11 @@ use App\Models\PaymentsModel;
 use App\Models\OrderDetailsModel;
 use Illuminate\Http\Request;
 use App\Models\ProducttoshopModel;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use App\Models\voucher;
+use App\Models\Voucher;
 use App\Models\voucher_to_main;
 use App\Models\VoucherToShop;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -39,7 +39,7 @@ class PurchaseController extends Controller
             }
 
         // dd($voucherToMainCode, $voucherToShopCode);
-        DB::beginTransaction();
+
 
         try {
 
@@ -97,6 +97,7 @@ class PurchaseController extends Controller
             $product->decrement('quantity', $request->quantity);
 
             DB::commit();
+            // Update voucher quantity
             if ($checkVoucherToMain) {
                 $myVoucher = voucher::where("code", $checkVoucherToMain->code)->first();
                 $myVoucher->quantity -= 1;
