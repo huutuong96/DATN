@@ -5,7 +5,6 @@ use App\Http\Controllers\Learning_sellerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
-use App\Http\Controllers\Notifications;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
@@ -37,6 +36,7 @@ use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\Categori_ShopsController;
@@ -71,6 +71,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
             Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
             Route::resource('shops', ShopController::class);
+            Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
             Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
             Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]);
             Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
@@ -83,7 +84,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::put('coupons/shop/update/{id}', [CouponsController::class, "update_to_shop"]);
             Route::delete('coupons/shop/delete/{id}', [CouponsController::class, "destroy_to_shop"]);
             Route::resource('notification_to_main', Notification_to_mainController::class);
-            Route::resource('notifications', Notifications::class);
+            Route::resource('notifications', NotificationController::class);
             Route::resource('programes', ProgrameController::class);
             Route::resource('notification_to_shops', Notification_to_shopController::class);
             Route::resource('vouchers', VoucherController::class);
@@ -95,6 +96,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('Product_to_carts', ProducttocartController::class);
             Route::resource('learning_seller', Learning_sellerController::class);
             Route::post('purchase', [PurchaseController::class, "purchase"]);
+
 });
 
 //CRUD Thy (29/08)
