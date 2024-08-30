@@ -6,7 +6,7 @@ use Cloudinary\Cloudinary;
 use App\Models\ColorsModel;
 use Illuminate\Http\Request;
 use App\Http\Requests\ColorRequest;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 class ColorsController extends Controller
 {
     /**
@@ -47,7 +47,7 @@ class ColorsController extends Controller
     {
         $image = $request->file('image');
         $cloudinary = new Cloudinary();
-
+        $user = JWTAuth::parseToken()->authenticate();
         try {
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
 
@@ -56,8 +56,7 @@ class ColorsController extends Controller
                 'index' => $request->index,
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
-                'create_by' => $request->create_by,
-                'update_by' => $request->update_by
+                'create_by' => $user->id,
             ];
 
             $colors = ColorsModel::create($dataInsert);

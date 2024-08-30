@@ -1,23 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Categoriessupportmain;
-use App\Http\Requests\CategoriessupportmainRequest;
+use App\Http\Requests\ProgramtoshopRequest;
+use App\Models\ProgramtoshopModel;
 use Illuminate\Http\Request;
 
-class CategoriessupportmainController extends Controller
+class ProgramtoshopController extends Controller
 {
-    /**
+   /**
      * Display a listing of the resource.
      */
     public function index()
     {
         try {
-            $Categori_learn = Categoriessupportmain::all();
+            $Program_to_shop = ProgramtoshopModel::all();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Categori_learn ,
+                'data' =>  $Program_to_shop ,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -33,26 +33,25 @@ class CategoriessupportmainController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(request $request )
+    public function store(ProgramtoshopRequest $request)
     {
+       
         $dataInsert = [
-            "content"=> $request->content,
-            "status"=> $request->status,
-            "index"=> $request->index,
-            'create_by' => $request->input('create_by') ?? null,
+            "program_id"=> $request->program_id,
+            "shop_id"=> $request->shop_id,
             "created_at"=> now(),
         ];
-        Categoriessupportmain::create($dataInsert);
+        ProgramtoshopModel::create($dataInsert);
         $dataDone = [
             'status' => true,
-            'message' => "đã lưu categori_learn",
-            'data' => Categoriessupportmain::all(),
+            'message' => "đã lưu Program_to_shop",
+            'data' => $dataInsert,
         ];
         return response()->json($dataDone, 200);
     }
@@ -63,11 +62,11 @@ class CategoriessupportmainController extends Controller
     public function show(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
+            $Program_to_shop = ProgramtoshopModel::findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $Categori_learn,
+                'data' => $Program_to_shop,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -89,22 +88,20 @@ class CategoriessupportmainController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProgramtoshopRequest $request, string $id)
 {
-    $Categori_learn = Categoriessupportmain::findOrFail($id);
+    $Program_to_shop = ProgramtoshopModel::findOrFail($id);
 
-    $Categori_learn->update([
-        "content" => $request->content,
-        "status" => $request->status,
-        "index"=> $request->index,
-        'create_by' => $request->input('create_by') ?? null,
-        "updated_at" => now(),
+    $Program_to_shop->update([
+           "program_id"=> $request->program_id,
+            "shop_id"=> $request->shop_id,
+            "update"=> now(),
     ]);
 
     $dataDone = [
         'status' => true,
-        'message' => "đã lưu categori_learn",
-        'roles' => Categoriessupportmain::all(),
+        'message' => "đã lưu Program_to_shop",
+        'roles' =>     $Program_to_shop,
     ];
     return response()->json($dataDone, 200);
 }
@@ -115,8 +112,8 @@ class CategoriessupportmainController extends Controller
     public function destroy(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
-            $Categori_learn->delete();
+            $Program_to_shop = ProgramtoshopModel::findOrFail($id);
+            $Program_to_shop->delete();
             return response()->json([
                 'status' => "success",
                 'message' => 'Xóa thành công',

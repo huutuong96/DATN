@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class role_permissionModel extends Model
+class ProducttocartModel extends Model
 {
     use HasFactory;
-    protected $table = 'role_premissions'; // Thay đổi tên bảng nếu cần
+    protected $table = 'product_to_carts'; // Thay đổi tên bảng nếu cần
 
     // Các trường có thể được gán hàng loạt
     protected $fillable = [
-        'role_id',
-        'premission_id',
+        'quantity',
         'status',
-        'created_at',
+        'cart_id',
+        'product_id',
+        'create_by',
         'update_by',
     ];
 }
-

@@ -1,44 +1,61 @@
 <?php
 
+use App\Http\Controllers\OrderDetailController;
+use App\Http\Controllers\Learning_sellerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Notification_to_mainController;
-use App\Http\Controllers\AuthenController;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\RanksController;
-use App\Http\Controllers\AddressController;
+use App\Http\Controllers\FAQController;
+use App\Http\Controllers\Notifications;
+use App\Http\Controllers\TaxController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\PremissionsController;
+use App\Http\Controllers\LearnController;
+use App\Http\Controllers\RanksController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\ShipsController;
+use App\Http\Controllers\AuthenController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CouponsController;
-use App\Http\Controllers\FAQController;
 use App\Http\Controllers\PaymentsController;
-use App\Http\Controllers\ShipsController;
-use App\Http\Controllers\TaxController;
+use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\ProgrameController;
+use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\FollowToShopController;
+use App\Http\Controllers\Support_mainController;
+use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ProducttoshopController;
+use App\Http\Controllers\ProducttocartController;
+use App\Http\Controllers\ProgramtoshopController;
 use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
-use App\Http\Controllers\LearnController;
-use App\Http\Controllers\ShopController;
-use App\Http\Controllers\ProgrameController;
+use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
-use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\FollowToShopController;
-use App\Http\Controllers\Notifications;
-use App\Http\Controllers\Support_mainController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\Categori_ShopsController;
+use App\Http\Controllers\PurchaseController;
 
-Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
+
+Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
             Route::resource('users', AuthenController::class);
+            Route::resource('categories', CategoriesController::class);
+            Route::resource('categori_shops', Categori_ShopsController::class);
             Route::post('user/me', [AuthenController::class, "me"]);
-            Route::resource('role', RolesController::class);
+            Route::resource('roles', RolesController::class);
             Route::resource('address', AddressController::class);
-            Route::resource('permission', PermissionsController::class);
-            Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
-            Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
+            Route::resource('permission', PremissionsController::class);
+            Route::post('permission/grant_access', [PremissionsController::class, "grant_access"]);
+            Route::post('permission/delete_access', [PremissionsController::class, "delete_access"]);
             Route::resource('banners', BannerController::class);
+            Route::resource('products', ProductController::class);
             Route::resource('faqs', FAQController::class);
             Route::resource('taxs', TaxController::class);
             Route::resource('ranks', RanksController::class);
@@ -48,7 +65,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('colors',ColorsController::class);
             Route::resource('categori_learns', CategorilearnsController::class);
             Route::resource('Categoriessupportmains', CategoriessupportmainController::class);
-            Route::resource('learn', LearnController::class);
+            Route::resource('learns', LearnController::class);
             Route::resource('messages', MessageController::class);
             Route::post('messages/detail', [MessageController::class, "store_message_detail"]);
             Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
@@ -72,11 +89,17 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('vouchers', VoucherController::class);
             Route::resource('follows', FollowToShopController::class);
             Route::resource('support_main', Support_mainController::class);
+            Route::resource('Comments', CommentsController::class);
+            Route::resource('Wishlists', WishlistController::class);
+            Route::resource('Product_to_shops', ProducttoshopController::class);
+            Route::resource('Product_to_carts', ProducttocartController::class);
+            Route::resource('learning_seller', Learning_sellerController::class);
+            Route::post('purchase', [PurchaseController::class, "purchase"]);
 });
+
+//CRUD Thy (29/08)
+// Route::resource('momo', MomoController::class);
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
-
-
-
-
+Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');

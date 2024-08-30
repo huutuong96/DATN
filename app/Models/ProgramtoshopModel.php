@@ -5,16 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Coupon_to_shop extends Model
+class ProgramtoshopModel extends Model
 {
     use HasFactory;
+    protected $table = 'program_to_shops'; // Thay đổi tên bảng nếu cần
 
+    // Các trường có thể được gán hàng loạt
     protected $fillable = [
-        'status',
-        'created_at',
-        'updated_at',
-        'coupon_id',
+        'program_id',
         'shop_id',
     ];
-
 }

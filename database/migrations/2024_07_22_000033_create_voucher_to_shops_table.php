@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('voucher_to_shops', function (Blueprint $table) {
             $table->id();
+            $table->text('title')->nullable();
             $table->text('description')->nullable();
             $table->string('image')->nullable();
             $table->integer('quantity')->default(1);
