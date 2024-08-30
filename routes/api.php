@@ -43,7 +43,7 @@ use App\Http\Controllers\Categori_ShopsController;
 use App\Http\Controllers\PurchaseController;
 
 
-Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
+Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
             Route::resource('users', AuthenController::class);
             Route::resource('categories', CategoriesController::class);

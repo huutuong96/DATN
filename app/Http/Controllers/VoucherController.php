@@ -50,7 +50,11 @@ class VoucherController extends Controller
             // 'create_by',
             // 'update_by',
         ];
-
+        //
+            $checkShop = VoucherToShop::where("code", $request->code)->first();
+            $checkMain = voucherToMain::where("code", $request->code)->first();
+            
+        //
         try {
             $voucher = Voucher::create( $dataInsert );
 
