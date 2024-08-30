@@ -8,6 +8,9 @@ use App\Models\PaymentsModel;
 use App\Models\OrderDetailsModel;
 use Illuminate\Http\Request;
 use App\Models\ProducttoshopModel;
+use App\Models\Voucher;
+use App\Models\voucher_to_main;
+use App\Models\VoucherToShop;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,14 +24,16 @@ class PurchaseController extends Controller
         //     'payment_id' => 'required',
         //     'ship_id' => 'required|exists:ships,id',
         // ]);
-            $voucherToMain = voucher::where("code", $request->voucherToMainCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
+        DB::beginTransaction();
+        try {
+            $voucherToMain = voucher::where("code", $request->voucherToMainCode)->where("quantity", ">=", 1)->where("status", 1)->first();
             if($voucherToMain){
                 $voucherToMainCode = $voucherToMain->code;
             }else{
                 $voucherToMainCode = null;
             }
 
-            $voucherToShop = voucher::where("code", $request->voucherToShopCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
+            $voucherToShop = voucher::where("code", $request->voucherToShopCode)->where("quantity", ">=", 1)->where("status", 1)->first();
             if($voucherToShop){
                 $voucherToShopCode = $voucherToShop->code;
             }else{
@@ -36,9 +41,9 @@ class PurchaseController extends Controller
             }
 
         // dd($voucherToMainCode, $voucherToShopCode);
-        DB::beginTransaction();
+        
 
-        try {
+        
             // $product = Product::findOrFail($request->product_id);
             // $productToShop = ProducttoshopModel::where('product_id', $product->id)->firstOrFail();
             // $shopId = $productToShop->shop_id;
@@ -102,6 +107,7 @@ class PurchaseController extends Controller
             $product->decrement('quantity', $request->quantity);
 
             DB::commit();
+            // Update voucher quantity
             if ($checkVoucherToMain) {
                 $myVoucher = voucher::where("code", $checkVoucherToMain->code)->first();
                 $myVoucher->quantity -= 1;
