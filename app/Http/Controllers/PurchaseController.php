@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\OrdersModel;
-use App\Models\PaymentsModel;
 use App\Models\OrderDetailsModel;
-use Illuminate\Http\Request;
-use App\Models\ProducttoshopModel;
 use App\Models\Voucher;
-use App\Models\voucher_to_main;
 use App\Models\VoucherToShop;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Mail\ConfirmOder;
+use Illuminate\Support\Facades\Mail;
 
 class PurchaseController extends Controller
 {
@@ -24,96 +22,26 @@ class PurchaseController extends Controller
             'payment_id' => 'required',
             'ship_id' => 'required|exists:ships,id',
         ]);
-            $voucherToMain = voucher::where("code", $request->voucherToMainCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
-            if($voucherToMain){
-                $voucherToMainCode = $voucherToMain->code;
-            }else{
-                $voucherToMainCode = null;
-            }
 
-            $voucherToShop = voucher::where("code", $request->voucherToShopCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
-            if($voucherToShop){
-                $voucherToShopCode = $voucherToShop->code;
-            }else{
-                $voucherToShopCode = null;
-            }
-
-        // dd($voucherToMainCode, $voucherToShopCode);
-
+        $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode);
+        $voucherToShopCode = $this->getValidVoucherCode($request->voucherToShopCode);
 
         try {
+            DB::beginTransaction();
 
-            $product = Product::where('shop_id', $request->shop_id)
-                   ->where('id', $request->product_id)
-                   ->first();
+            $product = $this->getProduct($request->shop_id, $request->product_id);
+            $this->checkProductAvailability($product, $request->quantity);
 
-            if ($product->quantity < $request->quantity) {
-                throw new \Exception('Không đủ hàng');
-            }
-            // dd($product);
-            $price = $product->sale_price && $product->sale_price < $product->price
-                ? $product->sale_price
-                : $product->price;
-            $totalPrice = $price * $request->quantity;
+            $totalPrice = $this->calculateTotalPrice($product, $request->quantity);
+            $voucherId = $this->applyVouchers($voucherToMainCode, $voucherToShopCode, $totalPrice);
 
-            //combine voucher
+            $order = $this->createOrder($request, $voucherId);
+            $orderDetail = $this->createOrderDetail($order, $product, $request->quantity, $totalPrice);
 
-            $checkVoucherToMain = voucher_to_main::where('code', $voucherToMainCode)->where("status", 1)->first();
-            $checkVoucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where("status", 1)->first();
-
-            if($checkVoucherToMain){
-                $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToMain->ratio / 100);
-            };
-            if($checkVoucherToShop){
-                $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToShop->ratio / 100);
-            };
-
-            $voucher_id = [
-                "main"=>($checkVoucherToMain->id ?? null),
-                "shop"=>($checkVoucherToShop->id ?? null)
-            ];
-
-            // Create order
-            $order = OrdersModel::create([
-                'payment_id' => $request->payment_id,
-                'user_id' => auth()->id(),
-                'shop_id' => $request->shop_id,
-                'voucher_id' => json_encode($voucher_id),
-                'ship_id' => $request->ship_id,
-                'status' => 1,
-
-            ]);
-
-            // Create order detail
-            $orderDetail = OrderDetailsModel::create([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'quantity' => $request->quantity,
-                'subtotal' => $totalPrice,
-                'status' => 1,
-            ]);
-
-            // Update product quantity
             $product->decrement('quantity', $request->quantity);
-
             DB::commit();
-            // Update voucher quantity
-            if ($checkVoucherToMain) {
-                $myVoucher = voucher::where("code", $checkVoucherToMain->code)->first();
-                $myVoucher->quantity -= 1;
-                if($myVoucher->quantity <= 0){
-                    $myVoucher->status = 0;
-                }
-                $myVoucher->save();
-            }
-            if ($checkVoucherToShop) {
-                $myVoucher = voucher::where("code", $checkVoucherToShop->code)->first();
-                $myVoucher->quantity -= 1;
-                if($myVoucher->quantity <= 0){
-                    $myVoucher->status = 0;
-                }
-                $myVoucher->save();
-            }
+
+            Mail::to($request->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $totalPrice));
 
             return response()->json([
                 'status' => true,
@@ -130,5 +58,90 @@ class PurchaseController extends Controller
             ], 400);
         }
     }
-}
 
+    private function getValidVoucherCode($code)
+    {
+        $voucher = Voucher::where('code', $code)
+            ->where('quantity', '>=', 1)
+            ->where('status', 1)
+            ->first();
+
+        return $voucher ? $voucher->code : null;
+    }
+
+    private function getProduct($shopId, $productId)
+    {
+        return Product::where('shop_id', $shopId)
+            ->where('id', $productId)
+            ->firstOrFail();
+    }
+
+    private function checkProductAvailability($product, $quantity)
+    {
+        if ($product->quantity < $quantity) {
+            throw new \Exception('Không đủ hàng');
+        }
+    }
+
+    private function calculateTotalPrice($product, $quantity)
+    {
+        $price = $product->sale_price && $product->sale_price < $product->price
+            ? $product->sale_price
+            : $product->price;
+        return $price * $quantity;
+    }
+
+    private function applyVouchers($voucherToMainCode, $voucherToShopCode, &$totalPrice)
+    {
+        $voucherId = ['main' => null, 'shop' => null];
+
+        if ($voucherToMainCode) {
+            $voucherToMain = Voucher::where('code', $voucherToMainCode)->first();
+            $this->updateVoucherQuantity($voucherToMain);
+            $voucherId['main'] = $voucherToMain->id;
+        }
+
+        if ($voucherToShopCode) {
+            $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)
+                ->where('status', 1)
+                ->first();
+            if ($voucherToShop) {
+                $totalPrice -= ($totalPrice * $voucherToShop->ratio / 100);
+                $voucherId['shop'] = $voucherToShop->id;
+            }
+        }
+
+        return $voucherId;
+    }
+
+    private function updateVoucherQuantity($voucher)
+    {
+        $voucher->decrement('quantity');
+        if ($voucher->quantity <= 0) {
+            $voucher->update(['status' => 0]);
+        }
+    }
+
+    private function createOrder($request, $voucherId)
+    {
+        return OrdersModel::create([
+            'payment_id' => $request->payment_id,
+            'user_id' => auth()->id(),
+            'shop_id' => $request->shop_id,
+            'voucher_id' => json_encode($voucherId),
+            'ship_id' => $request->ship_id,
+            'status' => 1,
+        ]);
+    }
+
+    private function createOrderDetail($order, $product, $quantity, $totalPrice)
+    {
+        OrderDetailsModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => $quantity,
+            'subtotal' => $totalPrice,
+            'status' => 1,
+        ]);
+    }
+}
