@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\OrdersModel;
 use App\Models\PaymentsModel;
+use App\Models\OrderDetailModel;
 use Illuminate\Http\Request;
+use App\Models\ProducttoshopModel;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
@@ -23,14 +25,19 @@ class PurchaseController extends Controller
 
         try {
             $product = Product::findOrFail($request->product_id);
+            $productToShop = ProducttoshopModel::where('product_id', $product->id)->first();
+            if (!$productToShop) {
+                throw new \Exception('Sản phẩm không thuộc về shop nào');
+            }
+            $shopId = $productToShop->shop_id;
 
             if ($product->quantity < $request->quantity) {
                 throw new \Exception('Không đủ hàng');
             }
 
             $totalPrice = $product->sale_price && $product->sale_price < $product->price
-                ? $product->sale_price * $request->quantity
-                : $product->price * $request->quantity;
+                            ? $product->sale_price * $request->quantity
+                            : $product->price * $request->quantity;
 
             // Create payment
             $payment = PaymentsModel::create([
@@ -38,16 +45,11 @@ class PurchaseController extends Controller
                 'status' => 1,
             ]);
 
-            // Ensure shop_id is not null
-            if (!$product->shop_id) {
-                throw new \Exception('Sản phẩm không có shop_id');
-            }
-
             // Create order
             $order = OrdersModel::create([
                 'payment_id' => $payment->id,
                 'user_id' => auth()->id(),
-                'shop_id' => $product->shop_id,
+                'shop_id' => $shopId,
                 'ship_id' => $request->ship_id,
                 'status' => 1,
                 'create_by' => auth()->id(),

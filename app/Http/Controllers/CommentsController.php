@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Categoriessupportmain;
-use App\Http\Requests\CategoriessupportmainRequest;
+use App\Models\CommentsModel;
+use App\Http\Requests\CommentsRequest;
 use Illuminate\Http\Request;
 
-class CategoriessupportmainController extends Controller
+class CommentsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,11 +13,11 @@ class CategoriessupportmainController extends Controller
     public function index()
     {
         try {
-            $Categori_learn = Categoriessupportmain::all();
+            $Comments = CommentsModel::all();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Categori_learn ,
+                'data' =>  $Comments ,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -33,26 +33,29 @@ class CategoriessupportmainController extends Controller
      */
     public function create()
     {
-
+        
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(request $request )
+    public function store(CommentsRequest $request )
     {
         $dataInsert = [
+            "title"=> $request->title,
             "content"=> $request->content,
+            "rate"=> $request->rate,
             "status"=> $request->status,
-            "index"=> $request->index,
-            'create_by' => $request->input('create_by') ?? null,
-            "created_at"=> now(),
+            "parent_id"=> $request->parent_id,
+            "product_id"=> $request->product_id,
+            "user_id"=> $request->user_id,
+         
         ];
-        Categoriessupportmain::create($dataInsert);
+        CommentsModel::create($dataInsert);
         $dataDone = [
             'status' => true,
-            'message' => "đã lưu categori_learn",
-            'data' => Categoriessupportmain::all(),
+            'message' => "đã lưu Comments",
+            'data' => CommentsModel::all(),
         ];
         return response()->json($dataDone, 200);
     }
@@ -63,11 +66,11 @@ class CategoriessupportmainController extends Controller
     public function show(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
+            $Comments = CommentsModel::findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $Categori_learn,
+                'data' => $Comments,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -89,22 +92,30 @@ class CategoriessupportmainController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CommentsRequest $request, string $id)
 {
-    $Categori_learn = Categoriessupportmain::findOrFail($id);
-
-    $Categori_learn->update([
-        "content" => $request->content,
-        "status" => $request->status,
-        "index"=> $request->index,
-        'create_by' => $request->input('create_by') ?? null,
+    $Comments = CommentsModel::findOrFail($id);
+    if (!$Comments) {
+        return response()->json([
+            'status' => false,
+            'message' => "Ship không tồn tại"
+        ], 404);
+    }
+    $Comments->update([
+        "title"=> $request->title,
+        "content"=> $request->content,
+        "rate"=> $request->rate,
+        "status"=> $request->status,
+        // "parent_id"=> $request->parent_id,
+        // "product_id"=> $request->product_id,
+        // "user_id"=> $request->user_id,
         "updated_at" => now(),
     ]);
 
     $dataDone = [
         'status' => true,
-        'message' => "đã lưu categori_learn",
-        'roles' => Categoriessupportmain::all(),
+        'message' => "đã lưu Comments",
+        'Comments' => $Comments,
     ];
     return response()->json($dataDone, 200);
 }
@@ -115,8 +126,8 @@ class CategoriessupportmainController extends Controller
     public function destroy(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
-            $Categori_learn->delete();
+            $Comments = CommentsModel::findOrFail($id);
+            $Comments->delete();     
             return response()->json([
                 'status' => "success",
                 'message' => 'Xóa thành công',
