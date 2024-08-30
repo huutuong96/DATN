@@ -44,7 +44,7 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        if ($rqt->hasFile('image')) {
+        if ($request->hasFile('image')) {
             $image = $rqt->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());

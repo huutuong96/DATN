@@ -29,6 +29,7 @@ use App\Http\Controllers\FollowToShopController;
 use App\Http\Controllers\Notifications;
 use App\Http\Controllers\Support_mainController;
 
+
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
 
             Route::resource('users', AuthenController::class);
@@ -76,6 +77,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
+
 
 
 
