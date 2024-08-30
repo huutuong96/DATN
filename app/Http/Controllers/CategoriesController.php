@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -47,7 +47,7 @@ class CategoriesController extends Controller
     {
         $image = $request->file('image');
         $cloudinary = new Cloudinary();
-
+        $user = JWTAuth::parseToken()->authenticate();
         try {
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
 
@@ -58,7 +58,7 @@ class CategoriesController extends Controller
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
                 'parent_id' => $request->parent_id,
-                'create_by' => $request->create_by
+                'create_by' => $user->id
             ];
 
             $categories = CategoriesModel::create($dataInsert);

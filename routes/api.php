@@ -28,10 +28,18 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\FollowToShopController;
 use App\Http\Controllers\Notifications;
 use App\Http\Controllers\Support_mainController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\Categori_ShopsController;
+use App\Http\Controllers\PurchaseController;
+
+
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
 
             Route::resource('users', AuthenController::class);
+            Route::resource('categories', CategoriesController::class);
+            Route::resource('categori_shops', Categori_ShopsController::class);
             Route::post('user/me', [AuthenController::class, "me"]);
             Route::resource('role', RolesController::class);
             Route::resource('address', AddressController::class);
@@ -39,6 +47,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
             Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
             Route::resource('banners', BannerController::class);
+            Route::resource('products', ProductController::class);
             Route::resource('faqs', FAQController::class);
             Route::resource('taxs', TaxController::class);
             Route::resource('ranks', RanksController::class);
@@ -72,6 +81,10 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('vouchers', VoucherController::class);
             Route::resource('follows', FollowToShopController::class);
             Route::resource('support_main', Support_mainController::class);
+
+
+            Route::post('purchase', [PurchaseController::class, "purchase"]);
+
 });
 
 Route::post('users/register', [AuthenController::class, "register"]);

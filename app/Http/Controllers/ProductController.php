@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Requests\ProductRequest;
-
+use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 class ProductController extends Controller
 {
     /**
@@ -44,8 +45,9 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        if ($rqt->hasFile('image')) {
-            $image = $rqt->file('image');
+        $user = JWTAuth::parseToken()->authenticate();
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
             $imageUrl = $uploadedImage['secure_url'];
@@ -54,20 +56,15 @@ class ProductController extends Controller
         }
         $dataInsert = [
             'name' => $request->name,
-            'slug' => $request->slug,
+            'slug' => $request->slug ?? Str::slug($request->name),
             'description' => $request->description,
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
             'image' => $imageUrl,
             'quantity' => $request->quantity,
-            'sold_count' => $request->sold_count,
-            'view_count' => $request->view_count,
             'parent_id' => $request->parent_id,
-            // 'create_by' => $request->create_by,
-            // 'update_by' => $request->update_by,
-            // 'create_at' => $request->create_at,
-            // 'update_at' => $request->update_at,
+            'create_by' => $user->id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
             'color_id' => $request->color_id,
