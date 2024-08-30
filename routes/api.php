@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderDetailController;
 use App\Http\Controllers\Learning_sellerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,7 @@ use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ProducttoshopController;
 use App\Http\Controllers\ProducttocartController;
+use App\Http\Controllers\ProgramtoshopController;
 use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\Notification_to_mainController;

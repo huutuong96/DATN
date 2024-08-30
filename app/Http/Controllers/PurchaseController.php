@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\OrdersModel;
 use App\Models\PaymentsModel;
-use App\Models\OrderDetailModel;
+use App\Models\OrderDetailsModel;
 use Illuminate\Http\Request;
 use App\Models\ProducttoshopModel;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +17,7 @@ class PurchaseController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
-            'payment_method' => 'required|string',
+            'payment_id' => 'required',
             'ship_id' => 'required|exists:ships,id',
         ]);
 
@@ -25,44 +25,41 @@ class PurchaseController extends Controller
 
         try {
             $product = Product::findOrFail($request->product_id);
-            $productToShop = ProducttoshopModel::where('product_id', $product->id)->first();
-            if (!$productToShop) {
-                throw new \Exception('Sản phẩm không thuộc về shop nào');
-            }
+            $productToShop = ProducttoshopModel::where('product_id', $product->id)->firstOrFail();
             $shopId = $productToShop->shop_id;
 
             if ($product->quantity < $request->quantity) {
                 throw new \Exception('Không đủ hàng');
             }
 
-            $totalPrice = $product->sale_price && $product->sale_price < $product->price
-                            ? $product->sale_price * $request->quantity
-                            : $product->price * $request->quantity;
+            $price = $product->sale_price && $product->sale_price < $product->price
+                ? $product->sale_price
+                : $product->price;
+            $totalPrice = $price * $request->quantity;
 
             // Create payment
-            $payment = PaymentsModel::create([
-                'name' => $request->payment_method,
-                'status' => 1,
-            ]);
+            // $payment = PaymentsModel::create([
+            //     'name' => $request->payment_method,
+            //     'status' => 1,
+            // ]);
 
             // Create order
             $order = OrdersModel::create([
-                'payment_id' => $payment->id,
+                'payment_id' => $request->payment_id,
                 'user_id' => auth()->id(),
                 'shop_id' => $shopId,
                 'ship_id' => $request->ship_id,
                 'status' => 1,
-                'create_by' => auth()->id(),
+
             ]);
 
             // Create order detail
-            $orderDetail = OrderDetailModel::create([
+            $orderDetail = OrderDetailsModel::create([
                 'order_id' => $order->id,
                 'product_id' => $product->id,
                 'quantity' => $request->quantity,
-                'price' => $product->price,
-                'sale_price' => $product->sale_price,
-                'total' => $totalPrice,
+                'subtotal' => $totalPrice,
+                'status' => 1,
             ]);
 
             // Update product quantity
@@ -86,3 +83,4 @@ class PurchaseController extends Controller
         }
     }
 }
+
