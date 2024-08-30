@@ -87,7 +87,13 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('vouchers', VoucherController::class);
             Route::resource('follows', FollowToShopController::class);
             Route::resource('support_main', Support_mainController::class);
+
+
+
             Route::post('purchase', [PurchaseController::class, "purchase"]);
+
+
+
             Route::resource('Comments', CommentsController::class);
             Route::resource('Wishlists', WishlistController::class);
             Route::resource('Product_to_shops', ProducttoshopController::class);
