@@ -39,7 +39,7 @@ class CategoriessupportmainController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CategoriessupportmainRequest $request )
+    public function store(request $request )
     {
         $dataInsert = [
             "content"=> $request->content,
@@ -89,7 +89,7 @@ class CategoriessupportmainController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CategoriessupportmainRequest $request, string $id)
+    public function update(Request $request, string $id)
 {
     $Categori_learn = Categoriessupportmain::findOrFail($id);
 
