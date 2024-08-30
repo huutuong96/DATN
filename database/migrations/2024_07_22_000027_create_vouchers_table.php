@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('type')->nullalbe();
             $table->integer('status')->default(1);
+            $table->integer('quantity');
             $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
             $table->timestamps();

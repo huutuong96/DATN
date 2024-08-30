@@ -21,6 +21,18 @@ class PurchaseController extends Controller
         //     'payment_id' => 'required',
         //     'ship_id' => 'required|exists:ships,id',
         // ]);
+        if ($request->voucherToMainCode) {
+            $myVoucher = voucher::where("code", $request->voucherToMainCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
+            if(!$myVoucher){
+                $voucherToMainCode = null;
+            }
+        }
+        if ($request->voucherToShopCode) {
+            $myVoucher = voucher::where("code", $request->voucherToShopCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
+            if(!$myVoucher){
+                $voucherToShopCode = null;
+            }
+        }
         
         DB::beginTransaction();
 
@@ -42,9 +54,10 @@ class PurchaseController extends Controller
                 : $product->price;
             $totalPrice = $price * $request->quantity;
             
-            //combine
-            $checkVoucherToMain = voucher_to_main::where('code', $request->voucherToMainCode ?? null)->where("status", 1)->first();
-            $checkVoucherToShop = VoucherToShop::where('code', $request->voucherToShopCode ?? null)->where("status", 1)->first();
+            //combine voucher
+
+            $checkVoucherToMain = voucher_to_main::where('code', $voucherToMainCode)->where("status", 1)->first();
+            $checkVoucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where("status", 1)->first();
 
             if($checkVoucherToMain){
                 $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToMain->ratio / 100);
@@ -87,6 +100,16 @@ class PurchaseController extends Controller
             $product->decrement('quantity', $request->quantity);
 
             DB::commit();
+            if ($checkVoucherToMain) {
+                $myVoucher = voucher::where("code", $checkVoucherToMain->code)->first();
+                $myVoucher->quantity -= 1;
+                $myVoucher->save();
+            }
+            if ($checkVoucherToShop) {
+                $myVoucher = voucher::where("code", $checkVoucherToShop->code)->first();
+                $myVoucher->quantity -= 1;
+                $myVoucher->save();
+            }
 
             return response()->json([
                 'status' => true,
