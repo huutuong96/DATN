@@ -10,17 +10,20 @@ use Illuminate\Http\Request;
 use App\Models\ProducttoshopModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\voucher;
+use App\Models\voucher_to_main;
+use App\Models\VoucherToShop;
 
 class PurchaseController extends Controller
 {
     public function purchase(Request $request)
     {
-        // $request->validate([
-        //     'product_id' => 'required|exists:products,id',
-        //     'quantity' => 'required|integer|min:1',
-        //     'payment_id' => 'required',
-        //     'ship_id' => 'required|exists:ships,id',
-        // ]);
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'payment_id' => 'required',
+            'ship_id' => 'required|exists:ships,id',
+        ]);
             $voucherToMain = voucher::where("code", $request->voucherToMainCode ?? null)->where("quantity", ">=", 1)->where("status", 1)->first();
             if($voucherToMain){
                 $voucherToMainCode = $voucherToMain->code;
@@ -39,23 +42,20 @@ class PurchaseController extends Controller
         DB::beginTransaction();
 
         try {
-            // $product = Product::findOrFail($request->product_id);
-            // $productToShop = ProducttoshopModel::where('product_id', $product->id)->firstOrFail();
-            // $shopId = $productToShop->shop_id;
 
             $product = Product::where('shop_id', $request->shop_id)
                    ->where('id', $request->product_id)
                    ->first();
-            
+
             if ($product->quantity < $request->quantity) {
                 throw new \Exception('Không đủ hàng');
             }
-
+            // dd($product);
             $price = $product->sale_price && $product->sale_price < $product->price
                 ? $product->sale_price
                 : $product->price;
             $totalPrice = $price * $request->quantity;
-            
+
             //combine voucher
 
             $checkVoucherToMain = voucher_to_main::where('code', $voucherToMainCode)->where("status", 1)->first();
@@ -68,11 +68,6 @@ class PurchaseController extends Controller
                 $totalPrice = $totalPrice - ($totalPrice * $checkVoucherToShop->ratio / 100);
             };
 
-            // Create payment
-            // $payment = PaymentsModel::create([
-            //     'name' => $request->payment_method,
-            //     'status' => 1,
-            // ]);
             $voucher_id = [
                 "main"=>($checkVoucherToMain->id ?? null),
                 "shop"=>($checkVoucherToShop->id ?? null)

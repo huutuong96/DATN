@@ -45,7 +45,7 @@ class AuthenController extends Controller
 
     public function register(UserRequest $request)
     {
-        $role = RolesModel::where('title', 'customer')->first();
+        $role = RolesModel::where('title', 'user')->first();
         $rank = RanksModel::where('title', 'đồng')->first();
         $dataInsert = [
             "fullname"=> $request->fullname,
