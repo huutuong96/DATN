@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderDetailController;
 use App\Http\Controllers\Learning_sellerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,7 @@ use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ProducttoshopController;
 use App\Http\Controllers\ProducttocartController;
+use App\Http\Controllers\ProgramtoshopController;
 use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\Notification_to_mainController;
@@ -92,4 +94,11 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 
+
+Route::resource('Comments', CommentsController::class);
+Route::resource('Wishlists', WishlistController::class);
+Route::resource('Product_to_shops', ProducttoshopController::class);
+Route::resource('Product_to_carts', ProducttocartController::class);
+Route::resource('Order_Details', OrderDetailController::class);
+Route::resource('Program_to_shops', ProgramtoshopController::class);
 
