@@ -125,6 +125,8 @@ class CouponsController extends Controller
             'data' => $coupons
         ], 200);
     }
+
+
     public function show_to_shop(string $id)
     {
         $coupons = Coupon_to_shop::where('id', $id)->first();
@@ -135,13 +137,6 @@ class CouponsController extends Controller
                 'message' => "Coupon không tồn tại"
             ], 404);
         }
-        $dataUpdate = [
-            "status" => $request->status,
-            "coupon_id" => $request->coupon_id,
-            "shop_id" => $id,
-        ];
-        $coupons->update();
-        // Coupon_to_shop::where('id', $id)->first();
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",

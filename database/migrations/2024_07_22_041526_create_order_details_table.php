@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->integer('subtotal');
             $table->integer('status')->default(1);
-            $table->integer('creat_by');
-            $table->integer('update_by')->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('product_id');

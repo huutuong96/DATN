@@ -5,25 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OrdersModel extends Model
+class Learning_sellerModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'orders';
+    protected $table = 'learning_seller'; // Khai báo tên bảng
 
     protected $fillable = [
-        'payment_id',
-        'ship_id',
-        'voucher_id',
-        'user_id',
-        'shop_id',
         'status',
-        'create_at',
-        'update_at'
+        'learn_id',
+        'shop_id',
+        'create_by',
+        'update_by',
     ];
 
-
-     /**
+    /**
      * Các trường sẽ được tự động chuyển đổi sang kiểu dữ liệu tương ứng.
      *
      * @var array

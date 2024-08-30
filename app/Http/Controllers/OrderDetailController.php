@@ -1,23 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Categoriessupportmain;
-use App\Http\Requests\CategoriessupportmainRequest;
+use App\Http\Requests\OrderDetailRequest;
+use App\Models\OrderDetailsModel;
 use Illuminate\Http\Request;
 
-class CategoriessupportmainController extends Controller
+class OrderDetailController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         try {
-            $Categori_learn = Categoriessupportmain::all();
+            $OrderDetails = OrderDetailsModel::all();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Categori_learn ,
+                'data' =>  $OrderDetails ,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -33,26 +33,28 @@ class CategoriessupportmainController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(request $request )
+    public function store(OrderDetailRequest $request)
     {
+       
         $dataInsert = [
-            "content"=> $request->content,
+            "subtotal"=> $request->subtotal,
             "status"=> $request->status,
-            "index"=> $request->index,
+            "order_id"=> $request->order_id,
+            "product_id"=> $request->category_id,
             'create_by' => $request->input('create_by') ?? null,
             "created_at"=> now(),
         ];
-        Categoriessupportmain::create($dataInsert);
+        OrderDetailsModel::create($dataInsert);
         $dataDone = [
             'status' => true,
-            'message' => "đã lưu categori_learn",
-            'data' => Categoriessupportmain::all(),
+            'message' => "đã lưu OrderDetail",
+            'data' => $dataInsert,
         ];
         return response()->json($dataDone, 200);
     }
@@ -63,11 +65,11 @@ class CategoriessupportmainController extends Controller
     public function show(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
+            $OrderDetails = OrderDetailsModel::findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $Categori_learn,
+                'data' => $OrderDetails,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -89,22 +91,23 @@ class CategoriessupportmainController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(OrderDetailRequest $request, string $id)
 {
-    $Categori_learn = Categoriessupportmain::findOrFail($id);
+    $OrderDetails = OrderDetailsModel::findOrFail($id);
 
-    $Categori_learn->update([
-        "content" => $request->content,
-        "status" => $request->status,
-        "index"=> $request->index,
-        'create_by' => $request->input('create_by') ?? null,
-        "updated_at" => now(),
+    $OrderDetails->update([
+            "subtotal"=> $request->subtotal,
+            "status"=> $request->status,
+            // "order_id"=> $request->order_id,
+            // "product_id"=> $request->product_id,
+            'update_by' => $request->input('update_by') ?? null,
+            "created_at"=> now(),
     ]);
 
     $dataDone = [
         'status' => true,
-        'message' => "đã lưu categori_learn",
-        'roles' => Categoriessupportmain::all(),
+        'message' => "đã lưu Learn",
+        'roles' =>     $OrderDetails,
     ];
     return response()->json($dataDone, 200);
 }
@@ -115,8 +118,8 @@ class CategoriessupportmainController extends Controller
     public function destroy(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
-            $Categori_learn->delete();
+            $OrderDetails = OrderDetailsModel::findOrFail($id);
+            $OrderDetails->delete();
             return response()->json([
                 'status' => "success",
                 'message' => 'Xóa thành công',

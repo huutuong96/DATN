@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Categori_shopsModel;
 use App\Http\Requests\CategoriesRequest;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 class Categori_ShopsController extends Controller
 {
     /**
@@ -46,6 +46,7 @@ class Categori_ShopsController extends Controller
      */
     public function store(CategoriesRequest $request)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $image = $request->file('image');
         $cloudinary = new Cloudinary();
 
@@ -59,7 +60,7 @@ class Categori_ShopsController extends Controller
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
                 'parent_id' => $request->parent_id,
-                'create_by' => $request->create_by,
+                'create_by' => $user->id,
                 'shop_id' => $request->shop_id,
                 'category_id_main' => $request->category_id_main
             ];
@@ -151,7 +152,7 @@ class Categori_ShopsController extends Controller
             'parent_id' => $request->parent_id ?? $categori_shops->parent_id,
             'create_by' => $request->create_by ?? $categori_shops->create_by,
             'shop_id' => $request->shop_id ?? $categori_shops->shop_id,
-            'category_id_main' => $request->category_id_main ?? $categori_shops->category_id_main 
+            'category_id_main' => $request->category_id_main ?? $categori_shops->category_id_main
         ];
 
 

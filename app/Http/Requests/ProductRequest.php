@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
-
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductRequest extends FormRequest
@@ -20,16 +20,11 @@ class ProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'slug' => 'string',
             'description' => 'required|nullable|string|max:255',
             'infomation' => 'string',
             'price' => 'required|numeric',
             'sale_price' => 'numeric',
-            // 'image' => 'nullable|string|max:255',
             'quantity' => 'required|numeric',
-            'sold_count' => 'numeric',
-            'view_count' => 'numeric',
-            'parent_id' => 'nullable',
             'category_id'=> 'required|numeric',
             'brand_id'=> 'required|numeric',
             'color_id'=> 'numeric',

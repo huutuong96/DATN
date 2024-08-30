@@ -18,10 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('voucher_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('shop_id');
-            
+
             $table->integer('status')->default(1);
-            $table->integer('create_by');
-            $table->integer('update_by')->nullable();
             $table->timestamps();
 
             $table->foreign('payment_id')->references('id')->on('payments')->onDelete('restrict')->onUpdate('restrict');
