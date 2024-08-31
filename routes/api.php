@@ -96,12 +96,12 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('Product_to_carts', ProducttocartController::class);
             Route::resource('learning_seller', Learning_sellerController::class);
             Route::post('purchase', [PurchaseController::class, "purchase"]);
-
+            Route::post('user/change_password', [AuthenController::class, "change_password"]);
+            Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
 });
 
-//CRUD Thy (29/08)
-// Route::resource('momo', MomoController::class);
-
+Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
+Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
