@@ -8,8 +8,13 @@ use App\Http\Requests\ShopRequest;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Shop;
 use App\Models\Shop_manager;
+use App\Models\Tax;
+use App\Models\Categori_shopsModel;
+use App\Models\CategoriesModel;
+use App\Models\Product;
+use App\Models\Image;
+use App\Models\ColorModel;
 use Illuminate\Support\Str;
-use App\Models\UsersModel;
 
 class ShopController extends Controller
 {
@@ -41,101 +46,205 @@ class ShopController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function shop_manager_store(Request $rqt)
+    public function shop_manager_store(Shop $Shop, $user_id, $role, $status)
     {
         $dataInsert = [
-            'status' => $rqt->status,
-            'user_id' => $rqt->user_id,
-            'shop_id' => $rqt->shop_id,
-            'role' => $rqt->role,
+            'status' => $status,
+            'user_id' => $user_id,
+            'shop_id' => $Shop->id,
+            'role' => $role,
         ];
         try {
-            $Shop_manager = Shop_manager::create( $dataInsert );
+            $Shop_manager = Shop_manager::create($dataInsert);
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm thành công",
-                    'data' => $Shop_manager,
-                ]
-            );
+            return response()->json([
+                'status' => true,
+                'message' => "Thêm thành công",
+                'data' => $Shop_manager,
+            ], 201);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
         }
     }
 
     public function store(ShopRequest $rqt)
     {
-        $image = $rqt->file('image');
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        $dataInsert = [
-            'shop_name' => $rqt->shop_name,
-            'pick_up_address' => $rqt->pick_up_address ,
-            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
-            'image' => $uploadedImage['secure_url'] ?? "",// thêm ?? để tranh lỗi khi test băng post man
-            'cccd' => $rqt->cccd,
-            'status' => $rqt->status ,
-            'tax_id' => $rqt->tax_id,
-        ];
         try {
-            $Shop = Shop::create( $dataInsert );
+            $dataInsert = [
+                'shop_name' => $rqt->shop_name,
+                'pick_up_address' => $rqt->pick_up_address,
+                'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
+                'cccd' => $rqt->cccd,
+                'status' => 101,
+                'create_by' => auth()->user()->id,
+                'update_by' => auth()->user()->id,
+            ];
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm Shop thành công",
-                    'data' => $Shop,
-                ]
-            );
+            if ($rqt->hasFile('image')) {
+                $image = $rqt->file('image');
+                $cloudinary = new Cloudinary();
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $dataInsert['image'] = $uploadedImage['secure_url'];
+            }
+            $tax = Tax::find($rqt->tax_id);
+            if (!$tax) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Mã số thuế không tồn tại",
+                ], 404);
+            }
+            $dataInsert['tax_id'] = $tax->id;
+            $Shop = Shop::create($dataInsert);
+            $this->shop_manager_store($Shop, auth()->user()->id, 'owner', 1);
+
+            // NẾU TẠO SHOP THÀNH CÔNG THÌ TẠO KHÓA HỌC CHO SHOP
+
+                //code tạo khóa học cho shop
+
+            // NẾU TẠO SHOP THÀNH CÔNG THÌ TẠO KHÓA HỌC CHO SHOP
+
+            return response()->json([
+                'status' => true,
+                'message' => "Thêm Shop thành công",
+                'data' => $Shop,
+            ], 201);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm Shop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm Shop không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show_shop_members(string $id)
+    public function category_shop_store(Request $rqt,string $id, string $category_main_id)
     {
-        $member = Shop_manager::where('shop_id', $id)->pluck('user_id');
-
-        if(!$member){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại Shop nào",
-                ]
-            );
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => "Shop không tồn tại",
+            ], 404);
         }
-        $user = JWTAuth::parseToken()->authenticate();
-        $check_member = false;
+        $category_main = CategoriesModel::find($category_main_id);
+        if (!$category_main) {
+            return response()->json([
+                'status' => false,
+                'message' => "Category không tồn tại",
+            ], 404);
+        }
+        $dataInsert = [
+            'title' => $rqt->title ?? $category_main->title,
+            'slug' => $rqt->slug ?? $category_main->slug ?? Str::slug($category_main->title, '-'),
+            'index' => $rqt->index ?? 1,
+            'status' => $category_main->status,
+            'parent_id' => $rqt->parent_id ?? $category_main->parent_id,
+            'category_id_main' => $category_main_id,
+            'shop_id' => $shop->id,
+            'create_by' => auth()->user()->id,
+            'update_by' => auth()->user()->id,
+        ];
+        if ($rqt->hasFile('image')) {
+            $image = $rqt->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $dataInsert['image'] = $uploadedImage['secure_url'];
+        }
+        $categori_shops = Categori_shopsModel::create($dataInsert);
+        return response()->json([
+            'status' => true,
+            'message' => "Thêm Category thành công",
+            'data' => $categori_shops,
+        ], 201);
+    }
 
-        foreach ($member as $user_id) {
-            if ($user_id == $user->id) {
-                $check_member = true;
+    public function product_to_shop_store(Request $rqt, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => "Shop không tồn tại",
+            ], 404);
+        }
+
+        $dataInsert = [
+            'name' => $rqt->name,
+            'slug' => $rqt->slug ?? Str::slug($rqt->name, '-'),
+            'description' => $rqt->description,
+            'infomation' => $rqt->infomation,
+            'price' => $rqt->price,
+            'sale_price' => $rqt->sale_price,
+            'image' => $dataInsert['image'][0],
+            'quantity' => $rqt->quantity,
+            'category_id' => $rqt->category_id,
+            'brand_id' => $rqt->brand_id,
+            'create_by' => auth()->user()->id,
+            'update_by' => auth()->user()->id,
+        ];
+        $product = Product::create($dataInsert);
+        if($rqt->hasFile('image')){
+            foreach($rqt->file('image') as $image){
+                $cloudinary = new Cloudinary();
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $uploadedImage['secure_url'];
+                Image::create([
+                    'image' => $uploadedImage['secure_url'],
+                    'product_id' => $product->id,
+                    'create_by' => auth()->user()->id,
+                    'update_by' => auth()->user()->id,
+                ]);
             }
         }
+        $colorInsert = [
+            'product_id' => $product->id,
+            'title' => $rqt->title,
+            'index' => $rqt->index,
+            'status' => $rqt->status,
+            'create_by' => auth()->user()->id,
+            'update_by' => auth()->user()->id,
+        ];
+        $color = ColorModel::create($colorInsert);
+        if(!$color){
+            return response()->json([
+                'status' => false,
+                'message' => "Color không tồn tại",
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => "Thêm Product thành công",
+            'data' => $product,
+        ], 201);
+    }
 
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành viên shop $id thành công",
-                'data' => $user,
-            ]
-        );
+
+    public function show_shop_members(string $id)
+    {
+        $members = Shop_manager::where('shop_id', $id)->with('user')->get();
+
+        if ($members->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại thành viên nào trong Shop này",
+            ], 404);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $is_member = $members->contains('user_id', $user->id);
+
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành viên shop $id thành công",
+            'data' => [
+                'members' => $members,
+                'is_current_user_member' => $is_member
+            ],
+        ]);
     }
 
     public function show(string $id)

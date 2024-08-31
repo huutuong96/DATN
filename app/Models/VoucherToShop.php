@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class VoucherToShop extends Model
 {
     use HasFactory;
-    protected $table = 'voucher_to_shop';
+    protected $table = 'voucher_to_shops';
 
     // Các trường có thể gán giá trị hàng loạt
     protected $fillable = [
