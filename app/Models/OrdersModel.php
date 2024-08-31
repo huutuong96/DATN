@@ -18,8 +18,6 @@ class OrdersModel extends Model
         'user_id',
         'shop_id',
         'status',
-        'create_by',
-        'update_by',
         'create_at',
         'update_at'
     ];

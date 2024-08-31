@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\CommentsModel;
 use App\Http\Requests\CommentsRequest;
 use Illuminate\Http\Request;
-
+use JWTAuth;
 class CommentsController extends Controller
 {
     /**
@@ -33,7 +33,7 @@ class CommentsController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
@@ -41,6 +41,7 @@ class CommentsController extends Controller
      */
     public function store(CommentsRequest $request )
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $dataInsert = [
             "title"=> $request->title,
             "content"=> $request->content,
@@ -48,14 +49,13 @@ class CommentsController extends Controller
             "status"=> $request->status,
             "parent_id"=> $request->parent_id,
             "product_id"=> $request->product_id,
-            "user_id"=> $request->user_id,
-         
+            "user_id"=> $user->id,
         ];
         CommentsModel::create($dataInsert);
         $dataDone = [
             'status' => true,
             'message' => "đã lưu Comments",
-            'data' => CommentsModel::all(),
+            'data' => $dataInsert,
         ];
         return response()->json($dataDone, 200);
     }
@@ -127,7 +127,7 @@ class CommentsController extends Controller
     {
         try {
             $Comments = CommentsModel::findOrFail($id);
-            $Comments->delete();     
+            $Comments->delete();
             return response()->json([
                 'status' => "success",
                 'message' => 'Xóa thành công',

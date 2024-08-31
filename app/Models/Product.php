@@ -31,5 +31,5 @@ class Product extends Model
         'brand_id',
         'color_id',
     ];
-    
+
 }

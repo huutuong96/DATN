@@ -16,8 +16,6 @@ class OrderDetailsModel extends Model
         'status',
         'order_id',
         'product_id',
-        'create_by',
-        'update_by',
         'create_at',
         'update_at',
     ];

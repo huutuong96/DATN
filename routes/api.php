@@ -5,10 +5,10 @@ use App\Http\Controllers\Learning_sellerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
-use App\Http\Controllers\Notifications;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PremissionsController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\RanksController;
 use App\Http\Controllers\RolesController;
@@ -36,17 +36,26 @@ use App\Http\Controllers\VoucherToMainController;
 use App\Http\Controllers\CategorilearnsController;
 use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\Categori_ShopsController;
+use App\Http\Controllers\PurchaseController;
 
-Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'CheckPermission']], function () {
+
+Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
             Route::resource('users', AuthenController::class);
+            Route::resource('categories', CategoriesController::class);
+            Route::resource('categori_shops', Categori_ShopsController::class);
             Route::post('user/me', [AuthenController::class, "me"]);
             Route::resource('roles', RolesController::class);
             Route::resource('address', AddressController::class);
-            Route::resource('permission', PermissionsController::class);
-            Route::post('permission/grant_access', [PermissionsController::class, "grant_access"]);
-            Route::post('permission/delete_access', [PermissionsController::class, "delete_access"]);
+            Route::resource('permission', PremissionsController::class);
+            Route::post('permission/grant_access', [PremissionsController::class, "grant_access"]);
+            Route::post('permission/delete_access', [PremissionsController::class, "delete_access"]);
             Route::resource('banners', BannerController::class);
+            Route::resource('products', ProductController::class);
             Route::resource('faqs', FAQController::class);
             Route::resource('taxs', TaxController::class);
             Route::resource('ranks', RanksController::class);
@@ -62,6 +71,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
             Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
             Route::resource('shops', ShopController::class);
+            Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
             Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
             Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]);
             Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
@@ -74,7 +84,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::put('coupons/shop/update/{id}', [CouponsController::class, "update_to_shop"]);
             Route::delete('coupons/shop/delete/{id}', [CouponsController::class, "destroy_to_shop"]);
             Route::resource('notification_to_main', Notification_to_mainController::class);
-            Route::resource('notifications', Notifications::class);
+            Route::resource('notifications', NotificationController::class);
             Route::resource('programes', ProgrameController::class);
             Route::resource('notification_to_shops', Notification_to_shopController::class);
             Route::resource('vouchers', VoucherController::class);
@@ -85,20 +95,13 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole', 'Ch
             Route::resource('Product_to_shops', ProducttoshopController::class);
             Route::resource('Product_to_carts', ProducttocartController::class);
             Route::resource('learning_seller', Learning_sellerController::class);
-  
+            Route::post('purchase', [PurchaseController::class, "purchase"]);
+            Route::post('user/change_password', [AuthenController::class, "change_password"]);
+            Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
 });
 
-//CRUD Thy (29/08)
-// Route::resource('momo', MomoController::class);
-
+Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
+Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
-
-
-Route::resource('Comments', CommentsController::class);
-Route::resource('Wishlists', WishlistController::class);
-Route::resource('Product_to_shops', ProducttoshopController::class);
-Route::resource('Product_to_carts', ProducttocartController::class);
-Route::resource('Order_Details', OrderDetailController::class);
-Route::resource('Program_to_shops', ProgramtoshopController::class);
-
+Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
