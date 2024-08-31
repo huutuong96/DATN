@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Shop;
 
 class LearnModel extends Model
 {
@@ -18,5 +19,8 @@ class LearnModel extends Model
         'create_by',
         'update_by',
     ];
+    public function shops(){
+        return $this->belongsToMany(Shop::class, 'Learning_seller', 'shop_id', 'learn_id');
+    }
 }
 

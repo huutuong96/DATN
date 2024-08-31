@@ -94,7 +94,12 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('Wishlists', WishlistController::class);
             Route::resource('Product_to_shops', ProducttoshopController::class);
             Route::resource('Product_to_carts', ProducttocartController::class);
-            Route::resource('learning_seller', Learning_sellerController::class);
+            // Route::resource('learning_seller', Learning_sellerController::class);
+            Route::get('learning_seller/{shop_id}', [Learning_sellerController::class, 'index']);
+            Route::get('learning_seller/{shop_id}/{learn_id}', [Learning_sellerController::class, 'show']);
+            Route::post('learning_seller', [Learning_sellerController::class, 'store']);
+            Route::put('learning_seller/{id}', [Learning_sellerController::class, 'update']);
+            Route::delete('learning_seller/delete/{id}', [Learning_sellerController::class, 'destroy']);
 });
 
 //CRUD Thy (29/08)
