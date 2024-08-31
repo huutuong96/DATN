@@ -5,17 +5,19 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Learning_sellerRequest;
 use App\Models\Learning_sellerModel;
 use Illuminate\Http\Request;
+use App\Models\Shop;
 
 class Learning_sellerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($shop_id)
     {
-        $learning_seller = Learning_sellerModel::all();
+        $learning_seller = Shop::with('learns')->find($shop_id);
+        
 
-        if ($learning_seller->isEmpty()) {
+        if (!$learning_seller) {
             return response()->json(
                 [
                     'status' => false,
@@ -71,9 +73,9 @@ class Learning_sellerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($shop_id, string $id)
     {
-        $learning_seller = Learning_sellerModel::find($id);
+        $learning_seller = Shop::with('learns')->find($shop_id);
 
         if (!$learning_seller) {
             return response()->json([
@@ -81,12 +83,20 @@ class Learning_sellerController extends Controller
                 'message' => "Learning_seller không tồn tại"
             ], 404);
         }
-
+        foreach ($learning_seller->learns as $key => $learn) {
+            if($learn->id == $id){
+                return response()->json([
+                    'status' => true,
+                    'message' => "Lấy dữ liệu thành công",
+                    'data' => $learn
+                ], 200);
+            }
+        }
         return response()->json([
-            'status' => true,
-            'message' => "Lấy dữ liệu thành công",
-            'data' => $learning_seller
-        ], 200);
+            'status' => false,
+            'message' => "Learning_seller không tồn tại"
+        ], 404);
+        
     }
 
     /**
