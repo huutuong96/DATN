@@ -15,6 +15,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmMail;
+use App\Mail\ConfirmMailChangePassword;
 class AuthenController extends Controller
 {
     public function index()
@@ -45,6 +46,14 @@ class AuthenController extends Controller
 
     public function register(UserRequest $request)
     {
+        $existingUser = UsersModel::where('email', $request->email)->first();
+        if ($existingUser) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email đã tồn tại.',
+            ], 422);
+        }
+
         $role = RolesModel::where('title', 'user')->first();
         $rank = RanksModel::where('title', 'đồng')->first();
         $dataInsert = [
@@ -58,29 +67,29 @@ class AuthenController extends Controller
         ];
         $user = UsersModel::create($dataInsert);
         $token = JWTAuth::fromUser($user);
-            $user->update([
-                'refesh_token' => $token,
-            ]);
+        $user->update([
+            'refesh_token' => $token,
+        ]);
+
         // Send confirm mail
-        $confirmMail = [
+        $notificationData = [
+            'type' => 'main',
+            'user_id' => $user->id,
             'title' => 'Vui lòng xác nhận đăng ký tài khoản',
             'description' => 'Cảm ơn bạn đã đăng ký tài khoản. Vui lòng xác nhận đăng ký tài khoản để hoàn tất quá trình đăng ký.',
         ];
-        $notification_to_main = Notification_to_mainModel::create($confirmMail);
-        $dataInfomation = [
-            'id_notification' => $notification_to_main->id,
-            'user_id' => $user->id,
-            'type' => 'Thông báo từ VN Shop',
-        ];
-        $notification = Notification::create($dataInfomation);
+
+        $notificationController = new NotificationController();
+        $notification = $notificationController->store(new Request($notificationData));
+
         $dataDone = [
             'status' => true,
             'message' => "Đăng ký thành công, chưa kích hoạt",
             'user' => $user,
             'notification' => $notification,
-            'notification_to_main' => $notification_to_main,
         ];
-        Mail::to($user->email)->send(new ConfirmMail($user, $confirmMail, $token));
+
+        Mail::to($user->email)->send(new ConfirmMail($user, $notificationData, $token));
         return response()->json($dataDone, 201);
     }
 
@@ -117,9 +126,9 @@ class AuthenController extends Controller
         }
         if (Hash::check($request->password, $user->password)) {
             $token = JWTAuth::fromUser($user);
-            $user->update([
-                'refesh_token' => $token,
-            ]);
+            // $user->update([
+            //     'refesh_token' => $token,
+            // ]);
             $dataDone = [
                 'status' => true,
                 'message' => "Đăng nhập thành công",
@@ -182,44 +191,126 @@ class AuthenController extends Controller
     }
     public function update(UserRequest $request, string $id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $dataUpdate = [
-            "fullname"=> $request->fullname,
-            "password"=> $request->password,
-            "phone"=> $request->phone,
-            "email"=> $request->email,
-            "description"=> $request->description,
-            "genre"=> $request->genre,
-            "datebirth"=> $request->datebirth,
-            "avatar"=> $request->avatar,
-            "rank_id"=> $request->rank_id,
-            "role_id"=> $request->role_id,
-            "address_id"=> $request->address_id,
+            "fullname"=> $request->fullname ?? $user->fullname,
+            "password"=> $request->password ?? $user->password,
+            "phone"=> $request->phone ?? $user->phone,
+            "email"=> $request->email ?? $user->email,
+            "description"=> $request->description ?? $user->description,
+            "genre"=> $request->genre ?? $user->genre,
+            "datebirth"=> $request->datebirth ?? $user->datebirth,
+            "avatar"=> $request->avatar ?? $user->avatar,
+            "address_id"=> $request->address_id ?? $user->address_id,
             "login_at"=> now(),
         ];
         $user = UsersModel::where('id', $id)->update($dataUpdate);
 
         $dataDone = [
             'status' => true,
-            'message' => "user Đã được cập nhật",
+            'message' => "Tài khoản đã được cập nhật",
             'users' => UsersModel::all(),
         ];
         return response()->json($dataDone, 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    public function update_profile(Request $request)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        $dataUpdate = [
+            "fullname"=> $request->fullname ?? $user->fullname,
+            "phone"=> $request->phone ?? $user->phone,
+            "email"=> $request->email ?? $user->email,
+            "description"=> $request->description ?? $user->description,
+            "genre"=> $request->genre ?? $user->genre,
+            "datebirth"=> $request->datebirth ?? $user->datebirth,
+            "avatar"=> $request->avatar ?? $user->avatar,
+            "address_id"=> $request->address_id ?? $user->address_id,
+            "updated_at"=> now(),
+        ];
+        $user = UsersModel::where('id', $user->id)->update($dataUpdate);
+
+        $dataDone = [
+            'status' => true,
+            'message' => "Tài khoản đã được cập nhật",
+        ];
+        return response()->json($dataDone, 200);
+    }
+
+    public function change_password(Request $request)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user) {
+            return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
+        }
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'Mật khẩu không đúng'], 401);
+        }
+        $dataUpdate = [
+            "password"=> Hash::make($request->password),
+            "updated_at"=> now(),
+        ];
+        $user = UsersModel::where('id', $user->id)->update($dataUpdate);
+        $dataDone = [
+            'status' => true,
+            'message' => "Mật khẩu đã được thay đổi thành công",
+        ];
+        return response()->json($dataDone, 200);
+    }
+
+    public function fogot_password(Request $request)
+    {
+        $user = UsersModel::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
+        }
+        $token = JWTAuth::fromUser($user);
+        $user->update([
+            'refesh_token' => $token,
+        ]);
+        Mail::to($user->email)->send(new ConfirmMailChangePassword($user, $token));
+        $dataDone = [
+            'status' => true,
+            'message' => "Đã gửi mã xác nhận đến email",
+            'user' => $user->email,
+        ];
+        return response()->json($dataDone, 200);
+    }
+
+    public function confirm_mail_change_password(Request $request, $token, $email)
+    {
+        $user = UsersModel::where('email', $email)->first();
+
+        if ($user) {
+          return $this->reset_password($request, $token, $email);
+        }
+    }
+
+    public function reset_password(Request $request, $token, $email)
+    {
+        $user = UsersModel::where('email', $email)->first();
+        if ($user) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+            $dataDone = [
+                'status' => true,
+                'message' => "Mật khẩu đã được thay đổi thành công",
+            ];
+            return response()->json($dataDone, 200);
+        }
+    }
+
     public function destroy(string $id)
     {
         $dataUpdate = [
-            "status"=> 4,
+            "status"=> 102,
         ];
         $user = UsersModel::where('id', $id)->update($dataUpdate);
 
         $dataDone = [
             'status' => true,
-            'message' => "user đã được vô hiệu hóa",
-            'users' => UsersModel::all(),
+            'message' => "Tài khoản đã được vô hiệu hóa",
         ];
         return response()->json($dataDone, 200);
     }
