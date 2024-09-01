@@ -15,8 +15,6 @@ class Learning_sellerController extends Controller
     public function index($shop_id)
     {
         $learning_seller = Shop::with('learns')->find($shop_id);
-        
-
         if (!$learning_seller) {
             return response()->json(
                 [
@@ -96,7 +94,7 @@ class Learning_sellerController extends Controller
             'status' => false,
             'message' => "Learning_seller không tồn tại"
         ], 404);
-        
+
     }
 
     /**
@@ -160,9 +158,9 @@ class Learning_sellerController extends Controller
                     'message' => "Learning_seller không tồn tại"
                 ], 404);
             }
-    
+
             $learning_seller->delete();
-    
+
             return response()->json([
                 'status' => true,
                 'message' => "Learning_seller đã được xóa"
