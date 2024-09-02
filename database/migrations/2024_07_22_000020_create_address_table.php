@@ -20,6 +20,9 @@ return new class extends Migration
             $table->integer('create_by');
             $table->integer('update_by')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('user_id')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
         });
     }
 

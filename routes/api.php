@@ -77,12 +77,12 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
             Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"]);
             Route::resource('voucher_main', VoucherToMainController::class);
-            Route::resource('coupons',CouponsController::class);
-            Route::get('coupons/shop/{id}', [CouponsController::class, "index_to_shop"]);
-            Route::post('coupons/shop/add/{id}', [CouponsController::class, "store_to_shop"]);
-            Route::get('coupons/shop/detail/{id}', [CouponsController::class, "show_to_shop"]);
-            Route::put('coupons/shop/update/{id}', [CouponsController::class, "update_to_shop"]);
-            Route::delete('coupons/shop/delete/{id}', [CouponsController::class, "destroy_to_shop"]);
+            // Route::resource('coupons',CouponsController::class);
+            // Route::get('coupons/shop/{id}', [CouponsController::class, "index_to_shop"]);
+            // Route::post('coupons/shop/add/{id}', [CouponsController::class, "store_to_shop"]);
+            // Route::get('coupons/shop/detail/{id}', [CouponsController::class, "show_to_shop"]);
+            // Route::put('coupons/shop/update/{id}', [CouponsController::class, "update_to_shop"]);
+            // Route::delete('coupons/shop/delete/{id}', [CouponsController::class, "destroy_to_shop"]);
             Route::resource('notification_to_main', Notification_to_mainController::class);
             Route::resource('notifications', NotificationController::class);
             Route::resource('programes', ProgrameController::class);
@@ -99,6 +99,8 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::post('user/change_password', [AuthenController::class, "change_password"]);
             Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
 });
+
+
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
 Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');

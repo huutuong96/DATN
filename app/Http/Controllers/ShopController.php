@@ -13,7 +13,7 @@ use App\Models\Categori_shopsModel;
 use App\Models\CategoriesModel;
 use App\Models\Product;
 use App\Models\Image;
-use App\Models\ColorModel;
+use App\Models\ColorsModel;
 use Illuminate\Support\Str;
 
 class ShopController extends Controller
@@ -208,7 +208,7 @@ class ShopController extends Controller
             'create_by' => auth()->user()->id,
             'update_by' => auth()->user()->id,
         ];
-        $color = ColorModel::create($colorInsert);
+        $color = ColorsModel::create($colorInsert);
         if(!$color){
             return response()->json([
                 'status' => false,

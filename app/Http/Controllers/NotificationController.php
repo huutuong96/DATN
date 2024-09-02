@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Cloudinary\Cloudinary;
 use App\Models\Notification;
-use App\Models\Notification_to_mainModel;
-use App\Models\Notification_to_shop;
-use Cloudinary;
 use Illuminate\Http\Request;
+use App\Models\Notification_to_shop;
+use App\Models\Notification_to_mainModel;
 
 class NotificationController extends Controller
 {
@@ -84,9 +84,9 @@ class NotificationController extends Controller
         $notification = Notification::findOrFail($id);
 
         if ($notification->type === 'main') {
-            NotificationToMain::destroy($notification->id_notification);
+            Notification_to_mainModel::destroy($notification->id_notification);
         } elseif ($notification->type === 'shop') {
-            NotificationToShops::destroy($notification->id_notification);
+            Notification_to_shop::destroy($notification->id_notification);
         }
 
         $notification->delete();
