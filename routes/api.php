@@ -18,7 +18,6 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
 use App\Http\Controllers\AddressController;
-use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\MessageController;
@@ -49,7 +48,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
             Route::resource('categories', CategoriesController::class);
             Route::resource('categori_shops', Categori_ShopsController::class);
-            Route::get('user/me', [AuthenController::class, "me"]);
             Route::resource('roles', RolesController::class);
             Route::resource('address', AddressController::class);
             Route::resource('permission', PremissionsController::class);
@@ -65,7 +63,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
             Route::resource('categori_learns', CategorilearnsController::class);
-            Route::resource('Categoriessupportmains', CategoriessupportmainController::class);
+            Route::resource('categoriessupportmains', CategoriessupportmainController::class);
             Route::resource('learns', LearnController::class);
             Route::resource('messages', MessageController::class);
             Route::post('messages/detail', [MessageController::class, "store_message_detail"]);
@@ -95,8 +93,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
             Route::post('purchase', [PurchaseController::class, "purchase"]);
 
-
-
+            //SHOP
             Route::resource('shops', ShopController::class);
             Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
             Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
@@ -108,8 +105,15 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
             Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]);
             Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+            //SHOP
+
             Route::resource('carts', CartController::class);
+
+
+
+
             Route::resource('users', AuthenController::class);
+            Route::get('user/me', [AuthenController::class, "me"]);
             Route::post('user/change_password', [AuthenController::class, "change_password"]);
             Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
 
