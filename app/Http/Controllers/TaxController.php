@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaxRequest;
 use App\Models\Tax;
+use Illuminate\Support\Facades\Cache;
 
 class TaxController extends Controller
 {
@@ -13,62 +14,28 @@ class TaxController extends Controller
      */
     public function index()
     {
-        $taxs = Tax::all();
-        if($taxs->isEmpty()){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại tax nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $taxs,
-            ]
-        );
-    }
+        $taxes = Cache::remember('all_taxes', 60 * 60, function () {
+            return Tax::all();
+        });
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if ($taxes->isEmpty()) {
+            return $this->errorResponse("Không tồn tại thuế nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $taxes);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TaxRequest $rqt)
+    public function store(TaxRequest $request)
     {
-        $dataInsert = [
-            'title' => $rqt->title,
-            'type' => $rqt->type,
-            'tax_number' => $rqt->tax_number,
-            'status' => $rqt->status,
-        ];
-
         try {
-            $tax = Tax::create( $dataInsert );
-
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm tax thành công",
-                    'data' => $tax,
-                ]
-            );
+            $tax = Tax::create($request->validated());
+            Cache::forget('all_taxes');
+            return $this->successResponse("Thêm thuế thành công", $tax);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm tax không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Thêm thuế không thành công", $th->getMessage());
         }
     }
 
@@ -77,79 +44,37 @@ class TaxController extends Controller
      */
     public function show(string $id)
     {
-        $tax = Tax::find($id);
-        if(!$tax){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại tax nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $tax,
-            ]
-        );
-    }
+        $tax = Cache::remember('tax_' . $id, 60 * 60, function () use ($id) {
+            return Tax::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$tax) {
+            return $this->errorResponse("Không tồn tại thuế nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $tax);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(taxRequest $rqt, string $id)
+    public function update(TaxRequest $request, string $id)
     {
-        // Tìm tax theo ID
-        $tax = Tax::find($id);
+        $tax = Cache::remember('tax_' . $id, 60 * 60, function () use ($id) {
+            return Tax::find($id);
+        });
 
-        // Kiểm tra xem rqt có tồn tại không
         if (!$tax) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "tax không tồn tại",
-                ],
-                404
-            );
+            return $this->errorResponse("Thuế không tồn tại", 404);
         }
 
-        // Cập nhật dữ liệu
-        $dataUpdate = [
-            'title' => $rqt->title,
-            'type' => $rqt->type,
-            'tax_number' => $rqt->tax_number,
-            'status' => $rqt->status,
-            'created_at' => $rqt->created_at ?? $tax->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
-        ];
-
         try {
-            // Cập nhật bản ghi
-            $tax->update($dataUpdate);
-
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật Tax thành công",
-                    'data' => $tax,
-                ]
-            );
+            $tax->update($request->validated());
+            Cache::forget('tax_' . $id);
+            Cache::forget('all_taxes');
+            return $this->successResponse("Cập nhật thuế thành công", $tax);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật tax không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Cập nhật thuế không thành công", $th->getMessage());
         }
     }
 
@@ -159,30 +84,37 @@ class TaxController extends Controller
     public function destroy(string $id)
     {
         try {
-            $tax = Tax::find($id);
-
-            if (!$tax) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'tax không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
+            $tax = Tax::findOrFail($id);
             $tax->delete();
-
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa tax thành công',
-                ]);
+            Cache::forget('tax_' . $id);
+            Cache::forget('all_taxes');
+            return $this->successResponse("Xóa thuế thành công");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa tax không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa thuế không thành công", $th->getMessage());
         }
+    }
+
+    /**
+     * Return a success response.
+     */
+    private function successResponse($message, $data = null)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Return an error response.
+     */
+    private function errorResponse($message, $error = null, $code = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error,
+        ], $code);
     }
 }

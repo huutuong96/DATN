@@ -41,14 +41,15 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\Categori_ShopsController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\CartController;
 
 
 Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
-            Route::resource('users', AuthenController::class);
             Route::resource('categories', CategoriesController::class);
             Route::resource('categori_shops', Categori_ShopsController::class);
-            Route::post('user/me', [AuthenController::class, "me"]);
+            Route::get('user/me', [AuthenController::class, "me"]);
             Route::resource('roles', RolesController::class);
             Route::resource('address', AddressController::class);
             Route::resource('permission', PremissionsController::class);
@@ -71,7 +72,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
             Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
             Route::resource('voucher_main', VoucherToMainController::class);
-            Route::resource('coupons',CouponsController::class);
             Route::resource('notification_to_main', Notification_to_mainController::class);
             Route::resource('notifications', NotificationController::class);
             Route::resource('programes', ProgrameController::class);
@@ -94,21 +94,24 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
 
             Route::post('purchase', [PurchaseController::class, "purchase"]);
+
+
+
+            Route::resource('shops', ShopController::class);
+            Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
+            Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
+            Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]);
+            Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
+            Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"]);
+            Route::post('shop/increase_follower/{id}', [ShopController::class, "increase_follower"]);
+            Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);
+            Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
+            Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]);
+            Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+            Route::resource('carts', CartController::class);
+            Route::resource('users', AuthenController::class);
             Route::post('user/change_password', [AuthenController::class, "change_password"]);
             Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
-
-
-                Route::resource('shops', ShopController::class);
-                Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
-                Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
-                Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]);
-                Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
-                Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"]);
-                Route::post('shop/increase_follower/{id}', [ShopController::class, "increase_follower"]);
-                Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);
-                Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
-                Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]);
-                Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
 
 });
 
@@ -117,3 +120,5 @@ Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenControlle
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
+
+Route::resource('images', ImageController::class);

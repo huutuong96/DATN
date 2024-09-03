@@ -23,7 +23,6 @@ class SendNotification
     public function handle(Request $request, Closure $next): Response
     {
         $shopId = $request->route('id');
-
         if ($shopId && $request->method() !== 'POST') {
             $shop = Shop::find($shopId);
             if (!$shop) {
@@ -31,7 +30,6 @@ class SendNotification
             }
             $this->executeEveryOtherDay($shopId);
         }
-
         return $next($request);
     }
 

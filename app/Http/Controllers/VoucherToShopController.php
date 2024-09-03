@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\VoucherToShop;
 use App\Http\Requests\VoucherRequest;
+use Illuminate\Support\Facades\Cache;
 
 class VoucherToShopController extends Controller
 {
@@ -13,30 +13,15 @@ class VoucherToShopController extends Controller
      */
     public function index()
     {
-        $voucherShop = voucherToShop::all();
-        if($voucherShop->isEmpty()){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại voucher main nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $voucherShop,
-            ]
-        );
-    }
+        $voucherShops = Cache::remember('all_voucher_shops', 60 * 60, function () {
+            return VoucherToShop::all();
+        });
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if ($voucherShops->isEmpty()) {
+            return $this->errorResponse("Không tồn tại voucher shop nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $voucherShops);
     }
 
     /**
@@ -44,35 +29,12 @@ class VoucherToShopController extends Controller
      */
     public function store(VoucherRequest $request)
     {
-        $dataInsert = [
-            'title' => $request->title,
-            'description' => $request->description,
-            'quantity' => $request->quantity,
-            'condition' => $request->condition,
-            'ratio' => $request->ratio,
-            'code' => $request->code,
-            'shop_id' => $request->shop_id,
-            'status' => $request->status,
-        ];
-
         try {
-            $voucherShop = voucherToShop::create( $dataInsert );
-
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm voucherShop thành công",
-                    'data' => $voucherShop,
-                ]
-            );
+            $voucherShop = VoucherToShop::create($request->validated());
+            Cache::forget('all_voucher_shops');
+            return $this->successResponse("Thêm voucher shop thành công", $voucherShop);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm voucherShop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Thêm voucher shop không thành công", $th->getMessage());
         }
     }
 
@@ -81,30 +43,15 @@ class VoucherToShopController extends Controller
      */
     public function show(string $id)
     {
-        $voucherShop = voucherToShop::find($id);
-        if(!$voucherShop){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại voucher Main nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $voucherShop,
-            ]
-        );
-    }
+        $voucherShop = Cache::remember('voucher_shop_' . $id, 60 * 60, function () use ($id) {
+            return VoucherToShop::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$voucherShop) {
+            return $this->errorResponse("Không tồn tại voucher shop nào", null, 404);
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $voucherShop);
     }
 
     /**
@@ -112,47 +59,21 @@ class VoucherToShopController extends Controller
      */
     public function update(VoucherRequest $request, string $id)
     {
-        $voucherShop = voucherToShop::find($id);
+        $voucherShop = Cache::remember('voucher_shop_' . $id, 60 * 60, function () use ($id) {
+            return VoucherToShop::find($id);
+        });
 
-        // Kiểm tra xem rqt có tồn tại không
         if (!$voucherShop) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "voucher main không tồn tại",
-                ],
-                404
-            );
+            return $this->errorResponse("Voucher shop không tồn tại", null, 404);
         }
 
-        $dataUpdate = [
-            'title' => $request->title,
-            'description' => $request->description,
-            'quantity' => $request->quantity,
-            'condition' => $request->condition,
-            'ratio' => $request->ratio,
-            'code' => $request->code,
-            'shop_id' => $request->shop_id,
-            'status' => $request->status,
-        ];
-
         try {
-            // Cập nhật bản ghi
-            $voucherShop->update($dataUpdate);
-
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật voucher main thành công",
-                    'data' => $voucherShop,
-                ]
-            );
+            $voucherShop->update($request->validated());
+            Cache::forget('voucher_shop_' . $id);
+            Cache::forget('all_voucher_shops');
+            return $this->successResponse("Cập nhật voucher shop thành công", $voucherShop);
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => "Cập nhật voucher main không thành công",
-                'error' => $th->getMessage(),
-            ]);
+            return $this->errorResponse("Cập nhật voucher shop không thành công", $th->getMessage());
         }
     }
 
@@ -161,29 +82,45 @@ class VoucherToShopController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            $voucherShop = voucherToShop::find($id);
+        $voucherShop = Cache::remember('voucher_shop_' . $id, 60 * 60, function () use ($id) {
+            return VoucherToShop::find($id);
+        });
 
-            if (!$voucherShop) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'voucher main không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
-            $voucherShop->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Xóa voucher main thành công',
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => "Xóa voucher main không thành công",
-                'error' => $th->getMessage(),
-            ]);
+        if (!$voucherShop) {
+            return $this->errorResponse("Voucher shop không tồn tại", null, 404);
         }
+
+        try {
+            $voucherShop->delete();
+            Cache::forget('voucher_shop_' . $id);
+            Cache::forget('all_voucher_shops');
+            return $this->successResponse("Xóa voucher shop thành công");
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Xóa voucher shop không thành công", $th->getMessage());
+        }
+    }
+
+    /**
+     * Return success response
+     */
+    private function successResponse(string $message, $data = null, int $status = 200)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
+    }
+
+    /**
+     * Return error response
+     */
+    private function errorResponse(string $message, $error = null, int $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
     }
 }

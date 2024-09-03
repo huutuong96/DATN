@@ -19,6 +19,7 @@ use App\Models\ProgramtoshopModel;
 use App\Models\Programme_detail;
 use App\Models\Follow_to_shop;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class ShopController extends Controller
 {
@@ -28,7 +29,10 @@ class ShopController extends Controller
 
     public function index()
     {
-        $Shops = Shop::all();
+        $Shops = Cache::remember('all_shops', 60*60, function () {
+            return Shop::all();
+        });
+
         if($Shops->isEmpty()){
             return response()->json(
                 [
@@ -61,6 +65,8 @@ class ShopController extends Controller
         ];
         try {
             $Shop_manager = Shop_manager::create($dataInsert);
+
+            Cache::forget('all_shops');
 
             return response()->json([
                 'status' => true,
@@ -112,6 +118,9 @@ class ShopController extends Controller
                 'create_by' => auth()->user()->id
             ];
             $learning_seller = Learning_sellerModel::create($learningInsert);
+
+            Cache::forget('all_shops');
+
             return response()->json([
                 'status' => true,
                 'message' => "Tạo Shop thành công",
@@ -128,14 +137,20 @@ class ShopController extends Controller
 
     public function category_shop_store(Request $rqt,string $id, string $category_main_id)
     {
-        $shop = Shop::find($id);
+        $shop = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
+            return Shop::find($id);
+        });
+
         if (!$shop) {
             return response()->json([
                 'status' => false,
                 'message' => "Shop không tồn tại",
             ], 404);
         }
-        $category_main = CategoriesModel::find($category_main_id);
+        $category_main = Cache::remember('category_'.$category_main_id, 60*60, function () use ($category_main_id) {
+            return CategoriesModel::find($category_main_id);
+        });
+
         if (!$category_main) {
             return response()->json([
                 'status' => false,
@@ -160,6 +175,10 @@ class ShopController extends Controller
             $dataInsert['image'] = $uploadedImage['secure_url'];
         }
         $categori_shops = Categori_shopsModel::create($dataInsert);
+
+        Cache::forget('shop_'.$id);
+        Cache::forget('category_'.$category_main_id);
+
         return response()->json([
             'status' => true,
             'message' => "Thêm Category thành công",
@@ -169,7 +188,10 @@ class ShopController extends Controller
 
     public function product_to_shop_store(Request $rqt, string $id)
     {
-        $shop = Shop::find($id);
+        $shop = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
+            return Shop::find($id);
+        });
+
         if (!$shop) {
             return response()->json([
                 'status' => false,
@@ -217,6 +239,9 @@ class ShopController extends Controller
                 ColorModel::create($colorInsert);
             }
         }
+
+        Cache::forget('shop_'.$id);
+
         return response()->json([
             'status' => true,
             'message' => "Thêm sản phẩm thành công",
@@ -227,7 +252,9 @@ class ShopController extends Controller
 
     public function show_shop_members(string $id)
     {
-        $members = Shop_manager::where('shop_id', $id)->with('user')->get();
+        $members = Cache::remember('shop_members_'.$id, 60*60, function () use ($id) {
+            return Shop_manager::where('shop_id', $id)->with('user')->get();
+        });
 
         if ($members->isEmpty()) {
             return response()->json([
@@ -251,7 +278,9 @@ class ShopController extends Controller
 
     public function show(string $id)
     {
-        $Shops = Shop::find($id);
+        $Shops = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
+            return Shop::find($id);
+        });
 
         if(!$Shops){
             return response()->json(
@@ -287,6 +316,9 @@ class ShopController extends Controller
         $member->update([
             'role' => $rqt->role,
         ]);
+
+        Cache::forget('shop_members_'.$member->shop_id);
+
         return response()->json(
             [
                 'status' => true,
@@ -323,6 +355,10 @@ class ShopController extends Controller
         ];
         try {
             $shop->update($dataInsert);
+
+            Cache::forget('shop_'.$id);
+            Cache::forget('all_shops');
+
             return response()->json([
                 'status' => true,
                 'message' => "Cập nhật thông tin Shop thành công",
@@ -353,6 +389,10 @@ class ShopController extends Controller
             // Thay đổi trạng thái thay vì xóa
             $shop->status = 101;
             $shop->save();
+
+            Cache::forget('shop_'.$id);
+            Cache::forget('all_shops');
+
             return response()->json([
                 'status' => true,
                 'message' => 'Cập nhật trạng thái shop thành công',
@@ -378,6 +418,9 @@ class ShopController extends Controller
                 ], 404);
             }
             $member->delete();
+
+            Cache::forget('shop_members_'.$member->shop_id);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa thành viên thành công',
