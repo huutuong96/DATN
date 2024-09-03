@@ -13,6 +13,7 @@ class ColorsModel extends Model
 
     protected $fillable = [
         'title',
+        'product_id',
         'index',
         'image',
         'status',
