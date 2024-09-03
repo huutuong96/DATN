@@ -81,14 +81,14 @@ class ProductController extends Controller
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'image' => null,
+            'image' => $imageUrl,
             'quantity' => $request->quantity,
             'parent_id' => $request->parent_id,
             'create_by' => $user->id,
             'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-            'shop_id' => $request->shop_id,
+            'color_id' => $request->color_id,
         ];
 
         try {
@@ -117,6 +117,12 @@ class ProductController extends Controller
 
             return response()->json($dataDone, 200);
 
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm product không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
         }
     }
 
