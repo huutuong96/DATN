@@ -124,8 +124,8 @@ class MessageController extends Controller
     public function showByStore($shop_id)
     {   
         $user = JWTAuth::parseToken()->authenticate();
-        dd(Cache::get("shop:$shop_id"));
-        $value = Cache::remember("shop:$shop_id", 10, function () {
+        $value = Cache::remember("shop:$shop_id", 10, function () use ($shop_id)  {
+            // dd($shop_id);
             $messages = Message::where('shop_id', $shop_id)->get();
             if($messages->isEmpty()){
                 return response()->json(
@@ -157,7 +157,7 @@ class MessageController extends Controller
     }
     public function showByUser($user_id)
     {
-        $value = Cache::remember("user:$user_id", 10, function () {
+        $value = Cache::remember("user:$user_id", 10, function () use ($user_id){
             $messages = Message::where('user_id', $user_id)->get();
             if($messages->isEmpty()){
                 return response()->json(
