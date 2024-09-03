@@ -131,8 +131,8 @@ class ProductController extends Controller
             ], 404);
         }
 
-        if ($rqt->hasFile('image')) {
-            $image = $rqt->file('image');
+        if ($ $request->hasFile('image')) {
+            $image = $ $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
             $imageUrl = $uploadedImage['secure_url'];
