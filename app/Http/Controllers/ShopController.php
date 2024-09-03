@@ -14,16 +14,25 @@ use App\Models\CategoriesModel;
 use App\Models\Product;
 use App\Models\Image;
 use App\Models\ColorModel;
+use App\Models\BannerShop;
+use App\Models\ProgramtoshopModel;
+use App\Models\Programme_detail;
+use App\Models\Follow_to_shop;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class ShopController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct() {
+        $this->middleware('SendNotification');
+    }
+
     public function index()
     {
-        $Shops = Shop::all();
+        $Shops = Cache::remember('all_shops', 60*60, function () {
+            return Shop::all();
+        });
+
         if($Shops->isEmpty()){
             return response()->json(
                 [
@@ -56,6 +65,8 @@ class ShopController extends Controller
         ];
         try {
             $Shop_manager = Shop_manager::create($dataInsert);
+
+            Cache::forget('all_shops');
 
             return response()->json([
                 'status' => true,
@@ -100,22 +111,25 @@ class ShopController extends Controller
             $dataInsert['tax_id'] = $tax->id;
             $Shop = Shop::create($dataInsert);
             $this->shop_manager_store($Shop, auth()->user()->id, 'owner', 1);
+            $learningInsert = [
+                'learn_id' => $request->learn_id,
+                'shop_id' => $Shop->id,
+                'status' => 101, // Chưa học
+                'create_by' => auth()->user()->id
+            ];
+            $learning_seller = Learning_sellerModel::create($learningInsert);
 
-            // NẾU TẠO SHOP THÀNH CÔNG THÌ TẠO KHÓA HỌC CHO SHOP
-
-                //code tạo khóa học cho shop
-
-            // NẾU TẠO SHOP THÀNH CÔNG THÌ TẠO KHÓA HỌC CHO SHOP
+            Cache::forget('all_shops');
 
             return response()->json([
                 'status' => true,
-                'message' => "Thêm Shop thành công",
+                'message' => "Tạo Shop thành công",
                 'data' => $Shop,
             ], 201);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Thêm Shop không thành công",
+                'message' => "Tạo Shop không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -123,18 +137,24 @@ class ShopController extends Controller
 
     public function category_shop_store(Request $rqt,string $id, string $category_main_id)
     {
-        $shop = Shop::find($id);
+        $shop = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
+            return Shop::find($id);
+        });
+
         if (!$shop) {
             return response()->json([
                 'status' => false,
                 'message' => "Shop không tồn tại",
             ], 404);
         }
-        $category_main = CategoriesModel::find($category_main_id);
+        $category_main = Cache::remember('category_'.$category_main_id, 60*60, function () use ($category_main_id) {
+            return CategoriesModel::find($category_main_id);
+        });
+
         if (!$category_main) {
             return response()->json([
                 'status' => false,
-                'message' => "Category không tồn tại",
+                'message' => "Danh mục không tồn tại",
             ], 404);
         }
         $dataInsert = [
@@ -155,6 +175,10 @@ class ShopController extends Controller
             $dataInsert['image'] = $uploadedImage['secure_url'];
         }
         $categori_shops = Categori_shopsModel::create($dataInsert);
+
+        Cache::forget('shop_'.$id);
+        Cache::forget('category_'.$category_main_id);
+
         return response()->json([
             'status' => true,
             'message' => "Thêm Category thành công",
@@ -164,14 +188,16 @@ class ShopController extends Controller
 
     public function product_to_shop_store(Request $rqt, string $id)
     {
-        $shop = Shop::find($id);
+        $shop = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
+            return Shop::find($id);
+        });
+
         if (!$shop) {
             return response()->json([
                 'status' => false,
                 'message' => "Shop không tồn tại",
             ], 404);
         }
-
         $dataInsert = [
             'name' => $rqt->name,
             'slug' => $rqt->slug ?? Str::slug($rqt->name, '-'),
@@ -200,24 +226,27 @@ class ShopController extends Controller
                 ]);
             }
         }
-        $colorInsert = [
-            'product_id' => $product->id,
-            'title' => $rqt->title,
-            'index' => $rqt->index,
-            'status' => $rqt->status,
-            'create_by' => auth()->user()->id,
-            'update_by' => auth()->user()->id,
-        ];
-        $color = ColorModel::create($colorInsert);
-        if(!$color){
-            return response()->json([
-                'status' => false,
-                'message' => "Color không tồn tại",
-            ], 404);
+
+        if ($rqt->color) {
+            foreach($rqt->color as $color){
+                $colorInsert = [
+                    'product_id' => $product->id,
+                    'title' => $color['title'],
+                    'index' => $color['index'],
+                    'status' => $color['status'],
+                    'create_by' => auth()->user()->id,
+                    'update_by' => auth()->user()->id,
+                ];
+                ColorModel::create($colorInsert);
+            }
+
         }
+
+        Cache::forget('shop_'.$id);
+
         return response()->json([
             'status' => true,
-            'message' => "Thêm Product thành công",
+            'message' => "Thêm sản phẩm thành công",
             'data' => $product,
         ], 201);
     }
@@ -225,7 +254,9 @@ class ShopController extends Controller
 
     public function show_shop_members(string $id)
     {
-        $members = Shop_manager::where('shop_id', $id)->with('user')->get();
+        $members = Cache::remember('shop_members_'.$id, 60*60, function () use ($id) {
+            return Shop_manager::where('shop_id', $id)->with('user')->get();
+        });
 
         if ($members->isEmpty()) {
             return response()->json([
@@ -249,7 +280,9 @@ class ShopController extends Controller
 
     public function show(string $id)
     {
-        $Shops = Shop::find($id);
+        $Shops = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
+            return Shop::find($id);
+        });
 
         if(!$Shops){
             return response()->json(
@@ -278,13 +311,16 @@ class ShopController extends Controller
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại thành viên trong hóp này",
+                    'message' => "Không tồn tại thành viên trong shop này",
                 ]
             );
         }
         $member->update([
             'role' => $rqt->role,
         ]);
+
+        Cache::forget('shop_members_'.$member->shop_id);
+
         return response()->json(
             [
                 'status' => true,
@@ -295,54 +331,47 @@ class ShopController extends Controller
     }
     public function update(Request $rqt, string $id)
     {
-        $shop = Shop::find($id);
+        $shop = Shop::findOrFail($id);
 
         if (!$shop) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "shop không tồn tại",
-                ],
-                404
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
         }
-        $image = $rqt->file('image');
-        $cloudinary = new Cloudinary();
-        // $uploudinary = $cloudinary->uploadApi()->upload($image->getRealPath());
-
-        // $user = JWTAuth::parseToken()->authenticate();
-        // lấy địa chỉ của usẻr để thêm vào dòn 59 ?? $user->address_id
-
-
-
+        if($rqt->hasFile('image')){
+            $image = $rqt->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $dataInsert['image'] = $uploadedImage['secure_url'];
+        }
         $dataInsert = [
-            'shop_name' => $rqt->shop_name,
-            'pick_up_address' => $rqt->pick_up_address ,
-            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
-            'image' => $uploadedImage['secure_url'] ?? "",// thêm ?? để tranh lỗi khi test băng post man
-            'cccd' => $rqt->cccd,
-            'status' => $rqt->status ,
-            'tax_id' => $rqt->tax_id,
-            'created_at' => $rqt->created_at ?? $shop->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
+            'shop_name' => $rqt->shop_name ?? $shop->shop_name,
+            'pick_up_address' => $rqt->pick_up_address ?? $shop->pick_up_address,
+            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name ?? $shop->shop_name, '-'),
+            'cccd' => $rqt->cccd ?? $shop->cccd,
+            'status' => $rqt->status ?? $shop->status,
+            'tax_id' => $rqt->tax_id ?? $shop->tax_id,
+            'update_by' => auth()->user()->id,
+            'updated_at' => now(),
         ];
         try {
             $shop->update($dataInsert);
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "cập nhật thông tin Shop thành công",
-                    'data' => $shop,
-                ]
-            );
+            Cache::forget('shop_'.$id);
+            Cache::forget('all_shops');
+
+            return response()->json([
+                'status' => true,
+                'message' => "Cập nhật thông tin Shop thành công",
+                'data' => $shop,
+            ], 200);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "cập nhật thông tin Shop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật thông tin Shop không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
         }
     }
 
@@ -353,26 +382,28 @@ class ShopController extends Controller
     {
         try {
             $shop = Shop::find($id);
-
             if (!$shop) {
                 return response()->json([
                     'status' => false,
                     'message' => 'shop không tồn tại',
                 ], 404);
             }
+            // Thay đổi trạng thái thay vì xóa
+            $shop->status = 101;
+            $shop->save();
 
-            // Xóa bản ghi
-            $shop->delete();
+            Cache::forget('shop_'.$id);
+            Cache::forget('all_shops');
 
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa shop thành công',
-                ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Cập nhật trạng thái shop thành công',
+            ]);
         } catch (\Throwable $th) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "xóa shop không thành công",
+                    'message' => "Cập nhật trạng thái shop không thành công",
                     'error' => $th->getMessage(),
                 ]
             );
@@ -382,29 +413,234 @@ class ShopController extends Controller
     {
         try {
             $member = Shop_manager::find($id);
-
             if (!$member) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'thành viên không tồn tại',
+                    'message' => 'Thành viên không tồn tại',
                 ], 404);
             }
-
-            // Xóa bản ghi
             $member->delete();
 
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa thành viên thành công',
-                ]);
+            Cache::forget('shop_members_'.$member->shop_id);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Xóa thành viên thành công',
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa thành viên không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Xóa thành viên không thành công',
+                'error' => $th->getMessage(),
+            ], 500);
         }
     }
+    public function store_banner_to_shop(Request $rqt, string $id)
+    {
+        try {
+            $shop = Shop::find($id);
+            if (!$shop) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Shop không tồn tại',
+                ], 404);
+            }
+            if ($rqt->hasFile('image')) {
+                $image = $rqt->file('image');
+                $cloudinary = new Cloudinary();
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $dataInsert['image'] = $uploadedImage['secure_url'];
+                $banner = Banner::create([
+                    'image' => $dataInsert['image'],
+                    'shop_id' => $shop->id,
+                    'create_by' => auth()->user()->id,
+                    'update_by' => auth()->user()->id,
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Thêm banner thành công',
+                    'data' => $banner,
+                ], 201);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không có file hình ảnh được tải lên',
+                ], 400);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Thêm banner không thành công',
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+    public function programe_to_shop(Request $rqt, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+        }
+        $program_detail = Programme_detail::create([
+            'title' => $rqt->title,
+            'content' => $rqt->content,
+            'create_by' => auth()->user()->id,
+            'update_by' => auth()->user()->id,
+        ]);
+        $program = ProgramtoshopModel::create([
+            'program_id' => $program_detail->id,
+            'shop_id' => $shop->id,
+            'create_by' => auth()->user()->id,
+            'update_by' => auth()->user()->id,
+            'created_at' => now(),
+        ]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Thêm chương trình thành công',
+            'data' => $program_detail,
+        ], 201);
+    }
+
+    public function increase_follower(string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+        }
+        $follow = Follow_to_shop::create([
+            'user_id' => auth()->user()->id,
+            'shop_id' => $shop->id,
+            'created_at' => now(),
+        ]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Đã follow shop thành công',
+            'data' => $follow,
+        ], 200);
+    }
+    public function decrease_follower(string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+        }
+        $follow = Follow_to_shop::where('user_id', auth()->user()->id)->where('shop_id', $shop->id)->first();
+        if (!$follow) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bạn không theo dõi shop này',
+            ], 404);
+        }
+        $follow->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'Đã unfollow shop thành công',
+            'data' => $follow,
+        ], 200);
+    }
+    public function message_to_shop(Request $rqt, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+        }
+        $message = Message::create([
+            'shop_id' => $shop->id,
+            'user_id' => auth()->user()->id,
+            'status' => 1,
+            'created_at' => now(),
+        ]);
+        $messageDetail = Message_detail::create([
+            'message_id' => $message->id,
+            'content' => $rqt->content,
+            'send_by' => auth()->user()->id,
+            'status' => 1,
+            'created_at' => now(),
+        ]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Đã gửi tin nhắn thành công',
+            'data' => $message,
+        ], 200);
+    }
+    public function get_order_to_shop(string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+    }
+        $order = Order::where('shop_id', $shop->id)->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy đơn hàng thành công',
+            'data' => $order,
+        ], 200);
+    }
+    public function get_order_detail_to_shop(string $id)
+    {
+        $order = Order::find($id);
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Đơn hàng không tồn tại',
+            ], 404);
+        }
+        $orderDetail = Order_detail::where('order_id', $order->id)->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy chi tiết đơn hàng thành công',
+            'data' => $orderDetail,
+        ], 200);
+    }
+    public function get_product_to_shop(string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+        }
+        $product = Product::where('shop_id', $shop->id)->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy sản phẩm thành công',
+            'data' => $product,
+        ], 200);
+    }
+    public function get_voucher_to_shop(string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Shop không tồn tại',
+            ], 404);
+        }
+        $voucher_to_shop = Voucher_to_shop::where('shop_id', $shop->id)->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy voucher thành công',
+            'data' => [
+                'voucher' => $voucher,
+                'voucher_to_shop' => $voucher_to_shop,
+            ],
+        ], 200);
+    }
+
 }

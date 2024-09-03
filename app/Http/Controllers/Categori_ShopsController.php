@@ -7,206 +7,155 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Categori_shopsModel;
 use App\Http\Requests\CategoriesRequest;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Cache;
+
 class Categori_ShopsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $categori_shops = Categori_shopsModel::all();
+        $categori_shops = Cache::remember('all_categori_shops', 60 * 60, function () {
+            return Categori_shopsModel::all();
+        });
+
         if ($categori_shops->isEmpty()) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Không tồn tại Categori_Shop nào",
-                ]
-            );
+            return $this->errorResponse("Không tồn tại danh mục shop nào");
         }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $categori_shops,
-            ]
-        );
+
+        return $this->successResponse("Lấy dữ liệu thành công", $categori_shops);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CategoriesRequest $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $image = $request->file('image');
-        $cloudinary = new Cloudinary();
-
         try {
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $imageUrl = $this->uploadImage($request);
 
-            $dataInsert = [
-                'title' => $request->title,
-                'index' => $request->index,
-                'slug' => Str::slug($request->title),
-                'image' => $uploadedImage['secure_url'],
-                'status' => $request->status,
-                'parent_id' => $request->parent_id,
-                'create_by' => $user->id,
-                'shop_id' => $request->shop_id,
-                'category_id_main' => $request->category_id_main
-            ];
+            $dataInsert = $this->prepareDataForInsert($request, $imageUrl);
 
             $categori_shops = Categori_shopsModel::create($dataInsert);
 
-            return response()->json([
-                'status' => true,
-                'message' => "Thêm Categori_Shop thành công",
-                'data' => $categori_shops,
-            ], 200);
+            Cache::forget('all_categori_shops');
+
+            return $this->successResponse("Thêm danh mục shop thành công", $categori_shops);
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => "Thêm Categori_Shop không thành công",
-                'error' => $th->getMessage(),
-            ], 500);
+            return $this->errorResponse("Thêm danh mục shop không thành công", $th->getMessage());
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $categori_shops = Categori_shopsModel::find($id);
+        $categori_shops = Cache::remember('categori_shop_' . $id, 60 * 60, function () use ($id) {
+            return Categori_shopsModel::find($id);
+        });
 
         if (!$categori_shops) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại Categori_Shop nào",
-                ]
-            );
+            return $this->errorResponse("Không tồn tại danh mục shop nào");
         }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $categori_shops,
-            ]
-        );
+
+        return $this->successResponse("Lấy dữ liệu thành công", $categori_shops);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(CategoriesRequest $request, string $id)
     {
-        $categori_shops = Categori_shopsModel::find($id);
-        // Kiểm tra xem banner có tồn tại không
+        $categori_shops = Cache::remember('categori_shop_' . $id, 60 * 60, function () use ($id) {
+            return Categori_shopsModel::find($id);
+        });
+
         if (!$categori_shops) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Categori_Shop không tồn tại",
-                ],
-                404
-            );
+            return $this->errorResponse("Danh mục shop không tồn tại", 404);
         }
 
-        // Check xem co anh moi duoc tai len khong
+        $imageUrl = $this->uploadImage($request);
+
+        $dataUpdate = $this->prepareDataForUpdate($request, $categori_shops, $imageUrl);
+
+        try {
+            $categori_shops->update($dataUpdate);
+            Cache::forget('categori_shop_' . $id);
+            Cache::forget('all_categori_shops');
+            return $this->successResponse("Cập nhật danh mục shop thành công", $categori_shops);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Cập nhật danh mục shop không thành công", $th->getMessage());
+        }
+    }
+
+    public function destroy(string $id)
+    {
+        try {
+            $categori_shops = Cache::remember('categori_shop_' . $id, 60 * 60, function () use ($id) {
+                return Categori_shopsModel::find($id);
+            });
+
+            if (!$categori_shops) {
+                return $this->errorResponse('Danh mục shop không tồn tại', 404);
+            }
+
+            $categori_shops->delete();
+
+            Cache::forget('categori_shop_' . $id);
+            Cache::forget('all_categori_shops');
+
+            return $this->successResponse('Xóa danh mục shop thành công');
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Xóa danh mục shop không thành công", $th->getMessage());
+        }
+    }
+
+    private function uploadImage($request)
+    {
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $imageUrl = $uploadedImage['secure_url'];
-        } else {
-            // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
-            $imageUrl = $categori_shops->image;
+            return $uploadedImage['secure_url'];
         }
+        return null;
+    }
 
-
-        // Cập nhật dữ liệu
-        $dataUpdate = [
-            'title' => $request->title ?? $categori_shops->title,
-            'index' => $request->index ?? $categori_shops->index,
+    private function prepareDataForInsert($request, $imageUrl)
+    {
+        return [
+            'title' => $request->title,
+            'index' => $request->index,
             'slug' => Str::slug($request->title),
             'image' => $imageUrl,
+            'status' => $request->status,
+            'parent_id' => $request->parent_id,
+            'create_by' => auth()->user()->id,
+            'shop_id' => $request->shop_id,
+            'category_id_main' => $request->category_id_main
+        ];
+    }
+
+    private function prepareDataForUpdate($request, $categori_shops, $imageUrl)
+    {
+        return [
+            'title' => $request->title ?? $categori_shops->title,
+            'index' => $request->index ?? $categori_shops->index,
+            'slug' => $request->slug ?? Str::slug($request->title),
+            'image' => $imageUrl ?? $categori_shops->image,
             'status' => $request->status ?? $categori_shops->status,
             'parent_id' => $request->parent_id ?? $categori_shops->parent_id,
-            'create_by' => $request->create_by ?? $categori_shops->create_by,
+            'create_by' => auth()->user()->id,
             'shop_id' => $request->shop_id ?? $categori_shops->shop_id,
             'category_id_main' => $request->category_id_main ?? $categori_shops->category_id_main
         ];
-
-
-        try {
-            // Cập nhật bản ghi
-            $categori_shops->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật Categori_Shop thành công",
-                    'data' => $categori_shops,
-                ]
-            );
-        } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật Categori_Shop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
-        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    private function successResponse($message, $data = null, $status = 200)
     {
-        try {
-            $categori_shops = Categori_shopsModel::find($id);
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
+    }
 
-            if (!$categori_shops) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Categori_Shop không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
-            $categori_shops->delete();
-
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa Categori_Shop thành công',
-                ]);
-        } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa Categori_Shop không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
-        }
+    private function errorResponse($message, $error = null, $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
     }
 }

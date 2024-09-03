@@ -1,9 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Programme_detail;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProgrameRequest;
+use Illuminate\Support\Facades\Cache;
+
 class ProgrameController extends Controller
 {
     /**
@@ -11,30 +14,15 @@ class ProgrameController extends Controller
      */
     public function index()
     {
-        $programe = Programme_detail::all();
-        if($programe->isEmpty()){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại chương trình nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $programe,
-            ]
-        );
-    }
+        $programs = Cache::remember('all_programs', 60 * 60, function () {
+            return Programme_detail::all();
+        });
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if ($programs->isEmpty()) {
+            return $this->errorResponse("Không tồn tại chương trình nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $programs);
     }
 
     /**
@@ -42,29 +30,12 @@ class ProgrameController extends Controller
      */
     public function store(ProgrameRequest $request)
     {
-        $dataInsert = [
-            'title' => $request->title,
-            'content' => $request->content,
-        ];
-
         try {
-            $programe = Programme_detail::create( $dataInsert );
-
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm chương trình thành công",
-                    'data' => $programe,
-                ]
-            );
+            $program = Programme_detail::create($request->validated());
+            Cache::forget('all_programs');
+            return $this->successResponse("Thêm chương trình thành công", $program);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm chương trình không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Thêm chương trình không thành công", $th->getMessage());
         }
     }
 
@@ -73,74 +44,35 @@ class ProgrameController extends Controller
      */
     public function show(string $id)
     {
-        $programe = Programme_detail::find($id);
-        if(!$programe){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại chương trình nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $programe,
-            ]
-        );
-    }
+        $program = Cache::remember('program_' . $id, 60 * 60, function () use ($id) {
+            return Programme_detail::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$program) {
+            return $this->errorResponse("Chương trình không tồn tại", 404);
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $program);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProgrameRequest $request, string $id)
     {
-        // Tìm chương trình theo ID
-        $programe = Programme_detail::find($id);
-        if (!$programe) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Chương trình không tồn tại",
-                ],
-                404
-            );
-        }
-        // Cập nhật dữ liệu
-        $dataUpdate = [
-            'title' => $request->title ?? $programe->title,
-            'content' => $request->content ?? $programe->content,
-            'update_at' => now(), // Đặt giá trị mặc định nếu không có trong yêu cầu
-        ];
+        $program = Programme_detail::find($id);
 
+        if (!$program) {
+            return $this->errorResponse("Chương trình không tồn tại", 404);
+        }
 
         try {
-            // Cập nhật bản ghi
-            $programe->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật chương trình thành công",
-                    'data' => $programe,
-                ]
-            );
+            $program->update($request->validated());
+            Cache::forget('program_' . $id);
+            Cache::forget('all_programs');
+            return $this->successResponse("Cập nhật chương trình thành công", $program);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật chương trình không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Cập nhật chương trình không thành công", $th->getMessage());
         }
     }
 
@@ -150,30 +82,37 @@ class ProgrameController extends Controller
     public function destroy(string $id)
     {
         try {
-            $programe = Programme_detail::find($id);
-
-            if (!$programe) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'chương trình không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
-            $programe->delete();
-
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa chương trình thành công',
-                ]);
+            $program = Programme_detail::findOrFail($id);
+            $program->delete();
+            Cache::forget('program_' . $id);
+            Cache::forget('all_programs');
+            return $this->successResponse("Xóa chương trình thành công");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa chương trình không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa chương trình không thành công", $th->getMessage());
         }
+    }
+
+    /**
+     * Return a success response.
+     */
+    private function successResponse($message, $data = null)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Return an error response.
+     */
+    private function errorResponse($message, $error = null, $code = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error,
+        ], $code);
     }
 }
