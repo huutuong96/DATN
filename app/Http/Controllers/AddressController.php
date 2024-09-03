@@ -43,10 +43,10 @@ class AddressController extends Controller
         $Address = [
             "address"=> $request->address,
             "type"=> $request->type,
-            "status"=> $request->status,
             "default"=> $request->default,
-            'create_by' => $request->input('create_by') ?? null,
-           
+            "status"=> $request->status,
+            "create_by" => $request->input('create_by') ?? null,
+            "user_id" => $request->user_id
         ];
         AddressModel::create($Address);
         $dataDone = [
@@ -100,6 +100,7 @@ class AddressController extends Controller
             "default"=> $request->default,
             'create_by' => $request->input('create_by') ?? null,
             "updated_at"=> now(),
+            "user_id" => $request->user_id
         ]);
     
         $dataDone = [

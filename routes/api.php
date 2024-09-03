@@ -115,6 +115,8 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
 });
 
+
+
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
 Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
 Route::post('users/register', [AuthenController::class, "register"]);

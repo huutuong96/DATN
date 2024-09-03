@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Cloudinary\Cloudinary;
 use App\Models\Notification;
-use App\Models\Notification_to_mainModel;
-use App\Models\Notification_to_shop;
-use Cloudinary;
 use Illuminate\Http\Request;
+
+use App\Models\Notification_to_shop;
+use App\Models\Notification_to_mainModel;
+
 use Illuminate\Support\Facades\Cache;
+
 
 class NotificationController extends Controller
 {
@@ -98,21 +101,17 @@ class NotificationController extends Controller
     public function destroy($id)
     {
         $notification = Notification::findOrFail($id);
-
+        Notification::destroy($id);
         if ($notification->type === 'main') {
-            NotificationToMain::destroy($notification->id_notification);
+            Notification_to_mainModel::destroy($notification->id_notification);
             Cache::forget('notification_main_' . $notification->id_notification);
         } elseif ($notification->type === 'shop') {
-            NotificationToShops::destroy($notification->id_notification);
+            Notification_to_shop::destroy($notification->id_notification);
             Cache::forget('notification_shop_' . $notification->id_notification);
         }
-
-        $notification->delete();
-
         // Update cache
         $this->updateCache('notifications_' . $notification->user_id, Notification::where('user_id', $notification->user_id)->get());
         Cache::forget('notification_' . $notification->user_id . '_' . $id);
-
         return response()->json(null, 204);
     }
 }
