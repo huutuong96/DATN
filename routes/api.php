@@ -18,7 +18,6 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
 use App\Http\Controllers\AddressController;
-use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\MessageController;
@@ -64,7 +63,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('brands',BrandsController::class);
             Route::resource('colors',ColorsController::class);
             Route::resource('categori_learns', CategorilearnsController::class);
-            Route::resource('Categoriessupportmains', CategoriessupportmainController::class);
+            Route::resource('categoriessupportmains', CategoriessupportmainController::class);
             Route::resource('learns', LearnController::class);
             Route::resource('messages', MessageController::class);
             Route::post('messages/detail', [MessageController::class, "store_message_detail"]);
@@ -119,6 +118,8 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
 
 });
+
+
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
 Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');

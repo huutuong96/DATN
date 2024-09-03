@@ -226,6 +226,7 @@ class ShopController extends Controller
                 ]);
             }
         }
+
         if ($rqt->color) {
             foreach($rqt->color as $color){
                 $colorInsert = [
@@ -238,6 +239,7 @@ class ShopController extends Controller
                 ];
                 ColorModel::create($colorInsert);
             }
+
         }
 
         Cache::forget('shop_'.$id);

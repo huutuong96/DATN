@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Cloudinary\Cloudinary;
 use App\Models\Notification;
-use App\Models\Notification_to_mainModel;
-use App\Models\Notification_to_shop;
-use Cloudinary;
 use Illuminate\Http\Request;
+
+use App\Models\Notification_to_shop;
+use App\Models\Notification_to_mainModel;
+
 use Illuminate\Support\Facades\Cache;
+
 
 class NotificationController extends Controller
 {

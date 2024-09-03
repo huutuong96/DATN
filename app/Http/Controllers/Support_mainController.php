@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SupportMain;
+use App\Models\support_main;
 use Illuminate\Support\Facades\Cache;
 
 class SupportMainController extends Controller
@@ -14,7 +14,7 @@ class SupportMainController extends Controller
     public function index()
     {
         $supports = Cache::remember('all_supports', 60 * 60, function () {
-            return SupportMain::all();
+            return support_main::all();
         });
 
         if ($supports->isEmpty()) {
@@ -37,7 +37,7 @@ class SupportMainController extends Controller
         ]);
 
         try {
-            $support = SupportMain::create($validatedData);
+            $support = support_main::create($validatedData);
             Cache::forget('all_supports');
             return $this->successResponse("Thêm hỗ trợ thành công", $support);
         } catch (\Throwable $th) {
@@ -51,7 +51,7 @@ class SupportMainController extends Controller
     public function show(string $id)
     {
         $support = Cache::remember('support_' . $id, 60 * 60, function () use ($id) {
-            return SupportMain::find($id);
+            return support_main::find($id);
         });
 
         if (!$support) {
@@ -66,7 +66,7 @@ class SupportMainController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $support = SupportMain::find($id);
+        $support = support_main::find($id);
 
         if (!$support) {
             return $this->errorResponse("Hỗ trợ không tồn tại", 404);
@@ -95,7 +95,7 @@ class SupportMainController extends Controller
     public function destroy(string $id)
     {
         try {
-            $support = SupportMain::findOrFail($id);
+            $support = support_main::findOrFail($id);
             $support->delete();
             Cache::forget('support_' . $id);
             Cache::forget('all_supports');
