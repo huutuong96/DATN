@@ -29,6 +29,7 @@ class UsersModel extends Authenticatable implements JWTSubject {
         'rank_id',
         'role_id',
         'address_id',
+        'status',
     ];
 
      public function getJWTIdentifier()

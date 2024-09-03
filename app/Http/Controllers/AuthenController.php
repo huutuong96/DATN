@@ -4,11 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\UsersModel;
+use App\Models\RolesModel;
+use App\Models\RanksModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\Notification_to_mainModel;
+use App\Models\Notification;
 use Tymon\JWTAuth\Exceptions\JWTException;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ConfirmMail;
 class AuthenController extends Controller
 {
     public function index()
@@ -39,32 +45,66 @@ class AuthenController extends Controller
 
     public function register(UserRequest $request)
     {
+        $role = RolesModel::where('title', 'user')->first();
+        $rank = RanksModel::where('title', 'đồng')->first();
         $dataInsert = [
             "fullname"=> $request->fullname,
-            "password"=> $request->password,
+            "password"=> Hash::make($request->password),
             "email"=> $request->email,
-            "rank_id"=> $request->rank_id,
-            "role_id"=> $request->role_id,
+            "rank_id"=> $rank->id,
+            "role_id"=> $role->id,
+            "status"=> 101, // 101 là tài khoản chưa được kích hoạt
             "login_at"=> now(),
         ];
         $user = UsersModel::create($dataInsert);
-        // Cấp JWT token
-        try {
-            $token = JWTAuth::fromUser($user);
+        $token = JWTAuth::fromUser($user);
             $user->update([
                 'refesh_token' => $token,
             ]);
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
-        }
+        // Send confirm mail
+        $confirmMail = [
+            'title' => 'Vui lòng xác nhận đăng ký tài khoản',
+            'description' => 'Cảm ơn bạn đã đăng ký tài khoản. Vui lòng xác nhận đăng ký tài khoản để hoàn tất quá trình đăng ký.',
+        ];
+        $notification_to_main = Notification_to_mainModel::create($confirmMail);
+        $dataInfomation = [
+            'id_notification' => $notification_to_main->id,
+            'user_id' => $user->id,
+            'type' => 'Thông báo từ VN Shop',
+        ];
+        $notification = Notification::create($dataInfomation);
         $dataDone = [
             'status' => true,
-            'message' => "user Đã được lưu",
-            'token' => $token,
-            'users' => UsersModel::all(),
+            'message' => "Đăng ký thành công, chưa kích hoạt",
+            'user' => $user,
+            'notification' => $notification,
+            'notification_to_main' => $notification_to_main,
         ];
-        return response()->json($dataDone, 200);
+        Mail::to($user->email)->send(new ConfirmMail($user, $confirmMail, $token));
+        return response()->json($dataDone, 201);
     }
+
+    public function confirm($token)
+    {
+        $user = UsersModel::where('refesh_token', $token)->first();
+        if ($user) {
+            $user->update([
+                'status' => 1,
+            ]);
+            $activeDone = [
+                'status' => true,
+                'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
+            ];
+            return response()->json($activeDone, 200);
+        } else {
+            $activeFail = [
+                'status' => true,
+                'message' => "Tài khoản không tồn tại, Vui lòng đăng ký lại",
+            ];
+            return response()->json($activeFail, 200);
+        }
+    }
+
 
     public function login(Request $request)
     {
@@ -72,10 +112,10 @@ class AuthenController extends Controller
         if (!$user) {
             return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
         }
-        if ($user->password != $request->password) {
+        if (!Hash::check($request->password, $user->password)) {
             return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
         }
-        if ($user->password == $request->password) {
+        if (Hash::check($request->password, $user->password)) {
             $token = JWTAuth::fromUser($user);
             $user->update([
                 'refesh_token' => $token,

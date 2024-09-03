@@ -89,7 +89,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('vouchers', VoucherController::class);
             Route::resource('follows', FollowToShopController::class);
             Route::resource('support_main', Support_mainController::class);
-            Route::post('purchase', [PurchaseController::class, "purchase"]);
             Route::resource('Comments', CommentsController::class);
             Route::resource('Wishlists', WishlistController::class);
             Route::resource('Product_to_shops', ProducttoshopController::class);
@@ -100,6 +99,8 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::post('learning_seller', [Learning_sellerController::class, 'store']);
             Route::put('learning_seller/{id}', [Learning_sellerController::class, 'update']);
             Route::delete('learning_seller/delete/{id}', [Learning_sellerController::class, 'destroy']);
+            // Route::resource('learning_seller', Learning_sellerController::class);
+            Route::post('purchase', [PurchaseController::class, "purchase"]);
 });
 
 //CRUD Thy (29/08)
@@ -107,3 +108,4 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
+Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
