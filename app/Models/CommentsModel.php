@@ -18,7 +18,7 @@ class CommentsModel extends Model
         'status',
         'parent_id',
         'product_id',
-        'user_id',
+        'user_id'
     ];
 
 }

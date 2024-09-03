@@ -45,7 +45,6 @@ class AddressController extends Controller
             "type"=> $request->type,
             "default"=> $request->default,
             "status"=> $request->status,
-            "create_by" => $request->input('create_by') ?? null,
             "user_id" => $request->user_id
         ];
         AddressModel::create($Address);
@@ -98,7 +97,6 @@ class AddressController extends Controller
             "type"=> $request->type,
             "status"=> $request->status,
             "default"=> $request->default,
-            'create_by' => $request->input('create_by') ?? null,
             "updated_at"=> now(),
             "user_id" => $request->user_id
         ]);

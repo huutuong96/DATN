@@ -13,7 +13,14 @@ class SupportMainController extends Controller
      */
     public function index()
     {
+
+        // Chưa động đến nhưng đã lưu vào cache
+        // Tên Controller là Support_mainController
+
         $supports = Cache::remember('all_supports', 60 * 60, function () {
+
+            // Tên Model ai đặt là support_main :)) không phải SupportMain
+
             return SupportMain::all();
         });
 
