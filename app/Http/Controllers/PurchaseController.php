@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 
 class PurchaseController extends Controller
 {
@@ -49,13 +50,11 @@ class PurchaseController extends Controller
             }
         }
 
-
         try {
             DB::beginTransaction();
             $product = $this->getProduct($request->shop_id, $request->product_id);
 
             $this->checkProductAvailability($product, $request->quantity);
-
 
             $totalPrice = $this->calculateTotalPrice($product, $request->quantity);
             $voucherId = $this->applyVouchers($voucherToMainCode, $voucherToShopCode, $totalPrice);
@@ -67,6 +66,11 @@ class PurchaseController extends Controller
 
             Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $totalPrice));
             $this->add_point_to_user();
+
+            // Clear relevant caches
+            Cache::forget('product_' . $product->id);
+            Cache::forget('user_present_' . auth()->id());
+
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
@@ -86,36 +90,46 @@ class PurchaseController extends Controller
 
     private function add_point_to_user()
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $user = UsersModel::find($user->id);
+        $userId = auth()->id();
+        $user = Cache::remember('user_' . $userId, 60, function () use ($userId) {
+            return UsersModel::find($userId);
+        });
         $user->update([
             'point' => $user->point + 100,
         ]);
+        Cache::forget('user_' . $userId);
     }
 
     private function getValidVoucherCode($code, $type)
     {
-        if ($type === 'main') {
-            $voucher = voucher_to_main::where('code', $code)
-            ->where('quantity', '>=', 1)
-            ->where('status', 1)
-            ->first();
-            return $voucher ? $voucher->code : null;
-        }
-        if ($type === 'shop') {
-            $voucher = VoucherToShop::where('code', $code)
-            ->where('quantity', '>=', 1)
-            ->where('status', 1)
-            ->first();
-            return $voucher ? $voucher->code : null;
-        }
+        $cacheKey = 'voucher_' . $type . '_' . $code;
+        return Cache::remember($cacheKey, 60, function () use ($code, $type) {
+            if ($type === 'main') {
+                $voucher = voucher_to_main::where('code', $code)
+                    ->where('quantity', '>=', 1)
+                    ->where('status', 1)
+                    ->first();
+                return $voucher ? $voucher->code : null;
+            }
+            if ($type === 'shop') {
+                $voucher = VoucherToShop::where('code', $code)
+                    ->where('quantity', '>=', 1)
+                    ->where('status', 1)
+                    ->first();
+                return $voucher ? $voucher->code : null;
+            }
+        });
     }
 
     private function getProduct($shopId, $productId)
     {
-        return Product::where('shop_id', $shopId)
-            ->where('id', $productId)
-            ->firstOrFail();
+
+        $cacheKey = 'product_' . $productId . '_shop_' . $shopId;
+        return Cache::remember($cacheKey, 60, function () use ($shopId, $productId) {
+            return Product::where('shop_id', $shopId)
+                ->where('id', $productId)
+                ->first();
+        });
     }
 
     private function checkProductAvailability($product, $quantity)
@@ -138,7 +152,9 @@ class PurchaseController extends Controller
         $voucherId = ['main' => null, 'shop' => null];
 
         if ($voucherToMainCode) {
-            $voucherToMain = voucher_to_main::where('code', $voucherToMainCode)->first();
+            $voucherToMain = Cache::remember('voucher_main_' . $voucherToMainCode, 60, function () use ($voucherToMainCode) {
+                return voucher_to_main::where('code', $voucherToMainCode)->first();
+            });
             if ($voucherToMain) {
                 $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
                 $voucherId['shop'] = $voucherToMain->id;
@@ -147,9 +163,11 @@ class PurchaseController extends Controller
         }
 
         if ($voucherToShopCode) {
-            $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)
-                ->where('status', 1)
-                ->first();
+            $voucherToShop = Cache::remember('voucher_shop_' . $voucherToShopCode, 60, function () use ($voucherToShopCode) {
+                return VoucherToShop::where('code', $voucherToShopCode)
+                    ->where('status', 1)
+                    ->first();
+            });
             if ($voucherToShop) {
                 $totalPrice -= ($totalPrice * $voucherToShop->ratio / 100);
                 $voucherId['shop'] = $voucherToShop->id;
@@ -162,14 +180,13 @@ class PurchaseController extends Controller
 
     private function updateVoucherQuantity($voucher)
     {
-        // dd($voucher);
         if ($voucher) {
             $voucher->decrement('quantity');
             if ($voucher->quantity <= 0) {
                 $voucher->update(['status' => 0]);
             }
+            Cache::forget('voucher_' . ($voucher instanceof voucher_to_main ? 'main_' : 'shop_') . $voucher->code);
         }
-
     }
 
     private function createOrder($request, $voucherId)

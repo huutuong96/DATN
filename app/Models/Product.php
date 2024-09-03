@@ -29,7 +29,7 @@ class Product extends Model
         'update_at',
         'category_id',
         'brand_id',
-        'color_id',
+        'shop_id',
     ];
 
 }

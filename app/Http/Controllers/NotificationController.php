@@ -5,28 +5,34 @@ namespace App\Http\Controllers;
 use Cloudinary\Cloudinary;
 use App\Models\Notification;
 use Illuminate\Http\Request;
+
 use App\Models\Notification_to_shop;
 use App\Models\Notification_to_mainModel;
 
+use Illuminate\Support\Facades\Cache;
+
+
 class NotificationController extends Controller
 {
+    private function updateCache($key, $data)
+    {
+        Cache::put($key, $data, 60 * 60 * 24); // Cache for 24 hours
+    }
+
     public function index()
     {
-        $notifications = Notification::where('user_id', auth()->user()->id)->get();
+        $userId = auth()->user()->id;
+        $cacheKey = 'notifications_' . $userId;
+
+        $notifications = Cache::remember($cacheKey, 60 * 60, function () use ($userId) {
+            return Notification::where('user_id', $userId)->get();
+        });
+
         return response()->json($notifications);
     }
 
     public function store(Request $request)
     {
-        // $request->validate([
-        //     'type' => 'required|string',
-        //     'user_id' => 'required|exists:users,id',
-        //     'title' => 'required|string',
-        //     'description' => 'nullable|string',
-        //     'image' => 'nullable|string',
-        //     'shop_id' => 'nullable|exists:shops,id',
-        // ]);
-
         $notification = new Notification();
         $notification->type = $request->type;
         $notification->user_id = $request->user_id;
@@ -58,18 +64,31 @@ class NotificationController extends Controller
         }
 
         $notification->save();
-        // return response()->json($notification, 201);
 
+        // Update cache
+        $this->updateCache('notifications_' . $request->user_id, Notification::where('user_id', $request->user_id)->get());
+
+        // return response()->json($notification, 201);
     }
 
     public function show($id)
     {
-        $notification = Notification::where('user_id', auth()->user()->id)->findOrFail($id);
+        $userId = auth()->user()->id;
+        $cacheKey = 'notification_' . $userId . '_' . $id;
+
+        $notification = Cache::remember($cacheKey, 60 * 60, function () use ($userId, $id) {
+            return Notification::where('user_id', $userId)->findOrFail($id);
+        });
+
         if($notification->type === 'main'){
-            $notificationToMain = Notification_to_mainModel::findOrFail($notification->id_notification);
+            $notificationToMain = Cache::remember('notification_main_' . $notification->id_notification, 60 * 60, function () use ($notification) {
+                return Notification_to_mainModel::findOrFail($notification->id_notification);
+            });
             return response()->json($notificationToMain);
         }elseif($notification->type === 'shop'){
-            $notificationToShops = Notification_to_shop::findOrFail($notification->id_notification);
+            $notificationToShops = Cache::remember('notification_shop_' . $notification->id_notification, 60 * 60, function () use ($notification) {
+                return Notification_to_shop::findOrFail($notification->id_notification);
+            });
             return response()->json($notificationToShops);
         }
     }
@@ -82,15 +101,17 @@ class NotificationController extends Controller
     public function destroy($id)
     {
         $notification = Notification::findOrFail($id);
-
+        Notification::destroy($id);
         if ($notification->type === 'main') {
             Notification_to_mainModel::destroy($notification->id_notification);
+            Cache::forget('notification_main_' . $notification->id_notification);
         } elseif ($notification->type === 'shop') {
             Notification_to_shop::destroy($notification->id_notification);
+            Cache::forget('notification_shop_' . $notification->id_notification);
         }
-
-        $notification->delete();
-
+        // Update cache
+        $this->updateCache('notifications_' . $notification->user_id, Notification::where('user_id', $notification->user_id)->get());
+        Cache::forget('notification_' . $notification->user_id . '_' . $id);
         return response()->json(null, 204);
     }
 }
