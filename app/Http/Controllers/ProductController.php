@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Cache;
 use Cloudinary\Cloudinary;
-use App\Models\Image;
 use App\Models\ColorsModel;
 
 class ProductController extends Controller
@@ -252,7 +251,7 @@ class ProductController extends Controller
                     'message' => 'product không tồn tại',
                 ], 404);
             }
-            
+
             Image::where("product_id", $product->id)->delete();
             // $product->delete();
 
