@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\RanksModel;
 use App\Http\Requests\RankRequest;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class RanksController extends Controller
 {
@@ -12,30 +13,15 @@ class RanksController extends Controller
      */
     public function index()
     {
-        $ranks = RanksModel::all();
-        if($ranks->isEmpty()){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại rank nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $ranks,
-            ]
-        );
-    }
+        $ranks = Cache::remember('all_ranks', 60 * 60, function () {
+            return RanksModel::all();
+        });
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if ($ranks->isEmpty()) {
+            return $this->errorResponse("Không tồn tại rank nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $ranks);
     }
 
     /**
@@ -43,18 +29,13 @@ class RanksController extends Controller
      */
     public function store(RankRequest $request)
     {
-        $dataInsert = [
-            "title"=> $request->title,
-            "description"=> $request->description,
-            "status"=> $request->status,
-        ];
-        RanksModel::create($dataInsert);
-        $dataDone = [
-            'status' => true,
-            'message' => "Rank Đã được lưu",
-            'Ranks' => RanksModel::all(),
-        ];
-        return response()->json($dataDone, 200);
+        try {
+            $rank = RanksModel::create($request->validated());
+            Cache::forget('all_ranks');
+            return $this->successResponse("Thêm rank thành công", $rank);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Thêm rank không thành công", $th->getMessage());
+        }
     }
 
     /**
@@ -62,30 +43,15 @@ class RanksController extends Controller
      */
     public function show(string $id)
     {
-        $rank = RanksModel::find($id);
-        if(!$rank){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại rank nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $rank,
-            ]
-        );
-    }
+        $rank = Cache::remember('rank_' . $id, 60 * 60, function () use ($id) {
+            return RanksModel::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$rank) {
+            return $this->errorResponse("Rank không tồn tại", 404);
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $rank);
     }
 
     /**
@@ -93,47 +59,21 @@ class RanksController extends Controller
      */
     public function update(RankRequest $request, string $id)
     {
-        // Tìm rank theo ID
-        $rank = RanksModel::find($id);
+        $rank = Cache::remember('rank_' . $id, 60 * 60, function () use ($id) {
+            return RanksModel::find($id);
+        });
 
-        // Kiểm tra xem rqt có tồn tại không
         if (!$rank) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "rank không tồn tại",
-                ],
-                404
-            );
+            return $this->errorResponse("Rank không tồn tại", 404);
         }
 
-        // Cập nhật dữ liệu
-        $dataUpdate = [
-            "title"=> $request->title,
-            "description"=> $request->description ?? null,
-            "status"=> $request->status,
-            'created_at' => $request->created_at ?? $rank->created_at, // Đặt giá trị mặc định nếu không có trong yêu cầu
-        ];
-
         try {
-            // Cập nhật bản ghi
-            $rank->update($dataUpdate);
-
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật rank thành công",
-                    'data' => $rank,
-                ]
-            );
+            $rank->update($request->validated());
+            Cache::forget('rank_' . $id);
+            Cache::forget('all_ranks');
+            return $this->successResponse("Cập nhật rank thành công", $rank);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật rank không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Cập nhật rank không thành công", $th->getMessage());
         }
     }
 
@@ -142,31 +82,19 @@ class RanksController extends Controller
      */
     public function destroy(string $id)
     {
+        $rank = RanksModel::find($id);
+
+        if (!$rank) {
+            return $this->errorResponse("Rank không tồn tại", 404);
+        }
+
         try {
-            $rank = RanksModel::find($id);
-
-            if (!$rank) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'rank không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
             $rank->delete();
-
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa rank thành công',
-                ]);
+            Cache::forget('rank_' . $id);
+            Cache::forget('all_ranks');
+            return $this->successResponse("Xóa rank thành công");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa rank không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa rank không thành công", $th->getMessage());
         }
     }
 }

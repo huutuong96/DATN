@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\RolesModel;
 use App\Http\Requests\RoleRequest;
-
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class RolesController extends Controller
 {
@@ -13,28 +13,15 @@ class RolesController extends Controller
      */
     public function index()
     {
-        try {
-            $Roles = RolesModel::all();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Roles ,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 500);
-        }
-    }
+        $roles = Cache::remember('all_roles', 60 * 60, function () {
+            return RolesModel::all();
+        });
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if ($roles->isEmpty()) {
+            return $this->errorResponse("Không tồn tại vai trò nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $roles);
     }
 
     /**
@@ -42,20 +29,13 @@ class RolesController extends Controller
      */
     public function store(RoleRequest $request)
     {
-        $dataInsert = [
-            "title"=> $request->title,
-            "description"=> $request->description,
-            "status"=> $request->status,
-            "create_by"=> $request->create_by,
-            "created_at"=> now(),
-        ];
-        RolesModel::create($dataInsert);
-        $dataDone = [
-            'status' => true,
-            'message' => "Role Đã được lưu",
-            'roles' => RolesModel::all(),
-        ];
-        return response()->json($dataDone, 200);
+        try {
+            $role = RolesModel::create($request->validated());
+            Cache::forget('all_roles');
+            return $this->successResponse("Thêm vai trò thành công", $role);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Thêm vai trò không thành công", $th->getMessage());
+        }
     }
 
     /**
@@ -63,28 +43,15 @@ class RolesController extends Controller
      */
     public function show(string $id)
     {
-        try {
-            $Role = RolesModel::findOrFail($id);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lấy dữ liệu thành công',
-                'data' => $Role,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 400);
-        }
-    }
+        $role = Cache::remember('role_' . $id, 60 * 60, function () use ($id) {
+            return RolesModel::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$role) {
+            return $this->errorResponse("Vai trò không tồn tại", 404);
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $role);
     }
 
     /**
@@ -92,22 +59,22 @@ class RolesController extends Controller
      */
     public function update(RoleRequest $request, string $id)
     {
-        $Role = RolesModel::findOrFail($id);
+        $role = Cache::remember('role_' . $id, 60 * 60, function () use ($id) {
+            return RolesModel::find($id);
+        });
 
-        $Role->update([
-            "title"=> $request->title,
-            "description"=> $request->description,
-            "status"=> $request->status,
-            "create_by"=> $request->create_by,
-            "updated_at"=> now(),
-        ]);
-    
-        $dataDone = [
-            'status' => true,
-            'message' => "đã lưu Role",
-            'roles' => RolesModel::all(),
-        ];
-        return response()->json($dataDone, 200);
+        if (!$role) {
+            return $this->errorResponse("Vai trò không tồn tại", 404);
+        }
+
+        try {
+            $role->update($request->validated());
+            Cache::forget('role_' . $id);
+            Cache::forget('all_roles');
+            return $this->successResponse("Cập nhật vai trò thành công", $role);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Cập nhật vai trò không thành công", $th->getMessage());
+        }
     }
 
     /**
@@ -115,20 +82,19 @@ class RolesController extends Controller
      */
     public function destroy(string $id)
     {
+        $role = RolesModel::find($id);
+
+        if (!$role) {
+            return $this->errorResponse("Vai trò không tồn tại", 404);
+        }
+
         try {
-            $Role = RolesModel::findOrFail($id);
-            $Role->delete();
-            return response()->json([
-                'status' => "success",
-                'message' => 'Xóa thành công',
-                'data' => null,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 500);
+            $role->delete();
+            Cache::forget('role_' . $id);
+            Cache::forget('all_roles');
+            return $this->successResponse("Xóa vai trò thành công");
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Xóa vai trò không thành công", $th->getMessage());
         }
     }
 }

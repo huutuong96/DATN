@@ -5,173 +5,111 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class OrdersController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $orders = OrdersModel::all();
+        $orders = Cache::remember('all_orders', 60 * 60, function () {
+            return OrdersModel::all();
+        });
 
-        if($orders->isEmpty()){
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Không tồn tại Order nào",
-                ]
-            );
+        if ($orders->isEmpty()) {
+            return $this->errorResponse("Không tồn tại Order nào", 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Lấy dữ liệu thành công',
-            'data' => $orders
-        ], 200);
+        return $this->successResponse('Lấy dữ liệu thành công', $orders);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function indexOrderToShop($id)
     {
-        //
-    }
+        $orders = Cache::remember('orders_shop_' . $id, 60 * 60, function () use ($id) {
+            return OrdersModel::where('shop_id', $id)->get();
+        });
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(OrderRequest $request)
-    {
-        $dataInsert = [
-            'payment_id' => $request->payment_id,
-            'ship_id' => $request->ship_id,
-            'voucher_id' => $request->voucher_id,
-            'user_id' => $request->user_id,
-            'shop_id' => $request->shop_id,
-            'status' => $request->status,
-            'create_by' => $request->create_by
-        ];
-
-        try {
-            $orders = OrdersModel::create($dataInsert);
-            $dataDone = [
-                'status' => true,
-                'message' => "Thêm Order thành công",
-                'data' => $orders
-            ];
-            return response()->json($dataDone, 200);
-        } catch (\Throwable $th) {
-            $dataDone = [
-                'status' => false,
-                'message' => "Thêm Order không thành công",
-                'error' => $th->getMessage()
-            ];
-            return response()->json($dataDone);
+        if ($orders->isEmpty()) {
+            return $this->errorResponse("Không tồn tại Order nào", 404);
         }
+
+        return $this->successResponse('Lấy dữ liệu thành công', $orders);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $orders = OrdersModel::find($id);
+        $order = Cache::remember('order_' . $id, 60 * 60, function () use ($id) {
+            return OrdersModel::find($id);
+        });
 
-        if (!$orders) {
-            return response()->json([
-                'status' => false,
-                'message' => "Order không tồn tại"
-            ], 404);
+        if (!$order) {
+            return $this->errorResponse("Order không tồn tại", 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => "Lấy dữ liệu thành công",
-            'data' => $orders
-        ], 200);
+        return $this->successResponse("Lấy dữ liệu thành công", $order);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(OrderRequest $request, string $id)
     {
-        $orders = OrdersModel::find($id);
+        $order = Cache::remember('order_' . $id, 60 * 60, function () use ($id) {
+            return OrdersModel::find($id);
+        });
 
-        if (!$orders) {
-            return response()->json([
-                'status' => false,
-                'message' => "Order không tồn tại"
-            ], 404);
+        if (!$order) {
+            return $this->errorResponse("Order không tồn tại", 404);
         }
 
         $dataUpdate = [
-            'payment_id' => $request->payment_id ?? $orders->payment_id,
-            'ship_id' => $request->ship_id ?? $orders->ship_id,
-            'voucher_id' => $request->voucher_id ?? $orders->voucher_id,
-            'user_id' => $request->user_id ?? $orders->user_id,
-            'shop_id' => $request->shop_id ?? $orders->shop_id,
-            'status' => $request->status ?? $orders->status,
-            'update_by' => $request->update_by
+            'status' => $request->status ?? $order->status,
+            'update_by' => auth()->id()
         ];
 
         try {
-            $orders->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Order đã được cập nhật",
-                    'data' => $orders
-                ], 200);
+            $order->update($dataUpdate);
+            Cache::forget('order_' . $id);
+            Cache::forget('all_orders');
+            Cache::forget('orders_shop_' . $order->shop_id);
+            return $this->successResponse("Order đã được cập nhật", $order);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật Order không thành công",
-                    'error' => $th->getMessage()
-                ]);
+            return $this->errorResponse("Cập nhật Order không thành công", $th->getMessage());
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $orders = OrdersModel::find($id);
+        $order = Cache::remember('order_' . $id, 60 * 60, function () use ($id) {
+            return OrdersModel::find($id);
+        });
+
+        if (!$order) {
+            return $this->errorResponse("Order không tồn tại", 404);
+        }
 
         try {
-            if (!$orders) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "Order không tồn tại"
-                ], 404);
-            }
-    
-            $orders->delete();
-    
-            return response()->json([
-                'status' => true,
-                'message' => "Order đã được xóa"
-            ]);
+            $order->update(['status' => 101]);
+            Cache::forget('order_' . $id);
+            Cache::forget('all_orders');
+            Cache::forget('orders_shop_' . $order->shop_id);
+            return $this->successResponse("Order đã được xóa");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa Order không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa Order không thành công", $th->getMessage());
         }
+    }
+
+    private function successResponse($message, $data = null, $status = 200)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
+    }
+
+    private function errorResponse($message, $error = null, $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
     }
 }

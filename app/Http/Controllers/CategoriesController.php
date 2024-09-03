@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\CategoriesModel;
 use App\Http\Requests\CategoriesRequest;
+use Illuminate\Support\Facades\Cache;
 
 class CategoriesController extends Controller
 {
@@ -15,13 +16,15 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = CategoriesModel::all();
+        $categories = Cache::remember('all_categories_main', 60 * 60, function () {
+            return CategoriesModel::all();
+        });
 
         if ($categories->isEmpty()) {
             return response()->json(
                 [
-                    'status' => false,
-                    'message' => "Không tồn tại Categories nào"
+                'status' => false,
+                'message' => "Không tồn tại danh mục nào"
                 ]
             );
         }
@@ -32,46 +35,38 @@ class CategoriesController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CategoriesRequest $request)
     {
-        $image = $request->file('image');
-        $cloudinary = new Cloudinary();
-        $user = JWTAuth::parseToken()->authenticate();
-        try {
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        if($request->file('image')){
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $dataInsert['image'] = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+        }
 
+        try {
             $dataInsert = [
                 'title' => $request->title,
-                'slug' => Str::slug($request->title),
-                'index' => $request->index,
-                'image' => $uploadedImage['secure_url'],
-                'status' => $request->status,
-                'parent_id' => $request->parent_id,
-                'create_by' => $user->id
+                'slug' => $request->slug ?? Str::slug($request->title),
+                'index' => $request->index ?? 1,
+                'status' => $request->status ?? 1,
+                'parent_id' => $request->parent_id ?? null,
+                'create_by' => auth()->user()->id,
+                'image' => $dataInsert['image'] ?? null,
             ];
 
             $categories = CategoriesModel::create($dataInsert);
 
+            Cache::forget('all_categories_main');
+
             return response()->json([
                 'status' => true,
-                'message' => "Thêm Categories thành công",
+                'message' => "Thêm danh mục thành công",
                 'data' => $categories,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Thêm Categories không thành công",
+                'message' => "Thêm danh mục không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -83,62 +78,47 @@ class CategoriesController extends Controller
     public function show(string $id)
     {
         try {
-            $categories = CategoriesModel::find($id);
+            $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
+                return CategoriesModel::find($id);
+            });
 
             if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Categories không tồn tại",
+                    'message' => "Danh mục không tồn tại",
                 ], 404);
             }
 
             return response()->json([
                 'status' => true,
-                'message' => "Lấy thông tin Categories thành công",
+                'message' => "Lấy thông tin danh mục thành công",
                 'data' => $categories,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Lỗi khi lấy thông tin Categories",
+                'message' => "Lỗi khi lấy thông tin danh mục",
                 'error' => $th->getMessage(),
             ], 500);
         }
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(CategoriesRequest $request, string $id)
     {
         try {
-            $categories = CategoriesModel::find($id);
+            $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
+                return CategoriesModel::find($id);
+            });
 
             if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Categories không tồn tại",
+                    'message' => "Danh mục không tồn tại",
                 ], 404);
             }
-
-            $image = $request->file('image');
-
-            // Check xem co anh moi duoc tai len khong
-            if ($image) {
+            if ($request->file('image')) {
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $imageUrl = $uploadedImage['secure_url'];
-            } else {
-                // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
-                $imageUrl = $categories->image;
             }
 
             $dataUpdate = [
@@ -148,21 +128,24 @@ class CategoriesController extends Controller
                 'image' => $imageUrl ?? $categories->image,
                 'status' => $request->status ?? $categories->status,
                 'parent_id' => $request->parent_id ?? $categories->parent_id,
-                'update_by' => $request->update_by ?? $categories->update_by,
+                'update_by' => auth()->user()->id,
                 'updated_at' => now(),
             ];
 
             $categories->update($dataUpdate);
 
+            Cache::forget('category_'.$id);
+            Cache::forget('all_categories_main');
+
             return response()->json([
                 'status' => true,
-                'message' => "Cập nhật Categories thành công",
+                'message' => "Cập nhật danh mục thành công",
                 'data' => $categories,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Cập nhật Categories không thành công",
+                'message' => "Cập nhật danh mục không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -174,25 +157,30 @@ class CategoriesController extends Controller
     public function destroy(string $id)
     {
         try {
-            $categories = CategoriesModel::find($id);
+            $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
+                return CategoriesModel::find($id);
+            });
 
             if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Categories không tồn tại",
+                    'message' => "Danh mục không tồn tại",
                 ], 404);
             }
 
             $categories->delete();
 
+            Cache::forget('category_'.$id);
+            Cache::forget('all_categories_main');
+
             return response()->json([
                 'status' => true,
-                'message' => "Xóa Categories thành công",
+                'message' => "Xóa danh mục thành công",
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Xóa Categories không thành công",
+                'message' => "Xóa danh mục không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }

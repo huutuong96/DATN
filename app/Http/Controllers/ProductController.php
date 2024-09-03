@@ -8,7 +8,10 @@ use App\Models\Image;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Cache;
 use Cloudinary\Cloudinary;
+use App\Models\Image;
+use App\Models\ColorsModel;
 
 class ProductController extends Controller
 {
@@ -22,11 +25,18 @@ class ProductController extends Controller
             $images = Image::find($product->id);
             $product["images"] = $images;
         }
+        // $products = Cache::remember('all_products', 60 * 60, function () {
+        //     return Product::all();
+        // });
+        // $images = Cache::remember('all_images', 60 * 60, function () {
+        //     return Images::all();
+        // });
+
         if($products->isEmpty()){
             return response()->json(
                 [
                     'status' => true,
-                    'message' => "Không tồn tại products nào",
+                    'message' => "Không tồn tại sản phẩm nào",
                 ]
             );
         }
@@ -35,6 +45,7 @@ class ProductController extends Controller
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
                 'data' => $products,
+                'images' => $images,
             ]
         );
     }
@@ -50,7 +61,7 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProductRequest $request)
+    public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
@@ -63,6 +74,7 @@ class ProductController extends Controller
             $imageUrl = null;
         }
 
+
         $dataInsert = [
             'name' => $request->name,
             'slug' => $request->slug ?? Str::slug($request->name),
@@ -70,14 +82,14 @@ class ProductController extends Controller
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'image' => $imageUrl,
+            'image' => null,
             'quantity' => $request->quantity,
             'parent_id' => $request->parent_id,
             'create_by' => $user->id,
             'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-            'color_id' => $request->color_id,
+            'shop_id' => $request->shop_id,
         ];
 
         try {
@@ -106,12 +118,6 @@ class ProductController extends Controller
 
             return response()->json($dataDone, 200);
 
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => "Thêm product không thành công",
-                'error' => $th->getMessage(),
-            ], 500);
         }
     }
 
@@ -121,7 +127,12 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Product::find($id);
+        $product = Cache::remember('product_' . $id, 60 * 60, function () use ($id) {
+            return Product::find($id);
+        });
+        $images = Cache::remember('images_' . $product->id, 60 * 60, function () use ($product) {
+            return Image::where('product_id', $product->id)->get();
+        });
 
         $images = Image::find($product->id);
         $product["images"] = $images;
@@ -129,7 +140,7 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json([
                 'status' => false,
-                'message' => "Không tồn tại product nào",
+                'message' => "Không tồn tại sản phẩm nào",
             ]);
         }
 
@@ -137,6 +148,7 @@ class ProductController extends Controller
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
             'data' => $product,
+            'images' => $images,
         ]);
     }
 
@@ -161,6 +173,7 @@ class ProductController extends Controller
                 'message' => "Sản phẩm không tồn tại",
             ], 404);
         }
+
 
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
@@ -239,17 +252,22 @@ class ProductController extends Controller
                     'message' => 'product không tồn tại',
                 ], 404);
             }
+            
             Image::where("product_id", $product->id)->delete();
             // $product->delete();
 
+            // $product->update(['status' => 101]);
+            // Cache::forget('all_products');
+            // Cache::forget('product_' . $id);
+
             return response()->json([
                 'status' => true,
-                'message' => 'Xóa product thành công',
+                'message' => 'Xóa sản phẩm thành công',
             ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Xóa product không thành công",
+                'message' => "Xóa sản phẩm không thành công",
                 'error' => $th->getMessage(),
             ]);
         }

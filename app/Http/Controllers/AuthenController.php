@@ -16,25 +16,35 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmMail;
 use App\Mail\ConfirmMailChangePassword;
+use App\Models\Cart_to_usersModel;
+use Illuminate\Support\Facades\Cache;
+
 class AuthenController extends Controller
 {
+    private function updateCache($key, $data)
+    {
+        Cache::put($key, $data, 60 * 60 * 24);
+    }
+
     public function index()
     {
         try {
-            // Xác thực người dùng bằng token JWT
-            // $user = JWTAuth::parseToken()->authenticate();
+            $cacheKey = 'list_users_vnshop';
+            $list_users = Cache::remember($cacheKey, 60 * 60 * 24, function () {
+                return UsersModel::all();
+            });
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => UsersModel::all(),
+                'data' => $list_users,
             ], 200);
         } catch (JWTException $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token không hợp lệ hoặc không tồn tại',
                 'error' => $e->getMessage(),
-            ], 401); // Sử dụng 401 cho lỗi xác thực
+            ], 401);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -71,6 +81,9 @@ class AuthenController extends Controller
             'refesh_token' => $token,
         ]);
 
+        // Update cache
+        $this->updateCache('list_users_vnshop', UsersModel::all());
+
         // Send confirm mail
         $notificationData = [
             'type' => 'main',
@@ -100,6 +113,17 @@ class AuthenController extends Controller
             $user->update([
                 'status' => 1,
             ]);
+            $notificationController = new NotificationController();
+            $notification = $notificationController->destroy($user->id);
+
+            // Update cache
+            $this->updateCache('list_users_vnshop', UsersModel::all());
+
+            $cart_to_users = Cart_to_usersModel::create([
+                'user_id' => $user->id,
+                'status' => 1,
+            ]);
+
             $activeDone = [
                 'status' => true,
                 'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
@@ -114,36 +138,44 @@ class AuthenController extends Controller
         }
     }
 
-
     public function login(Request $request)
     {
         $user = UsersModel::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
-        }
-        if (!Hash::check($request->password, $user->password)) {
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
         }
-        if (Hash::check($request->password, $user->password)) {
-            $token = JWTAuth::fromUser($user);
-            // $user->update([
-            //     'refesh_token' => $token,
-            // ]);
-            $dataDone = [
-                'status' => true,
-                'message' => "Đăng nhập thành công",
-                'token' => $token,
-            ];
-            return response()->json($dataDone, 200);
-        }
+
+        $cacheKey = 'user_present';
+        $this->updateCache($cacheKey, $user);
+        $user_present = Cache::get($cacheKey);
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'token' => $token,
+            'user_present' => $user_present,
+        ], 200);
     }
 
     public function show(string $id)
     {
         try {
-            // Xác thực người dùng bằng token JWT
-            $user = UsersModel::where('id', $id)->first();
-            // dd($user);
+            $cacheKey = 'list_users_vnshop';
+            $list_users = Cache::remember($cacheKey, 60 * 60 * 24, function () {
+                return UsersModel::all();
+            });
+
+            $user = $list_users->find($id);
+            if (!$user) {
+                $user = UsersModel::find($id);
+                if ($user) {
+                    $list_users->push($user);
+                    $this->updateCache($cacheKey, $list_users);
+                }
+            }
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
@@ -154,7 +186,7 @@ class AuthenController extends Controller
                 'status' => 'error',
                 'message' => 'Token không hợp lệ hoặc không tồn tại',
                 'error' => $e->getMessage(),
-            ], 401); // Sử dụng 401 cho lỗi xác thực
+            ], 401);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -164,23 +196,25 @@ class AuthenController extends Controller
         }
     }
 
-    public function me(Request $request)
+    public function me()
     {
         try {
-            // Xác thực người dùng bằng token JWT
-            $user = JWTAuth::parseToken()->authenticate();
-            // dd($user);
+            $cacheKey = 'user_present';
+            $user_present = Cache::remember($cacheKey, 60 * 60 * 24, function () {
+                return JWTAuth::parseToken()->authenticate();
+            });
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $user,
+                'data' => $user_present,
             ], 200);
         } catch (JWTException $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token không hợp lệ hoặc không tồn tại',
                 'error' => $e->getMessage(),
-            ], 401); // Sử dụng 401 cho lỗi xác thực
+            ], 401);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -189,7 +223,8 @@ class AuthenController extends Controller
             ], 500);
         }
     }
-    public function update(UserRequest $request, string $id)
+
+    public function update(Request $request, string $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
         $dataUpdate = [
@@ -205,6 +240,9 @@ class AuthenController extends Controller
             "login_at"=> now(),
         ];
         $user = UsersModel::where('id', $id)->update($dataUpdate);
+
+        // Update cache
+        $this->updateCache('list_users_vnshop', UsersModel::all());
 
         $dataDone = [
             'status' => true,
@@ -230,6 +268,10 @@ class AuthenController extends Controller
         ];
         $user = UsersModel::where('id', $user->id)->update($dataUpdate);
 
+        // Update cache
+        $this->updateCache('list_users_vnshop', UsersModel::all());
+        $this->updateCache('user_present', UsersModel::find($user->id));
+
         $dataDone = [
             'status' => true,
             'message' => "Tài khoản đã được cập nhật",
@@ -251,6 +293,11 @@ class AuthenController extends Controller
             "updated_at"=> now(),
         ];
         $user = UsersModel::where('id', $user->id)->update($dataUpdate);
+
+        // Update cache
+        $this->updateCache('list_users_vnshop', UsersModel::all());
+        $this->updateCache('user_present', UsersModel::find($user->id));
+
         $dataDone = [
             'status' => true,
             'message' => "Mật khẩu đã được thay đổi thành công",
@@ -268,6 +315,10 @@ class AuthenController extends Controller
         $user->update([
             'refesh_token' => $token,
         ]);
+
+        // Update cache
+        $this->updateCache('list_users_vnshop', UsersModel::all());
+
         Mail::to($user->email)->send(new ConfirmMailChangePassword($user, $token));
         $dataDone = [
             'status' => true,
@@ -293,6 +344,10 @@ class AuthenController extends Controller
             $user->update([
                 'password' => Hash::make($request->password),
             ]);
+
+            // Update cache
+            $this->updateCache('list_users_vnshop', UsersModel::all());
+
             $dataDone = [
                 'status' => true,
                 'message' => "Mật khẩu đã được thay đổi thành công",
@@ -301,12 +356,33 @@ class AuthenController extends Controller
         }
     }
 
+    public function logout()
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        Cache::forget('user_present');
+        $user->update([
+            'refesh_token' => null,
+        ]);
+
+        // Update cache
+        $this->updateCache('list_users_vnshop', UsersModel::all());
+
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return response()->json([
+            'status' => true,
+            'message' => "Đăng xuất thành công",
+        ], 200);
+    }
+
     public function destroy(string $id)
     {
         $dataUpdate = [
             "status"=> 102,
         ];
         $user = UsersModel::where('id', $id)->update($dataUpdate);
+
+        // Update cache
+        $this->updateCache('list_users_vnshop', UsersModel::all());
 
         $dataDone = [
             'status' => true,

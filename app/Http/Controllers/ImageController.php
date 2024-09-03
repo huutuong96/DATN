@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Image;
-
+use Cloudinary\Cloudinary;
 class ImageController extends Controller
 {
     /**
@@ -43,22 +43,22 @@ class ImageController extends Controller
      */
     public function store(Request $request)
     {
-        // if ($rqt->hasFile('image')) {
-        //     $image = $rqt->file('image');
+
+
+        // if ($request->hasFile('image')) {
         //     $cloudinary = new Cloudinary();
-        //     $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        //     $uploadedImage = $cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
         //     $imageUrl = $uploadedImage['secure_url'];
-        // } else {
-        //     $imageUrl = null;
         // }
 
         // try {
 
-        //     $dataInsert = [
-        //         'product_id' => $rqrequestt->title,
-        //         'url' =>$imageUrl,
-        //         'status' =>  $request->content,
-        //     ];
+
+            // $dataInsert = [
+            //     'product_id' => $request->product_id,
+            //     'url' => $imageUrl,
+            //     'status' =>  $request->status,
+            // ];
 
         //     $image = Image::create($dataInsert);
 
