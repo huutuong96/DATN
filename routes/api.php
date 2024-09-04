@@ -69,9 +69,9 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('learns', LearnController::class);
             Route::get('messages',[MessageController::class, "index"]);
             Route::get('messages/test',[MessageController::class, "saveTest"]);
-            Route::post('messages/{shop_id}/{user_id}',[MessageController::class, "store"]);
+            Route::post('messages/{shop_id}/{user_id}/{senby}',[MessageController::class, "store"]);
             Route::get('messages/showByStore/{shop_id}',[MessageController::class, "showByStore"]);
-            Route::get('messages/showByUser/{user_id}',[MessageController::class, "saveTest"]);
+            Route::get('messages/showByUser/{user_id}',[MessageController::class, "showByUser"]);
             Route::resource('voucher_main', VoucherToMainController::class);
             Route::resource('notification_to_main', Notification_to_mainController::class);
             Route::resource('notifications', NotificationController::class);

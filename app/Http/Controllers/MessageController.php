@@ -25,6 +25,40 @@ class MessageController extends Controller
         }
         return "tạo dữ liệu thành công";
     }
+    public function updateCache($shop_id, $user_id)
+{
+    // Kiểm tra và xóa cache shop nếu tồn tại
+    if (Cache::has("shop:$shop_id")) {
+        Cache::forget("shop:$shop_id");
+    }
+
+    // Cập nhật lại cache cho shop
+    $message = Message::where('shop_id', $shop_id)->first();
+    $message["messageDetail"] = message_detail::where('mes_id', $message->id)
+        ->orderBy("created_at", "desc")
+        ->get();
+    Cache::put("shop:$shop_id", $message, 10);
+
+    // Kiểm tra và xóa cache user nếu tồn tại
+    if (Cache::has("user:$user_id")) {
+        Cache::forget("user:$user_id");
+    }
+
+    // Cập nhật lại cache cho user
+    $message = Message::where('user_id', $user_id)->first();
+    $message["messageDetail"] = message_detail::where('mes_id', $message->id)
+        ->orderBy("created_at", "desc")
+        ->get();
+    Cache::put("user:$user_id", $message, 10);
+
+    // Kiểm tra giá trị cache sau khi cập nhật
+    // dd(Cache::get("shop:$shop_id"));
+    // dd(Cache::get("user:$user_id"));
+
+    
+}
+
+
 
     public function index()
     {
@@ -72,7 +106,7 @@ class MessageController extends Controller
     }
 
 
-    public function store(Request $request, $shop_id, $user_id)
+    public function store(Request $request, $shop_id, $user_id, $senby)
     {
         try {
 
@@ -94,11 +128,11 @@ class MessageController extends Controller
                 "mes_id"=> $message->id,
                 'content'=> $request->content,
                 'status'=> 1,
-                // 'send_by'=> $user_id,
+                'send_by'=> $senby,
                 'created_at' => now(),
             ];
             message_detail::create($data);
-
+            $this->updateCache($shop_id, $user_id);
 
             $dataDone = [
                 'status' => true,

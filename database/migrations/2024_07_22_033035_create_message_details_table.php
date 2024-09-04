@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('mes_id');
             $table->text('content')->nullable();
             $table->integer('status')->default(1);
+            $table->string('send_by');
             $table->timestamps();
 
             $table->foreign('mes_id')->references('id')->on('messages')->onDelete('restrict')->onUpdate('restrict');
