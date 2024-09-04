@@ -116,6 +116,7 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
             Route::get('shop_get_message/{shop_id}', [MessageController::class, "shop_get_message"]);
+            Route::get('user_get_message/{user_id}', [MessageController::class, "user_get_message"]);
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
            
 

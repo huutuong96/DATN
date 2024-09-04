@@ -19,17 +19,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
-        foreach ($products as $key => $product) {
-            $images = Image::find($product->id);
-            $product["images"] = $images;
-        }
-        // $products = Cache::remember('all_products', 60 * 60, function () {
-        //     return Product::all();
-        // });
-        // $images = Cache::remember('all_images', 60 * 60, function () {
-        //     return Images::all();
-        // });
+        $products = Cache::remember('all_products', 60 * 60, function () {
+            return Product::all();
+        });
+        $images = Cache::remember('all_images', 60 * 60, function () {
+            return Image::all();
+        });
 
         if($products->isEmpty()){
             return response()->json(

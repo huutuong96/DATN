@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\support_main;
 use Illuminate\Support\Facades\Cache;
 
-class SupportMainController extends Controller
+class Support_mainController extends Controller
 {
     /**
      * Display a listing of the resource.
