@@ -8,7 +8,7 @@ use App\Http\Requests\CommentsRequest;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Product;
-
+use Illuminate\Support\Facades\Cache;
 class CommentsController extends Controller
 {
     /**
@@ -42,7 +42,9 @@ class CommentsController extends Controller
      */
     public function store(CommentsRequest $request)
     {
+
         $user = JWTAuth::parseToken()->authenticate();
+
         $dataInsert = [
             "title" => $request->title,
             "content" => $request->content,
@@ -53,12 +55,19 @@ class CommentsController extends Controller
             "user_id" => $user->id,
             "created_at" => now()
         ];
+
         $notificationController = new NotificationController();
-        CommentsModel::create($dataInsert);
+        $comment = CommentsModel::create($dataInsert);
+
+        if (is_null($request->parent_id)) {
+            Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
+        }
 
         if ($request->parent_id) {
 
-            $parent_comment = CommentsModel::find($request->parent_id);
+            $parent_comment = Cache::remember('parent_comment_'.$request->parent_id, 60 * 60, function () use ($request) {
+                return CommentsModel::find($request->parent_id);
+            });
 
             if ($parent_comment) {
                 $parent_user_id = $parent_comment->user_id;
@@ -71,7 +80,10 @@ class CommentsController extends Controller
                 $notificationController->store($notificationRequest);
             }
         }
-        $product = Product::find($request->product_id);
+
+        $product = Cache::remember('product_'.$request->product_id, 60 * 60, function () use ($request) {
+            return Product::find($request->product_id);
+        });
 
             
             $notificationRequest = new Request([
@@ -125,33 +137,70 @@ class CommentsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CommentsRequest $request, string $id)
-    {
-        $Comments = CommentsModel::findOrFail($id);
-        if (!$Comments) {
-            return response()->json([
-                'status' => false,
-                'message' => "Ship không tồn tại"
-            ], 404);
-        }
-        $Comments->update([
-            "title" => $request->title,
-            "content" => $request->content,
-            "rate" => $request->rate,
-            "status" => $request->status,
-            // "parent_id"=> $request->parent_id,
-            // "product_id"=> $request->product_id,
-            // "user_id"=> $request->user_id,
-            "updated_at" => now(),
-        ]);
+    public function update(CommentsRequest $request, $id)
+{
+    $user = JWTAuth::parseToken()->authenticate();
+    $comment = CommentsModel::find($id);
 
-        $dataDone = [
-            'status' => true,
-            'message' => "đã lưu Comments",
-            'Comments' => $Comments,
-        ];
-        return response()->json($dataDone, 200);
+    if (!$comment) {
+        return response()->json(['status' => false, 'message' => 'Comment not found'], 404);
     }
+
+    $dataUpdate = [
+        "title" => $request->title,
+        "content" => $request->content,
+        "rate" => $request->rate,
+        "status" => $request->status,
+        "parent_id" => $request->parent_id,
+        "product_id" => $request->product_id,
+        "user_id" => $user->id,
+        "updated_at" => now()
+    ];
+
+    $comment->update($dataUpdate);
+
+    if (is_null($request->parent_id)) {
+        Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
+    } else {
+        $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 60 * 60, function () use ($request) {
+            return CommentsModel::find($request->parent_id);
+        });
+
+        if ($parent_comment) {
+            $parent_user_id = $parent_comment->user_id;
+            $notificationRequest = new Request([
+                'type' => 'main',
+                'user_id' => $parent_user_id,
+                'title' => 'Có cập nhật mới từ comment của bạn',
+                'description' => $user->fullname.' đã phản hồi comment của bạn.',
+            ]);
+            $notificationController = new NotificationController();
+            $notificationController->store($notificationRequest);
+        }
+    }
+
+    $product = Cache::remember('product_' . $request->product_id, 60 * 60, function () use ($request) {
+        return Product::find($request->product_id);
+    });
+
+    $notificationRequest = new Request([
+        'type' => 'shop',
+        'user_id' => $user->id,
+        'title' => 'Thông báo cập nhật từ Sản Phẩm',
+        'description' => $user->fullname.' đã cập nhật một bình luận đến sản phẩm của bạn.',
+        'shop_id' => $product->shop_id
+    ]);
+    $notificationController = new NotificationController();
+    $notificationController->store($notificationRequest);
+
+    $dataDone = [
+        'status' => true,
+        'message' => "Đã cập nhật comment",
+        'data' => $dataUpdate,
+    ];
+
+    return response()->json($dataDone, 200);
+}
 
     /**
      * Remove the specified resource from storage.

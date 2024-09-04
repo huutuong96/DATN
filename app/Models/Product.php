@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
-    // protected $table = 'products'; // Thay đổi tên bảng nếu cần
+    protected $table = 'products'; // Thay đổi tên bảng nếu cần
 
     // Các trường có thể được gán hàng loạt
     protected $fillable = [
