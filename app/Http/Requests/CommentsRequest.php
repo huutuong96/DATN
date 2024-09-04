@@ -51,7 +51,6 @@ class CommentsRequest extends FormRequest
             'product_id.exists' => 'Sản phẩm không tồn tại.',
             'user_id.required' => 'Trường người dùng là bắt buộc.',
             'user_id.exists' => 'Người dùng không tồn tại.',
-
         ];
     }
     protected function failedValidation(Validator $validator)
