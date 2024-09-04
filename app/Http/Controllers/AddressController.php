@@ -45,13 +45,13 @@ class AddressController extends Controller
             "type"=> $request->type,
             "default"=> $request->default,
             "status"=> $request->status,
-            "user_id" => $request->user_id
+            "user_id" => auth()->user()->id
         ];
         AddressModel::create($Address);
         $dataDone = [
             'status' => true,
-            'message' => "address Đã được lưu",
-            'address' => AddressModel::all(),
+            'message' => "Địa chỉ đã được lưu",
+            'address' => AddressModel::where('user_id', auth()->user()->id)->get(),
         ];
         return response()->json($dataDone, 200);
     }
@@ -98,13 +98,13 @@ class AddressController extends Controller
             "status"=> $request->status,
             "default"=> $request->default,
             "updated_at"=> now(),
-            "user_id" => $request->user_id
+            "user_id" => auth()->user()->id
         ]);
     
         $dataDone = [
             'status' => true,
-            'message' => "đã lưu Address",
-            'roles' => AddressModel::all(),
+            'message' => "đã lưu địa chỉ",
+            'roles' => AddressModel::where('user_id', auth()->user()->id)->get(),
         ];
         return response()->json($dataDone, 200);
     }
