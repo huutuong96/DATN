@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Message;
 use App\Models\message_detail;
-use App\Models\Shop;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Cache;
@@ -14,24 +12,60 @@ class MessageController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function saveTest()
-    {
-        $response = $this->index();
-        $content = $response->getContent();
-        $messages = json_decode($content, true);
 
-        if ($messages['status'] === true) {
-            foreach ($messages['data'] as $key => $message) {
-                dd($message);
-            }
+
+    public function saveTest(){
+        $messages = Message::all()->groupBy('user_id');
+        foreach ($messages as $key => $message) {
+            $message[0]["messageDetail"] = message_detail::where('mes_id', $message[0]->id)->orderBy("created_at", "desc")->get();
+            Cache::put("user:".$message[0]->user_id, $message, 2);
         }
+        $messages = Message::all()->groupBy('shop_id');
+        foreach ($messages as $key => $message) {
+            $message[0]["messageDetail"] = message_detail::where('mes_id', $message[0]->id)->orderBy("created_at", "desc")->get();
+            Cache::put("shop:".$message[0]->shop_id, $message, 2);
+        }
+        return "tạo dữ liệu thành công";
     }
+    public function updateCache($shop_id, $user_id)
+{
+    // Kiểm tra và xóa cache shop nếu tồn tại
+    if (Cache::has("shop:$shop_id")) {
+        Cache::forget("shop:$shop_id");
+    }
+
+    // Cập nhật lại cache cho shop
+    $message = Message::where('shop_id', $shop_id)->first();
+    $message["messageDetail"] = message_detail::where('mes_id', $message->id)
+        ->orderBy("created_at", "desc")
+        ->get();
+    Cache::put("shop:$shop_id", $message, 10);
+
+    // Kiểm tra và xóa cache user nếu tồn tại
+    if (Cache::has("user:$user_id")) {
+        Cache::forget("user:$user_id");
+    }
+    
+    // Cập nhật lại cache cho user
+    $message = Message::where('user_id', $user_id)->first();
+    $message["messageDetail"] = message_detail::where('mes_id', $message->id)
+        ->orderBy("created_at", "desc")
+        ->get();
+    Cache::put("user:$user_id", $message, 10);
+
+    // Kiểm tra giá trị cache sau khi cập nhật
+    // dd(Cache::get("shop:$shop_id"));
+    // dd(Cache::get("user:$user_id"));
+}
+
+
 
     public function index()
     {
         $messages = Message::all();
-
-        if ($messages->isEmpty()) {
+        
+        // dd($messages);
+        if($messages->isEmpty()){
             return response()->json(
                 [
                     'status' => false,
@@ -51,10 +85,11 @@ class MessageController extends Controller
             ]
         );
     }
-    public function index_message_detail($id) // có dùng nhưng không liên quan đên route
+    public function index_message_detail($id) 
     {
         $message = message_detail::where('mes_id', $id)->orderBy("created_at", "desc")->get();
-        if ($message->isEmpty()) {
+
+        if($message->isEmpty()){
             return response()->json(
                 [
                     'status' => false,
@@ -62,6 +97,7 @@ class MessageController extends Controller
                 ]
             );
         }
+
         return response()->json(
             [
                 'status' => true,
@@ -70,42 +106,41 @@ class MessageController extends Controller
             ]
         );
     }
-
-
     public function store(Request $request, $shop_id, $user_id)
-    {
+    {   
+        $user = JWTAuth::parseToken()->authenticate();
         try {
 
             $message = Message::where("shop_id", $shop_id)
-                ->where("user_id", $user_id)
-                ->first();
+                    ->where("user_id", $user_id)
+                    ->first();
 
-            if (!$message) {
+            if(!$message){
                 $dataInsert = [
-                    "status" => 1,
-                    'created_at' => now(),
-                    'user_id' => $user_id,
+                    "status"=> 1,
+                    'created_at'=> now(),
+                    'user_id'=> $user->id,
                     'shop_id' => $request->shop_id,
                 ];
                 $message = Message::create($dataInsert);
             }
-
+            
             $data = [
-                "mes_id" => $message->id,
-                'content' => $request->content,
-                'status' => 1,
-                // 'send_by'=> $user_id,
+                "mes_id"=> $message->id,
+                'content'=> $request->content,
+                'status'=> 1,
+                'send_by'=> $user->id,
                 'created_at' => now(),
             ];
             message_detail::create($data);
-
-
+            $this->updateCache($shop_id, $user_id);
             $dataDone = [
                 'status' => true,
                 'message' => "message Đã được lưu",
                 'messages' => $data,
             ];
             return response()->json($dataDone, 200);
+
         } catch (\Throwable $th) {
             $dataDone = [
                 'status' => false,
@@ -115,26 +150,48 @@ class MessageController extends Controller
             return response()->json($dataDone);
         }
     }
-
-
     /**
      * Display the specified resource.
      */
-    public function showByStore()
-    {
+    public function showByStore($shop_id)
+    {   
         $user = JWTAuth::parseToken()->authenticate();
-        $store = Shop::where("owner_id", $user->id)->first();
-        if (!$store) {
+        $value = Cache::remember("shop:$shop_id", 10, function () use ($shop_id)  {
+            // dd($shop_id);
+            $messages = Message::where('shop_id', $shop_id)->get();
+            if($messages->isEmpty()){
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => "Không tồn tại message nào",
+                    ]
+                );
+            }
+            foreach ($messages as $key => $message) {
+                $message["messageDetail"] = $this->index_message_detail($message->id);
+            }
             return response()->json(
                 [
-                    'status' => false,
-                    'message' => "bạn chưa có đăng ký cửa hàng",
+                    'status' => true,
+                    'message' => "Lấy dữ liệu thành công",
+                    'data' => $messages,
                 ]
             );
-        }
-        $value = Cache::remember("$user->id-$store->id", 10, function () {
-            $messages = Message::where('shop_id', $store_id)->get();
-            if ($messages->isEmpty()) {
+        });
+        return response()->json(
+            [
+                'status' => true,
+                'message' => "Lấy dữ liệu thành công",
+                'data' => $value,
+            ]
+        );
+        
+    }
+    public function showByUser($user_id)
+    {
+        $value = Cache::remember("user:$user_id", 10, function () use ($user_id){
+            $messages = Message::where('user_id', $user_id)->get();
+            if($messages->isEmpty()){
                 return response()->json(
                     [
                         'status' => false,
@@ -161,48 +218,18 @@ class MessageController extends Controller
             ]
         );
     }
-    public function showByUser()
-    {
-        $user = JWTAuth::parseToken()->authenticate();
-
-        $value = Cache::remember("$user->id-$store->id", 10, function () {
-            $messages = Message::where('user_id', $user->id)->get();
-            if ($messages->isEmpty()) {
-                return response()->json(
-                    [
-                        'status' => false,
-                        'message' => "Không tồn tại message nào",
-                    ]
-                );
-            }
-            foreach ($messages as $key => $message) {
-                $message["messageDetail"] = $this->index_message_detail($message->id);
-            }
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Lấy dữ liệu thành công",
-                    'data' => $messages,
-                ]
-            );
-        });
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $value,
-            ]
-        );
-    }
-
     public function edit(string $id)
     {
         //
     }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id) {}
+    public function update(Request $request, string $id)
+    {
+
+    }
 
     /**
      * Remove the specified resource from storage.
