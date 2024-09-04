@@ -105,20 +105,22 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
             Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]);
             Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+            Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
+            Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]);
             //SHOP
-
             Route::resource('carts', CartController::class);
-
-
-
-
             Route::resource('users', AuthenController::class);
             Route::get('user/me', [AuthenController::class, "me"]);
             Route::post('user/change_password', [AuthenController::class, "change_password"]);
             Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
 
-});
+            Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
+            Route::get('shop_get_message/{shop_id}', [MessageController::class, "shop_get_message"]);
+            Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
+           
 
+});
+Route::get('login', [MessageController::class, "login"]);
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
