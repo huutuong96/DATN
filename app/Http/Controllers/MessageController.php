@@ -5,240 +5,58 @@ use App\Models\Message;
 use App\Models\message_detail;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Cache;
-
+use App\Models\Shop;
+use App\Models\Shop_manager;
 class MessageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function saveTest(){
-        $messages = Message::all()->groupBy('user_id');
-        foreach ($messages as $key => $message) {
-            $message[0]["messageDetail"] = message_detail::where('mes_id', $message[0]->id)->orderBy("created_at", "desc")->get();
-            Cache::put("user:".$message[0]->user_id, $message, 2);
+
+
+    public function user_send(Request $request, $shop_id){
+        $message = Message::where('user_id', auth()->user()->id)->where('shop_id', $shop_id)->first();
+        // Nếu chưa nhắn tin với shop lần nào thì tạo cuộc trò chuyện ở đây là bảng message
+        if (!$message) {
+            $message = Message::create([
+                'user_id' => auth()->user()->id, // User id ở đây là khách hàng gửi cho shop
+                'shop_id' => $shop_id, // Shop id ở đây là shop nhận được tin nhắn có thể truyền theo url
+                'status' => 1,
+            ]);
         }
-        $messages = Message::all()->groupBy('shop_id');
-        foreach ($messages as $key => $message) {
-            $message[0]["messageDetail"] = message_detail::where('mes_id', $message[0]->id)->orderBy("created_at", "desc")->get();
-            Cache::put("shop:".$message[0]->shop_id, $message, 2);
-        }
-        return "tạo dữ liệu thành công";
-    }
-    public function updateCache($shop_id, $user_id)
-{
-    // Kiểm tra và xóa cache shop nếu tồn tại
-    if (Cache::has("shop:$shop_id")) {
-        Cache::forget("shop:$shop_id");
+        $message_detail = message_detail::create([
+            'mes_id' => $message->id,
+            'content' => $request->content,
+            'send_by' => auth()->user()->id, // Đây là id của khách hàng gửi tin nhắn
+        ]);
+      
+        return $this->successResponse("Gửi tin nhắn thành công", $message);
     }
 
-    // Cập nhật lại cache cho shop
-    $message = Message::where('shop_id', $shop_id)->first();
-    $message["messageDetail"] = message_detail::where('mes_id', $message->id)
-        ->orderBy("created_at", "desc")
-        ->get();
-    Cache::put("shop:$shop_id", $message, 10);
-
-    // Kiểm tra và xóa cache user nếu tồn tại
-    if (Cache::has("user:$user_id")) {
-        Cache::forget("user:$user_id");
-    }
-
-    // Cập nhật lại cache cho user
-    $message = Message::where('user_id', $user_id)->first();
-    $message["messageDetail"] = message_detail::where('mes_id', $message->id)
-        ->orderBy("created_at", "desc")
-        ->get();
-    Cache::put("user:$user_id", $message, 10);
-
-    // Kiểm tra giá trị cache sau khi cập nhật
-    // dd(Cache::get("shop:$shop_id"));
-    // dd(Cache::get("user:$user_id"));
-
-    
-}
-
-
-
-    public function index()
-    {
-        $messages = Message::all();
-        
-        // dd($messages);
-        if($messages->isEmpty()){
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Không tồn tại message nào",
-                ]
-            );
-        }
-
-        foreach ($messages as $key => $message) {
-            $message["messageDetail"] = $this->index_message_detail($message->id);
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $messages,
-            ]
-        );
-    }
-    public function index_message_detail($id) 
-    {
-        $message = message_detail::where('mes_id', $id)->orderBy("created_at", "desc")->get();
-        if($message->isEmpty()){
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Không tồn tại message nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $message,
-            ]
-        );
-    }
-
-
-    public function store(Request $request, $shop_id, $user_id, $senby)
-    {
-        try {
-
-            $message = Message::where("shop_id", $shop_id)
-                    ->where("user_id", $user_id)
-                    ->first();
-
-            if(!$message){
-                $dataInsert = [
-                    "status"=> 1,
-                    'created_at'=> now(),
-                    'user_id'=> $user_id,
-                    'shop_id' => $request->shop_id,
-                ];
-                $message = Message::create($dataInsert);
-            }
-
-            $data = [
-                "mes_id"=> $message->id,
-                'content'=> $request->content,
-                'status'=> 1,
-                'send_by'=> $senby,
-                'created_at' => now(),
-            ];
-            message_detail::create($data);
-            $this->updateCache($shop_id, $user_id);
-
-            $dataDone = [
-                'status' => true,
-                'message' => "message Đã được lưu",
-                'messages' => $data,
-            ];
-            return response()->json($dataDone, 200);
-
-        } catch (\Throwable $th) {
-            $dataDone = [
-                'status' => false,
-                'message' => "thêm message không thành công ",
-                'error' => $th->getMessage()
-            ];
-            return response()->json($dataDone);
-        }
-    }
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function showByStore($shop_id)
-    {   
+    public function shop_get_message(Request $request, $shop_id){
         $user = JWTAuth::parseToken()->authenticate();
-        $value = Cache::remember("shop:$shop_id", 10, function () use ($shop_id)  {
-            // dd($shop_id);
-            $messages = Message::where('shop_id', $shop_id)->get();
-            if($messages->isEmpty()){
-                return response()->json(
-                    [
-                        'status' => false,
-                        'message' => "Không tồn tại message nào",
-                    ]
-                );
-            }
-            foreach ($messages as $key => $message) {
-                $message["messageDetail"] = $this->index_message_detail($message->id);
-            }
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Lấy dữ liệu thành công",
-                    'data' => $messages,
-                ]
-            );
-        });
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $value,
-            ]
-        );
-        
-    }
-    public function showByUser($user_id)
-    {
-        $value = Cache::remember("user:$user_id", 10, function () use ($user_id){
-            $messages = Message::where('user_id', $user_id)->get();
-            if($messages->isEmpty()){
-                return response()->json(
-                    [
-                        'status' => false,
-                        'message' => "Không tồn tại message nào",
-                    ]
-                );
-            }
-            foreach ($messages as $key => $message) {
-                $message["messageDetail"] = $this->index_message_detail($message->id);
-            }
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Lấy dữ liệu thành công",
-                    'data' => $messages,
-                ]
-            );
-        });
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $value,
-            ]
-        );
+        $shop_manager = Shop_manager::where('shop_id', $shop_id)->where('user_id', $user->id)->first();
+        if($shop_manager){
+            $message = Message::where('shop_id', $shop_id)->get();
+            return $this->successResponse("Lấy tin nhắn thành công", $message);
+        }
+        return $this->errorResponse("Bạn không có quyền truy cập");
     }
 
-    public function edit(string $id)
-    {
-        //
+    public function shop_send(Request $request, $mes_id){
+        $message = Message::where('id', $mes_id)->first();
+        // dd($message);
+        $message_detail = message_detail::create([
+            'mes_id' => $message->id,
+            'content' => $request->content,
+            'send_by' => auth()->user()->id, // Đây là admin của shop gửi tin nhắn
+        ]);
+        return $this->successResponse("Gửi tin nhắn thành công", $message);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    private function successResponse($message, $data = null, $status = 200)
     {
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
     }
 }

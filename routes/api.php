@@ -65,11 +65,10 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('categori_learns', CategorilearnsController::class);
             Route::resource('categoriessupportmains', CategoriessupportmainController::class);
             Route::resource('learns', LearnController::class);
-            Route::get('messages',[MessageController::class, "index"]);
-            Route::get('messages/test',[MessageController::class, "saveTest"]);
-            Route::post('messages/{shop_id}/{user_id}/{senby}',[MessageController::class, "store"]);
-            Route::get('messages/showByStore/{shop_id}',[MessageController::class, "showByStore"]);
-            Route::get('messages/showByUser/{user_id}',[MessageController::class, "showByUser"]);
+            Route::resource('messages', MessageController::class);
+            Route::post('messages/detail', [MessageController::class, "store_message_detail"]);
+            Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
+            Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
             Route::resource('voucher_main', VoucherToMainController::class);
             Route::resource('notification_to_main', Notification_to_mainController::class);
             Route::resource('notifications', NotificationController::class);
@@ -82,14 +81,13 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('Wishlists', WishlistController::class);
             Route::resource('Product_to_shops', ProducttoshopController::class);
             Route::resource('Product_to_carts', ProducttocartController::class);
+
             // Route::resource('learning_seller', Learning_sellerController::class);
             Route::get('learning_seller/{shop_id}', [Learning_sellerController::class, 'index']);
             Route::get('learning_seller/{shop_id}/{learn_id}', [Learning_sellerController::class, 'show']);
             Route::post('learning_seller', [Learning_sellerController::class, 'store']);
             Route::put('learning_seller/{id}', [Learning_sellerController::class, 'update']);
             Route::delete('learning_seller/delete/{id}', [Learning_sellerController::class, 'destroy']);
-            // Route::resource('learning_seller', Learning_sellerController::class);
-            Route::post('purchase', [PurchaseController::class, "purchase"]);
             Route::resource('learning_seller', Learning_sellerController::class);
 
 
@@ -107,19 +105,22 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
             Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]);
             Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+            Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
+            Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]);
             //SHOP
-
             Route::resource('carts', CartController::class);
-
-
-
-
             Route::resource('users', AuthenController::class);
             Route::get('user/me', [AuthenController::class, "me"]);
             Route::post('user/change_password', [AuthenController::class, "change_password"]);
             Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
-});
 
+            Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
+            Route::get('shop_get_message/{shop_id}', [MessageController::class, "shop_get_message"]);
+            Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
+           
+
+});
+Route::get('login', [MessageController::class, "login"]);
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
