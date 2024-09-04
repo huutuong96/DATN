@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Shop;
 use App\Models\Shop_manager;
+
 class MessageController extends Controller
 {
 
@@ -57,6 +58,14 @@ class MessageController extends Controller
             'status' => true,
             'message' => $message,
             'data' => $data
+        ], $status);
+    }
+    private function errorResponse($message, $error = null, $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
         ], $status);
     }
 }

@@ -183,8 +183,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
 
-
-
+        // TranslateTool\Providers\TranslateServiceProvider::class,
         /*
          * Package Service Providers...
          */

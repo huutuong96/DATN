@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmMail;
 use App\Mail\ConfirmMailChangePassword;
 use App\Models\Cart_to_usersModel;
+
 use Illuminate\Support\Facades\Cache;
 
 class AuthenController extends Controller
@@ -150,7 +151,7 @@ class AuthenController extends Controller
         $this->updateCache($cacheKey, $user);
         $user_present = Cache::get($cacheKey);
         $token = JWTAuth::fromUser($user);
-
+        
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
