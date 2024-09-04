@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ShipRequest;
 use App\Models\ShipsModel;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ShipsController extends Controller
 {
@@ -13,31 +13,15 @@ class ShipsController extends Controller
      */
     public function index()
     {
+        $ships = Cache::remember('all_ships', 60 * 60, function () {
+            return ShipsModel::all();
+        });
 
-        $ships = ShipsModel::all();
-
-        if($ships->isEmpty()){
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Không tồn tại Ship nào",
-                ]
-            );
+        if ($ships->isEmpty()) {
+            return $this->errorResponse("Không tồn tại Ship nào");
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Lấy dữ liệu thành công',
-            'data' => $ships
-        ], 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return $this->successResponse("Lấy dữ liệu thành công", $ships);
     }
 
     /**
@@ -45,59 +29,29 @@ class ShipsController extends Controller
      */
     public function store(ShipRequest $request)
     {
-
-        $dataInsert = [
-            "name" => $request->name,
-            "description" => $request->description,
-            "status" => $request->status,
-        ];
-
         try {
-            $ships = ShipsModel::create($dataInsert);
-            $dataDone = [
-                'status' => true,
-                'message' => "Thêm Ship thành công",
-                'data' => $ships
-            ];
-            return response()->json($dataDone, 200);
+            $ship = ShipsModel::create($request->validated());
+            Cache::forget('all_ships');
+            return $this->successResponse("Thêm Ship thành công", $ship);
         } catch (\Throwable $th) {
-            $dataDone = [
-                'status' => false,
-                'message' => "Thêm Ship không thành công",
-                'error' => $th->getMessage()
-            ];
-            return response()->json($dataDone);
+            return $this->errorResponse("Thêm Ship không thành công", $th->getMessage());
         }
-        
     }
+
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
+        $ship = Cache::remember('ship_' . $id, 60 * 60, function () use ($id) {
+            return ShipsModel::find($id);
+        });
 
-        $ships = ShipsModel::find($id);
-
-        if (!$ships) {
-            return response()->json([
-                'status' => false,
-                'message' => "Ship không tồn tại"
-            ], 404);
+        if (!$ship) {
+            return $this->errorResponse("Ship không tồn tại", 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => "Lấy dữ liệu thành công",
-            'data' => $ships
-        ], 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return $this->successResponse("Lấy dữ liệu thành công", $ship);
     }
 
     /**
@@ -105,39 +59,22 @@ class ShipsController extends Controller
      */
     public function update(ShipRequest $request, string $id)
     {
+        $ship = Cache::remember('ship_' . $id, 60 * 60, function () use ($id) {
+            return ShipsModel::find($id);
+        });
 
-        $ships = ShipsModel::find($id);
-
-        if (!$ships) {
-            return response()->json([
-                'status' => false,
-                'message' => "Ship không tồn tại"
-            ], 404);
+        if (!$ship) {
+            return $this->errorResponse("Ship không tồn tại", 404);
         }
-
-        $dataUpdate = [
-            "name" => $request->name ?? $ships->name,
-            "description" => $request->description ?? $ships->description,
-            "status" => $request->status ?? $ships->status,
-        ];
 
         try {
-            $ships->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Ship đã được cập nhật",
-                    'data' => $ships
-                ], 200);
+            $ship->update($request->validated());
+            Cache::forget('ship_' . $id);
+            Cache::forget('all_ships');
+            return $this->successResponse("Ship đã được cập nhật", $ship);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật Ship không thành công",
-                    'error' => $th->getMessage()
-                ]);
+            return $this->errorResponse("Cập nhật Ship không thành công", $th->getMessage());
         }
-        
     }
 
     /**
@@ -145,31 +82,19 @@ class ShipsController extends Controller
      */
     public function destroy($id)
     {
+        $ship = ShipsModel::find($id);
 
-        $ships = ShipsModel::find($id);
+        if (!$ship) {
+            return $this->errorResponse("Ship không tồn tại", 404);
+        }
 
         try {
-            if (!$ships) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "Ship không tồn tại"
-                ], 404);
-            }
-    
-            $ships->delete();
-    
-            return response()->json([
-                'status' => true,
-                'message' => "Ship đã được xóa"
-            ]);
+            $ship->delete();
+            Cache::forget('ship_' . $id);
+            Cache::forget('all_ships');
+            return $this->successResponse("Ship đã được xóa");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa Ship không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa Ship không thành công", $th->getMessage());
         }
     }
 }

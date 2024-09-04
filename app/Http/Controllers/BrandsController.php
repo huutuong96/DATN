@@ -57,7 +57,7 @@ class BrandsController extends Controller
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
                 'parent_id' => $request->parent_id,
-                'create_by' => $user->id,
+                'create_by' => auth()->user()->id,
             ];
             $brands = BrandsModel::create($dataInsert);
 
@@ -147,7 +147,7 @@ class BrandsController extends Controller
                 'image' => $imageUrl ?? $brands->image,
                 'status' => $request->status ?? $brands->status,
                 'parent_id' => $request->parent_id ?? $brands->parent_id,
-                'update_by' => $request->update_by ?? $brands->update_by,
+                'update_by' => auth()->user()->id,
                 'updated_at' => now(),
             ];
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\support_main;
+use Illuminate\Support\Facades\Cache;
+
 class Support_mainController extends Controller
 {
     /**
@@ -11,30 +13,15 @@ class Support_mainController extends Controller
      */
     public function index()
     {
-        $supports = support_main::all();
-        if($supports->isEmpty()){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại hỗ trợ nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $supports,
-            ]
-        );
-    }
+        $supports = Cache::remember('all_supports', 60 * 60, function () {
+            return support_main::all();
+        });
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if ($supports->isEmpty()) {
+            return $this->errorResponse("Không tồn tại hỗ trợ nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $supports);
     }
 
     /**
@@ -42,31 +29,19 @@ class Support_mainController extends Controller
      */
     public function store(Request $request)
     {
-        $dataInsert = [
-            'content' => $request->content,
-            'status' => $request->status,
-            'index' => $request->index,
-            'category_support_id' => $request->category_support_id,
-        ];
+        $validatedData = $request->validate([
+            'content' => 'required',
+            'status' => 'required',
+            'index' => 'required',
+            'category_support_id' => 'required|exists:category_supports,id',
+        ]);
 
         try {
-            $support = support_main::create( $dataInsert );
-
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm hỗ trợ thành công",
-                    'data' => $support,
-                ]
-            );
+            $support = support_main::create($validatedData);
+            Cache::forget('all_supports');
+            return $this->successResponse("Thêm hỗ trợ thành công", $support);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Thêm hỗ trợ không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Thêm hỗ trợ không thành công", $th->getMessage());
         }
     }
 
@@ -75,30 +50,15 @@ class Support_mainController extends Controller
      */
     public function show(string $id)
     {
-        $support = support_main::find($id);
-        if(!$support){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại support nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $support,
-            ]
-        );
-    }
+        $support = Cache::remember('support_' . $id, 60 * 60, function () use ($id) {
+            return support_main::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$support) {
+            return $this->errorResponse("Không tồn tại hỗ trợ nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $support);
     }
 
     /**
@@ -106,45 +66,26 @@ class Support_mainController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Tìm banner theo ID
         $support = support_main::find($id);
-        // Kiểm tra xem support_main có tồn tại không
-        if (!$support) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "support không tồn tại",
-                ],
-                404
-            );
-        }
-        // Cập nhật dữ liệu
-        $dataUpdate = [
-            'content' => $request->content ?? $support->content,
-            'status' => $request->status ?? $support->status,
-            'index' => $request->index ?? $support->index,
-            'category_support_id' => $request->category_support_id ?? $support->category_support_id,
-        ];
 
+        if (!$support) {
+            return $this->errorResponse("Hỗ trợ không tồn tại", 404);
+        }
+
+        $validatedData = $request->validate([
+            'content' => 'sometimes|required',
+            'status' => 'sometimes|required',
+            'index' => 'sometimes|required',
+            'category_support_id' => 'sometimes|required|exists:category_supports,id',
+        ]);
 
         try {
-            // Cập nhật bản ghi
-            $support->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật support thành công",
-                    'data' => $support,
-                ]
-            );
+            $support->update($validatedData);
+            Cache::forget('support_' . $id);
+            Cache::forget('all_supports');
+            return $this->successResponse("Cập nhật hỗ trợ thành công", $support);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật support không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Cập nhật hỗ trợ không thành công", $th->getMessage());
         }
     }
 
@@ -154,30 +95,37 @@ class Support_mainController extends Controller
     public function destroy(string $id)
     {
         try {
-            $support = support_main::find($id);
-
-            if (!$support) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'support không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
+            $support = support_main::findOrFail($id);
             $support->delete();
-
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa support thành công',
-                ]);
+            Cache::forget('support_' . $id);
+            Cache::forget('all_supports');
+            return $this->successResponse("Xóa hỗ trợ thành công");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa support không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa hỗ trợ không thành công", $th->getMessage());
         }
+    }
+
+    /**
+     * Return a success response.
+     */
+    private function successResponse($message, $data = null)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Return an error response.
+     */
+    private function errorResponse($message, $error = null, $code = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error,
+        ], $code);
     }
 }

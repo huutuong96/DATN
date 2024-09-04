@@ -86,7 +86,6 @@ Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
             Route::resource('support_main', Support_mainController::class);
             Route::resource('Comments', CommentsController::class);
             Route::resource('Wishlists', WishlistController::class);
-            Route::resource('Product_to_shops', ProducttoshopController::class);
             Route::resource('Product_to_carts', ProducttocartController::class);
             Route::resource('learning_seller', Learning_sellerController::class);
             Route::post('purchase', [PurchaseController::class, "purchase"]);
