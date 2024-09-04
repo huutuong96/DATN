@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Image;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Cache;
 use Cloudinary\Cloudinary;
-use App\Models\Image;
 use App\Models\ColorsModel;
+
 class ProductController extends Controller
 {
     /**
@@ -18,12 +19,17 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Cache::remember('all_products', 60 * 60, function () {
-            return Product::all();
-        });
-        $images = Cache::remember('all_images', 60 * 60, function () {
-            return Images::all();
-        });
+        $products = Product::all();
+        foreach ($products as $key => $product) {
+            $images = Image::find($product->id);
+            $product["images"] = $images;
+        }
+        // $products = Cache::remember('all_products', 60 * 60, function () {
+        //     return Product::all();
+        // });
+        // $images = Cache::remember('all_images', 60 * 60, function () {
+        //     return Images::all();
+        // });
 
         if($products->isEmpty()){
             return response()->json(
@@ -56,7 +62,17 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->file('image'));
+        $user = JWTAuth::parseToken()->authenticate();
+        $cloudinary = new Cloudinary();
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $imageUrl = $uploadedImage['secure_url'];
+        } else {
+            $imageUrl = null;
+        }
+
 
         $dataInsert = [
             'name' => $request->name,
@@ -65,34 +81,51 @@ class ProductController extends Controller
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'image' => null,
+            'image' => $imageUrl,
             'quantity' => $request->quantity,
             'parent_id' => $request->parent_id,
-            'create_by' => auth()->user()->id,
+            'create_by' => $user->id,
+            'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-            'shop_id' => $request->shop_id,
+            'color_id' => $request->color_id,
         ];
 
-        $product = Product::create($dataInsert);
-        if ($request->hasFile('image')) {
-            $cloudinary = new Cloudinary();
-            $uploadedImage = $cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
-            $imageUrl = $uploadedImage['secure_url'];
-            $dataImage = [
-                'product_id' => $product->id,
-                'url' => $imageUrl,
-                'status' => 1,
+        try {
+            $product = Product::create($dataInsert);
+
+            if ($request->hasFile('images')) {
+                $images = $request->file('images');
+                foreach ($images as $image) {
+                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                    $imageUrl = $uploadedImage['secure_url'];
+
+                    // Lưu URL vào bảng image
+                    Image::create([
+                        'product_id' => $product->id,
+                        'url' => $imageUrl,
+                        'status' => 1,
+                    ]);
+                }
+            }
+
+            $dataDone = [
+                'status' => true,
+                'message' => "Sản phẩm đã được lưu",
+                'product' => $product,
             ];
-            Image::create($dataImage);
+
+            return response()->json($dataDone, 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm product không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
         }
-        return response()->json([
-            'status' => true,
-            'message' => "Thêm sản phẩm thành công",
-            'data' => $product,
-            'images' => $dataImage,
-        ]);
     }
+
 
     /**
      * Display the specified resource.
@@ -106,6 +139,9 @@ class ProductController extends Controller
             return Image::where('product_id', $product->id)->get();
         });
 
+        $images = Image::find($product->id);
+        $product["images"] = $images;
+        
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -143,38 +179,54 @@ class ProductController extends Controller
             ], 404);
         }
 
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $cloudinary = new Cloudinary();
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
             $imageUrl = $uploadedImage['secure_url'];
         } else {
-            $imageUrl = $product->URL;
+            $imageUrl = $product->image;
         }
 
         $dataInsert = [
             'name' => $request->name,
-            'slug' => $request->slug,
+            'slug' => $request->slug ?? Str::slug($request->name),
             'description' => $request->description,
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
             'image' => $imageUrl,
             'quantity' => $request->quantity,
-            'sold_count' => $request->sold_count,
-            'view_count' => $request->view_count,
             'parent_id' => $request->parent_id,
+            'create_by' => $user->id,
+            'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
             'color_id' => $request->color_id,
         ];
+
         try {
-            $product->update($dataInsert);
-            Cache::forget('all_products');
-            Cache::forget('product_' . $id);
-            if ($request->hasFile('image')) {
-                Cache::forget('images_' . $product->id);
+            $product ->update($dataInsert);
+
+            if ($request->hasFile('images')) {
+                $images = $request->file('images');
+                Image::where("product_id", $product->id)->delete();
+                foreach ($images as $image) {
+                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                    $imageUrl = $uploadedImage['secure_url'];
+
+                    // Lưu URL vào bảng image
+                    Image::create([
+                        'product_id' => $product->id,
+                        'url' => $imageUrl,
+                        'status' => 1,
+                    ]);
+                }
             }
+
             $dataDone = [
                 'status' => true,
                 'message' => "sản phẩm Đã được cập nhật",
@@ -198,7 +250,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::find($id);
-
+            
             if (!$product) {
                 return response()->json([
                     'status' => false,
@@ -206,9 +258,12 @@ class ProductController extends Controller
                 ], 404);
             }
 
-            $product->update(['status' => 101]);
-            Cache::forget('all_products');
-            Cache::forget('product_' . $id);
+            Image::where("product_id", $product->id)->delete();
+            // $product->delete();
+
+            // $product->update(['status' => 101]);
+            // Cache::forget('all_products');
+            // Cache::forget('product_' . $id);
 
             return response()->json([
                 'status' => true,
