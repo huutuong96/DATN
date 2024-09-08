@@ -61,9 +61,11 @@ class CommentsController extends Controller
 
 
         if (is_null($request->parent_id)) {
-            Cache::put('parent_comment_' . $comment->id, $comment, 30 * 60);
-        } elseif ($request->parent_id) {
-            $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 30 * 60, function () use ($request) {
+            Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
+        }
+
+        if ($request->parent_id) {
+            $parent_comment = Cache::remember('parent_comment_'.$request->parent_id, 60 * 60, function () use ($request) {
                 return CommentsModel::find($request->parent_id);
             });
 
@@ -81,11 +83,12 @@ class CommentsController extends Controller
 
         $product = Product::find($request->product_id);
 
-        $notificationRequest = new Request([
+         // dd($user->id);
+         $notificationRequest = new Request([
             'type' => 'shop',
             'user_id' => $user->id,
             'title' => 'Thông báo từ Sản Phẩm',
-            'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
+            'description' => $user->fullname.' đã gửi một bình luận đến sản phẩm của bạn.',
             'shop_id' => $product->shop_id
         ]);
         $notificationController->store($notificationRequest);
