@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmMail;
 use App\Mail\ConfirmMailChangePassword;
 use App\Models\Cart_to_usersModel;
+
 use Illuminate\Support\Facades\Cache;
 
 class AuthenController extends Controller
@@ -115,7 +116,6 @@ class AuthenController extends Controller
             ]);
             $notificationController = new NotificationController();
             $notification = $notificationController->destroy($user->id);
-
             // Update cache
             $this->updateCache('list_users_vnshop', UsersModel::all());
 
@@ -128,6 +128,7 @@ class AuthenController extends Controller
                 'status' => true,
                 'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
             ];
+            
             return response()->json($activeDone, 200);
         } else {
             $activeFail = [
@@ -150,7 +151,7 @@ class AuthenController extends Controller
         $this->updateCache($cacheKey, $user);
         $user_present = Cache::get($cacheKey);
         $token = JWTAuth::fromUser($user);
-
+        
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
@@ -289,7 +290,7 @@ class AuthenController extends Controller
             return response()->json(['error' => 'Mật khẩu không đúng'], 401);
         }
         $dataUpdate = [
-            "password"=> Hash::make($request->password),
+            "password"=> Hash::make($request->new_password),
             "updated_at"=> now(),
         ];
         $user = UsersModel::where('id', $user->id)->update($dataUpdate);

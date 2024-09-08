@@ -44,7 +44,6 @@ class CommentsController extends Controller
     public function store(CommentsRequest $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
-
         $dataInsert = [
             "title" => $request->title,
             "content" => $request->content,
@@ -55,7 +54,6 @@ class CommentsController extends Controller
             "user_id" => $user->id,
             "created_at" => now()
         ];
-
         $notificationController = new NotificationController();
         $comment = CommentsModel::create($dataInsert);
 
@@ -83,15 +81,15 @@ class CommentsController extends Controller
 
         $product = Product::find($request->product_id);
 
-         // dd($user->id);
-         $notificationRequest = new Request([
-            'type' => 'shop',
-            'user_id' => $user->id,
-            'title' => 'Thông báo từ Sản Phẩm',
-            'description' => $user->fullname.' đã gửi một bình luận đến sản phẩm của bạn.',
-            'shop_id' => $product->shop_id
-        ]);
-        $notificationController->store($notificationRequest);
+            // dd($user->id);
+            $notificationRequest = new Request([
+                'type' => 'shop',
+                'user_id' => $user->id,
+                'title' => 'Thông báo từ Sản Phẩm',
+                'description' => $user->fullname.' đã gửi một bình luận đến sản phẩm của bạn.',
+                'shop_id' => $product->shop_id
+            ]);
+            $notificationController->store($notificationRequest);
 
         $dataDone = [
             'status' => true,

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Voucher;
-use App\Models\VoucherToMain;
+use App\Models\voucher_to_main;
 use App\Models\VoucherToShop;
 use App\Http\Requests\VoucherRequest;
 use Illuminate\Support\Facades\Cache;
@@ -25,10 +25,10 @@ class VoucherController extends Controller
 
     public function store(VoucherRequest $request)
     {
-        $checkVoucherToMain = VoucherToMain::where('code', $request->code)->exists();
+        $checkvoucher_to_main = voucher_to_main::where('code', $request->code)->exists();
         $checkVoucherToShop = VoucherToShop::where('code', $request->code)->exists();
 
-        if (!$checkVoucherToMain && !$checkVoucherToShop) {
+        if (!$checkvoucher_to_main && !$checkVoucherToShop) {
             return $this->errorResponse("Mã voucher không khớp với bất kỳ voucher nào của shop hoặc sàn.");
         }
 
@@ -85,5 +85,23 @@ class VoucherController extends Controller
         } catch (\Throwable $th) {
             return $this->errorResponse("Xóa voucher không thành công", $th->getMessage());
         }
+    }
+
+    private function successResponse($message, $data = null, $status = 200)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
+    }
+    
+    private function errorResponse($message, $error = null, $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
     }
 }

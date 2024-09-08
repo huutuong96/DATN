@@ -97,4 +97,6 @@ class RanksController extends Controller
             return $this->errorResponse("Xóa rank không thành công", $th->getMessage());
         }
     }
+
+
 }
