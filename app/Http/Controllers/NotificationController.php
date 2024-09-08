@@ -59,16 +59,15 @@ class NotificationController extends Controller
             $notificationToShops->image = $image ?? null;
             $notificationToShops->shop_id = $request->shop_id;
             $notificationToShops->save();
-
+            
             $notification->id_notification = $notificationToShops->id;
         }
-
         $notification->save();
 
         // Update cache
         $this->updateCache('notifications_' . $request->user_id, Notification::where('user_id', $request->user_id)->get());
 
-        // return response()->json($notification, 201);
+        return response()->json($notification, 201);
     }
 
     public function show($id)

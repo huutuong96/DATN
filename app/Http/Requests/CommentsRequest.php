@@ -28,9 +28,9 @@ class CommentsRequest extends FormRequest
             'content' => 'required|string',
             'rate' => 'required|integer|min:1|max:5',
             'status' => 'required',
-            'parent_id' => 'nullable|exists:reviews,id',
+            'parent_id' => 'nullable',
             'product_id' => 'required|exists:products,id',
-            'user_id' => 'required|exists:users,id',
+          
         ];
     }
     public function messages()

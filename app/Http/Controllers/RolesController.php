@@ -97,4 +97,14 @@ class RolesController extends Controller
             return $this->errorResponse("Xóa vai trò không thành công", $th->getMessage());
         }
     }
+
+    public function successResponse($message, $data = null)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], 200);
+    }
+    
 }

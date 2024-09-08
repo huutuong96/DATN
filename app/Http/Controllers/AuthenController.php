@@ -116,7 +116,6 @@ class AuthenController extends Controller
             ]);
             $notificationController = new NotificationController();
             $notification = $notificationController->destroy($user->id);
-
             // Update cache
             $this->updateCache('list_users_vnshop', UsersModel::all());
 
@@ -129,6 +128,7 @@ class AuthenController extends Controller
                 'status' => true,
                 'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
             ];
+            
             return response()->json($activeDone, 200);
         } else {
             $activeFail = [
@@ -290,7 +290,7 @@ class AuthenController extends Controller
             return response()->json(['error' => 'Mật khẩu không đúng'], 401);
         }
         $dataUpdate = [
-            "password"=> Hash::make($request->password),
+            "password"=> Hash::make($request->new_password),
             "updated_at"=> now(),
         ];
         $user = UsersModel::where('id', $user->id)->update($dataUpdate);

@@ -97,4 +97,22 @@ class ShipsController extends Controller
             return $this->errorResponse("Xóa Ship không thành công", $th->getMessage());
         }
     }
+
+    public function successResponse($message, $data = null)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], 200);
+    }
+
+    public function errorResponse($message, $data = null)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'data' => $data
+        ], 400);
+    }
 }
