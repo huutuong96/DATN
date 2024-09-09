@@ -26,7 +26,7 @@ class ShopRequest extends FormRequest
         return [
             'shop_name' => 'required|string',
             'pickup_address' => 'nullable|string',
-            'image' => 'required|url',
+            'image' => 'url',
             'tax_id' => 'required|numeric',
             'cccd' => 'required|string',
             'status' => 'required|integer',
@@ -44,7 +44,7 @@ class ShopRequest extends FormRequest
             'image.required' => 'Hình ảnh là bắt buộc.',
             'image.url' => 'Hình ảnh phải là một đường dẫn URL hợp lệ.',
 
-            'tax_id.required' => 'Mã số thuế là bắt buộc.',
+            // 'tax_id.required' => 'Mã số thuế là bắt buộc.',
             'tax_id.numeric' => 'Mã số thuế phải là một số.',
 
             'cccd.required' => 'Số CCCD là bắt buộc.',

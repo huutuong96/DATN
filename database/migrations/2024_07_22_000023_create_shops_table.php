@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('cccd');
             $table->integer('status')->default(1);
-            $table->integer('create_by')->nullable();
-            $table->integer('update_by')->nullable();
+            $table->integer('create_by');
+            $table->integer('update_by');
             $table->timestamps();
             $table->unsignedBigInteger('tax_id');
 

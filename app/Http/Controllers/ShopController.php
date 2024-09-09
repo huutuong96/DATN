@@ -18,6 +18,7 @@ use App\Models\BannerShop;
 use App\Models\ProgramtoshopModel;
 use App\Models\Programme_detail;
 use App\Models\Follow_to_shop;
+use App\Models\Learning_sellerModel;
 use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\Cache;
@@ -78,6 +79,7 @@ class ShopController extends Controller
 
     public function store(ShopRequest $rqt)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         try {
             $dataInsert = [
                 'shop_name' => $rqt->shop_name,
@@ -85,8 +87,8 @@ class ShopController extends Controller
                 'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
                 'cccd' => $rqt->cccd,
                 'status' => 101,
-                'create_by' => auth()->user()->id,
-                'update_by' => auth()->user()->id,
+                'create_by' => $user->id,
+                'update_by' => $user->id,
             ];
 
             if ($rqt->hasFile('image')) {
@@ -101,12 +103,12 @@ class ShopController extends Controller
             }
             $dataInsert['tax_id'] = $tax->id;
             $Shop = Shop::create($dataInsert);
-            $this->shop_manager_store($Shop, auth()->user()->id, 'owner', 1);
+            $this->shop_manager_store($Shop, $user->id, 'owner', 1);
             $learningInsert = [
-                'learn_id' => $request->learn_id,
+                'learn_id' => $rqt->learn_id,
                 'shop_id' => $Shop->id,
                 'status' => 101, // Chưa học
-                'create_by' => auth()->user()->id
+                'create_by' => $user->id
             ];
             $learning_seller = Learning_sellerModel::create($learningInsert);
 
@@ -122,6 +124,7 @@ class ShopController extends Controller
 
     public function product_to_shop_store(Request $rqt, string $id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $shop = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
             return Shop::find($id);
         });
@@ -140,8 +143,8 @@ class ShopController extends Controller
             'quantity' => $rqt->quantity,
             'category_id' => $rqt->category_id,
             'brand_id' => $rqt->brand_id,
-            'create_by' => auth()->user()->id,
-            'update_by' => auth()->user()->id,
+            'create_by' => $user->id,
+            'update_by' => $user->id
         ];
         $product = Product::create($dataInsert);
         if($rqt->hasFile('image')){
@@ -152,8 +155,8 @@ class ShopController extends Controller
                 Image::create([
                     'image' => $uploadedImage['secure_url'],
                     'product_id' => $product->id,
-                    'create_by' => auth()->user()->id,
-                    'update_by' => auth()->user()->id,
+                    'create_by' => $user->id,
+                    'update_by' => $user->id
                 ]);
             }
         }
@@ -232,7 +235,6 @@ class ShopController extends Controller
     public function update(Request $rqt, string $id)
     {
         $shop = Shop::findOrFail($id);
-
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại", $th->getMessage());
         }
@@ -330,6 +332,7 @@ class ShopController extends Controller
     }
     public function programe_to_shop(Request $rqt, string $id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại", $th->getMessage());
@@ -337,14 +340,14 @@ class ShopController extends Controller
         $program_detail = Programme_detail::create([
             'title' => $rqt->title,
             'content' => $rqt->content,
-            'create_by' => auth()->user()->id,
-            'update_by' => auth()->user()->id,
+            'create_by' => $user->id,
+            'update_by' => $user->id,
         ]);
         $program = ProgramtoshopModel::create([
             'program_id' => $program_detail->id,
             'shop_id' => $shop->id,
-            'create_by' => auth()->user()->id,
-            'update_by' => auth()->user()->id,
+            'create_by' => $user->id,
+            'update_by' => $user->id,
             'created_at' => now(),
         ]);
         return $this->successResponse("Thêm chương trình thành công", $program);
@@ -513,6 +516,7 @@ class ShopController extends Controller
             'data' => $categori_shops,
         ], 201);
     }
+    
     public function update_category_shop(Request $request, string $id)
     {
         $categori_shops = Categori_shopsModel::find($id);

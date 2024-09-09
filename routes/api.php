@@ -79,7 +79,7 @@ use App\Http\Controllers\VoucherToShopController;
                 Route::resource('support_main', Support_mainController::class);
                 Route::resource('Comments', CommentsController::class);
                 Route::resource('Wishlists', WishlistController::class);
-                Route::resource('Product_to_shops', ProducttoshopController::class);
+                // Route::resource('Product_to_shops', ProducttoshopController::class);
                 Route::resource('Product_to_carts', ProducttocartController::class);
                 Route::resource('voucher_shop', VoucherToShopController::class);
                 // Route::resource('learning_seller', Learning_sellerController::class);
@@ -131,4 +131,4 @@ Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
 
-Route::resource('images', ImageController::class);
+Route::resource('images', ImageController::class);// đã thêm xóa sửa cơ bản kết hợp với products, nên note lại rồi nếu phát triển thì sửa thêm sau
