@@ -98,5 +98,20 @@ class RanksController extends Controller
         }
     }
 
-
+    public function successResponse($message, $data = null)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], 200);
+    }
+    private function errorResponse($message, $error = null, $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
+    }
 }

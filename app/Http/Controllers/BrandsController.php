@@ -57,7 +57,7 @@ class BrandsController extends Controller
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
                 'parent_id' => $request->parent_id,
-                'create_by' => auth()->user()->id,
+                'create_by' => $user->id,
             ];
             $brands = BrandsModel::create($dataInsert);
 
@@ -119,6 +119,9 @@ class BrandsController extends Controller
      */
     public function update(BrandRequest $request, $id)
     {
+
+        $user = JWTAuth::parseToken()->authenticate();
+
         try {
             $brands = BrandsModel::find($id);
 
@@ -147,7 +150,7 @@ class BrandsController extends Controller
                 'image' => $imageUrl ?? $brands->image,
                 'status' => $request->status ?? $brands->status,
                 'parent_id' => $request->parent_id ?? $brands->parent_id,
-                'update_by' => auth()->user()->id,
+                'update_by' => $user->id,
                 'updated_at' => now(),
             ];
 

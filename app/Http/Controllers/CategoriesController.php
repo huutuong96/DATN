@@ -42,15 +42,15 @@ class CategoriesController extends Controller
             $cloudinary = new Cloudinary();
             $dataInsert['image'] = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
         }
-
+        $user = JWTAuth::parseToken()->authenticate();
         try {
             $dataInsert = [
                 'title' => $request->title,
-                'slug' => $request->slug ?? Str::slug($request->title),
+                'slug' => $request->slug ?? Str::slug($request->title, '-'),
                 'index' => $request->index ?? 1,
                 'status' => $request->status ?? 1,
                 'parent_id' => $request->parent_id ?? null,
-                'create_by' => auth()->user()->id,
+                'create_by' => $user->id,
                 'image' => $dataInsert['image'] ?? null,
             ];
 
@@ -77,6 +77,7 @@ class CategoriesController extends Controller
      */
     public function show(string $id)
     {
+        
         try {
             $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
                 return CategoriesModel::find($id);
@@ -104,6 +105,7 @@ class CategoriesController extends Controller
     }
     public function update(CategoriesRequest $request, string $id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         try {
             $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
                 return CategoriesModel::find($id);
@@ -116,6 +118,7 @@ class CategoriesController extends Controller
                 ], 404);
             }
             if ($request->file('image')) {
+                $image = $request->file('image');
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $imageUrl = $uploadedImage['secure_url'];
@@ -128,7 +131,7 @@ class CategoriesController extends Controller
                 'image' => $imageUrl ?? $categories->image,
                 'status' => $request->status ?? $categories->status,
                 'parent_id' => $request->parent_id ?? $categories->parent_id,
-                'update_by' => auth()->user()->id,
+                'update_by' => $user->id,
                 'updated_at' => now(),
             ];
 

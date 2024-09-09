@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('shop_managers', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(1);
+            $table->string('role');
             $table->timestamps();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('shop_id');
