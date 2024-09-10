@@ -76,26 +76,26 @@ class ShopController extends Controller
         }
     }
 
-    public function store(ShopRequest $rqt)
+    public function store(ShopRequest $request)
     {
         try {
             $dataInsert = [
-                'shop_name' => $rqt->shop_name,
-                'pick_up_address' => $rqt->pick_up_address,
-                'slug' => $rqt->slug ?? Str::slug($rqt->shop_name, '-'),
-                'cccd' => $rqt->cccd,
+                'shop_name' => $request->shop_name,
+                'pick_up_address' => $request->pick_up_address,
+                'slug' => $request->slug ?? Str::slug($request->shop_name, '-'),
+                'cccd' => $request->cccd,
                 'status' => 101,
                 'create_by' => auth()->user()->id,
                 'update_by' => auth()->user()->id,
             ];
 
-            if ($rqt->hasFile('image')) {
-                $image = $rqt->file('image');
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $dataInsert['image'] = $uploadedImage['secure_url'];
             }
-            $tax = Tax::find($rqt->tax_id);
+            $tax = Tax::find($request->tax_id);
             if (!$tax) {
                 return $this->errorResponse("Mã số thuế không tồn tại", $th->getMessage());
             }
@@ -118,9 +118,9 @@ class ShopController extends Controller
         }
     }
 
-  
 
-    public function product_to_shop_store(Request $rqt, string $id)
+
+    public function product_to_shop_store(Request $request, string $id)
     {
         $shop = Cache::remember('shop_'.$id, 60*60, function () use ($id) {
             return Shop::find($id);
@@ -130,22 +130,22 @@ class ShopController extends Controller
             return $this->errorResponse("Shop không tồn tại", $th->getMessage());
         }
         $dataInsert = [
-            'name' => $rqt->name,
-            'slug' => $rqt->slug ?? Str::slug($rqt->name, '-'),
-            'description' => $rqt->description,
-            'infomation' => $rqt->infomation,
-            'price' => $rqt->price,
-            'sale_price' => $rqt->sale_price,
+            'name' => $request->name,
+            'slug' => $request->slug ?? Str::slug($request->name, '-'),
+            'description' => $request->description,
+            'infomation' => $request->infomation,
+            'price' => $request->price,
+            'sale_price' => $request->sale_price,
             'image' => $dataInsert['image'][0],
-            'quantity' => $rqt->quantity,
-            'category_id' => $rqt->category_id,
-            'brand_id' => $rqt->brand_id,
+            'quantity' => $request->quantity,
+            'category_id' => $request->category_id,
+            'brand_id' => $request->brand_id,
             'create_by' => auth()->user()->id,
             'update_by' => auth()->user()->id,
         ];
         $product = Product::create($dataInsert);
-        if($rqt->hasFile('image')){
-            foreach($rqt->file('image') as $image){
+        if($request->hasFile('image')){
+            foreach($request->file('image') as $image){
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $uploadedImage['secure_url'];
@@ -158,8 +158,8 @@ class ShopController extends Controller
             }
         }
 
-        if ($rqt->color) {
-            foreach($rqt->color as $color){
+        if ($request->color) {
+            foreach($request->color as $color){
                 $colorInsert = [
                     'product_id' => $product->id,
                     'title' => $color['title'],
@@ -215,40 +215,40 @@ class ShopController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update_shop_members(Request $rqt, string $id)
+    public function update_shop_members(Request $request, string $id)
     {
         $member = Shop_manager::where('id', $id)->first();
         if(!$member){
             return $this->errorResponse("Không tồn tại thành viên trong shop này", $th->getMessage());
         }
         $member->update([
-            'role' => $rqt->role,
+            'role' => $request->role,
         ]);
 
         Cache::forget('shop_members_'.$member->shop_id);
 
         return $this->successResponse("cập nhật thành viên shop $id thành công", $member);
     }
-    public function update(Request $rqt, string $id)
+    public function update(Request $request, string $id)
     {
         $shop = Shop::findOrFail($id);
 
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại", $th->getMessage());
         }
-        if($rqt->hasFile('image')){
-            $image = $rqt->file('image');
+        if($request->hasFile('image')){
+            $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
             $dataInsert['image'] = $uploadedImage['secure_url'];
         }
         $dataInsert = [
-            'shop_name' => $rqt->shop_name ?? $shop->shop_name,
-            'pick_up_address' => $rqt->pick_up_address ?? $shop->pick_up_address,
-            'slug' => $rqt->slug ?? Str::slug($rqt->shop_name ?? $shop->shop_name, '-'),
-            'cccd' => $rqt->cccd ?? $shop->cccd,
-            'status' => $rqt->status ?? $shop->status,
-            'tax_id' => $rqt->tax_id ?? $shop->tax_id,
+            'shop_name' => $request->shop_name ?? $shop->shop_name,
+            'pick_up_address' => $request->pick_up_address ?? $shop->pick_up_address,
+            'slug' => $request->slug ?? Str::slug($request->shop_name ?? $shop->shop_name, '-'),
+            'cccd' => $request->cccd ?? $shop->cccd,
+            'status' => $request->status ?? $shop->status,
+            'tax_id' => $request->tax_id ?? $shop->tax_id,
             'update_by' => auth()->user()->id,
             'updated_at' => now(),
         ];
@@ -302,15 +302,15 @@ class ShopController extends Controller
             return $this->errorResponse("Xóa thành viên không thành công", $th->getMessage());
         }
     }
-    public function store_banner_to_shop(Request $rqt, string $id)
+    public function store_banner_to_shop(Request $request, string $id)
     {
         try {
             $shop = Shop::find($id);
             if (!$shop) {
                 return $this->errorResponse("Shop không tồn tại", $th->getMessage());
             }
-            if ($rqt->hasFile('image')) {
-                $image = $rqt->file('image');
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $dataInsert['image'] = $uploadedImage['secure_url'];
@@ -328,15 +328,15 @@ class ShopController extends Controller
             return $this->errorResponse("Thêm banner không thành công", $th->getMessage());
         }
     }
-    public function programe_to_shop(Request $rqt, string $id)
+    public function programe_to_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại", $th->getMessage());
         }
         $program_detail = Programme_detail::create([
-            'title' => $rqt->title,
-            'content' => $rqt->content,
+            'title' => $request->title,
+            'content' => $request->content,
             'create_by' => auth()->user()->id,
             'update_by' => auth()->user()->id,
         ]);
@@ -376,7 +376,7 @@ class ShopController extends Controller
         $follow->delete();
         return $this->successResponse("Đã unfollow shop thành công", $follow);
     }
-    public function message_to_shop(Request $rqt, string $id)
+    public function message_to_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
@@ -390,6 +390,7 @@ class ShopController extends Controller
         ]);
         $messageDetail = Message_detail::create([
             'message_id' => $message->id,
+            'content' => $request->content,
             'content' => $rqt->content,
             'send_by' => auth()->user()->id,
             'status' => 1,
@@ -451,7 +452,7 @@ class ShopController extends Controller
             ],
         ], 200);
     }
-    
+
     public function get_category_shop()
     {
         $category_shop = Cache::remember('category_shop', 60*60, function () {
