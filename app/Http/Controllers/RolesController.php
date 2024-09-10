@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RolesModel;
 use App\Http\Requests\RoleRequest;
 use Illuminate\Support\Facades\Cache;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RolesController extends Controller
 {
@@ -29,8 +30,12 @@ class RolesController extends Controller
      */
     public function store(RoleRequest $request)
     {
+        $user = JWTAuth::parseToken()->authenticate();
+        
         try {
-            $role = RolesModel::create($request->validated());
+            $validatedData = $request->validated();
+            $validatedData['create_by'] = $user->id;
+            $role = RolesModel::create($validatedData);
             Cache::forget('all_roles');
             return $this->successResponse("Thêm vai trò thành công", $role);
         } catch (\Throwable $th) {
@@ -68,7 +73,10 @@ class RolesController extends Controller
         }
 
         try {
-            $role->update($request->validated());
+            $user = JWTAuth::parseToken()->authenticate();
+            $validateDate = $request->validated();
+            $validateDate['update_by'] = $user->id;
+            $role->update($validateDate);
             Cache::forget('role_' . $id);
             Cache::forget('all_roles');
             return $this->successResponse("Cập nhật vai trò thành công", $role);
@@ -106,5 +114,12 @@ class RolesController extends Controller
             'data' => $data
         ], 200);
     }
-    
+    private function errorResponse($message, $error = null, $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
+    }
 }

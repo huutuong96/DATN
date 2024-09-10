@@ -44,7 +44,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\VoucherToShopController;
 
-    // Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
+    Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
                 Route::resource('categories', CategoriesController::class);
                 Route::resource('categori_shops', Categori_ShopsController::class);
@@ -79,7 +79,7 @@ use App\Http\Controllers\VoucherToShopController;
                 Route::resource('support_main', Support_mainController::class);
                 Route::resource('Comments', CommentsController::class);
                 Route::resource('Wishlists', WishlistController::class);
-                Route::resource('Product_to_shops', ProducttoshopController::class);
+                // Route::resource('Product_to_shops', ProducttoshopController::class);
                 Route::resource('Product_to_carts', ProducttocartController::class);
                 Route::resource('voucher_shop', VoucherToShopController::class);
                 // Route::resource('learning_seller', Learning_sellerController::class);
@@ -99,7 +99,7 @@ use App\Http\Controllers\VoucherToShopController;
                 Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
                 Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]);
                 Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
-                Route::delete('shop/manager/destroy/members/{id', [ShopController::class, "destroy_members"]);
+                Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"]);
                 Route::post('shop/increase_follower/{id}', [ShopController::class, "increase_follower"]);
                 Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);
                 Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
@@ -121,7 +121,7 @@ use App\Http\Controllers\VoucherToShopController;
            
 
 
-// });
+});
 Route::get('login', [MessageController::class, "login"]);
 
 

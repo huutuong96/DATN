@@ -68,13 +68,13 @@ class AuthenController extends Controller
         $role = RolesModel::where('title', 'user')->first();
         $rank = RanksModel::where('title', 'đồng')->first();
         $dataInsert = [
-            "fullname"=> $request->fullname,
-            "password"=> Hash::make($request->password),
-            "email"=> $request->email,
-            "rank_id"=> $rank->id,
-            "role_id"=> $role->id,
-            "status"=> 101, // 101 là tài khoản chưa được kích hoạt
-            "login_at"=> now(),
+            "fullname" => $request->fullname,
+            "password" => Hash::make($request->password),
+            "email" => $request->email,
+            "rank_id" => $rank->id,
+            "role_id" => $role->id,
+            "status" => 101, // 101 là tài khoản chưa được kích hoạt
+            "login_at" => now(),
         ];
         $user = UsersModel::create($dataInsert);
         $token = JWTAuth::fromUser($user);
@@ -128,7 +128,7 @@ class AuthenController extends Controller
                 'status' => true,
                 'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
             ];
-            
+
             return response()->json($activeDone, 200);
         } else {
             $activeFail = [
@@ -151,7 +151,7 @@ class AuthenController extends Controller
         $this->updateCache($cacheKey, $user);
         $user_present = Cache::get($cacheKey);
         $token = JWTAuth::fromUser($user);
-        
+
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
@@ -229,16 +229,16 @@ class AuthenController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         $dataUpdate = [
-            "fullname"=> $request->fullname ?? $user->fullname,
-            "password"=> $request->password ?? $user->password,
-            "phone"=> $request->phone ?? $user->phone,
-            "email"=> $request->email ?? $user->email,
-            "description"=> $request->description ?? $user->description,
-            "genre"=> $request->genre ?? $user->genre,
-            "datebirth"=> $request->datebirth ?? $user->datebirth,
-            "avatar"=> $request->avatar ?? $user->avatar,
-            "address_id"=> $request->address_id ?? $user->address_id,
-            "login_at"=> now(),
+            "fullname" => $request->fullname ?? $user->fullname,
+            "password" => $request->password ?? $user->password,
+            "phone" => $request->phone ?? $user->phone,
+            "email" => $request->email ?? $user->email,
+            "description" => $request->description ?? $user->description,
+            "genre" => $request->genre ?? $user->genre,
+            "datebirth" => $request->datebirth ?? $user->datebirth,
+            "avatar" => $request->avatar ?? $user->avatar,
+            // "address_id"=> $request->address_id ?? $user->address_id, // Bỏ dòng này
+            "login_at" => now(),
         ];
         $user = UsersModel::where('id', $id)->update($dataUpdate);
 
@@ -257,21 +257,23 @@ class AuthenController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         $dataUpdate = [
-            "fullname"=> $request->fullname ?? $user->fullname,
-            "phone"=> $request->phone ?? $user->phone,
-            "email"=> $request->email ?? $user->email,
-            "description"=> $request->description ?? $user->description,
-            "genre"=> $request->genre ?? $user->genre,
-            "datebirth"=> $request->datebirth ?? $user->datebirth,
-            "avatar"=> $request->avatar ?? $user->avatar,
-            "address_id"=> $request->address_id ?? $user->address_id,
-            "updated_at"=> now(),
+            "fullname" => $request->fullname ?? $user->fullname,
+            "phone" => $request->phone ?? $user->phone,
+            "email" => $request->email ?? $user->email,
+            "description" => $request->description ?? $user->description,
+            "genre" => $request->genre ?? $user->genre,
+            "datebirth" => $request->datebirth ?? $user->datebirth,
+            "avatar" => $request->avatar ?? $user->avatar,
+            // "address_id"=> $request->address_id ?? $user->address_id, // Bỏ dòng này 
+            "updated_at" => now(),
         ];
-        $user = UsersModel::where('id', $user->id)->update($dataUpdate);
+
+        UsersModel::where('id', $user->id)->update($dataUpdate);
+        $user = UsersModel::find($user->id);
 
         // Update cache
         $this->updateCache('list_users_vnshop', UsersModel::all());
-        $this->updateCache('user_present', UsersModel::find($user->id));
+        $this->updateCache('user_present', $user);
 
         $dataDone = [
             'status' => true,
@@ -290,14 +292,16 @@ class AuthenController extends Controller
             return response()->json(['error' => 'Mật khẩu không đúng'], 401);
         }
         $dataUpdate = [
-            "password"=> Hash::make($request->new_password),
-            "updated_at"=> now(),
+            "password" => Hash::make($request->new_password),
+            "updated_at" => now(),
         ];
-        $user = UsersModel::where('id', $user->id)->update($dataUpdate);
+
+        UsersModel::where('id', $user->id)->update($dataUpdate);
+        $user = UsersModel::find($user->id);
 
         // Update cache
         $this->updateCache('list_users_vnshop', UsersModel::all());
-        $this->updateCache('user_present', UsersModel::find($user->id));
+        $this->updateCache('user_present', $user);
 
         $dataDone = [
             'status' => true,
@@ -334,7 +338,7 @@ class AuthenController extends Controller
         $user = UsersModel::where('email', $email)->first();
 
         if ($user) {
-          return $this->reset_password($request, $token, $email);
+            return $this->reset_password($request, $token, $email);
         }
     }
 
@@ -378,7 +382,7 @@ class AuthenController extends Controller
     public function destroy(string $id)
     {
         $dataUpdate = [
-            "status"=> 102,
+            "status" => 102,
         ];
         $user = UsersModel::where('id', $id)->update($dataUpdate);
 
