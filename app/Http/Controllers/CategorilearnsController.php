@@ -44,7 +44,7 @@ class CategorilearnsController extends Controller
         $dataInsert = [
             "title"=> $request->title,
             "status"=> $request->status,
-            'create_by' => $request->input('create_by') ?? null,
+            'create_by' => auth()->user()->id,
             "created_at"=> now(),
         ];
         Categori_learnModel::create($dataInsert);
@@ -95,7 +95,7 @@ class CategorilearnsController extends Controller
     $Categori_learn->update([
         "title" => $request->title,
         "status" => $request->status,
-        'create_by' => $request->input('create_by') ?? null,
+        'update_by' => auth()->user()->id,
         "updated_at" => now(),
     ]);
 

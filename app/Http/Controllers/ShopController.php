@@ -112,21 +112,22 @@ class ShopController extends Controller
             $Shop = Shop::create($dataInsert);
             $this->shop_manager_store($Shop, $user->id, 'owner', 1);
 
-            // TẠM THƠI ẨN THÊM KHÓA HỌC CHO SHOP
-
-            // $learningInsert = [
-            //     'learn_id' => $rqt->learn_id,
-            //     'shop_id' => $Shop->id,
-            //     'status' => 101, // Chưa học
-            //     'create_by' => $user->id
-            // ];
-            // $learning_seller = Learning_sellerModel::create($learningInsert);
-
-            // TẠM THƠI ẨN THÊM KHÓA HỌC CHO SHOP
+            $learningInsert = [
+                'learn_id' => $rqt->learn_id,
+                'shop_id' => $Shop->id,
+                'status' => 101, // Chưa học
+                'create_by' => $user->id
+            ];
+            $learning_seller = Learning_sellerModel::create($learningInsert);
 
             Cache::forget('all_shops');
 
-            return $this->shop_manager_store($Shop, $user->id, 'owner', 1);
+            return $this->successResponse("Tạo Shop thành công", [
+                'data' => [
+                    'Shop' => $Shop,
+                    'Learning_seller' => $learning_seller
+                ],
+            ]);
         } catch (\Throwable $th) {
             return $this->errorResponse("Tạo Shop không thành công", $th->getMessage());
         }
