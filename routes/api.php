@@ -79,7 +79,6 @@ use App\Http\Controllers\VoucherToShopController;
                 Route::resource('support_main', Support_mainController::class);
                 Route::resource('Comments', CommentsController::class);
                 Route::resource('Wishlists', WishlistController::class);
-                Route::resource('Product_to_shops', ProducttoshopController::class);
                 Route::resource('Product_to_carts', ProducttocartController::class);
                 Route::resource('voucher_shop', VoucherToShopController::class);
                 // Route::resource('learning_seller', Learning_sellerController::class);

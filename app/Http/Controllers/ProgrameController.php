@@ -61,7 +61,7 @@ class ProgrameController extends Controller
     public function update(ProgrameRequest $request, string $id)
     {
         $program = Programme_detail::find($id);
-
+dd($program);
         if (!$program) {
             return $this->errorResponse("Chương trình không tồn tại", 404);
         }
