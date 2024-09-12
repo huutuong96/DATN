@@ -33,6 +33,10 @@ class NotificationController extends Controller
 
     public function store(Request $request)
     {
+        if (!$request->has('user_id') || !$request->user_id) {
+            return response()->json(['error' => 'user_id không được để trống'], 400);
+        }
+
         $notification = new Notification();
         $notification->type = $request->type;
         $notification->user_id = $request->user_id;
@@ -59,7 +63,7 @@ class NotificationController extends Controller
             $notificationToShops->image = $image ?? null;
             $notificationToShops->shop_id = $request->shop_id;
             $notificationToShops->save();
-            
+
             $notification->id_notification = $notificationToShops->id;
         }
         $notification->save();

@@ -135,7 +135,7 @@ class Categori_ShopsController extends Controller
             'image' => $imageUrl ?? $categori_shops->image,
             'status' => $request->status ?? $categori_shops->status,
             'parent_id' => $request->parent_id ?? $categori_shops->parent_id,
-            'create_by' => auth()->user()->id,
+            'update_by' => auth()->user()->id,
             'shop_id' => $request->shop_id ?? $categori_shops->shop_id,
             'category_id_main' => $request->category_id_main ?? $categori_shops->category_id_main
         ];

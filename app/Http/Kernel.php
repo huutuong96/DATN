@@ -21,13 +21,14 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        
+
 
     ];
     protected $routeMiddleware = [
         // Các middleware khác...
         'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
         'SendNotification' => \App\Http\Middleware\SendNotification::class,
+        'CheckShop' => \App\Http\Middleware\CheckShop::class,
     ];
     /**
      * The application's route middleware groups.
