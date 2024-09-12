@@ -114,13 +114,18 @@ class ShopController extends Controller
             $this->shop_manager_store($Shop, $user->id, 'owner', 1);
             $learningInsert = [
                 'learn_id' => $request->learn_id,
+
                 'shop_id' => $Shop->id,
                 'status' => 101, // Chưa học
                 'create_by' => $user->id
             ];
             $learning_seller = Learning_sellerModel::create($learningInsert);
-
-            return $this->shop_manager_store($Shop, $user->id, 'owner', 1);
+            return $this->successResponse("Tạo Shop thành công", [
+                'data' => [
+                    'Shop' => $Shop,
+                    'Learning_seller' => $learning_seller
+                ],
+            ]);
         } catch (\Throwable $th) {
             return $this->errorResponse("Tạo Shop không thành công", $th->getMessage());
         }
