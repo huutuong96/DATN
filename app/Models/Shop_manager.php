@@ -9,12 +9,19 @@ class Shop_manager extends Model
 {
     use HasFactory;
 
+    protected $table = 'shop_managers';
+
     protected $fillable = [
         'status',
-        'created_at',
-        'updated_at',
         'user_id',
         'shop_id',
         'role',
+        'created_at',
+        'updated_at'
     ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

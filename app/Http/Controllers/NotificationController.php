@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
 use App\Models\Notification;
 use Illuminate\Http\Request;
@@ -27,15 +27,17 @@ class NotificationController extends Controller
         $notifications = Cache::remember($cacheKey, 60 * 60, function () use ($userId) {
             return Notification::where('user_id', $userId)->get();
         });
-
+    //    dd($notifications);
         return response()->json($notifications);
     }
 
     public function store(Request $request)
-    {
+    {  
+       
+        $user = JWTAuth::parseToken()->authenticate();
         $notification = new Notification();
         $notification->type = $request->type;
-        $notification->user_id = $request->user_id;
+        $notification->user_id = $user->id;
 
         if($request->image){
             $image = $request->file('image');
@@ -53,6 +55,7 @@ class NotificationController extends Controller
 
             $notification->id_notification = $notificationToMain->id;
         } elseif ($request->type === 'shop') {
+           
             $notificationToShops = new Notification_to_shop();
             $notificationToShops->title = $request->title;
             $notificationToShops->description = $request->description;
@@ -62,11 +65,12 @@ class NotificationController extends Controller
             
             $notification->id_notification = $notificationToShops->id;
         }
+      
         $notification->save();
 
         // Update cache
-        $this->updateCache('notifications_' . $request->user_id, Notification::where('user_id', $request->user_id)->get());
-
+        $this->updateCache('notifications_' . $user->id, Notification::where('user_id',  $user->id)->get());
+     
         return response()->json($notification, 201);
     }
 

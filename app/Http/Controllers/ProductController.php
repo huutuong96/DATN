@@ -60,12 +60,12 @@ class ProductController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $imageUrl = $uploadedImage['secure_url'];
-        } else {
-            $imageUrl = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $imageUrl = $uploadedImage['secure_url'];
+            } else {
+                $imageUrl = null;
         }
 
 
@@ -80,10 +80,9 @@ class ProductController extends Controller
             'quantity' => $request->quantity,
             'parent_id' => $request->parent_id,
             'create_by' => $user->id,
-            'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-            'color_id' => $request->color_id,
+            'color_id' => $request->color_id
         ];
 
         try {

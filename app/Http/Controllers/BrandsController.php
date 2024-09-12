@@ -57,7 +57,7 @@ class BrandsController extends Controller
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
                 'parent_id' => $request->parent_id,
-                'create_by' => auth()->user()->id,
+                'create_by' => $user->id,
             ];
             $brands = BrandsModel::create($dataInsert);
 
@@ -118,8 +118,11 @@ class BrandsController extends Controller
      * Update the specified resource in storage.
      */
     public function update(BrandRequest $request, $id)
-    {   
+
+    {
+
         $user = JWTAuth::parseToken()->authenticate();
+
         try {
             $brands = BrandsModel::find($id);
 

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Programme_detail;
 use Illuminate\Http\Request;
-use App\Http\Requests\ProgrameRequest;
+use App\Models\Programme_detail;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\ProgrameRequest;
 
 class ProgrameController extends Controller
 {
@@ -30,8 +31,12 @@ class ProgrameController extends Controller
      */
     public function store(ProgrameRequest $request)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         try {
-            $program = Programme_detail::create($request->validated());
+            $validatedData = $request->validated();
+            $validatedData['create_by'] = $user->id;
+            $program = Programme_detail::create($validatedData);
+            
             Cache::forget('all_programs');
             return $this->successResponse("Thêm chương trình thành công", $program);
         } catch (\Throwable $th) {
@@ -61,13 +66,17 @@ class ProgrameController extends Controller
     public function update(ProgrameRequest $request, string $id)
     {
         $program = Programme_detail::find($id);
-dd($program);
+        $user = JWTAuth::parseToken()->authenticate();
+
         if (!$program) {
             return $this->errorResponse("Chương trình không tồn tại", 404);
         }
 
         try {
-            $program->update($request->validated());
+
+            $validatedData = $request->validated();
+            $validatedData['update_by'] = $user->id;
+            $program->update($validatedData);
             Cache::forget('program_' . $id);
             Cache::forget('all_programs');
             return $this->successResponse("Cập nhật chương trình thành công", $program);
