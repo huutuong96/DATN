@@ -8,7 +8,6 @@ use App\Models\Image;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Cache;
 use Cloudinary\Cloudinary;
 use App\Models\ColorsModel;
 
@@ -19,12 +18,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Cache::remember('all_products', 60 * 60, function () {
-            return Product::all();
-        });
-        $images = Cache::remember('all_images', 60 * 60, function () {
-            return Image::all();
-        });
+        $products = Product::all();
+        $images = Image::all();
 
         if($products->isEmpty()){
             return response()->json(
@@ -83,7 +78,7 @@ class ProductController extends Controller
             'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-            'color_id' => $request->color_id,
+            'shop_id' => $request->shop_id,
         ];
 
         try {
@@ -127,16 +122,11 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Cache::remember('product_' . $id, 60 * 60, function () use ($id) {
-            return Product::find($id);
-        });
-        $images = Cache::remember('images_' . $product->id, 60 * 60, function () use ($product) {
-            return Image::where('product_id', $product->id)->get();
-        });
+        $product = Product::find($id);
+        $images = Image::where('product_id', $product->id)->get();
 
-        $images = Image::find($product->id);
         $product["images"] = $images;
-        
+
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -245,7 +235,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::find($id);
-            
+
             if (!$product) {
                 return response()->json([
                     'status' => false,
@@ -257,8 +247,6 @@ class ProductController extends Controller
             // $product->delete();
 
             // $product->update(['status' => 101]);
-            // Cache::forget('all_products');
-            // Cache::forget('product_' . $id);
 
             return response()->json([
                 'status' => true,

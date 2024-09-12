@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+
 
 class OrdersController extends Controller
 {
     public function index()
     {
-        $orders = Cache::remember('all_orders', 60 * 60, function () {
-            return OrdersModel::all();
-        });
+        $orders = OrdersModel::all();
 
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
@@ -22,11 +20,36 @@ class OrdersController extends Controller
         return $this->successResponse('Lấy dữ liệu thành công', $orders);
     }
 
+    public function store(OrderRequest $request)
+    {
+
+        $dataInsert = [
+            'user_id' => auth()->id(),
+            'status' => $request->status,
+            'address_id' => $request->address_id,
+            'shop_id' => $request->shop_id,
+            'total_price' => $request->total_price,
+            'note' => $request->note,
+        ];
+        $order = OrdersModel::create($dataInsert);
+        return $this->successResponse('Tạo Order thành công', $order);
+    }
+
     public function indexOrderToShop($id)
     {
-        $orders = Cache::remember('orders_shop_' . $id, 60 * 60, function () use ($id) {
-            return OrdersModel::where('shop_id', $id)->get();
-        });
+        $orders = OrdersModel::where('shop_id', $id)->get();
+
+
+        if ($orders->isEmpty()) {
+            return $this->errorResponse("Không tồn tại Order nào", 404);
+        }
+
+        return $this->successResponse('Lấy dữ liệu thành công', $orders);
+    }
+    public function indexOrderToUser()
+    {
+
+        $orders = OrdersModel::where('user_id', auth()->id())->get();
 
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
@@ -37,9 +60,7 @@ class OrdersController extends Controller
 
     public function show(string $id)
     {
-        $order = Cache::remember('order_' . $id, 60 * 60, function () use ($id) {
-            return OrdersModel::find($id);
-        });
+        $order = OrdersModel::find($id);
 
         if (!$order) {
             return $this->errorResponse("Order không tồn tại", 404);
@@ -50,9 +71,7 @@ class OrdersController extends Controller
 
     public function update(OrderRequest $request, string $id)
     {
-        $order = Cache::remember('order_' . $id, 60 * 60, function () use ($id) {
-            return OrdersModel::find($id);
-        });
+        $order = OrdersModel::find($id);
 
         if (!$order) {
             return $this->errorResponse("Order không tồn tại", 404);
@@ -65,9 +84,6 @@ class OrdersController extends Controller
 
         try {
             $order->update($dataUpdate);
-            Cache::forget('order_' . $id);
-            Cache::forget('all_orders');
-            Cache::forget('orders_shop_' . $order->shop_id);
             return $this->successResponse("Order đã được cập nhật", $order);
         } catch (\Throwable $th) {
             return $this->errorResponse("Cập nhật Order không thành công", $th->getMessage());
@@ -76,9 +92,7 @@ class OrdersController extends Controller
 
     public function destroy(string $id)
     {
-        $order = Cache::remember('order_' . $id, 60 * 60, function () use ($id) {
-            return OrdersModel::find($id);
-        });
+        $order = OrdersModel::find($id);
 
         if (!$order) {
             return $this->errorResponse("Order không tồn tại", 404);
@@ -86,9 +100,6 @@ class OrdersController extends Controller
 
         try {
             $order->update(['status' => 101]);
-            Cache::forget('order_' . $id);
-            Cache::forget('all_orders');
-            Cache::forget('orders_shop_' . $order->shop_id);
             return $this->successResponse("Order đã được xóa");
         } catch (\Throwable $th) {
             return $this->errorResponse("Xóa Order không thành công", $th->getMessage());

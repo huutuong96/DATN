@@ -63,7 +63,7 @@ class NotificationController extends Controller
             $notificationToShops->image = $image ?? null;
             $notificationToShops->shop_id = $request->shop_id;
             $notificationToShops->save();
-            
+
             $notification->id_notification = $notificationToShops->id;
         }
         $notification->save();
