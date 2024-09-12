@@ -13,6 +13,7 @@ use App\Models\AddressModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
+use App\Mail\ConfirmOderToCart;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 
@@ -89,22 +90,23 @@ class PurchaseController extends Controller
 
     public function purchaseToCart(Request $request)
     {
-        $carts = [
-            [
-                'product_id' => 30,
-                'quantity' => 10,
-                'shop_id' => 3,
-                'payment_id' => 9,
-                'ship_id' => 3,
-            ],                                       // DỮ LIỆU MẪU ĐẦU VÀO CỦA GIỎ HÀNG
-            [
-                'product_id' => 31,
-                'quantity' => 2,
-                'shop_id' => 3,
-                'payment_id' => 9,
-                'ship_id' => 3,
-            ],
-        ];
+        // $carts = [
+        //     [
+        //         'product_id' => 30,
+        //         'quantity' => 10,
+        //         'shop_id' => 3,
+        //         'payment_id' => 9,
+        //         'ship_id' => 3,
+        //     ],                                       // DỮ LIỆU MẪU ĐẦU VÀO CỦA GIỎ HÀNG
+        //     [
+        //         'product_id' => 31,
+        //         'quantity' => 2,
+        //         'shop_id' => 3,
+        //         'payment_id' => 9,
+        //         'ship_id' => 3,
+        //     ],
+        // ];
+        // dd($request->carts);
         $voucherToMainCode = null;
         $voucherToShopCode = null;
         if ($request->voucherToMainCode) {
@@ -126,8 +128,13 @@ class PurchaseController extends Controller
             }
         }
         try {
-
-            foreach ($carts as $cart) {
+            $allOrders = [];
+            $allOrderDetails = [];
+            $allProduct = [];
+            $allQuantity = [];
+            $totalQuantity = 0;
+            $grandTotalPrice = 0;
+            foreach ($request->carts as $cart) {
                 DB::beginTransaction();
 
                 $product = $this->getProduct($cart['shop_id'], $cart['product_id']);
@@ -141,9 +148,18 @@ class PurchaseController extends Controller
                 $orderDetail = $this->createOrderDetail($order, $product, $cart['quantity'], $totalPrice);
                 $product->decrement('quantity', $cart['quantity']);
 
+
+                $allProduct[] = $product;
+                $allQuantity[] = $cart['quantity'];
+                $allOrders[] = $order;
+                $allOrderDetails[] = $orderDetail;
+                $totalQuantity += $cart['quantity'];
+                $grandTotalPrice += $totalPrice;
                 DB::commit();
             }
-            Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $totalPrice));
+            // dd($allOrderDetails);
+            Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($allOrders, $allOrderDetails, $allProduct, $allQuantity, $totalQuantity, $grandTotalPrice));
+            // Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $totalPrice));
             $this->add_point_to_user();
             $this->check_point_to_user();
             $notificationData = [
@@ -254,10 +270,35 @@ class PurchaseController extends Controller
         $price = $product->sale_price && $product->sale_price < $product->price
             ? $product->sale_price
             : $product->price;
+
         return $price * $quantity;
     }
 
     private function applyVouchers($voucherToMainCode, $voucherToShopCode, &$totalPrice)
+    {
+        $voucherId = ['main' => null, 'shop' => null];
+
+        if ($voucherToMainCode) {
+            $voucherToMain = voucher_to_main::where('code', $voucherToMainCode)->first();
+            if ($voucherToMain) {
+                $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
+                $voucherId['shop'] = $voucherToMain->id;
+                $this->updateVoucherQuantity($voucherToMain);
+            }
+        }
+
+        if ($voucherToShopCode) {
+            $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where('status', 1)->first();
+            if ($voucherToShop) {
+                $totalPrice -= ($totalPrice * $voucherToShop->ratio / 100);
+                $voucherId['shop'] = $voucherToShop->id;
+                $this->updateVoucherQuantity($voucherToShop);
+            }
+        }
+
+        return $voucherId;
+    }
+    private function applyVouchersToCart($voucherToMainCode, $voucherToShopCode, &$totalPrice)
     {
         $voucherId = ['main' => null, 'shop' => null];
 

@@ -34,7 +34,7 @@ class ShopController extends Controller
     public function __construct()
     {
         $this->middleware('SendNotification');
-        $this->middleware('CheckShop')->except('store');
+        $this->middleware('CheckShop')->except('store', 'done_learning_seller');
 
     }
 
@@ -184,14 +184,11 @@ class ShopController extends Controller
     public function show_shop_members(string $id)
     {
         $members = Shop_manager::where('shop_id', $id)->with('users')->get();
-
         if ($members->isEmpty()) {
             return $this->errorResponse("Không tồn tại thành viên nào trong Shop này");
         }
-
         $user = JWTAuth::parseToken()->authenticate();
         $is_member = $members->contains('user_id', $user->id);
-
         return $this->successResponse("Lấy dữ liệu thành viên shop $id thành công", [
             'data' => [
                 'members' => $members,
@@ -541,10 +538,11 @@ class ShopController extends Controller
     {
         $learning = Learning_sellerModel::where('shop_id', $shopId)->first();
         if (!$learning) {
-            return $this->errorResponse('Học không tồn tại', 404);
+            return $this->errorResponse('Khóa học không tồn tại', 404);
         }
         $learning->status = 1; // ĐÃ HOÀN THÀNH KHÓA HỌC
         $learning->save();
+        return $this->successResponse('Hoàn thành khóa học thành công', $learning);
     }
 
     public function IsOwnerShop(){
@@ -553,4 +551,6 @@ class ShopController extends Controller
             return $this->errorResponse("Chỉ có chủ shop mới được phép thực hiện chức năng này, Bạn không phải là chủ sở hữu shop");
         }
     }
+
+
 }
