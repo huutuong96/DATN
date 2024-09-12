@@ -24,11 +24,11 @@ class CheckShop
             ?? $request->segment(2) // Assuming shop_id might be in the second segment of the URL
             ?? $request->header('X-Shop-ID') // In case it's passed as a custom header
             ?? $request->json('shop_id'); // For JSON payloads
-            dd("OK");
-        dd($shopId);
+        //     dd("OK");
+        // dd($shopId);
         // KIỂM TRA XEM SHOP CÓ HOÀN THÀNH KHÓA HỌC CHO NHÀ BÁN HÀNG KHÔNG
         $shop_learning = Learning_sellerModel::where('shop_id', $shopId)->first();
-        if($shop_learning->status == 101){
+        if ($shop_learning && $shop_learning->status == 101) {
             return response()->json([
                 'message' => 'Bạn chưa hoàn thành khóa học dành cho nhà bán hàng',
             ], 403);

@@ -99,6 +99,7 @@ class LearnController extends Controller
 
     $Learn->update([
         "title" => $request->title,
+        "content" => $request->content,
         "status" => $request->status,
         "category_id"=>$request->category_id,
         'update_by' => auth()->user()->id,

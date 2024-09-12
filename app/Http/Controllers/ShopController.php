@@ -311,8 +311,11 @@ class ShopController extends Controller
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $dataInsert['image'] = $uploadedImage['secure_url'];
-                $banner = Banner::create([
-                    'image' => $dataInsert['image'],
+                $banner = BannerShop::create([
+                    'title' => $request->title,
+                    'content' => $request->content,
+                    'status' => $request->status,
+                    'URL' => $dataInsert['image'],
                     'shop_id' => $shop->id,
                     'create_by' => auth()->user()->id,
                     'update_by' => auth()->user()->id,
@@ -388,7 +391,6 @@ class ShopController extends Controller
         $messageDetail = message_detail::create([
             'message_id' => $message->id,
             'content' => $request->content,
-            'content' => $rqt->content,
             'send_by' => auth()->user()->id,
             'status' => 1,
             'created_at' => now(),
