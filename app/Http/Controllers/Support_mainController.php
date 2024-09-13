@@ -39,10 +39,12 @@ class Support_mainController extends Controller
             'content' => 'required',
             'status' => 'required',
             'index' => 'required',
-            'category_support_id' => 'required|exists:category_supports,id',
+            'category_support_id' => 'required',
+            
         ]);
 
         try {
+            $validatedData['create_by'] = auth()->user()->id;
             $support = support_main::create($validatedData);
             Cache::forget('all_supports');
             return $this->successResponse("Thêm hỗ trợ thành công", $support);
@@ -98,7 +100,7 @@ class Support_mainController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+public function destroy(string $id)
     {
         try {
             $support = support_main::findOrFail($id);

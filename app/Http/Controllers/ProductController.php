@@ -20,7 +20,7 @@ class ProductController extends Controller
         $products = Product::paginate(10);
 
 
-        if($products->isEmpty()){
+        if ($products->isEmpty()) {
             return response()->json(
                 [
                     'status' => true,
@@ -55,11 +55,10 @@ class ProductController extends Controller
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'image' => $imageUrl,
+            'image' => $mainImageUrl, // Lưu ảnh chính vào bảng product
             'quantity' => $request->quantity,
             'parent_id' => $request->parent_id,
             'create_by' => $user->id,
-            'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
             'shop_id' => $request->shop_id,
@@ -81,7 +80,6 @@ class ProductController extends Controller
                     ]);
                 }
             }
-
             $dataDone = [
                 'status' => true,
                 'message' => "Sản phẩm đã được lưu",
@@ -89,7 +87,6 @@ class ProductController extends Controller
             ];
 
             return response()->json($dataDone, 200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -98,6 +95,7 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
 
 
     /**
@@ -124,6 +122,7 @@ class ProductController extends Controller
     }
 
     public function update(ProductRequest $request, string $id)
+
     {
         $product = Product::find($id);
 
@@ -134,46 +133,41 @@ class ProductController extends Controller
             ], 404);
         }
 
-
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $imageUrl = $uploadedImage['secure_url'];
+            $mainImageUrl = $uploadedImage['secure_url']; // Ảnh chính
         } else {
-            $imageUrl = $product->image;
+            $mainImageUrl = $product->image;
         }
 
         $dataInsert = [
-            'name' => $request->name,
-            'slug' => $request->slug ?? Str::slug($request->name),
-            'description' => $request->description,
-            'infomation' => $request->infomation,
-            'price' => $request->price,
-            'sale_price' => $request->sale_price,
-            'image' => $imageUrl,
-            'quantity' => $request->quantity,
-            'parent_id' => $request->parent_id,
-            'create_by' => $user->id,
-            'create_by' => $request->shop_id,
-            'category_id' => $request->category_id,
-            'brand_id' => $request->brand_id,
-            'color_id' => $request->color_id,
+            'name' => $request->name ?? $product->name,
+            'slug' => $request->filled('slug') ? $request->slug : Str::slug($request->name ?? $product->name),
+            'description' => $request->description ?? $product->description,
+            'infomation' => $request->infomation ?? $product->infomation,
+            'price' => $request->price ?? $product->price,
+            'sale_price' => $request->sale_price ?? $product->sale_price,
+            'image' => $mainImageUrl,
+            'quantity' => $request->quantity ?? $product->quantity,
+            'parent_id' => $request->parent_id ?? $product->parent_id,
+            'update_by' => $user->id,
+            'category_id' => $request->category_id ?? $product->category_id,
+            'brand_id' => $request->brand_id ?? $product->brand_id,
+            'shop_id' => $request->shop_id ?? $product->shop_id,
         ];
-
+        dd($dataInsert['name']);
         try {
-            $product ->update($dataInsert);
+            $product->update($dataInsert);
 
             if ($request->hasFile('images')) {
-                $images = $request->file('images');
-                Image::where("product_id", $product->id)->delete();
-                foreach ($images as $image) {
+                foreach ($request->file('images') as $image) {
                     $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                     $imageUrl = $uploadedImage['secure_url'];
 
-                    // Lưu URL vào bảng image
                     Image::create([
                         'product_id' => $product->id,
                         'url' => $imageUrl,
@@ -182,21 +176,20 @@ class ProductController extends Controller
                 }
             }
 
-            $dataDone = [
+            return response()->json([
                 'status' => true,
-                'message' => "sản phẩm Đã được cập nhật",
-                'Products' => $product,
-            ];
-            return response()->json($dataDone, 200);
-
+                'message' => "Sản phẩm đã được cập nhật",
+                'product' => $product,
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "cập nhật không thành công",
+                'message' => "Cập nhật không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

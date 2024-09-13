@@ -18,7 +18,19 @@ class CartController extends Controller
         $all_products_to_cart_to_users = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
         return response()->json($all_products_to_cart_to_users, 200);
     }
-
+    public function show($id)
+    {
+        $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
+        
+        $product_to_cart = ProducttocartModel::where('cart_id', $cart_to_users->id)->where('product_id', $id)->first();
+        
+        if (!$product_to_cart) {
+            return response()->json(['error' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
+        }
+    
+        return response()->json($product_to_cart, 200);
+    }
+    
     public function store(Request $request)
     {
         $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();

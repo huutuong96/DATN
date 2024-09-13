@@ -22,17 +22,7 @@ class OrdersController extends Controller
 
     public function store(OrderRequest $request)
     {
-
-        $dataInsert = [
-            'user_id' => auth()->id(),
-            'status' => $request->status,
-            'address_id' => $request->address_id,
-            'shop_id' => $request->shop_id,
-            'total_price' => $request->total_price,
-            'note' => $request->note,
-        ];
-        $order = OrdersModel::create($dataInsert);
-        return $this->successResponse('Tạo Order thành công', $order);
+        "Thường là tự động tạo";
     }
 
     public function indexOrderToShop($id)

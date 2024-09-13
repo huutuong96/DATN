@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
 use App\Models\Notification;
 use Illuminate\Http\Request;
@@ -27,21 +28,19 @@ class NotificationController extends Controller
         $notifications = Cache::remember($cacheKey, 60 * 60, function () use ($userId) {
             return Notification::where('user_id', $userId)->get();
         });
-
+        //    dd($notifications);
         return response()->json($notifications);
     }
 
     public function store(Request $request)
     {
-        if (!$request->has('user_id') || !$request->user_id) {
-            return response()->json(['error' => 'user_id không được để trống'], 400);
-        }
 
+        $user = JWTAuth::parseToken()->authenticate();
         $notification = new Notification();
         $notification->type = $request->type;
-        $notification->user_id = $request->user_id;
+        $notification->user_id = $user->id;
 
-        if($request->image){
+        if ($request->image) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
@@ -57,19 +56,22 @@ class NotificationController extends Controller
 
             $notification->id_notification = $notificationToMain->id;
         } elseif ($request->type === 'shop') {
+
             $notificationToShops = new Notification_to_shop();
             $notificationToShops->title = $request->title;
             $notificationToShops->description = $request->description;
             $notificationToShops->image = $image ?? null;
             $notificationToShops->shop_id = $request->shop_id;
+            $notificationToShops->create_by = $user->id;
             $notificationToShops->save();
 
             $notification->id_notification = $notificationToShops->id;
         }
+
         $notification->save();
 
         // Update cache
-        $this->updateCache('notifications_' . $request->user_id, Notification::where('user_id', $request->user_id)->get());
+        $this->updateCache('notifications_' . $user->id, Notification::where('user_id',  $user->id)->get());
 
         return response()->json($notification, 201);
     }
@@ -83,12 +85,12 @@ class NotificationController extends Controller
             return Notification::where('user_id', $userId)->findOrFail($id);
         });
 
-        if($notification->type === 'main'){
+        if ($notification->type === 'main') {
             $notificationToMain = Cache::remember('notification_main_' . $notification->id_notification, 60 * 60, function () use ($notification) {
                 return Notification_to_mainModel::findOrFail($notification->id_notification);
             });
             return response()->json($notificationToMain);
-        }elseif($notification->type === 'shop'){
+        } elseif ($notification->type === 'shop') {
             $notificationToShops = Cache::remember('notification_shop_' . $notification->id_notification, 60 * 60, function () use ($notification) {
                 return Notification_to_shop::findOrFail($notification->id_notification);
             });
@@ -115,6 +117,9 @@ class NotificationController extends Controller
         // Update cache
         $this->updateCache('notifications_' . $notification->user_id, Notification::where('user_id', $notification->user_id)->get());
         Cache::forget('notification_' . $notification->user_id . '_' . $id);
-        return response()->json(null, 204);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'xóa thành công'
+        ], 200);
     }
 }
