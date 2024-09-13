@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
 use App\Models\ColorsModel;
-
 class ProductController extends Controller
 {
     /**
@@ -18,8 +17,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
-        $images = Image::all();
+        $products = Product::paginate(10);
+
 
         if ($products->isEmpty()) {
             return response()->json(
@@ -34,33 +33,20 @@ class ProductController extends Controller
                 'status' => true,
                 'message' => "Lấy dữ liệu thành công",
                 'data' => $products,
-                'images' => $images,
+
             ]
         );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+        if ($request->hasFile('main_image')) {
+            $image = $request->file('main_image');
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $mainImageUrl = $uploadedImage['secure_url']; // Ảnh chính
-        } else {
-            $mainImageUrl = null;
+            $imageUrl = $uploadedImage['secure_url'];
         }
         $dataInsert = [
             'name' => $request->name,
@@ -119,9 +105,7 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
         $images = Image::where('product_id', $product->id)->get();
-
-        $product["images"] = $images;
-
+        $colors = ColorsModel::where('product_id', $product->id)->get();
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -137,18 +121,8 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function update(ProductRequest $request, string $id)
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
     {
         $product = Product::find($id);
 

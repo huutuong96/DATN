@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\VoucherToMain;
+use App\Models\voucher_to_main;
 use App\Http\Requests\VoucherRequest;
 use Illuminate\Support\Facades\Cache;
 
@@ -14,7 +14,7 @@ class VoucherToMainController extends Controller
     public function index()
     {
         $voucherMains = Cache::remember('all_voucher_mains', 60 * 60, function () {
-            return VoucherToMain::all();
+            return voucher_to_main::all();
         });
 
         if ($voucherMains->isEmpty()) {
@@ -30,7 +30,7 @@ class VoucherToMainController extends Controller
     public function store(VoucherRequest $request)
     {
         try {
-            $voucherMain = VoucherToMain::create($request->validated());
+            $voucherMain = voucher_to_main::create($request->validated());
             Cache::forget('all_voucher_mains');
             return $this->successResponse("Thêm voucher main thành công", $voucherMain);
         } catch (\Throwable $th) {
@@ -44,7 +44,7 @@ class VoucherToMainController extends Controller
     public function show(string $id)
     {
         $voucherMain = Cache::remember('voucher_main_' . $id, 60 * 60, function () use ($id) {
-            return VoucherToMain::find($id);
+            return voucher_to_main::find($id);
         });
 
         if (!$voucherMain) {
@@ -60,7 +60,7 @@ class VoucherToMainController extends Controller
     public function update(VoucherRequest $request, string $id)
     {
         $voucherMain = Cache::remember('voucher_main_' . $id, 60 * 60, function () use ($id) {
-            return VoucherToMain::find($id);
+            return voucher_to_main::find($id);
         });
 
         if (!$voucherMain) {
@@ -83,7 +83,7 @@ class VoucherToMainController extends Controller
     public function destroy(string $id)
     {
         $voucherMain = Cache::remember('voucher_main_' . $id, 60 * 60, function () use ($id) {
-            return VoucherToMain::find($id);
+            return voucher_to_main::find($id);
         });
 
         if (!$voucherMain) {
