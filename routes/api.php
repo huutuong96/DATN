@@ -149,3 +149,6 @@ Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confi
 
 Route::resource('images', ImageController::class);
 
+
+Route::post('/shipcaculate', [PurchaseController::class, 'ShipFee']);
+
