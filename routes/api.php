@@ -108,6 +108,7 @@ use App\Http\Controllers\OrdersController;
                     Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
                     Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]);
                     Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"]);
+                    Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
 
                 //SHOP
                 Route::resource('carts', CartController::class);

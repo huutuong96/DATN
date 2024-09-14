@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\voucher_to_main;
 use App\Http\Requests\VoucherRequest;
-use Illuminate\Support\Facades\Cache;
 
 class VoucherToMainController extends Controller
 {
@@ -13,9 +12,7 @@ class VoucherToMainController extends Controller
      */
     public function index()
     {
-        $voucherMains = Cache::remember('all_voucher_mains', 60 * 60, function () {
-            return voucher_to_main::all();
-        });
+        $voucherMains = voucher_to_main::all();
 
         if ($voucherMains->isEmpty()) {
             return $this->errorResponse('Không tồn tại voucher main nào');
@@ -29,9 +26,18 @@ class VoucherToMainController extends Controller
      */
     public function store(VoucherRequest $request)
     {
+        $dataInsert = [
+            'title' => $request->title,
+            'description' => $request->description,
+            'image' => $request->image,
+            'quantity' => $request->quantity,
+            'limitValue' => $request->limitValue,
+            'ratio' => $request->ratio,
+            'code' => $request->code,
+            'status' => $request->status,
+        ];
         try {
-            $voucherMain = voucher_to_main::create($request->validated());
-            Cache::forget('all_voucher_mains');
+            $voucherMain = voucher_to_main::create($dataInsert);
             return $this->successResponse("Thêm voucher main thành công", $voucherMain);
         } catch (\Throwable $th) {
             return $this->errorResponse('Thêm voucher main không thành công', $th->getMessage());
@@ -43,9 +49,7 @@ class VoucherToMainController extends Controller
      */
     public function show(string $id)
     {
-        $voucherMain = Cache::remember('voucher_main_' . $id, 60 * 60, function () use ($id) {
-            return voucher_to_main::find($id);
-        });
+        $voucherMain = voucher_to_main::find($id);
 
         if (!$voucherMain) {
             return $this->errorResponse("Không tồn tại voucher main nào", null, 404);
@@ -59,9 +63,7 @@ class VoucherToMainController extends Controller
      */
     public function update(VoucherRequest $request, string $id)
     {
-        $voucherMain = Cache::remember('voucher_main_' . $id, 60 * 60, function () use ($id) {
-            return voucher_to_main::find($id);
-        });
+        $voucherMain = voucher_to_main::find($id);
 
         if (!$voucherMain) {
             return $this->errorResponse("Voucher main không tồn tại", null, 404);
@@ -69,8 +71,6 @@ class VoucherToMainController extends Controller
 
         try {
             $voucherMain->update($request->validated());
-            Cache::forget('voucher_main_' . $id);
-            Cache::forget('all_voucher_mains');
             return $this->successResponse("Cập nhật voucher main thành công", $voucherMain);
         } catch (\Throwable $th) {
             return $this->errorResponse("Cập nhật voucher main không thành công", $th->getMessage());
@@ -82,9 +82,7 @@ class VoucherToMainController extends Controller
      */
     public function destroy(string $id)
     {
-        $voucherMain = Cache::remember('voucher_main_' . $id, 60 * 60, function () use ($id) {
-            return voucher_to_main::find($id);
-        });
+        $voucherMain = voucher_to_main::find($id);
 
         if (!$voucherMain) {
             return $this->errorResponse("Voucher main không tồn tại", null, 404);
@@ -92,8 +90,6 @@ class VoucherToMainController extends Controller
 
         try {
             $voucherMain->delete();
-            Cache::forget('voucher_main_' . $id);
-            Cache::forget('all_voucher_mains');
             return $this->successResponse("Xóa voucher main thành công");
         } catch (\Throwable $th) {
             return $this->errorResponse("Xóa voucher main không thành công", $th->getMessage());
