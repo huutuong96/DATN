@@ -16,10 +16,15 @@ use App\Mail\ConfirmOder;
 use App\Mail\ConfirmOderToCart;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-
+use App\Services\DistanceCalculatorService;
 
 class PurchaseController extends Controller
 {
+    protected $distanceService;
+    public function __construct(DistanceCalculatorService $distanceService)
+    {
+        $this->distanceService = $distanceService;
+    }
     public function purchase(Request $request)
     {
         $voucherToMainCode = null;
@@ -48,6 +53,8 @@ class PurchaseController extends Controller
             $product = $this->getProduct($request->shop_id, $request->product_id);
             $this->checkProductAvailability($product, $request->quantity);
             $totalPrice = $this->calculateTotalPrice($product, $request->quantity);
+            $shipFee = $this->calculateShippingFee($request);
+            $totalPrice += $shipFee;
             $voucherId = $this->applyVouchers($voucherToMainCode, $voucherToShopCode, $totalPrice);
             $order = $this->createOrder($request, $voucherId, $request->delivery_address);
             $orderDetail = $this->createOrderDetail($order, $product, $request->quantity, $totalPrice);
@@ -87,6 +94,105 @@ class PurchaseController extends Controller
             ], 400);
         }
     }
+
+    private function calculateShippingFee(Request $request)
+    {
+        $originLat = $request->origin_lat;
+        $originLng = $request->origin_lng;
+        $destinationLat = $request->destination_lat;
+        $destinationLng = $request->destination_lng;
+        $shippingType = $request->shipping_type ?? 'standard';
+        $insuranceOptions = $request->insurance_options ?? [];
+
+        $distance = $this->distanceService->calculateDistance($originLat, $originLng, $destinationLat, $destinationLng);
+
+        if ($distance === null) {
+            return response()->json(['error' => 'Unable to calculate distance'], 400);
+        }
+
+        // Xác định loại vùng dựa trên khoảng cách
+        $zoneType = $this->determineZoneType($distance);
+
+        $shippingFee = $this->distanceService->calculateShippingFee($distance, $zoneType, $shippingType, $insuranceOptions);
+
+        // return response()->json([
+        //     'distance_km' => $distance,
+        //     'zone_type' => $zoneType,
+        //     'shipping_fee' => $shippingFee,
+        //     'shipping_type' => $shippingType,
+        //     'insurance_options' => $insuranceOptions
+        // ]);
+        return $shippingFee;
+    }
+
+
+    // public function purchase(Request $request)
+    // {
+    //     $voucherToMainCode = null;
+    //     $voucherToShopCode = null;
+    //     if ($request->voucherToMainCode) {
+    //         $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode, 'main');
+    //         if (!$voucherToMainCode) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Mã giảm giá này không hợp lệ',
+    //             ], 400);
+    //         }
+    //     }
+    //     if ($request->voucherToShopCode) {
+    //         $voucherToShopCode = $this->getValidVoucherCode($request->voucherToShopCode, 'shop');
+    //         if (!$voucherToShopCode) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Mã giảm giá cửa hàng không hợp lệ',
+    //             ], 400);
+    //         }
+    //     }
+    //     try {
+    //         DB::beginTransaction();
+
+    //         $product = $this->getProduct($request->shop_id, $request->product_id);
+    //         $this->checkProductAvailability($product, $request->quantity);
+    //         $totalPrice = $this->calculateTotalPrice($product, $request->quantity);
+    //         $voucherId = $this->applyVouchers($voucherToMainCode, $voucherToShopCode, $totalPrice);
+    //         $order = $this->createOrder($request, $voucherId, $request->delivery_address);
+    //         $orderDetail = $this->createOrderDetail($order, $product, $request->quantity, $totalPrice);
+    //         $product->decrement('quantity', $request->quantity);
+    //         DB::commit();
+    //         Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $totalPrice));
+    //         $this->add_point_to_user();
+    //         $this->check_point_to_user();
+    //         $notificationData = [
+    //             'type' => 'main',
+    //             'title' => 'Đặt hàng thành công',
+    //             'description' => 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý',
+    //             'user_id' => auth()->id(),
+    //         ];
+    //         $notificationController = new NotificationController();
+    //         $notification = $notificationController->store(new Request($notificationData));
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Đặt hàng thành công',
+    //             'data' => [
+    //                 'order' => $order,
+    //                 'orderDetail' => $orderDetail,
+    //                 'product' => $product,
+    //                 'quantity' => $request->quantity,
+    //                 'totalPrice' => $totalPrice,
+    //             ],
+    //             'point' => auth()->user()->point,
+    //             'notification' => $notification
+    //         ], 200);
+
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Đặt hàng thất bại',
+    //             'error' => $e->getMessage()
+    //         ], 400);
+    //     }
+    // }
 
     public function purchaseToCart(Request $request)
     {
@@ -358,6 +464,44 @@ class PurchaseController extends Controller
             'subtotal' => $totalPrice,
             'status' => 1,
         ]);
+    }
+
+    public function ShipFee(Request $request){
+        $originLat = $request->origin_lat;
+        $originLng = $request->origin_lng;
+        $destinationLat = $request->destination_lat;
+        $destinationLng = $request->destination_lng;
+        $shippingType = $request->shipping_type ?? 'standard';
+        $insuranceOptions = $request->insurance_options ?? [];
+
+        $distance = $this->distanceService->calculateDistance($originLat, $originLng, $destinationLat, $destinationLng);
+
+        if ($distance === null) {
+            return response()->json(['error' => 'Unable to calculate distance'], 400);
+        }
+
+        // Xác định loại vùng dựa trên khoảng cách
+        $zoneType = $this->determineZoneType($distance);
+
+        $shippingFee = $this->distanceService->calculateShippingFee($distance, $zoneType, $shippingType, $insuranceOptions);
+
+        return response()->json([
+            'distance_km' => $distance,
+            'zone_type' => $zoneType,
+            'shipping_fee' => $shippingFee,
+            'shipping_type' => $shippingType,
+            'insurance_options' => $insuranceOptions
+        ]);
+    }
+
+    private function determineZoneType($distance) {
+        if ($distance <= 10) {
+            return 'noi_thanh_hcm';
+        } elseif ($distance <= 30) {
+            return 'ngoai_thanh_hcm';
+        } else {
+            return 'tinh';
+        }
     }
 
 
