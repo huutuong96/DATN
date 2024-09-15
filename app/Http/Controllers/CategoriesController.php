@@ -171,7 +171,7 @@ class CategoriesController extends Controller
                 ], 404);
             }
 
-            $categories->delete();
+            $categories->update(['status' => 0]);
 
             Cache::forget('category_'.$id);
             Cache::forget('all_categories_main');

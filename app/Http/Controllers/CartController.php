@@ -6,6 +6,7 @@ use App\Models\ProducttocartModel;
 use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CartController extends Controller
 {
@@ -14,7 +15,8 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
+        $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
         $cart_to_users_products = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
         $all_products_to_cart_to_users = Cache::remember('all_products_to_cart_to_users', 60 * 60, function () use ($cart_to_users_products, $cart_to_users) {
             return ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
@@ -24,7 +26,9 @@ class CartController extends Controller
 
     public function store(Request $request)
     {
-        $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
+        $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
+        dd($cart_to_users);
         $all_products = Cache::get('all_products');
         if (!$all_products) {
             $all_products = Product::all();
