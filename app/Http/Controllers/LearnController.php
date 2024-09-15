@@ -49,7 +49,7 @@ class LearnController extends Controller
             "content"=> $request->content,
             "status"=> $request->status,
             "category_id"=> $request->category_id,
-            'create_by' => $request->input('create_by') ?? null,
+            'create_by' => auth()->user()->id,
             "created_at"=> now(),
         ];
         LearnModel::create($dataInsert);
@@ -99,9 +99,10 @@ class LearnController extends Controller
 
     $Learn->update([
         "title" => $request->title,
+        "content" => $request->content,
         "status" => $request->status,
         "category_id"=>$request->category_id,
-        'create_by' => $request->input('create_by') ?? null,
+        'update_by' => auth()->user()->id,
         "updated_at" => now(),
     ]);
 

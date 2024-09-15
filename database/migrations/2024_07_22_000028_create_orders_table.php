@@ -18,7 +18,7 @@ return new class extends Migration
             $table->json('voucher_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('shop_id');
-
+            $table->string('delivery_address')->nullable();
             $table->integer('status')->default(1);
             $table->timestamps();
 

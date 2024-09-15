@@ -29,20 +29,7 @@ class OrderDetailController extends Controller
      */
     public function store(OrderDetailRequest $request)
     {
-        try {
-            $orderDetail = OrderDetailsModel::create([
-                "subtotal" => $request->subtotal,
-                "status" => $request->status,
-                "order_id" => $request->order_id,
-                "product_id" => $request->product_id,
-                'create_by' => auth()->id(),
-            ]);
-
-            Cache::forget('all_order_details');
-            return $this->successResponse("Đã lưu chi tiết đơn hàng", $orderDetail);
-        } catch (\Exception $e) {
-            return $this->errorResponse("Lưu chi tiết đơn hàng không thành công", $e->getMessage());
-        }
+        "Thường là tự động tạo";
     }
 
     /**
