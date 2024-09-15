@@ -47,7 +47,11 @@ use App\Http\Controllers\OrdersController;
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
-                Route::resource('categories', CategoriesController::class);
+
+                Route::post('categories', [CategoriesController::class, 'store']);
+                Route::get('categories/{id}', [CategoriesController::class, 'show']);
+                Route::put('categories/{id}', [CategoriesController::class, 'update']);
+                Route::delete('categories/{id}', [CategoriesController::class, 'destroy']);
                 Route::resource('categori_shops', Categori_ShopsController::class);
                 Route::resource('roles', RolesController::class);
                 Route::resource('address', AddressController::class);
@@ -94,7 +98,11 @@ use App\Http\Controllers\OrdersController;
 
                 //SHOP
 
-                    Route::resource('shops', ShopController::class);
+
+
+                    Route::post('shops', [ShopController::class, 'store']);
+                    Route::put('shops/{id}', [ShopController::class, 'update']);
+                    Route::delete('shops/{id}', [ShopController::class, 'destroy']);
                     Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
                     Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
                     Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]);
@@ -104,8 +112,6 @@ use App\Http\Controllers\OrdersController;
                     Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);
                     Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
                     Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]);
-                    Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
-                    Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
                     Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]);
                     Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"]);
                     Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
@@ -132,24 +138,48 @@ use App\Http\Controllers\OrdersController;
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy']);
 
+            // Platform Fees Routes
+            Route::get('/platformfees', [TaxController::class, 'indexPlatformFees']);
+            Route::post('/platformfees', [TaxController::class, 'storePlatformFee']);
+            Route::get('/platformfees/{id}', [TaxController::class, 'showPlatformFee']);
+            Route::put('/platformfees/{id}', [TaxController::class, 'updatePlatformFee']);
+            Route::delete('/platformfees/{id}', [TaxController::class, 'destroyPlatformFee']);
+
+            // Order Tax Details Routes
+            Route::get('/ordertaxdetails', [TaxController::class, 'indexOrderTaxDetails']);
+            Route::post('/ordertaxdetails', [TaxController::class, 'storeOrderTaxDetail']);
+            Route::get('/ordertaxdetails/{id}', [TaxController::class, 'showOrderTaxDetail']);
+            Route::put('/ordertaxdetails/{id}', [TaxController::class, 'updateOrderTaxDetail']);
+            Route::delete('/ordertaxdetails/{id}', [TaxController::class, 'destroyOrderTaxDetail']);
+
+            // Order Fee Details Routes
+            Route::get('/orderfeedetails', [TaxController::class, 'indexOrderFeeDetails']);
+            Route::post('/orderfeedetails', [TaxController::class, 'storeOrderFeeDetail']);
+            Route::get('/orderfeedetails/{id}', [TaxController::class, 'showOrderFeeDetail']);
+            Route::put('/orderfeedetails/{id}', [TaxController::class, 'updateOrderFeeDetail']);
+            Route::delete('/orderfeedetails/{id}', [TaxController::class, 'destroyOrderFeeDetail']);
+
 
 });
-Route::get('products/{id}', [ProductController::class, 'show']);
-Route::get('products', [ProductController::class, 'index']);
+        Route::get('products/{id}', [ProductController::class, 'show']);
+        Route::get('products', [ProductController::class, 'index']);
 
+        Route::get('shops', [ShopController::class, 'index']);
+        Route::get('shops/{id}', [ShopController::class, 'show']);
+        Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+        Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
 
+        Route::get('categories', [CategoriesController::class, 'index']);
 
 Route::get('login', [MessageController::class, "login"]);
-
-
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
 Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
 
-Route::resource('images', ImageController::class);
+Route::get('/', function () {
+    return response()->json(['message' => 'Đây là API VNSHOP']);
+});
 
-
-Route::post('/shipcaculate', [PurchaseController::class, 'ShipFee']);
 
