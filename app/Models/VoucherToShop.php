@@ -16,7 +16,7 @@ class VoucherToShop extends Model
         'description',
         'image',
         'quantity',
-        'condition',
+        'limitValue',
         'ratio',
         'code',
         'shop_id',
