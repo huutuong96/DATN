@@ -19,6 +19,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
 use App\Mail\ConfirmOderToCart;
+use App\Models\Cart_to_usersModel;
+use App\Models\ProducttocartModel;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Services\DistanceCalculatorService;
@@ -98,7 +100,6 @@ class PurchaseController extends Controller
                 'point' => auth()->user()->point,
                 'notification' => $notification
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -161,31 +162,24 @@ class PurchaseController extends Controller
             $allQuantity = [];
             $totalQuantity = 0;
             $grandTotalPrice = 0;
-            // dd($request->carts);
+
             DB::beginTransaction();
             $order = $this->createOrder($request);
             foreach ($request->carts as $cart) {
-
-
                 $product = $this->getProduct($cart['shop_id'], $cart['product_id']);
                 $this->checkProductAvailability($product, $cart['quantity']);
-
                 $totalPrice = $this->calculateTotalPrice($product, $cart['quantity']);
 
                 // $order = $this->createOrder($cart, $voucherId, $request->delivery_address);
 
                 $orderDetail = $this->createOrderDetail($order, $product, $cart['quantity'], $totalPrice, $cart['shop_id']);
                 $product->decrement('quantity', $cart['quantity']);
-
-
-
                 $allProduct[] = $product;
                 $allQuantity[] = $cart['quantity'];
                 $allOrders[] = $order;
                 $allOrderDetails[] = $orderDetail;
                 $totalQuantity += $cart['quantity'];
                 $grandTotalPrice += $totalPrice;
-
             }
             $voucherId = $this->applyVouchersToCart($voucherToMainCode, $voucherToShopCode, $grandTotalPrice);
             $order->voucher_id = $voucherId;
@@ -195,17 +189,17 @@ class PurchaseController extends Controller
             $point = $this->add_point_to_user();
             $checkRank = $this->check_point_to_user();
             $totalPrice = $this->discountsByRank($checkRank, $totalPrice);
-            $totalPrice += $shipFee;
+            $grandTotalPrice += $shipFee;
             $this->addOrderFeesToTotal($order, $grandTotalPrice);
             DB::commit();
             Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($allOrders, $allOrderDetails, $allProduct, $allQuantity, $totalQuantity, $grandTotalPrice));
-
             $notificationData = [
                 'type' => 'main',
                 'title' => 'Đặt hàng thành công',
                 'description' => 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý',
                 'user_id' => auth()->id(),
             ];
+
             $notificationController = new NotificationController();
             $notification = $notificationController->store(new Request($notificationData));
             return response()->json([
@@ -221,7 +215,6 @@ class PurchaseController extends Controller
                 'point' => auth()->user()->point,
                 'notification' => $notification
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -272,27 +265,27 @@ class PurchaseController extends Controller
     }
     private function getValidVoucherCode($code, $type)
     {
-            if ($type === 'main') {
-                $voucher = voucher_to_main::where('code', $code)
-                    ->where('quantity', '>=', 1)
-                    ->where('status', 1)
-                    ->first();
-                return $voucher ? $voucher->code : null;
-            }
-            if ($type === 'shop') {
-                $voucher = VoucherToShop::where('code', $code)
-                    ->where('quantity', '>=', 1)
-                    ->where('status', 1)
-                    ->first();
-                return $voucher ? $voucher->code : null;
-            }
+        if ($type === 'main') {
+            $voucher = voucher_to_main::where('code', $code)
+                ->where('quantity', '>=', 1)
+                ->where('status', 1)
+                ->first();
+            return $voucher ? $voucher->code : null;
+        }
+        if ($type === 'shop') {
+            $voucher = VoucherToShop::where('code', $code)
+                ->where('quantity', '>=', 1)
+                ->where('status', 1)
+                ->first();
+            return $voucher ? $voucher->code : null;
+        }
     }
 
     private function getProduct($shopId, $productId)
     {
-            return Product::where('shop_id', $shopId)
-                ->where('id', $productId)
-                ->first();
+        return Product::where('shop_id', $shopId)
+            ->where('id', $productId)
+            ->first();
     }
 
     private function checkProductAvailability($product, $quantity)
@@ -302,7 +295,6 @@ class PurchaseController extends Controller
             throw new \Exception('Không đủ hàng');
         }
     }
-
     private function calculateTotalPrice($product, $quantity)
     {
         $price = $product->sale_price && $product->sale_price < $product->price
@@ -369,7 +361,6 @@ class PurchaseController extends Controller
             if ($voucher->quantity <= 0) {
                 $voucher->update(['status' => 0]);
             }
-
         }
     }
 
@@ -386,7 +377,6 @@ class PurchaseController extends Controller
         ]);
         return $order;
     }
-
     private function createOrderDetail($order, $product, $quantity, $totalPrice,)
     {
         return OrderDetailsModel::create([
@@ -399,7 +389,8 @@ class PurchaseController extends Controller
     }
 
 
-    private function determineZoneType($distance) {
+    private function determineZoneType($distance)
+    {
         if ($distance <= 10) {
             return 'noi_thanh_hcm';
         } elseif ($distance <= 30) {
@@ -464,5 +455,4 @@ class PurchaseController extends Controller
 
         return $newTotal;
     }
-
 }
