@@ -118,6 +118,7 @@ class BrandsController extends Controller
      * Update the specified resource in storage.
      */
     public function update(BrandRequest $request, $id)
+
     {
 
         $user = JWTAuth::parseToken()->authenticate();
@@ -131,7 +132,7 @@ class BrandsController extends Controller
                     'message' => "Brand không tồn tại",
                 ], 404);
             }
-
+           
             $image = $request->file('image');
 
             // Check xem co anh moi duoc tai len khong
@@ -155,7 +156,7 @@ class BrandsController extends Controller
             ];
 
             $brands->update($dataUpdate);
-
+            
             return response()->json([
                 'status' => true,
                 'message' => "Cập nhật Brand thành công",
