@@ -16,10 +16,9 @@ class ConfirmMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $confirmMail, $token)
+    public function __construct($user, $token)
     {
         $this->user = $user;
-        $this->confirmMail = $confirmMail;
         $this->token = $token;
     }
 
@@ -42,7 +41,6 @@ class ConfirmMail extends Mailable
             view: 'emails.confirm',
             with: [
                 'user' => $this->user,
-                'confirmMail' => $this->confirmMail,
                 'token' => $this->token,
             ],
         );

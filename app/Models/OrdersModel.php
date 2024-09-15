@@ -18,6 +18,7 @@ class OrdersModel extends Model
         'user_id',
         'shop_id',
         'status',
+        'net_amount',
         'delivery_address',
         'create_at',
         'update_at'
