@@ -27,7 +27,6 @@ class NotificationController extends Controller
         $notifications = Cache::remember($cacheKey, 60 * 60, function () use ($userId) {
             return Notification::where('user_id', $userId)->get();
         });
-        //    dd($notifications);
         return response()->json($notifications);
     }
 
