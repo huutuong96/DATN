@@ -28,7 +28,7 @@ class CheckShop
         // dd(vars: $shopId);   
         // KIỂM TRA XEM SHOP CÓ HOÀN THÀNH KHÓA HỌC CHO NHÀ BÁN HÀNG KHÔNG
         $shop_learning = Learning_sellerModel::where('shop_id', $shopId)->first();
-        if ($shop_learning && $shop_learning->status == 101){
+        if ($shop_learning && $shop_learning->status == 101) {
             return response()->json([
                 'message' => 'Bạn chưa hoàn thành khóa học dành cho nhà bán hàng',
             ], 403);

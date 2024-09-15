@@ -55,7 +55,6 @@ use App\Http\Controllers\OrdersController;
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"]);
                 Route::post('permission/delete_access', [PremissionsController::class, "delete_access"]);
                 Route::resource('banners', BannerController::class);
-                Route::resource('products', ProductController::class);
                 Route::resource('faqs', FAQController::class);
                 Route::resource('taxs', TaxController::class);
                 Route::resource('ranks', RanksController::class);
@@ -108,7 +107,8 @@ use App\Http\Controllers\OrdersController;
                     Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
                     Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
                     Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]);
-                    Route::get('shop/done_learning_seller/{id}', [ShopController::class, "done_learning_seller"]);
+                    Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"]);
+                    Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
 
                 //SHOP
                 Route::resource('carts', CartController::class);
@@ -128,8 +128,17 @@ use App\Http\Controllers\OrdersController;
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
 
+            Route::post('products', [ProductController::class, 'store']);
+            Route::put('products/{id}', [ProductController::class, 'update']);
+            Route::delete('products/{id}', [ProductController::class, 'destroy']);
+
 
 });
+Route::get('products/{id}', [ProductController::class, 'show']);
+Route::get('products', [ProductController::class, 'index']);
+
+
+
 Route::get('login', [MessageController::class, "login"]);
 
 
@@ -140,4 +149,7 @@ Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
 
 Route::resource('images', ImageController::class);
+
+
+Route::post('/shipcaculate', [PurchaseController::class, 'ShipFee']);
 

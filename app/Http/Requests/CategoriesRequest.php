@@ -29,6 +29,7 @@ class CategoriesRequest extends FormRequest
             'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|integer|in:0,1',
             'parent_id' => 'nullable|integer',
+            'category_id_main' => 'integer'
         ];
     }
 

@@ -27,19 +27,19 @@ class NotificationController extends Controller
         $notifications = Cache::remember($cacheKey, 60 * 60, function () use ($userId) {
             return Notification::where('user_id', $userId)->get();
         });
-    //    dd($notifications);
+        //    dd($notifications);
         return response()->json($notifications);
     }
 
     public function store(Request $request)
-    {  
-       
+    {
+
         $user = JWTAuth::parseToken()->authenticate();
         $notification = new Notification();
         $notification->type = $request->type;
         $notification->user_id = $user->id;
 
-        if($request->image){
+        if ($request->image) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
@@ -55,7 +55,6 @@ class NotificationController extends Controller
 
             $notification->id_notification = $notificationToMain->id;
         } elseif ($request->type === 'shop') {
-           
             $notificationToShops = new Notification_to_shop();
             $notificationToShops->title = $request->title;
             $notificationToShops->description = $request->description;
@@ -66,12 +65,10 @@ class NotificationController extends Controller
 
             $notification->id_notification = $notificationToShops->id;
         }
-      
         $notification->save();
 
         // Update cache
         $this->updateCache('notifications_' . $user->id, Notification::where('user_id',  $user->id)->get());
-     
         return response()->json($notification, 201);
     }
 
@@ -84,12 +81,12 @@ class NotificationController extends Controller
             return Notification::where('user_id', $userId)->findOrFail($id);
         });
 
-        if($notification->type === 'main'){
+        if ($notification->type === 'main') {
             $notificationToMain = Cache::remember('notification_main_' . $notification->id_notification, 60 * 60, function () use ($notification) {
                 return Notification_to_mainModel::findOrFail($notification->id_notification);
             });
             return response()->json($notificationToMain);
-        }elseif($notification->type === 'shop'){
+        } elseif ($notification->type === 'shop') {
             $notificationToShops = Cache::remember('notification_shop_' . $notification->id_notification, 60 * 60, function () use ($notification) {
                 return Notification_to_shop::findOrFail($notification->id_notification);
             });

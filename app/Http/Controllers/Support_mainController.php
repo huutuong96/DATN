@@ -100,7 +100,7 @@ class Support_mainController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+public function destroy(string $id)
     {
         try {
             $support = support_main::findOrFail($id);
