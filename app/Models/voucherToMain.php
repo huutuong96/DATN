@@ -16,7 +16,7 @@ class voucherToMain extends Model
         'description',
         'image',
         'quantity',
-        'condition',
+        'limitValue',
         'ratio',
         'code',
         'status',

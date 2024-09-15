@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\CategoriesModel;
 use App\Http\Requests\CategoriesRequest;
-use Illuminate\Support\Facades\Cache;
 
 class CategoriesController extends Controller
 {
@@ -16,9 +15,7 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Cache::remember('all_categories_main', 60 * 60, function () {
-            return CategoriesModel::all();
-        });
+        $categories = CategoriesModel::where('status', 1)->get();
 
         if ($categories->isEmpty()) {
             return response()->json(
@@ -56,8 +53,6 @@ class CategoriesController extends Controller
 
             $categories = CategoriesModel::create($dataInsert);
 
-            Cache::forget('all_categories_main');
-
             return response()->json([
                 'status' => true,
                 'message' => "Thêm danh mục thành công",
@@ -77,11 +72,8 @@ class CategoriesController extends Controller
      */
     public function show(string $id)
     {
-        
         try {
-            $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
-                return CategoriesModel::find($id);
-            });
+            $categories = CategoriesModel::find($id);
 
             if (!$categories) {
                 return response()->json([
@@ -107,9 +99,7 @@ class CategoriesController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         try {
-            $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
-                return CategoriesModel::find($id);
-            });
+            $categories = CategoriesModel::find($id);
 
             if (!$categories) {
                 return response()->json([
@@ -136,9 +126,7 @@ class CategoriesController extends Controller
             ];
 
             $categories->update($dataUpdate);
-
-            Cache::forget('category_'.$id);
-            Cache::forget('all_categories_main');
+            $categories->update(['status' => 0]);
 
             return response()->json([
                 'status' => true,
@@ -160,9 +148,7 @@ class CategoriesController extends Controller
     public function destroy(string $id)
     {
         try {
-            $categories = Cache::remember('category_'.$id, 60 * 60, function () use ($id) {
-                return CategoriesModel::find($id);
-            });
+            $categories = CategoriesModel::find($id);
 
             if (!$categories) {
                 return response()->json([
@@ -172,9 +158,12 @@ class CategoriesController extends Controller
             }
 
             $categories->update(['status' => 0]);
+<<<<<<< HEAD
 
             Cache::forget('category_'.$id);
             Cache::forget('all_categories_main');
+=======
+>>>>>>> d5105970cb1cf07583a16c48ee5a69a7e7ffd055
 
             return response()->json([
                 'status' => true,

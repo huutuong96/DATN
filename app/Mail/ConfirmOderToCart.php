@@ -9,17 +9,21 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ConfirmMail extends Mailable
+class ConfirmOderToCart extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $token)
+    public function __construct($allOrders, $allOrderDetails, $allProduct, $allQuantity, $totalQuantity, $grandTotalPrice)
     {
-        $this->user = $user;
-        $this->token = $token;
+        $this->allOrders = $allOrders;
+        $this->allOrderDetails = $allOrderDetails;
+        $this->allProduct = $allProduct;
+        $this->allQuantity = $allQuantity;
+        $this->totalQuantity = $totalQuantity;
+        $this->grandTotalPrice = $grandTotalPrice;
     }
 
     /**
@@ -28,7 +32,7 @@ class ConfirmMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Vui lòng xác nhận đăng ký tài khoản',
+            subject: 'Đặt Hàng Thành Công - VN Shop',
         );
     }
 
@@ -38,10 +42,14 @@ class ConfirmMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.confirm',
+            view: 'emails.confirm_oder_tocart',
             with: [
-                'user' => $this->user,
-                'token' => $this->token,
+                'allOrders' => $this->allOrders,
+                'allOrderDetails' => $this->allOrderDetails,
+                'allProduct' => $this->allProduct,
+                'allQuantity' => $this->allQuantity,
+                'totalQuantity' => $this->totalQuantity,
+                'grandTotalPrice' => $this->grandTotalPrice,
             ],
         );
     }

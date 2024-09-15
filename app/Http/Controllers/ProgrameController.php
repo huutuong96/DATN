@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProgramtoshopModel;
 use Illuminate\Http\Request;
 use App\Models\Programme_detail;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -15,8 +16,10 @@ class ProgrameController extends Controller
      */
     public function index()
     {
+
+
         $programs = Cache::remember('all_programs', 60 * 60, function () {
-            return Programme_detail::all();
+            return ProgramtoshopModel::where('shop_id')->get();
         });
 
         if ($programs->isEmpty()) {
@@ -67,7 +70,7 @@ class ProgrameController extends Controller
     {
         $program = Programme_detail::find($id);
         $user = JWTAuth::parseToken()->authenticate();
-        
+
         if (!$program) {
             return $this->errorResponse("Chương trình không tồn tại", 404);
         }

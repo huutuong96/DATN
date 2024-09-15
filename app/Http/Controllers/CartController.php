@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 use App\Models\Cart_to_usersModel;
 use App\Models\ProducttocartModel;
 use App\Models\Product;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -18,14 +17,25 @@ class CartController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
         $cart_to_users_products = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
-        $all_products_to_cart_to_users = Cache::remember('all_products_to_cart_to_users', 60 * 60, function () use ($cart_to_users_products, $cart_to_users) {
-            return ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
-        });
+        $all_products_to_cart_to_users = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
         return response()->json($all_products_to_cart_to_users, 200);
     }
-
+    public function show($id)
+    {
+        $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
+        
+        $product_to_cart = ProducttocartModel::where('cart_id', $cart_to_users->id)->where('product_id', $id)->first();
+        
+        if (!$product_to_cart) {
+            return response()->json(['error' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
+        }
+    
+        return response()->json($product_to_cart, 200);
+    }
+    
     public function store(Request $request)
     {
+<<<<<<< HEAD
         $user = JWTAuth::parseToken()->authenticate();
         $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
         dd($cart_to_users);
@@ -35,13 +45,24 @@ class CartController extends Controller
             Cache::put('all_products', $all_products, 60 * 60);
         }
         $product = $all_products->where('id', $request->product_id)->first();
+=======
+        $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
+        $product = Product::find($request->product_id);
+>>>>>>> d5105970cb1cf07583a16c48ee5a69a7e7ffd055
         if (!$product) {
-            return response()->json(['error' => 'Product not found'], 404);
+            return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
+        }
+        $productExist = ProducttocartModel::where('cart_id', $cart_to_users->id)->where('product_id', $request->product_id)->first();
+        if ($productExist) {
+            ProducttocartModel::where('id', $productExist->id)->update([
+                'quantity' => $productExist->quantity + $request->quantity ?? 1,
+            ]);
+            return response()->json(['success' => 'Sản phẩm đã có trong giỏ hàng, cập nhật số lượng thành công'], 404);
         }
         $product_to_cart = ProducttocartModel::create([
             'cart_id' => $cart_to_users->id,
             'product_id' => $product->id,
-            'quantity' => $request->quantity,
+            'quantity' => $request->quantity ?? 1,
             'status' => 1,
         ]);
 
@@ -56,7 +77,6 @@ class CartController extends Controller
         if ($updated) {
             $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
             $all_products_to_cart_to_users = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
-            Cache::put('all_products_to_cart_to_users', $all_products_to_cart_to_users, 60 * 60);
             return response()->json($all_products_to_cart_to_users, 200);
         }
         return response()->json(['error' => 'Update failed'], 400);
@@ -71,7 +91,6 @@ class CartController extends Controller
         if ($deleted) {
             $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
             $all_products_to_cart_to_users = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
-            Cache::put('all_products_to_cart_to_users', $all_products_to_cart_to_users, 60 * 60);
             return response()->json($all_products_to_cart_to_users, 200);
         }
 

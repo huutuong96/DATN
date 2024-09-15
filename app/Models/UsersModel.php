@@ -28,7 +28,6 @@ class UsersModel extends Authenticatable implements JWTSubject {
         'login_at',
         'rank_id',
         'role_id',
-        'address_id',
         'status',
     ];
 
