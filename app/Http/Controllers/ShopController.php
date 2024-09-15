@@ -497,6 +497,22 @@ class ShopController extends Controller
         ]);
     }
 
+    public function VoucherToShop(Request $request, $shop_id){
+        $dataInsert = [
+            'title' => $request->title,
+            'description' => $request->description,
+            'image' => $request->image,
+            'quantity' => $request->quantity,
+            'limitValue' => $request->limitValue,
+            'ratio' => $request->ratio,
+            'code' => $request->code,
+            'shop_id' => $shop_id,
+            'status' => $request->status ?? 1,
+        ];
+        $VoucherToShop = VoucherToShop::create($dataInsert);
+        return $this->successResponse("Tạo Voucher thành công", $VoucherToShop);
+    }
+
 
     public function get_category_shop()
     {
@@ -599,11 +615,14 @@ class ShopController extends Controller
     public function done_learning_seller(string $shopId)
     {
         $learning = Learning_sellerModel::where('shop_id', $shopId)->first();
+        $shop = Shop::where('id', $shopId)->first();
         if (!$learning) {
             return $this->errorResponse('Khóa học không tồn tại', 404);
         }
         $learning->status = 1; // ĐÃ HOÀN THÀNH KHÓA HỌC
         $learning->save();
+        $shop->status = 1; // KÍCH HOẠT SHOP
+        $shop->save();
         return $this->successResponse('Hoàn thành khóa học thành công', $learning);
     }
 

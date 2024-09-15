@@ -67,30 +67,21 @@ class AuthenController extends Controller
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
         ];
+
         $user = UsersModel::create($dataInsert);
         $token = JWTAuth::fromUser($user);
+
         $user->update([
             'refesh_token' => $token,
         ]);
-        // Send confirm mail
-        $notificationData = [
-            'type' => 'main',
-            'user_id' => $user->id,
-            'title' => 'Vui lòng xác nhận đăng ký tài khoản',
-            'description' => 'Cảm ơn bạn đã đăng ký tài khoản. Vui lòng xác nhận đăng ký tài khoản để hoàn tất quá trình đăng ký.',
-        ];
-
-        $notificationController = new NotificationController();
-        $notification = $notificationController->store(new Request($notificationData));
-
+        // dd('ok');
         $dataDone = [
             'status' => true,
             'message' => "Đăng ký thành công, chưa kích hoạt",
             'user' => $user,
-            'notification' => $notification,
         ];
 
-        Mail::to($user->email)->send(new ConfirmMail($user, $notificationData, $token));
+        Mail::to($user->email)->send(new ConfirmMail($user, $token));
         return response()->json($dataDone, 201);
     }
 

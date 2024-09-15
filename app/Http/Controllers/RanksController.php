@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\RanksModel;
 use App\Http\Requests\RankRequest;
-use Illuminate\Support\Facades\Cache;
 
 class RanksController extends Controller
 {
@@ -13,9 +12,7 @@ class RanksController extends Controller
      */
     public function index()
     {
-        $ranks = Cache::remember('all_ranks', 60 * 60, function () {
-            return RanksModel::all();
-        });
+        $ranks = RanksModel::all();
 
         if ($ranks->isEmpty()) {
             return $this->errorResponse("Không tồn tại rank nào");
@@ -29,9 +26,15 @@ class RanksController extends Controller
      */
     public function store(RankRequest $request)
     {
+        $dataInsert = [
+            'title' => $request->title,
+            'description' => $request->description,
+            'condition' => $request->condition,
+            'value' => $request->value,
+            'limitValue' => $request->limitValue,
+        ];
         try {
-            $rank = RanksModel::create($request->validated());
-            Cache::forget('all_ranks');
+            $rank = RanksModel::create($dataInsert);
             return $this->successResponse("Thêm rank thành công", $rank);
         } catch (\Throwable $th) {
             return $this->errorResponse("Thêm rank không thành công", $th->getMessage());
@@ -43,9 +46,7 @@ class RanksController extends Controller
      */
     public function show(string $id)
     {
-        $rank = Cache::remember('rank_' . $id, 60 * 60, function () use ($id) {
-            return RanksModel::find($id);
-        });
+        $rank = RanksModel::find($id);
 
         if (!$rank) {
             return $this->errorResponse("Rank không tồn tại", 404);
@@ -59,9 +60,7 @@ class RanksController extends Controller
      */
     public function update(RankRequest $request, string $id)
     {
-        $rank = Cache::remember('rank_' . $id, 60 * 60, function () use ($id) {
-            return RanksModel::find($id);
-        });
+        $rank = RanksModel::find($id);
 
         if (!$rank) {
             return $this->errorResponse("Rank không tồn tại", 404);
@@ -69,8 +68,6 @@ class RanksController extends Controller
 
         try {
             $rank->update($request->validated());
-            Cache::forget('rank_' . $id);
-            Cache::forget('all_ranks');
             return $this->successResponse("Cập nhật rank thành công", $rank);
         } catch (\Throwable $th) {
             return $this->errorResponse("Cập nhật rank không thành công", $th->getMessage());
@@ -90,8 +87,6 @@ class RanksController extends Controller
 
         try {
             $rank->delete();
-            Cache::forget('rank_' . $id);
-            Cache::forget('all_ranks');
             return $this->successResponse("Xóa rank thành công");
         } catch (\Throwable $th) {
             return $this->errorResponse("Xóa rank không thành công", $th->getMessage());
