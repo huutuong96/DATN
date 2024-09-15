@@ -18,14 +18,12 @@ class ProgrameController extends Controller
         $programs = Cache::remember('all_programs', 60 * 60, function () {
             return Programme_detail::all();
         });
-
         if ($programs->isEmpty()) {
             return $this->errorResponse("Không tồn tại chương trình nào");
         }
 
         return $this->successResponse("Lấy dữ liệu thành công", $programs);
     }
-
     /**
      * Store a newly created resource in storage.
      */

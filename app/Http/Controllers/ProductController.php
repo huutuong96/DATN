@@ -8,9 +8,7 @@ use App\Models\Image;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Cache;
 use Cloudinary\Cloudinary;
-use App\Models\ColorsModel;
 
 class ProductController extends Controller
 {
@@ -19,12 +17,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Cache::remember('all_products', 60 * 60, function () {
-            return Product::all();
-        });
-        $images = Cache::remember('all_images', 60 * 60, function () {
-            return Image::all();
-        });
+        $products = Product::all();
+        $images = Image::all();
 
         if($products->isEmpty()){
             return response()->json(
@@ -60,15 +54,13 @@ class ProductController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
 
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                $imageUrl = $uploadedImage['secure_url'];
-            } else {
-                $imageUrl = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $mainImageUrl = $uploadedImage['secure_url']; // Ảnh chính
+        } else {
+            $mainImageUrl = null;
         }
-
-
         $dataInsert = [
             'name' => $request->name,
             'slug' => $request->slug ?? Str::slug($request->name),
@@ -76,18 +68,17 @@ class ProductController extends Controller
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'image' => $imageUrl,
+            'image' => $mainImageUrl, // Lưu ảnh chính vào bảng product
             'quantity' => $request->quantity,
             'parent_id' => $request->parent_id,
             'create_by' => $user->id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-            'color_id' => $request->color_id
+            'shop_id' => $request->shop_id,
         ];
 
         try {
             $product = Product::create($dataInsert);
-
             if ($request->hasFile('images')) {
                 $images = $request->file('images');
                 foreach ($images as $image) {
@@ -102,7 +93,6 @@ class ProductController extends Controller
                     ]);
                 }
             }
-
             $dataDone = [
                 'status' => true,
                 'message' => "Sản phẩm đã được lưu",
@@ -110,7 +100,6 @@ class ProductController extends Controller
             ];
 
             return response()->json($dataDone, 200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -120,22 +109,16 @@ class ProductController extends Controller
         }
     }
 
-
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        $product = Cache::remember('product_' . $id, 60 * 60, function () use ($id) {
-            return Product::find($id);
-        });
-        $images = Cache::remember('images_' . $product->id, 60 * 60, function () use ($product) {
-            return Image::where('product_id', $product->id)->get();
-        });
+        $product = Product::find($id);
+        $images = Image::where('product_id', $product->id)->get();
 
-        $images = Image::find($product->id);
         $product["images"] = $images;
-        
+
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -162,10 +145,10 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProductRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
         $product = Product::find($id);
-
+        // dd($product);
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -180,30 +163,30 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $imageUrl = $uploadedImage['secure_url'];
-        } else {
-            $imageUrl = $product->image;
+            $mainImageUrl = $uploadedImage['secure_url']; // Ảnh chính
+        }  else {
+            $mainImageUrl = $product->image;
         }
-
-        $dataInsert = [
+      
+        $dataupdate = [
             'name' => $request->name,
             'slug' => $request->slug ?? Str::slug($request->name),
             'description' => $request->description,
             'infomation' => $request->infomation,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'image' => $imageUrl,
+            'image' => $mainImageUrl, // Lưu ảnh chính vào bảng product
             'quantity' => $request->quantity,
             'parent_id' => $request->parent_id,
             'create_by' => $user->id,
-            'create_by' => $request->shop_id,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-            'color_id' => $request->color_id,
+            'shop_id' => $request->shop_id,
         ];
+          dd($dataupdate);
 
         try {
-            $product ->update($dataInsert);
+            $product ->update($dataupdate);
 
             if ($request->hasFile('images')) {
                 $images = $request->file('images');
@@ -244,7 +227,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::find($id);
-            
+
             if (!$product) {
                 return response()->json([
                     'status' => false,
@@ -256,8 +239,6 @@ class ProductController extends Controller
             // $product->delete();
 
             // $product->update(['status' => 101]);
-            // Cache::forget('all_products');
-            // Cache::forget('product_' . $id);
 
             return response()->json([
                 'status' => true,

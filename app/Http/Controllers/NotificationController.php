@@ -61,8 +61,9 @@ class NotificationController extends Controller
             $notificationToShops->description = $request->description;
             $notificationToShops->image = $image ?? null;
             $notificationToShops->shop_id = $request->shop_id;
+            $notificationToShops->create_by = $user->id;
             $notificationToShops->save();
-            
+
             $notification->id_notification = $notificationToShops->id;
         }
       
@@ -115,6 +116,9 @@ class NotificationController extends Controller
         // Update cache
         $this->updateCache('notifications_' . $notification->user_id, Notification::where('user_id', $notification->user_id)->get());
         Cache::forget('notification_' . $notification->user_id . '_' . $id);
-        return response()->json(null, 204);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'xóa thành công'
+        ], 200);
     }
 }
