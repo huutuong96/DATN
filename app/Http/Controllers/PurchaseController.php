@@ -19,6 +19,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
 use App\Mail\ConfirmOderToCart;
+use App\Models\Cart_to_usersModel;
+use App\Models\ProducttocartModel;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Services\DistanceCalculatorService;
@@ -134,7 +136,7 @@ class PurchaseController extends Controller
 
     public function purchaseToCart(Request $request)
     {
-
+        
         
         $voucherToMainCode = null;
         $voucherToShopCode = null;
@@ -163,31 +165,31 @@ class PurchaseController extends Controller
             $allQuantity = [];
             $totalQuantity = 0;
             $grandTotalPrice = 0;
-            // dd($request->carts);
+          
             DB::beginTransaction();
             $order = $this->createOrder($request);
+            // $cartToUser = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
+            
+            // // dd(vars: $cartToUser->id);
+            // // $carts = ProducttocartModel::where('cart_id', $cartToUser->id )->get();
+            // // dd( $carts);
             foreach ($request->carts as $cart) {
-
-
                 $product = $this->getProduct($cart['shop_id'], $cart['product_id']);
+                // dd($product);
                 $this->checkProductAvailability($product, $cart['quantity']);
-
+                // dd($cart['quantity']);
                 $totalPrice = $this->calculateTotalPrice($product, $cart['quantity']);
 
                 // $order = $this->createOrder($cart, $voucherId, $request->delivery_address);
 
                 $orderDetail = $this->createOrderDetail($order, $product, $cart['quantity'], $totalPrice, $cart['shop_id']);
                 $product->decrement('quantity', $cart['quantity']);
-
-
-
                 $allProduct[] = $product;
                 $allQuantity[] = $cart['quantity'];
                 $allOrders[] = $order;
                 $allOrderDetails[] = $orderDetail;
                 $totalQuantity += $cart['quantity'];
                 $grandTotalPrice += $totalPrice;
-
             }
             $voucherId = $this->applyVouchersToCart($voucherToMainCode, $voucherToShopCode, $grandTotalPrice);
             $order->voucher_id = $voucherId;
@@ -197,7 +199,7 @@ class PurchaseController extends Controller
             $point = $this->add_point_to_user();
             $checkRank = $this->check_point_to_user();
             $totalPrice = $this->discountsByRank($checkRank, $totalPrice);
-            $totalPrice += $shipFee;
+            $grandTotalPrice += $shipFee;
             $this->addOrderFeesToTotal($order, $grandTotalPrice);
             DB::commit();
             Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($allOrders, $allOrderDetails, $allProduct, $allQuantity, $totalQuantity, $grandTotalPrice));

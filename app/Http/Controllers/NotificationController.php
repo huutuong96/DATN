@@ -33,6 +33,9 @@ class NotificationController extends Controller
     public function store(Request $request)
     {
 
+     
+        $user = JWTAuth::parseToken()->authenticate();
+
         $notification = new Notification();
         $notification->type = $request->type;
         $notification->user_id = $user->id;
