@@ -70,7 +70,7 @@ class ProgrameController extends Controller
     {
         $program = Programme_detail::find($id);
         $user = JWTAuth::parseToken()->authenticate();
-        
+
         if (!$program) {
             return $this->errorResponse("Chương trình không tồn tại", 404);
         }

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
 use App\Models\Notification;
@@ -28,12 +27,13 @@ class NotificationController extends Controller
         $notifications = Cache::remember($cacheKey, 60 * 60, function () use ($userId) {
             return Notification::where('user_id', $userId)->get();
         });
-        //    dd($notifications);
         return response()->json($notifications);
     }
 
     public function store(Request $request)
-    {
+
+    {  
+        $user = JWTAuth::parseToken()->authenticate();
 
         $user = JWTAuth::parseToken()->authenticate();
         $notification = new Notification();

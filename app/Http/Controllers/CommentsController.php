@@ -78,18 +78,18 @@ class CommentsController extends Controller
                 $notificationController->store($notificationRequest);
             }
         }
-
         $product = Product::find($request->product_id);
 
-            // dd($user->id);
-            $notificationRequest = new Request([
-                'type' => 'shop',
-                'user_id' => $user->id,
-                'title' => 'Thông báo từ Sản Phẩm',
-                'description' => $user->fullname.' đã gửi một bình luận đến sản phẩm của bạn.',
-                'shop_id' => $product->shop_id
-            ]);
-            $notificationController->store($notificationRequest);
+            if ($product && $product->shop_id) {
+                $notificationRequest = new Request([
+                    'type' => 'shop',
+                    'user_id' => $user->id,
+                    'title' => 'Thông báo từ Sản Phẩm',
+                    'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
+                    'shop_id' => $product->shop_id
+                ]);
+                $notificationController->store($notificationRequest);
+            }
 
         $dataDone = [
             'status' => true,
