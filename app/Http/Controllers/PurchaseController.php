@@ -7,7 +7,7 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\Voucher;
 use App\Models\VoucherToShop;
-use App\Models\voucher_to_main;
+use App\Models\VoucherToMain;
 use App\Models\UsersModel;
 use App\Models\AddressModel;
 use App\Models\RanksModel;
@@ -137,6 +137,7 @@ class PurchaseController extends Controller
     {
         $voucherToMainCode = null;
         $voucherToShopCode = null;
+
         if ($request->voucherToMainCode) {
             $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode, 'main');
             if (!$voucherToMainCode) {
@@ -160,11 +161,13 @@ class PurchaseController extends Controller
             $allOrderDetails = [];
             $allProduct = [];
             $allQuantity = [];
-            $totalQuantity = 0;
-            $grandTotalPrice = 0;
+            $totalQuantity = 0;  
+            $grandTotalPrice = 0; 
+            // dd($request->carts);
 
             DB::beginTransaction();
             $order = $this->createOrder($request);
+            // dd($order);
             foreach ($request->carts as $cart) {
                 $product = $this->getProduct($cart['shop_id'], $cart['product_id']);
                 $this->checkProductAvailability($product, $cart['quantity']);
@@ -174,23 +177,37 @@ class PurchaseController extends Controller
 
                 $orderDetail = $this->createOrderDetail($order, $product, $cart['quantity'], $totalPrice, $cart['shop_id']);
                 $product->decrement('quantity', $cart['quantity']);
+
                 $allProduct[] = $product;
                 $allQuantity[] = $cart['quantity'];
                 $allOrders[] = $order;
                 $allOrderDetails[] = $orderDetail;
                 $totalQuantity += $cart['quantity'];
                 $grandTotalPrice += $totalPrice;
-            }
+            };
+            // dd($grandTotalPrice);
+
             $voucherId = $this->applyVouchersToCart($voucherToMainCode, $voucherToShopCode, $grandTotalPrice);
             $order->voucher_id = $voucherId;
+
             $order->save();
+
+            // dd($grandTotalPrice); giá hiện tại chưa tính j khác
 
             $shipFee = $this->calculateShippingFee($request);
             $point = $this->add_point_to_user();
             $checkRank = $this->check_point_to_user();
-            $totalPrice = $this->discountsByRank($checkRank, $totalPrice);
+
+            $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
             $grandTotalPrice += $shipFee;
-            $this->addOrderFeesToTotal($order, $grandTotalPrice);
+
+            $totalPriceOfShop = $grandTotalPrice;
+
+            $tax = $this->calculateStateTax($grandTotalPrice);
+            $totalPriceOfShop -= $tax;
+
+            $this->addOrderFeesToTotal($order, $totalPriceOfShop);
+
             DB::commit();
             Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($allOrders, $allOrderDetails, $allProduct, $allQuantity, $totalQuantity, $grandTotalPrice));
             $notificationData = [
@@ -265,8 +282,9 @@ class PurchaseController extends Controller
     }
     private function getValidVoucherCode($code, $type)
     {
+
         if ($type === 'main') {
-            $voucher = voucher_to_main::where('code', $code)
+            $voucher = voucherToMain::where('code', $code)
                 ->where('quantity', '>=', 1)
                 ->where('status', 1)
                 ->first();
@@ -309,7 +327,7 @@ class PurchaseController extends Controller
         $voucherId = ['main' => null, 'shop' => null];
 
         if ($voucherToMainCode) {
-            $voucherToMain = voucher_to_main::where('code', $voucherToMainCode)->first();
+            $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
                 $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
                 $voucherId['main'] = $voucherToMain->id;
@@ -334,7 +352,7 @@ class PurchaseController extends Controller
         $voucherId = ['main' => null, 'shop' => null];
 
         if ($voucherToMainCode) {
-            $voucherToMain = voucher_to_main::where('code', $voucherToMainCode)->first();
+            $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
                 $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
                 $voucherId['main'] = $voucherToMain->id;
@@ -400,13 +418,13 @@ class PurchaseController extends Controller
         }
     }
 
-    private function calculateStateTax($totalPrice)
+    private function calculateStateTax($grandTotalPrice)
     {
         $taxes = Tax::all();
         $totalTaxAmount = 0;
 
         foreach ($taxes as $tax) {
-            $taxAmount = $totalPrice * $tax->rate;
+            $taxAmount = $grandTotalPrice * $tax->rate;
             $totalTaxAmount += $taxAmount;
         }
 
@@ -428,13 +446,13 @@ class PurchaseController extends Controller
         }
     }
 
-    private function calculateOrderFees($order, $totalPrice)
+    private function calculateOrderFees($order, $totalPriceOfShop)
     {
         $platformFees = platform_fees::all();
         $totalFeeAmount = 0;
 
         foreach ($platformFees as $fee) {
-            $feeAmount = $totalPrice * $fee->rate;
+            $feeAmount = $totalPriceOfShop * $fee->rate;
             $totalFeeAmount += $feeAmount;
 
             order_fee_details::create([
@@ -447,10 +465,10 @@ class PurchaseController extends Controller
         return round($totalFeeAmount, 2);
     }
 
-    private function addOrderFeesToTotal($order, $totalPrice)
+    private function addOrderFeesToTotal($order, $totalPriceOfShop)
     {
-        $feeAmount = $this->calculateOrderFees($order, $totalPrice);
-        $newTotal = $totalPrice - $feeAmount;
+        $feeAmount = $this->calculateOrderFees($order, $totalPriceOfShop);
+        $newTotal = $totalPriceOfShop - $feeAmount;
         $order->update(['net_amount' => $newTotal]);
 
         return $newTotal;

@@ -158,6 +158,12 @@ class CategoriesController extends Controller
             }
 
             $categories->update(['status' => 0]);
+<<<<<<< HEAD
+
+            Cache::forget('category_'.$id);
+            Cache::forget('all_categories_main');
+=======
+>>>>>>> d5105970cb1cf07583a16c48ee5a69a7e7ffd055
 
             return response()->json([
                 'status' => true,
