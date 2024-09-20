@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class voucher_to_main extends Model
+class voucherToMain extends Model
 {
     use HasFactory;
     protected $table = 'voucher_to_main';

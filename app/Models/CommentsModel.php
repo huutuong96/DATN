@@ -18,7 +18,12 @@ class CommentsModel extends Model
         'status',
         'parent_id',
         'product_id',
+        'level',
         'user_id'
     ];
+    public function parent()
+    {
+        return $this->hasMany(CommentsModel::class, 'parent_id'); 
+    }
 
 }
