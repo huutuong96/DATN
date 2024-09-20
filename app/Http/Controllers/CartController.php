@@ -35,20 +35,8 @@ class CartController extends Controller
     
     public function store(Request $request)
     {
-<<<<<<< HEAD
-        $user = JWTAuth::parseToken()->authenticate();
-        $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
-        dd($cart_to_users);
-        $all_products = Cache::get('all_products');
-        if (!$all_products) {
-            $all_products = Product::all();
-            Cache::put('all_products', $all_products, 60 * 60);
-        }
-        $product = $all_products->where('id', $request->product_id)->first();
-=======
         $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
         $product = Product::find($request->product_id);
->>>>>>> d5105970cb1cf07583a16c48ee5a69a7e7ffd055
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
