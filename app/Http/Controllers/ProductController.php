@@ -16,8 +16,6 @@ use App\Models\product_variants;
 use App\Models\attributes;
 use App\Models\Attribute;
 use App\Models\categoryattribute;
-use App\Models\product_prices;
-use App\Models\price_histories;
 use Carbon\Carbon;
 
 

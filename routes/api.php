@@ -44,7 +44,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\VoucherToShopController;
 use App\Http\Controllers\OrdersController;
-use App\Http\Controllers\ProductPriceController;
+
 
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
@@ -191,8 +191,3 @@ Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
 Route::get('test', [AuthenController::class, "test"]);
-
-
-Route::post('/products/{id}/update-price', [ProductPriceController::class, 'updatePrice']);
-Route::get('/products/{id}/price-history', [ProductPriceController::class, 'getPriceHistory']);
-

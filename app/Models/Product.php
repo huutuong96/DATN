@@ -61,26 +61,6 @@ class Product extends Model
             'attribute_id' // Khóa ngoại trên bảng variantattribute
         );
     }
-    public function prices()
-    {
-        return $this->hasMany(product_prices::class);
-    }
 
-    public function priceHistories()
-    {
-        return $this->hasMany(price_histories::class);
-    }
-
-    public function currentPrice()
-    {
-        return $this->hasOne(product_prices::class)
-            ->where('start_date', '<=', now())
-            ->where(function ($query) {
-                $query->where('end_date', '>=', now())
-                      ->orWhereNull('end_date');
-            })
-            ->where('is_active', 1)
-            ->orderBy('start_date', 'desc');
-    }
 }
 
