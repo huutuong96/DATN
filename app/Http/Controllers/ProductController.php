@@ -71,9 +71,6 @@ class ProductController extends Controller
                 $uploadedImage = $cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
                 $mainImageUrl = $uploadedImage['secure_url'];
             }
-
-
-
             $product = Product::create([
                 'name' => $request->name,
                 'sku' => $request->sku ?? $this->generateSKU(), // Thêm phương thức để tạo SKU
