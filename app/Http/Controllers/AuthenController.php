@@ -6,37 +6,47 @@ use App\Http\Requests\UserRequest;
 use App\Models\UsersModel;
 use App\Models\RolesModel;
 use App\Models\RanksModel;
+use App\Models\AddressModel;
+use App\Models\Notification;
+use App\Models\OrdersModel;
+use App\Models\OrderDetailsModel;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Notification_to_mainModel;
-use App\Models\Notification;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmMail;
 use App\Mail\ConfirmMailChangePassword;
 use App\Models\Cart_to_usersModel;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Cloudinary\Cloudinary;
 
+/**
+ * Paginate a collection.
+ *
+ * @param  Collection  $collection
+ * @param  int  $perPage
+ * @param  int|null  $page
+ * @param  array  $options
+ * @return LengthAwarePaginator
+ */
 
 class AuthenController extends Controller
 {
     public function index()
     {
         try {
-            $list_users = UsersModel::all();
-
+            $list_users = UsersModel::where('status', 1)->paginate(20);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
                 'data' => $list_users,
             ], 200);
-        } catch (JWTException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Token không hợp lệ hoặc không tồn tại',
-                'error' => $e->getMessage(),
-            ], 401);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -70,17 +80,14 @@ class AuthenController extends Controller
 
         $user = UsersModel::create($dataInsert);
         $token = JWTAuth::fromUser($user);
-
         $user->update([
             'refesh_token' => $token,
         ]);
-        // dd('ok');
         $dataDone = [
             'status' => true,
             'message' => "Đăng ký thành công, chưa kích hoạt",
             'user' => $user,
         ];
-
         Mail::to($user->email)->send(new ConfirmMail($user, $token));
         return response()->json($dataDone, 201);
     }
@@ -97,13 +104,10 @@ class AuthenController extends Controller
                 'user_id' => $user->id,
                 'status' => 1,
             ]);
-            // dd($cart_to_users);
-
             $activeDone = [
                 'status' => true,
                 'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
             ];
-
             return response()->json($activeDone, 200);
         } else {
             $activeFail = [
@@ -117,13 +121,19 @@ class AuthenController extends Controller
 
     public function login(Request $request)
     {
-        $user = UsersModel::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
+        try {
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Không thể tạo token'], 500);
         }
 
-        $token = JWTAuth::fromUser($user);
+        $user = JWTAuth::user();
+        $user->refesh_token = $token;
+        $user->save();
 
         return response()->json([
             'status' => true,
@@ -136,8 +146,7 @@ class AuthenController extends Controller
     public function show(string $id)
     {
         try {
-            $user = UsersModel::find($id);
-
+            $user = UsersModel::where('id', $id)->where('status', 1)->first();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
@@ -163,10 +172,36 @@ class AuthenController extends Controller
         try {
             $user_present = JWTAuth::parseToken()->authenticate();
 
+            // Eager load related models
+            $user_present->load([
+                'address',
+                'rank',
+                'notifications',
+                'orders.orderDetails.product'
+            ]);
+
+            // Extract necessary data
+            $user_present_address = $user_present->address;
+            $user_present_rank = $user_present->rank;
+            $notifications = $user_present->notifications;
+            $notification_ids = $notifications->pluck('id_notification');
+            $main_notifications = Notification_to_mainModel::whereIn('id', $notification_ids)->paginate(20);
+            $orders = $user_present->orders;
+            $orderDetails = $orders->flatMap->orderDetails;
+            $productIds = $orderDetails->pluck('product_id');
+            $products = Product::whereIn('id', $productIds)->paginate(20);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $user_present,
+                'me' => $user_present,
+                'address' => $user_present_address,
+                'rank' => $user_present_rank,
+                'notifications' => $main_notifications,
+                'orders' => [
+                    'orderDetail' => $orderDetails,
+                    'product' => $products,
+                ],
             ], 200);
         } catch (JWTException $e) {
             return response()->json([
@@ -185,24 +220,15 @@ class AuthenController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $user = JWTAuth::parseToken()->authenticate();
+        $user = UsersModel::where('id', $id)->where('status', 1)->first();
         $dataUpdate = [
-            "fullname" => $request->fullname ?? $user->fullname,
-            "password" => $request->password ?? $user->password,
-            "phone" => $request->phone ?? $user->phone,
-            "email" => $request->email ?? $user->email,
-            "description" => $request->description ?? $user->description,
-            "genre" => $request->genre ?? $user->genre,
-            "datebirth" => $request->datebirth ?? $user->datebirth,
-            "avatar" => $request->avatar ?? $user->avatar,
-            "login_at" => now(),
+            "status" => 103, //tài khoản bị khóa
         ];
         $user = UsersModel::where('id', $id)->update($dataUpdate);
 
         $dataDone = [
             'status' => true,
-            'message' => "Tài khoản đã được cập nhật",
-            'users' => UsersModel::all(),
+            'message' => "Tài khoản đã bị khóa",
         ];
         return response()->json($dataDone, 200);
     }
@@ -210,6 +236,12 @@ class AuthenController extends Controller
     public function update_profile(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
+        $cloudinary = new Cloudinary();
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $uploadedavatar = $cloudinary->uploadApi()->upload($avatar->getRealPath());
+            $avatarUrl = $uploadedavatar['secure_url'];
+        }
         $dataUpdate = [
             "fullname" => $request->fullname ?? $user->fullname,
             "phone" => $request->phone ?? $user->phone,
@@ -217,16 +249,13 @@ class AuthenController extends Controller
             "description" => $request->description ?? $user->description,
             "genre" => $request->genre ?? $user->genre,
             "datebirth" => $request->datebirth ?? $user->datebirth,
-            "avatar" => $request->avatar ?? $user->avatar,
             "updated_at" => now(),
+            "avatar" => $avatarUrl ?? $user->avatar,
         ];
-
-        UsersModel::where('id', $user->id)->update($dataUpdate);
-        $user = UsersModel::find($user->id);
-
+        UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
         $dataDone = [
             'status' => true,
-            'message' => "Tài khoản đã được cập nhật",
+            'message' => "Cập nhật thành công!",
         ];
         return response()->json($dataDone, 200);
     }
@@ -306,7 +335,6 @@ class AuthenController extends Controller
         $user->update([
             'refesh_token' => null,
         ]);
-
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json([
             'status' => true,
