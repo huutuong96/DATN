@@ -7,7 +7,7 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\Voucher;
 use App\Models\VoucherToShop;
-use App\Models\voucher_to_main;
+use App\Models\VoucherToMain;
 use App\Models\UsersModel;
 use App\Models\AddressModel;
 use App\Models\RanksModel;
@@ -137,6 +137,7 @@ class PurchaseController extends Controller
     {
         $voucherToMainCode = null;
         $voucherToShopCode = null;
+
         if ($request->voucherToMainCode) {
             $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode, 'main');
             if (!$voucherToMainCode) {
@@ -160,11 +161,12 @@ class PurchaseController extends Controller
             $allOrderDetails = [];
             $allProduct = [];
             $allQuantity = [];
-            $totalQuantity = 0;
-            $grandTotalPrice = 0;
+            $totalQuantity = 0;  // giá của tổng các sản phẩm
+            $grandTotalPrice = 0; //giá user phải trả
             // dd($request->carts);
             DB::beginTransaction();
             $order = $this->createOrder($request);
+            // dd($order);
             foreach ($request->carts as $cart) {
 
 
@@ -178,8 +180,6 @@ class PurchaseController extends Controller
                 $orderDetail = $this->createOrderDetail($order, $product, $cart['quantity'], $totalPrice, $cart['shop_id']);
                 $product->decrement('quantity', $cart['quantity']);
 
-
-
                 $allProduct[] = $product;
                 $allQuantity[] = $cart['quantity'];
                 $allOrders[] = $order;
@@ -187,17 +187,30 @@ class PurchaseController extends Controller
                 $totalQuantity += $cart['quantity'];
                 $grandTotalPrice += $totalPrice;
 
-            }
+            };
+            // dd($grandTotalPrice);
             $voucherId = $this->applyVouchersToCart($voucherToMainCode, $voucherToShopCode, $grandTotalPrice);
             $order->voucher_id = $voucherId;
+
             $order->save();
 
+            // dd($grandTotalPrice); giá hiện tại chưa tính j khác
+
             $shipFee = $this->calculateShippingFee($request);
+            // dd( $shipFee);
             $point = $this->add_point_to_user();
             $checkRank = $this->check_point_to_user();
-            $totalPrice = $this->discountsByRank($checkRank, $totalPrice);
-            $totalPrice += $shipFee;
-            $this->addOrderFeesToTotal($order, $grandTotalPrice);
+            $totalPriceOfShop = $grandTotalPrice;
+            $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
+            $grandTotalPrice += $shipFee;
+
+            $tax = $this->calculateStateTax($grandTotalPrice);
+            //  dd($tax);
+            $totalPriceOfShop -= $tax;
+
+
+            $this->addStateTaxToOrder($order, $tax);
+            $this->addOrderFeesToTotal($order, $totalPriceOfShop);
             DB::commit();
             Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($allOrders, $allOrderDetails, $allProduct, $allQuantity, $totalQuantity, $grandTotalPrice));
 
@@ -274,7 +287,7 @@ class PurchaseController extends Controller
     private function getValidVoucherCode($code, $type)
     {
             if ($type === 'main') {
-                $voucher = voucher_to_main::where('code', $code)
+                $voucher = voucherToMain::where('code', $code)
                     ->where('quantity', '>=', 1)
                     ->where('status', 1)
                     ->first();
@@ -318,7 +331,7 @@ class PurchaseController extends Controller
         $voucherId = ['main' => null, 'shop' => null];
 
         if ($voucherToMainCode) {
-            $voucherToMain = voucher_to_main::where('code', $voucherToMainCode)->first();
+            $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
                 $discountAmount = min($totalPrice * $voucherToMain->ratio / 100, $voucherToMain->limitValue);
                 $totalPrice -= $discountAmount;
@@ -344,7 +357,7 @@ class PurchaseController extends Controller
         $voucherId = ['main' => null, 'shop' => null];
 
         if ($voucherToMainCode) {
-            $voucherToMain = voucher_to_main::where('code', $voucherToMainCode)->first();
+            $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
                 $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
                 $voucherId['main'] = $voucherToMain->id;
@@ -411,13 +424,13 @@ class PurchaseController extends Controller
         }
     }
 
-    private function calculateStateTax($totalPrice)
+    private function calculateStateTax($totalPriceOfShop)
     {
         $taxes = Tax::all();
         $totalTaxAmount = 0;
 
         foreach ($taxes as $tax) {
-            $taxAmount = $totalPrice * $tax->rate;
+            $taxAmount = $totalPriceOfShop * $tax->rate;
             $totalTaxAmount += $taxAmount;
         }
 
@@ -439,13 +452,14 @@ class PurchaseController extends Controller
         }
     }
 
-    private function calculateOrderFees($order, $totalPrice)
+    private function calculateOrderFees($order, $totalPriceOfShop)
     {
         $platformFees = platform_fees::all();
         $totalFeeAmount = 0;
 
         foreach ($platformFees as $fee) {
-            $feeAmount = $totalPrice * $fee->rate;
+            $feeAmount = $totalPriceOfShop * $fee->rate;
+            // dd( $feeAmount );
             $totalFeeAmount += $feeAmount;
 
             order_fee_details::create([
@@ -458,12 +472,14 @@ class PurchaseController extends Controller
         return round($totalFeeAmount, 2);
     }
 
-    private function addOrderFeesToTotal($order, $totalPrice)
+    private function addOrderFeesToTotal($order, $totalPriceOfShop)
     {
+
         $feeAmount = $this->calculateOrderFees($order, $totalPrice);
         $newTotal = $totalPrice - $feeAmount;
         $taxAmount = $this->calculateStateTax($totalPrice);
         $newTotal = $newTotal - $taxAmount;
+
         $order->update(['net_amount' => $newTotal]);
 
         return $newTotal;

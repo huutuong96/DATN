@@ -79,7 +79,7 @@ class PaymentsController extends Controller
 
         $payments = PaymentsModel::find($id);
 
-        if (!$payments) {
+        if (is_null($payments)) {
             return response()->json([
                 'status' => false,
                 'message' => "Payment không tồn tại"

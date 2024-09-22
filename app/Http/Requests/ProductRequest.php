@@ -28,7 +28,7 @@ class ProductRequest extends FormRequest
             'quantity' => 'required|numeric',
             'category_id'=> 'required|numeric',
             'brand_id'=> 'required|numeric',
-            'color_id'=> 'numeric',
+            'shop_id'=> 'numeric',
         ];
     }
 

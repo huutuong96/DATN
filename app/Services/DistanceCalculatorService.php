@@ -118,15 +118,12 @@ class DistanceCalculatorService
             'fragile' => 10000,  // Phí cho sản phẩm dễ vỡ
             'deformation' => 15000,  // Phí cho sản phẩm có nguy cơ méo móp
         ];
-
         $totalInsuranceFee = 0;
-
         foreach ($insuranceOptions as $option) {
             if (isset($insuranceRates[$option])) {
                 $totalInsuranceFee += $insuranceRates[$option];
             }
         }
-
         return $totalInsuranceFee;
     }
 }

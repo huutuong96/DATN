@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Notification_to_mainModel;
 use App\Http\Requests\Notification_to_mainRequest;
 
@@ -44,6 +45,7 @@ class Notification_to_mainController extends Controller
      */
     public function store(Notification_to_mainRequest $request)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $image = $request->file('image');
         $cloudinary = new Cloudinary();
 
@@ -55,8 +57,7 @@ class Notification_to_mainController extends Controller
                 'description' => $request->description,
                 'image' => $uploadedImage['secure_url'],
                 'status' => $request->status,
-                'create_by' => $request->create_by,
-                'update_by' => $request->update_by
+                'create_by' =>auth()->user()->id,
             ];
 
             $notification_to_main = Notification_to_mainModel::create($dataInsert);

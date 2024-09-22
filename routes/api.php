@@ -44,6 +44,8 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\VoucherToShopController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\ProductPriceController;
+
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
@@ -182,10 +184,15 @@ Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
 
+
+Route::resource('images', ImageController::class);// đã thêm xóa sửa cơ bản kết hợp với products, nên note lại rồi nếu phát triển thì sửa thêm sau
+
 Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
 Route::get('test', [AuthenController::class, "test"]);
 
 
+Route::post('/products/{id}/update-price', [ProductPriceController::class, 'updatePrice']);
+Route::get('/products/{id}/price-history', [ProductPriceController::class, 'getPriceHistory']);
 

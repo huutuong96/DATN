@@ -18,7 +18,17 @@ class CommentsModel extends Model
         'status',
         'parent_id',
         'product_id',
-        'user_id'
+        'level',
+        'user_id',
+        'images'
+
     ];
+    protected $casts = [
+        'images' => 'array', // Tự động convert JSON thành mảng khi lấy từ DB
+    ];
+    public function parent()
+    {
+        return $this->hasMany(CommentsModel::class, 'parent_id'); 
+    }
 
 }

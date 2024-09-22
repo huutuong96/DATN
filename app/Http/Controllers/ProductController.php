@@ -16,6 +16,10 @@ use App\Models\product_variants;
 use App\Models\attributes;
 use App\Models\Attribute;
 use App\Models\categoryattribute;
+use App\Models\product_prices;
+use App\Models\price_histories;
+use Carbon\Carbon;
+
 
 use Illuminate\Support\Facades\DB;
 
@@ -68,7 +72,9 @@ class ProductController extends Controller
 
             $mainImageUrl = null;
             if ($request->hasFile('image')) {
-                $uploadedImage = $cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
+
+                $image = $request->file('image');
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $mainImageUrl = $uploadedImage['secure_url'];
             }
             $product = Product::create([
@@ -103,7 +109,7 @@ class ProductController extends Controller
             }
 
             // Kiểm tra xem có thuộc tính nào được chọn không
-
+            $variant = [];
             if (isset($request['attributes']) && is_array($request['attributes']) && !empty($request['attributes'])) {
                 // Generate all possible variants
                 $variants = $this->generateVariants($request['attributes']);
@@ -112,23 +118,15 @@ class ProductController extends Controller
                     $variantData = [
                         'product_id' => $product->id,
                         'sku' => $product->sku . '-' . implode('-', array_column($variant, 'value')),
-                        'price' => $request->base_price,
+                        'price' => $request->price,
                         'stock' => 0, // Default stock, you might want to adjust this
                         'attributes' => $variant
                     ];
-
-                    $this->storeProductVariant($variantData, $product);
-
-                }
-
-            }
-
-            // Xử lý các biến thể và hình ảnh của chúng
-            if (isset($request['variants']) && is_array($request['variants'])) {
-                foreach ($request['variants'] as $variantData) {
-                    $this->storeProductVariant($variantData, $product);
+                    $variant = $this->storeProductVariant($variantData, $product);
                 }
             }
+
+
 
             DB::commit();
 
@@ -198,7 +196,7 @@ class ProductController extends Controller
             $append = [];
             foreach ($result as $product) {
                 foreach ($attribute['values'] as $item) {
-                    dd($attribute['id']);
+                    // dd($attribute['id']);
                     $newProduct = $product;
                     $newProduct[$attribute['id']] = $item;
                     $append[] = $newProduct;

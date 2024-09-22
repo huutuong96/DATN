@@ -41,4 +41,26 @@ class product_variants extends Model
     {
         return $this->hasMany(Image::class, 'product_variant_id');
     }
+    public function prices()
+    {
+        return $this->hasMany(product_prices::class);
+    }
+
+    public function priceHistories()
+    {
+        return $this->hasMany(price_histories::class);
+    }
+
+    public function currentPrice()
+    {
+        return $this->hasOne(product_prices::class, 'product_variant_id')
+            ->where('start_date', '<=', now())
+            ->where(function ($query) {
+                $query->where('end_date', '>=', now())
+                    ->orWhereNull('end_date');
+            })
+            ->where('is_active', 1)
+            ->orderBy('start_date', 'desc');
+    }
+
 }
