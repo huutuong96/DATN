@@ -31,4 +31,8 @@ class ColorsModel extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

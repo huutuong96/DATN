@@ -100,7 +100,7 @@ class AddressController extends Controller
             "updated_at"=> now(),
             "user_id" => auth()->user()->id
         ]);
-    
+
         $dataDone = [
             'status' => true,
             'message' => "đã lưu địa chỉ",
