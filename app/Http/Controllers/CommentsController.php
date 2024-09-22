@@ -2,35 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\NotificationController;
-use App\Models\CommentsModel;
-use App\Http\Requests\CommentsRequest;
-use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Product;
+use Cloudinary\Cloudinary;
+use Illuminate\Http\Request;
+use App\Models\CommentsModel;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\CommentsRequest;
+use App\Http\Controllers\NotificationController;
 
 class CommentsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            $Comments = CommentsModel::all();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Comments,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 500);
+        $productId = $request->product_id;
+        $perPage = $request->per_page;
+        $comments = CommentsModel::with('parent')
+            ->where('product_id', $productId)
+            ->where('parent_id', null)
+            ->paginate($perPage);
+        foreach ($comments as $comment) {
+            $comment->parent->load('parent');
         }
+        return response()->json([
+            'message' => 'Lấy bình luận sản phẩm thành công',
+            'comments' => $comments,
+        ]);
     }
 
     /**
@@ -44,52 +44,78 @@ class CommentsController extends Controller
     public function store(CommentsRequest $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
+        $cloudinary = new Cloudinary();
+        $level = 1;
+        if ($request->parent_id) {
+            $parent_comment = CommentsModel::find($request->parent_id);
+            if ($parent_comment) {
+                $level = $parent_comment->level + 1;
+                if ($parent_comment->level == 3) {
+                    $level = 3;
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Parent comment not found'
+                ], 404);
+            }
+        }
+        if ($request->hasFile('images')) {
+            $images = $request->file('images');
+            foreach ($images as $image) {
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $imageUrl = $uploadedImage['secure_url'];
+            }
+        }
+
         $dataInsert = [
             "title" => $request->title,
             "content" => $request->content,
             "rate" => $request->rate,
             "status" => $request->status,
+            "images" => $imageUrl,
             "parent_id" => $request->parent_id,
+            "level" => $level,
             "product_id" => $request->product_id,
             "user_id" => $user->id,
             "created_at" => now()
         ];
-        $notificationController = new NotificationController();
+
+        // $notificationController = new NotificationController();
         $comment = CommentsModel::create($dataInsert);
+        
+        
 
-
+        // Cache cho comment cha
         if (is_null($request->parent_id)) {
             Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
         }
-
-        if ($request->parent_id) {
-            $parent_comment = Cache::remember('parent_comment_'.$request->parent_id, 60 * 60, function () use ($request) {
-                return CommentsModel::find($request->parent_id);
-            });
-
-            if ($parent_comment) {
-                $parent_user_id = $parent_comment->user_id;
-                $notificationRequest = new Request([
-                    'type' => 'main',
-                    'user_id' => $parent_user_id,
-                    'title' => 'Có phản hồi mới từ comment của bạn',
-                    'description' => $user->fullname . ' đã phản hồi comment của bạn.',
-                ]);
-                $notificationController->store($notificationRequest);
-            }
-        }
-        $product = Product::find($request->product_id);
-
-            if ($product && $product->shop_id) {
-                $notificationRequest = new Request([
-                    'type' => 'shop',
-                    'user_id' => $user->id,
-                    'title' => 'Thông báo từ Sản Phẩm',
-                    'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
-                    'shop_id' => $product->shop_id
-                ]);
-                $notificationController->store($notificationRequest);
-            }
+        // if ($request->parent_id) {
+        //     $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 60 * 60, function () use ($request) {
+        //         return CommentsModel::find($request->parent_id);
+        //     });
+        //     if ($parent_comment) {
+        //         $parent_user_id = $parent_comment->user_id;
+        //         $notificationRequest = new Request([
+        //             'type' => 'main',
+        //             'user_id' => $parent_user_id,
+        //             'title' => 'Có phản hồi mới từ comment của bạn',
+        //             'description' => $user->fullname . ' đã phản hồi comment của bạn.',
+        //         ]);
+        //         $notificationController->store($notificationRequest);
+        //     }
+        // }
+        // $product = Product::find($request->product_id);
+        // if ($product && $product->shop_id) {
+        //     $notificationRequest = new Request([
+        //         'type' => 'shop',
+        //         'user_id' => $user->id,
+        //         'title' => 'Thông báo từ Sản Phẩm',
+        //         'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
+        //         'shop_id' => $product->shop_id
+        //     ]);
+        //     $notificationController->store($notificationRequest);
+        // }
 
         $dataDone = [
             'status' => true,
@@ -99,6 +125,7 @@ class CommentsController extends Controller
 
         return response()->json($dataDone, 200);
     }
+
 
 
 

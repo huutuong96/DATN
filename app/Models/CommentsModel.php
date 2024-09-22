@@ -8,17 +8,28 @@ use Illuminate\Database\Eloquent\Model;
 class CommentsModel extends Model
 {
     use HasFactory;
+    
     protected $table = 'comments'; // Thay đổi tên bảng nếu cần
 
     // Các trường có thể được gán hàng loạt
     protected $fillable = [
         'title',
         'content',
+        'images',
         'rate',
         'status',
+        'level',
         'parent_id',
         'product_id',
         'user_id'
     ];
 
+    protected $casts = [
+        'images' => 'array'
+    ];
+    // Mối quan hệ bình luận cha
+    public function parent()
+    {
+        return $this->hasMany(CommentsModel::class, 'parent_id'); 
+    }
 }
