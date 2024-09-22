@@ -18,5 +18,6 @@ class ProducttocartModel extends Model
         'product_id',
         'create_by',
         'update_by',
+        'variant_id'
     ];
 }

@@ -21,13 +21,13 @@ class CommentsModel extends Model
         'level',
         'parent_id',
         'product_id',
-        'user_id'
-    ];
+        'level',
+        'user_id',
 
-    protected $casts = [
-        'images' => 'array'
     ];
-    // Mối quan hệ bình luận cha
+    protected $casts = [
+        'images' => 'array', // Tự động convert JSON thành mảng khi lấy từ DB
+    ];
     public function parent()
     {
         return $this->hasMany(CommentsModel::class, 'parent_id'); 

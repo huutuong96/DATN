@@ -162,8 +162,8 @@ class PurchaseController extends Controller
             $allOrderDetails = [];
             $allProduct = [];
             $allQuantity = [];
-            $totalQuantity = 0;  
-            $grandTotalPrice = 0; 
+            $totalQuantity = 0;
+            $grandTotalPrice = 0;
             // dd($request->carts);
 
             DB::beginTransaction();
@@ -195,18 +195,20 @@ class PurchaseController extends Controller
 
             // dd($grandTotalPrice); giá hiện tại chưa tính j khác
 
+
             $shipFee = $this->calculateShippingFee($request);
+            // dd( $shipFee);
             $point = $this->add_point_to_user();
             $checkRank = $this->check_point_to_user();
-
+            $totalPriceOfShop = $grandTotalPrice;
             $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
             $grandTotalPrice += $shipFee;
-
-            $totalPriceOfShop = $grandTotalPrice;
-
             $tax = $this->calculateStateTax($grandTotalPrice);
+            //  dd($tax);
             $totalPriceOfShop -= $tax;
 
+
+            $this->addStateTaxToOrder($order, $tax);
             $this->addOrderFeesToTotal($order, $totalPriceOfShop);
 
             DB::commit();
@@ -420,13 +422,16 @@ class PurchaseController extends Controller
         }
     }
 
-    private function calculateStateTax($grandTotalPrice)
+
+    private function calculateStateTax($totalPriceOfShop)
     {
         $taxes = Tax::all();
         $totalTaxAmount = 0;
 
         foreach ($taxes as $tax) {
-            $taxAmount = $grandTotalPrice * $tax->rate;
+
+            $taxAmount = $totalPriceOfShop * $tax->rate;
+
             $totalTaxAmount += $taxAmount;
         }
 
@@ -455,6 +460,8 @@ class PurchaseController extends Controller
 
         foreach ($platformFees as $fee) {
             $feeAmount = $totalPriceOfShop * $fee->rate;
+
+            // dd( $feeAmount );
             $totalFeeAmount += $feeAmount;
 
             order_fee_details::create([
@@ -467,13 +474,15 @@ class PurchaseController extends Controller
         return round($totalFeeAmount, 2);
     }
 
-    private function addOrderFeesToTotal($order, $totalPriceOfShop)
+    private function addOrderFeesToTotal($order, $totalPrice)
     {
 
-        $feeAmount = $this->calculateOrderFees($order, $totalPriceOfShop);
-        $newTotal = $totalPriceOfShop - $feeAmount;
-        $taxAmount = $this->calculateStateTax($totalPriceOfShop);
+
+        $feeAmount = $this->calculateOrderFees($order, $totalPrice);
+        $newTotal = $totalPrice - $feeAmount;
+        $taxAmount = $this->calculateStateTax($totalPrice);
         $newTotal = $newTotal - $taxAmount;
+
         $order->update(['net_amount' => $newTotal]);
 
         return $newTotal;

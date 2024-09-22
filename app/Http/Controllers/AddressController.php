@@ -100,11 +100,11 @@ class AddressController extends Controller
             "updated_at"=> now(),
             "user_id" => auth()->user()->id
         ]);
-    
+
         $dataDone = [
             'status' => true,
             'message' => "đã lưu địa chỉ",
-            'roles' => AddressModel::where('user_id', auth()->user()->id)->get(),
+            'data' =>  $Address  ,
         ];
         return response()->json($dataDone, 200);
     }
