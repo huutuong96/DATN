@@ -15,7 +15,7 @@ use App\Models\attributevalue;
 use App\Models\product_variants;
 use App\Models\attributes;
 use App\Models\Attribute;
-
+use App\Models\categoryattribute;
 
 use Illuminate\Support\Facades\DB;
 
@@ -48,6 +48,18 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+
+        // HÀM NÀY LÀ HÀM QUY ĐỊNH ATTRIBUTE THEO CATEGORY //
+            // TRONG HÀM NÀY CHỨA CÁC THUỘC TÍNH DO SÀN QUY ĐỊNH
+            // KHÔNG NHẤT THIẾT PHẢI CÓ CHO SÀN THƯƠNG MẠI ĐIỆN TỬ
+                // $categoryattribute = categoryattribute::where('category_id', $request->category_id)->get();
+                // $attributes_id = [];
+                //     foreach ($categoryattribute as $attribute) {
+                //         $attributes_id[] = $attribute->attribute_id;
+                //     }
+                // // dd($attributes_id);
+        // HÀM NÀY LÀ HÀM QUY ĐỊNH ATTRIBUTE THEO CATEGORY //
+
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -59,6 +71,8 @@ class ProductController extends Controller
                 $uploadedImage = $cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
                 $mainImageUrl = $uploadedImage['secure_url'];
             }
+
+
 
             $product = Product::create([
                 'name' => $request->name,
@@ -187,6 +201,7 @@ class ProductController extends Controller
             $append = [];
             foreach ($result as $product) {
                 foreach ($attribute['values'] as $item) {
+                    dd($attribute['id']);
                     $newProduct = $product;
                     $newProduct[$attribute['id']] = $item;
                     $append[] = $newProduct;
