@@ -19,7 +19,12 @@ class CommentsModel extends Model
         'parent_id',
         'product_id',
         'level',
-        'user_id'
+        'user_id',
+        'images'
+
+    ];
+    protected $casts = [
+        'images' => 'array', // Tự động convert JSON thành mảng khi lấy từ DB
     ];
     public function parent()
     {
