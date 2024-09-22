@@ -18,6 +18,7 @@ return new class extends Migration
             $table->float('rate')->nullable();
             $table->integer('status')->default(1);
             $table->integer('parent_id')->nullable();
+            $table->text('images')->nullable(); // Lưu các URL hình ảnh dưới dạng JSON
             $table->timestamps();
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('user_id');

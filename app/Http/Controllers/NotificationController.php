@@ -31,8 +31,9 @@ class NotificationController extends Controller
     }
 
     public function store(Request $request)
+    {
 
-    {  
+     
         $user = JWTAuth::parseToken()->authenticate();
 
         $user = JWTAuth::parseToken()->authenticate();
@@ -56,7 +57,6 @@ class NotificationController extends Controller
 
             $notification->id_notification = $notificationToMain->id;
         } elseif ($request->type === 'shop') {
-
             $notificationToShops = new Notification_to_shop();
             $notificationToShops->title = $request->title;
             $notificationToShops->description = $request->description;
@@ -67,12 +67,10 @@ class NotificationController extends Controller
 
             $notification->id_notification = $notificationToShops->id;
         }
-
         $notification->save();
 
         // Update cache
         $this->updateCache('notifications_' . $user->id, Notification::where('user_id',  $user->id)->get());
-
         return response()->json($notification, 201);
     }
 
