@@ -24,7 +24,7 @@ class ProgramtoshopController extends Controller
 
         return $this->successResponse("Lấy dữ liệu thành công", $programToShops);
     }
-
+    
     /**
      * Store a newly created resource in storage.
      */

@@ -5,6 +5,7 @@ use App\Models\Cart_to_usersModel;
 use App\Models\ProducttocartModel;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CartController extends Controller
 {
@@ -13,7 +14,8 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
+        $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
         $cart_to_users_products = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
         $all_products_to_cart_to_users = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
         return response()->json($all_products_to_cart_to_users, 200);

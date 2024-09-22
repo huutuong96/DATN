@@ -14,6 +14,10 @@ class message_detail extends Model
         'content',
         'send_by',
         'status',
+         'images'
+    ];
+    protected $casts = [
+        'images' => 'array', // Tự động convert JSON thành mảng khi lấy từ DB
     ];
 
 }

@@ -68,9 +68,13 @@ class ProductController extends Controller
 
             $mainImageUrl = null;
             if ($request->hasFile('image')) {
-                $uploadedImage = $cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
+
+                $image = $request->file('image');
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $mainImageUrl = $uploadedImage['secure_url'];
-            }
+            } else {
+                $mainImageUrl = null;
+
 
 
 
