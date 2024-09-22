@@ -69,13 +69,14 @@ class PurchaseController extends Controller
             $point = $this->add_point_to_user();
             $checkRank = $this->check_point_to_user();
             $totalPrice = $this->discountsByRank($checkRank, $totalPrice);
+            $customerPay = $totalPrice;
             $stateTax = $this->calculateStateTax($totalPrice);
-            $totalPrice += $stateTax;
+            $totalPrice -= $stateTax;
             $this->addStateTaxToOrder($order, $stateTax);
             $this->addOrderFeesToTotal($order, $totalPrice);
             DB::commit();
 
-            Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $totalPrice));
+            Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $customerPay));
             $notificationData = [
                 'type' => 'main',
                 'title' => 'Đặt hàng thành công',
@@ -92,7 +93,7 @@ class PurchaseController extends Controller
                     'orderDetail' => $orderDetail,
                     'product' => $product,
                     'quantity' => $request->quantity,
-                    'shipFee' => $shipFee,
+                    // 'shipFee' => $shipFee,
                     'totalPrice' => $totalPrice,
                 ],
                 'point' => auth()->user()->point,
@@ -321,7 +322,7 @@ class PurchaseController extends Controller
         $price = $product->sale_price && $product->sale_price < $product->price
             ? $product->sale_price
             : $product->price;
-
+        // dd($price);
         return $price * $quantity;
     }
 
@@ -332,7 +333,8 @@ class PurchaseController extends Controller
         if ($voucherToMainCode) {
             $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
-                $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
+                $discountAmount = min($totalPrice * $voucherToMain->ratio / 100, $voucherToMain->limitValue);
+                $totalPrice -= $discountAmount;
                 $voucherId['main'] = $voucherToMain->id;
                 $this->updateVoucherQuantity($voucherToMain);
             }
@@ -341,12 +343,12 @@ class PurchaseController extends Controller
         if ($voucherToShopCode) {
             $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where('status', 1)->first();
             if ($voucherToShop) {
-                $totalPrice -= ($totalPrice * $voucherToShop->ratio / 100);
+                $discountAmount = min($totalPrice * $voucherToShop->ratio / 100, $voucherToShop->limitValue);
+                $totalPrice -= $discountAmount;
                 $voucherId['shop'] = $voucherToShop->id;
                 $this->updateVoucherQuantity($voucherToShop);
             }
         }
-
         return $voucherId;
     }
     private function applyVouchersToCart($voucherToMainCode, $voucherToShopCode, &$totalPrice)
@@ -470,10 +472,12 @@ class PurchaseController extends Controller
         return round($totalFeeAmount, 2);
     }
 
-    private function addOrderFeesToTotal($order, $totalPriceOfShop)
+    private function addOrderFeesToTotal($order, $totalPrice)
     {
-        $feeAmount = $this->calculateOrderFees($order, $totalPriceOfShop);
-        $newTotal = $totalPriceOfShop - $feeAmount;
+        $feeAmount = $this->calculateOrderFees($order, $totalPrice);
+        $newTotal = $totalPrice - $feeAmount;
+        $taxAmount = $this->calculateStateTax($totalPrice);
+        $newTotal = $newTotal - $taxAmount;
         $order->update(['net_amount' => $newTotal]);
 
         return $newTotal;

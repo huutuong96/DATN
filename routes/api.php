@@ -137,6 +137,10 @@ use App\Http\Controllers\OrdersController;
             Route::post('products', [ProductController::class, 'store']);
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy']);
+            Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
+            Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
+            Route::delete('product/remove_variant/{id}', [ProductController::class, 'removeVariant']);
+            Route::post('product/generate_variants', [ProductController::class, 'generateVariants']);
 
             // Platform Fees Routes
             Route::get('/platformfees', [TaxController::class, 'indexPlatformFees']);
@@ -184,6 +188,8 @@ Route::resource('images', ImageController::class);// đã thêm xóa sửa cơ b
 Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
+Route::get('test', [AuthenController::class, "test"]);
+
 
 
 

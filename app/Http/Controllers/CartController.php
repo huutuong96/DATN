@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart_to_usersModel;
 use App\Models\ProducttocartModel;
 use App\Models\Product;
+use App\Models\product_variants;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -36,21 +37,39 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
-        $product = Product::find($request->product_id);
+
+        $product = Product::where('sku', $request->sku)->first();
+        $productVariant = null;
+
+        if (!$product) {
+            $productVariant = product_variants::where('sku', $request->sku)->first();
+            if ($productVariant) {
+                $product = Product::find($productVariant->product_id);
+            }
+        }
+
+
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
-        $productExist = ProducttocartModel::where('cart_id', $cart_to_users->id)->where('product_id', $request->product_id)->first();
+
+        $productExist = ProducttocartModel::where('cart_id', $cart_to_users->id)
+            ->where('product_id', $product->id)
+            ->where('variant_id', $productVariant ? $productVariant->id : null)
+            ->first();
+
         if ($productExist) {
             ProducttocartModel::where('id', $productExist->id)->update([
-                'quantity' => $productExist->quantity + $request->quantity ?? 1,
+                'quantity' => $productExist->quantity + ($request->quantity ?? 1),
             ]);
-            return response()->json(['success' => 'Sản phẩm đã có trong giỏ hàng, cập nhật số lượng thành công'], 404);
+            return response()->json(['success' => 'Sản phẩm đã có trong giỏ hàng, cập nhật số lượng thành công'], 200);
         }
+
         $product_to_cart = ProducttocartModel::create([
             'cart_id' => $cart_to_users->id,
             'product_id' => $product->id,
             'quantity' => $request->quantity ?? 1,
+            'variant_id' => $productVariant ? $productVariant->id : null,
             'status' => 1,
         ]);
 
@@ -62,6 +81,7 @@ class CartController extends Controller
         $updated = ProducttocartModel::where('id', $id)->update([
             'quantity' => $request->quantity,
         ]);
+        // dd($updated);
         if ($updated) {
             $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
             $all_products_to_cart_to_users = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
