@@ -15,6 +15,7 @@ use App\Models\Tax;
 use App\Models\platform_fees;
 use App\Models\order_tax_details;
 use App\Models\order_fee_details;
+use App\Models\ProducttocartModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
@@ -30,84 +31,84 @@ class PurchaseController extends Controller
     {
         $this->distanceService = $distanceService;
     }
-    public function purchase(Request $request)
-    {
-        $voucherToMainCode = null;
-        $voucherToShopCode = null;
-        if ($request->voucherToMainCode) {
-            $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode, 'main');
-            if (!$voucherToMainCode) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Mã giảm giá này không hợp lệ',
-                ], 400);
-            }
-        }
-        if ($request->voucherToShopCode) {
-            $voucherToShopCode = $this->getValidVoucherCode($request->voucherToShopCode, 'shop');
-            if (!$voucherToShopCode) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Mã giảm giá cửa hàng không hợp lệ',
-                ], 400);
-            }
-        }
-        try {
-            DB::beginTransaction();
-            $product = $this->getProduct($request->shop_id, $request->product_id);
-            $this->checkProductAvailability($product, $request->quantity);
-            $totalPrice = $this->calculateTotalPrice($product, $request->quantity);
-            $shipFee = $this->calculateShippingFee($request);
-            $totalPrice += $shipFee;
-            $voucherId = $this->applyVouchers($voucherToMainCode, $voucherToShopCode, $totalPrice);
-            $order = $this->createOrder($request, $voucherId);
-            $order->voucher_id = $voucherId;
-            $order->save();
-            $orderDetail = $this->createOrderDetail($order, $product, $request->quantity, $totalPrice);
-            $product->decrement('quantity', $request->quantity);
-            $point = $this->add_point_to_user();
-            $checkRank = $this->check_point_to_user();
-            $totalPrice = $this->discountsByRank($checkRank, $totalPrice);
-            $customerPay = $totalPrice;
-            $stateTax = $this->calculateStateTax($totalPrice);
-            $totalPrice -= $stateTax;
-            $this->addStateTaxToOrder($order, $stateTax);
-            $this->addOrderFeesToTotal($order, $totalPrice);
-            DB::commit();
+    // public function purchase(Request $request)
+    // {
+    //     $voucherToMainCode = null;
+    //     $voucherToShopCode = null;
+    //     if ($request->voucherToMainCode) {
+    //         $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode, 'main');
+    //         if (!$voucherToMainCode) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Mã giảm giá này không hợp lệ',
+    //             ], 400);
+    //         }
+    //     }
+    //     if ($request->voucherToShopCode) {
+    //         $voucherToShopCode = $this->getValidVoucherCode($request->voucherToShopCode, 'shop');
+    //         if (!$voucherToShopCode) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Mã giảm giá cửa hàng không hợp lệ',
+    //             ], 400);
+    //         }
+    //     }
+    //     try {
+    //         DB::beginTransaction();
+    //         $product = $this->getProduct($request->shop_id, $request->product_id);
+    //         $this->checkProductAvailability($product, $request->quantity);
+    //         $totalPrice = $this->calculateTotalPrice($product, $request->quantity);
+    //         $shipFee = $this->calculateShippingFee($request);
+    //         $totalPrice += $shipFee;
+    //         $voucherId = $this->applyVouchers($voucherToMainCode, $voucherToShopCode, $totalPrice);
+    //         $order = $this->createOrder($request, $voucherId);
+    //         $order->voucher_id = $voucherId;
+    //         $order->save();
+    //         $orderDetail = $this->createOrderDetail($order, $product, $request->quantity, $totalPrice);
+    //         $product->decrement('quantity', $request->quantity);
+    //         $point = $this->add_point_to_user();
+    //         $checkRank = $this->check_point_to_user();
+    //         $totalPrice = $this->discountsByRank($checkRank, $totalPrice);
+    //         $customerPay = $totalPrice;
+    //         $stateTax = $this->calculateStateTax($totalPrice);
+    //         $totalPrice -= $stateTax;
+    //         $this->addStateTaxToOrder($order, $stateTax);
+    //         $this->addOrderFeesToTotal($order, $totalPrice);
+    //         DB::commit();
 
-            Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $customerPay));
-            $notificationData = [
-                'type' => 'main',
-                'title' => 'Đặt hàng thành công',
-                'description' => 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý',
-                'user_id' => auth()->id(),
-            ];
-            $notificationController = new NotificationController();
-            $notification = $notificationController->store(new Request($notificationData));
-            return response()->json([
-                'status' => true,
-                'message' => 'Đặt hàng thành công',
-                'data' => [
-                    'order' => $order,
-                    'orderDetail' => $orderDetail,
-                    'product' => $product,
-                    'quantity' => $request->quantity,
-                    // 'shipFee' => $shipFee,
-                    'totalPrice' => $totalPrice,
-                ],
-                'point' => auth()->user()->point,
-                'notification' => $notification
-            ], 200);
+    //         Mail::to(auth()->user()->email)->send(new ConfirmOder($order, $orderDetail, $product, $request->quantity, $customerPay));
+    //         $notificationData = [
+    //             'type' => 'main',
+    //             'title' => 'Đặt hàng thành công',
+    //             'description' => 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý',
+    //             'user_id' => auth()->id(),
+    //         ];
+    //         $notificationController = new NotificationController();
+    //         $notification = $notificationController->store(new Request($notificationData));
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Đặt hàng thành công',
+    //             'data' => [
+    //                 'order' => $order,
+    //                 'orderDetail' => $orderDetail,
+    //                 'product' => $product,
+    //                 'quantity' => $request->quantity,
+    //                 // 'shipFee' => $shipFee,
+    //                 'totalPrice' => $totalPrice,
+    //             ],
+    //             'point' => auth()->user()->point,
+    //             'notification' => $notification
+    //         ], 200);
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => false,
-                'message' => 'Đặt hàng thất bại',
-                'error' => $e->getMessage()
-            ], 400);
-        }
-    }
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Đặt hàng thất bại',
+    //             'error' => $e->getMessage()
+    //         ], 400);
+    //     }
+    // }
 
     private function calculateShippingFee(Request $request)
     {
@@ -162,52 +163,36 @@ class PurchaseController extends Controller
             $allQuantity = [];
             $totalQuantity = 0;  // giá của tổng các sản phẩm
             $grandTotalPrice = 0; //giá user phải trả
-            // dd($request->carts);
+            $carts = ProducttocartModel::whereIn('id', $request->carts)->get();
             DB::beginTransaction();
             $order = $this->createOrder($request);
-            // dd($order);
-            foreach ($request->carts as $cart) {
+            foreach ($carts as $cart) {
 
-
-                $product = $this->getProduct($cart['shop_id'], $cart['product_id']);
-                $this->checkProductAvailability($product, $cart['quantity']);
-
-                $totalPrice = $this->calculateTotalPrice($product, $cart['quantity']);
-
+                $variant = $this->getProduct($cart['product_id'], $cart['variant_id']);
+                $this->checkProductAvailability($variant, $cart['quantity']);
+                $totalPrice = $this->calculateTotalPrice($variant, $cart['quantity']);
                 // $order = $this->createOrder($cart, $voucherId, $request->delivery_address);
-
-                $orderDetail = $this->createOrderDetail($order, $product, $cart['quantity'], $totalPrice, $cart['shop_id']);
-                $product->decrement('quantity', $cart['quantity']);
-
-                $allProduct[] = $product;
+                $orderDetail = $this->createOrderDetail($order, $variant, $cart['quantity'], $totalPrice);
+                $variant->decrement('stock', $cart['quantity']);
+                $allProduct[] = $variant->product;
                 $allQuantity[] = $cart['quantity'];
                 $allOrders[] = $order;
                 $allOrderDetails[] = $orderDetail;
                 $totalQuantity += $cart['quantity'];
                 $grandTotalPrice += $totalPrice;
-
             };
-            // dd($grandTotalPrice);
             $voucherId = $this->applyVouchersToCart($voucherToMainCode, $voucherToShopCode, $grandTotalPrice);
             $order->voucher_id = $voucherId;
-
             $order->save();
-
-            // dd($grandTotalPrice); giá hiện tại chưa tính j khác
-
+            // dd($grandTotalPrice); //giá hiện tại chưa tính j khác
             $shipFee = $this->calculateShippingFee($request);
-            // dd( $shipFee);
             $point = $this->add_point_to_user();
             $checkRank = $this->check_point_to_user();
             $totalPriceOfShop = $grandTotalPrice;
             $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
             $grandTotalPrice += $shipFee;
-
             $tax = $this->calculateStateTax($grandTotalPrice);
-            //  dd($tax);
             $totalPriceOfShop -= $tax;
-
-
             $this->addStateTaxToOrder($order, $tax);
             $this->addOrderFeesToTotal($order, $totalPriceOfShop);
             DB::commit();
@@ -227,9 +212,10 @@ class PurchaseController extends Controller
                 'data' => [
                     'order' => $order,
                     'orderDetail' => $orderDetail,
-                    'product' => $product,
+                    'product' => $variant->product_id,
+                    'variant' => $variant->id,
                     'quantity' => $request->quantity,
-                    'totalPrice' => $totalPrice,
+                    'totalPrice' => $grandTotalPrice,
                 ],
                 'point' => auth()->user()->point,
                 'notification' => $notification
@@ -301,27 +287,35 @@ class PurchaseController extends Controller
             }
     }
 
-    private function getProduct($shopId, $productId)
+    private function getProduct($productId, $variantId)
     {
-            return Product::where('shop_id', $shopId)
-                ->where('id', $productId)
-                ->first();
+        $result = Product::with(['variants' => function ($query) use ($variantId) {
+            $query->where('id', $variantId);
+        }])
+        ->where('id', $productId)
+        ->first();
+
+        $variant = $result->variants->first();
+
+        return $variant;
+
     }
 
-    private function checkProductAvailability($product, $quantity)
+
+    private function checkProductAvailability($variant, $quantity)
     {
         // dd($product);
-        if ($product->quantity < $quantity) {
+        if ($variant->stock < $quantity) {
             throw new \Exception('Không đủ hàng');
         }
     }
 
-    private function calculateTotalPrice($product, $quantity)
+    private function calculateTotalPrice($variant, $quantity)
     {
-        $price = $product->sale_price && $product->sale_price < $product->price
-            ? $product->sale_price
-            : $product->price;
-        // dd($price);
+        $price = $variant->sale_price && $variant->sale_price < $variant->price
+            ? $variant->sale_price
+            : $variant->price;
+        // dd($price * $quantity);
         return $price * $quantity;
     }
 
@@ -401,11 +395,12 @@ class PurchaseController extends Controller
         return $order;
     }
 
-    private function createOrderDetail($order, $product, $quantity, $totalPrice,)
+    private function createOrderDetail($order, $variant, $quantity, $totalPrice)
     {
         return OrderDetailsModel::create([
             'order_id' => $order->id,
-            'product_id' => $product->id,
+            'product_id' => $variant->product_id,
+            'variant_id' => $variant->id,
             'quantity' => $quantity,
             'subtotal' => $totalPrice,
             'status' => 1,

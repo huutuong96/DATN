@@ -186,7 +186,7 @@ use App\Services\DistanceCalculatorService;
 
         Route::get('categories', [CategoriesController::class, 'index']);
 
-Route::get('login', [MessageController::class, "login"]);
+// Route::get('login', [MessageController::class, "login"]);
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
 Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
 Route::post('users/register', [AuthenController::class, "register"]);
