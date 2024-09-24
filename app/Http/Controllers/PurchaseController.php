@@ -54,7 +54,6 @@ class PurchaseController extends Controller
         }
         try {
             DB::beginTransaction();
-
             $product = $this->getProduct($request->shop_id, $request->product_id);
             $this->checkProductAvailability($product, $request->quantity);
             $totalPrice = $this->calculateTotalPrice($product, $request->quantity);
@@ -116,7 +115,7 @@ class PurchaseController extends Controller
         $originLng = $request->origin_lng;
         $destinationLat = $request->destination_lat;
         $destinationLng = $request->destination_lng;
-        $shippingType = $request->shipping_type ?? 'standard';
+        // $shippingType = $request->shipping_type;
         $insuranceOptions = $request->insurance_options ?? [];
 
         $distance = $this->distanceService->calculateDistance($originLat, $originLng, $destinationLat, $destinationLng);
@@ -126,9 +125,9 @@ class PurchaseController extends Controller
         }
 
         // Xác định loại vùng dựa trên khoảng cách
-        $zoneType = $this->determineZoneType($distance);
+        // $zoneType = $this->determineZoneType($distance);
 
-        $shippingFee = $this->distanceService->calculateShippingFee($distance, $zoneType, $shippingType, $insuranceOptions);
+        $shippingFee = $this->distanceService->calculateShippingFee($distance);
 
         return $shippingFee;
     }
@@ -414,15 +413,15 @@ class PurchaseController extends Controller
     }
 
 
-    private function determineZoneType($distance) {
-        if ($distance <= 10) {
-            return 'noi_thanh_hcm';
-        } elseif ($distance <= 30) {
-            return 'ngoai_thanh_hcm';
-        } else {
-            return 'tinh';
-        }
-    }
+    // private function determineZoneType($distance) {
+    //     if ($distance <= 10) {
+    //         return 'noi_thanh_hcm';
+    //     } elseif ($distance <= 30) {
+    //         return 'ngoai_thanh_hcm';
+    //     } else {
+    //         return 'tinh';
+    //     }
+    // }
 
     private function calculateStateTax($totalPriceOfShop)
     {

@@ -44,7 +44,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\VoucherToShopController;
 use App\Http\Controllers\OrdersController;
-
+use App\Services\DistanceCalculatorService;
 
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
@@ -143,6 +143,13 @@ use App\Http\Controllers\OrdersController;
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
             Route::delete('product/remove_variant/{id}', [ProductController::class, 'removeVariant']);
             Route::post('product/generate_variants', [ProductController::class, 'generateVariants']);
+            Route::put('product/update_stock_one_variant', [ProductController::class, 'updateStockOneVariant']);
+            Route::put('product/update_stock_all_variant', [ProductController::class, 'updateStockAllVariant']);
+            Route::put('product/update_price_one_variant', [ProductController::class, 'updatePriceOneVariant']);
+            Route::put('product/update_price_all_variant', [ProductController::class, 'updatePriceAllVariant']);
+            Route::post('product/update_image_one_variant', [ProductController::class, 'updateImageOneVariant']);
+            Route::post('product/update_image_all_variant', [ProductController::class, 'updateImageAllVariant']);
+
 
             // Platform Fees Routes
             Route::get('/platformfees', [TaxController::class, 'indexPlatformFees']);
@@ -164,6 +171,8 @@ use App\Http\Controllers\OrdersController;
             Route::get('/orderfeedetails/{id}', [TaxController::class, 'showOrderFeeDetail']);
             Route::put('/orderfeedetails/{id}', [TaxController::class, 'updateOrderFeeDetail']);
             Route::delete('/orderfeedetails/{id}', [TaxController::class, 'destroyOrderFeeDetail']);
+
+
 
 
 });
@@ -191,3 +200,26 @@ Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
 Route::get('test', [AuthenController::class, "test"]);
+
+Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
+
+Route::get('ship_companies', [ShipsController::class, 'ship_companies_index']);
+Route::post('ship_companies', [ShipsController::class, 'ship_companies_store']);
+Route::get('ship_companies/{id}', [ShipsController::class, 'ship_companies_show']);
+Route::put('ship_companies/{id}', [ShipsController::class, 'ship_companies_update']);
+Route::delete('ship_companies/{id}', [ShipsController::class, 'ship_companies_destroy']);
+
+// Ship Service Routes
+Route::get('/ship_service', [ShipsController::class, 'ship_service_get_one']);
+Route::get('/ship_service_all', [ShipsController::class, 'ship_service_get_all']);
+Route::post('/ship_service', [ShipsController::class, 'add_ship_service']);
+Route::put('/ship_service', [ShipsController::class, 'ship_service_update']);
+Route::delete('/ship_service', [ShipsController::class, 'ship_service_delete']);
+
+// Insurance Routes
+Route::get('/insurance/{id}', [ShipsController::class, 'insurance_get_one']);
+Route::get('/insurance_all/{id}', [ShipsController::class, 'insurance_get_all']);
+Route::post('/insurance', [ShipsController::class, 'insurance_store']);
+Route::put('/insurance/{id}', [ShipsController::class, 'insurance_update']);
+Route::delete('/insurance/{id}', [ShipsController::class, 'insurance_delete']);
+
