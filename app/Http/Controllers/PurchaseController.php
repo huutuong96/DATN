@@ -472,14 +472,12 @@ class PurchaseController extends Controller
         return round($totalFeeAmount, 2);
     }
 
-    private function addOrderFeesToTotal($order, $totalPriceOfShop)
+    private function addOrderFeesToTotal($order, $totalPrice)
     {
-
         $feeAmount = $this->calculateOrderFees($order, $totalPrice);
         $newTotal = $totalPrice - $feeAmount;
         $taxAmount = $this->calculateStateTax($totalPrice);
         $newTotal = $newTotal - $taxAmount;
-
         $order->update(['net_amount' => $newTotal]);
 
         return $newTotal;

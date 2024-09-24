@@ -104,6 +104,8 @@ class AuthenController extends Controller
                 'user_id' => $user->id,
                 'status' => 1,
             ]);
+
+
             $activeDone = [
                 'status' => true,
                 'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
