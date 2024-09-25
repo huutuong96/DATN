@@ -12,10 +12,7 @@ class OrdersModel extends Model
     protected $table = 'orders';
 
     // Define the relationship with OrderDetailsModel
-    public function orderDetails()
-    {
-        return $this->hasMany(OrderDetailsModel::class, 'order_id');
-    }
+   
 
     protected $fillable = [
         'payment_id',
@@ -29,7 +26,14 @@ class OrdersModel extends Model
         'create_at',
         'update_at'
     ];
-
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetailsModel::class, 'order_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id'); // Giả sử user_id là khóa ngoại
+    }
 
      /**
      * Các trường sẽ được tự động chuyển đổi sang kiểu dữ liệu tương ứng.

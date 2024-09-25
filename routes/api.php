@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\RefundController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\BlogsController;
+
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PremissionsController;
 use App\Http\Controllers\LearnController;
@@ -85,6 +89,11 @@ use App\Services\DistanceCalculatorService;
                 Route::resource('support_main', Support_mainController::class);
                 Route::resource('Comments', CommentsController::class);
                 Route::resource('Wishlists', WishlistController::class);
+
+      
+             
+                
+
                 Route::resource('Product_to_carts', ProducttocartController::class);
                 Route::resource('voucher_shop', VoucherToShopController::class);
                 Route::get('learning_seller/{shop_id}', [Learning_sellerController::class, 'index']);
@@ -172,8 +181,13 @@ use App\Services\DistanceCalculatorService;
             Route::put('/orderfeedetails/{id}', [TaxController::class, 'updateOrderFeeDetail']);
             Route::delete('/orderfeedetails/{id}', [TaxController::class, 'destroyOrderFeeDetail']);
 
+          // Route cho việc tạo yêu cầu hoàn tiền
+          Route::post('/refunds/{orderId}', [RefundController::class, 'createRefund']);
+          // Route cho việc duyệt yêu cầu hoàn tiền
+          Route::post('/refunds/approve/{refundId}', [RefundController::class, 'approveRefund']);
 
 
+          
 
 });
         Route::get('products/{id}', [ProductController::class, 'show']);
@@ -223,3 +237,11 @@ Route::post('/insurance', [ShipsController::class, 'insurance_store']);
 Route::put('/insurance/{id}', [ShipsController::class, 'insurance_update']);
 Route::delete('/insurance/{id}', [ShipsController::class, 'insurance_delete']);
 
+// Nhóm routes cho posts và blogs
+Route::group(['middleware' => 'CheckRole'], function () {
+    // posts
+    Route::resource('/posts', PostController::class);
+    
+    // blogs
+    Route::resource('/blogs', BlogsController::class);
+});

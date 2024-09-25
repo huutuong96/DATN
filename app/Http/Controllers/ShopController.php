@@ -630,8 +630,9 @@ class ShopController extends Controller
 
     public function IsOwnerShop($id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $isOwner = Shop_manager::where('shop_id', $id)
-            ->where('user_id', auth()->id())
+            ->where('user_id', $user->id)
             ->where('role', 'owner')
             ->first();
         return $isOwner;

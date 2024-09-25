@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
 use App\Mail\ConfirmOderToCart;
 use App\Models\Cart_to_usersModel;
-use App\Models\ProducttocartModel;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Services\DistanceCalculatorService;
@@ -175,7 +174,7 @@ class PurchaseController extends Controller
                     'orderDetail' => $orderDetail,
                     'product' => $product,
                     'quantity' => $request->quantity,
-                    // 'shipFee' => $shipFee,
+                    'shipFee' => $shipFee,
                     'totalPrice' => $totalPrice,
                 ],
                 'point' => auth()->user()->point,
