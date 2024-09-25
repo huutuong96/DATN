@@ -158,6 +158,7 @@ class CategoriesController extends Controller
             }
 
             $categories->update(['status' => 0]);
+
             return response()->json([
                 'status' => true,
                 'message' => "Xóa danh mục thành công",

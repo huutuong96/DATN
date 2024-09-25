@@ -11,7 +11,7 @@ class Shop extends Model
     use HasFactory;
 
     protected $fillable = [
-        'Owner_id', 
+        'Owner_id',
         'shop_name',
         'slug',
         'pick_up_address',

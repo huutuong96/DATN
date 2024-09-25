@@ -1,18 +1,38 @@
 <?php
 
 namespace App\Services;
-
+use App\Models\ShipsModel;
+use App\Models\insurance;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class DistanceCalculatorService
 {
     protected $client;
     protected $apiKey;
-
-    public function __construct()
+    protected $ships;
+    protected $insurance;
+    protected $shipping_type;
+    protected $ship_company_id;
+    protected $insurance_options;
+    public function __construct(Request $request)
     {
+        $this->insurance_options = $request->insurance ?? [];
+        $this->shipping_type = $request->shipping_type;
         $this->client = new Client();
         $this->apiKey = env('HERE_API_KEY'); // Lấy API key từ file .env
+        $this->ships = $this->getShippingRates() ?? null;
+        $this->insurance = $this->getInsuranceRates($request) ?? null;
+    }
+    private function getShippingRates()
+    {
+        return ShipsModel::pluck('fees', 'code')->toArray();
+    }
+    private function getInsuranceRates(Request $request)
+    {
+        return insurance::whereIn('code', $this->insurance_options)
+            ->pluck('price', 'code')
+            ->toArray();
     }
 
     /**
@@ -52,78 +72,44 @@ class DistanceCalculatorService
      * @param float $distance
      * @return int
      */
-    // public function calculateShippingFee($distance)
-    // {
-    //     $baseFee = 10000; // Phí ship cơ bản
-    //     $extraFeePerKm = 5000; // Phí tăng thêm mỗi km sau 5km
 
-    //     if ($distance <= 5) {
-    //         return $baseFee;
-    //     }
 
-    //     return $baseFee + ($distance - 5) * $extraFeePerKm;
-    // }
-
-    // public function calculateShippingFee($distance, $locationType)
-    // {
-    //     $shippingRates = [
-    //         'noi_thanh_hcm' => ['base' => 0, 'extra' => 0, 'threshold' => 0],
-    //         'ngoai_thanh_hcm' => ['base' => 20000, 'extra' => 0, 'threshold' => 0],
-    //         'tinh' => ['base' => 45000, 'extra' => 0, 'threshold' => 0],
-    //     ];
-
-    //     if (!isset($shippingRates[$locationType])) {
-    //         throw new \InvalidArgumentException("Loại địa điểm không hợp lệ");
-    //     }
-
-    //     return $shippingRates[$locationType]['base'];
-    // }
-
-    public function calculateShippingFee($distance, $locationType, $shippingType = 'standard', $insuranceOptions = [])
+    public function calculateShippingFee($distance)
     {
-        $baseRates = [
-            'noi_thanh_hcm' => 0,
-            'ngoai_thanh_hcm' => 20000,
-            'tinh' => 45000,
-        ];
-
-        if (!isset($baseRates[$locationType])) {
-            throw new \InvalidArgumentException("Loại địa điểm không hợp lệ");
+        // NẾU KHÔNG CHỌN SHIP_TYPE THÌ TÍNH THEO KHOẢNG CÁCH
+        $baseRates = $this->ships;
+        // Xác định loại địa điểm dựa trên khoảng cách
+        if(!isset($this->shipping_type) || $this->shipping_type == null){
+            if ($distance <= 10) {
+                $locationType = $baseRates['NOI-THANH'];
+            } elseif ($distance <= 30) {
+                $locationType = $baseRates['NGOAI-THANH'];
+            } else {
+                $locationType = $baseRates['TINH'];
+            }
+        }
+        // NẾU CHỌN SHIP_TYPE THÌ TÍNH THEO SHIP_TYPE
+        if(isset($this->shipping_type)){
+            $locationType = $baseRates[$this->shipping_type];
         }
 
-        $baseFee = $baseRates[$locationType];
+        if (!isset($locationType)) {
+            throw new \InvalidArgumentException("Loại địa điểm không hợp lệ");
+        }
+        $baseFee = $locationType;
 
-        $shippingMultipliers = [
-            'tiet_kiem' => 1.0,
-            'standard' => 1.2,
-            'nhanh' => 1.5,
-            'hoa_toc' => 2.0,
-        ];
-
-        if (!isset($shippingMultipliers[$shippingType])) {
+        $shippingMultipliers = 0;
+        if(isset($this->insurance_options)){
+            $shippingMultipliers = array_sum($this->insurance);
+        }
+        // dd($shippingMultipliers);
+        if (!isset($shippingMultipliers)) {
             throw new \InvalidArgumentException("Loại dịch vụ giao hàng không hợp lệ");
         }
 
-        $shippingFee = ceil($baseFee * $shippingMultipliers[$shippingType]);
-
-        // Tính phí bảo hiểm
-        $insuranceFee = $this->calculateInsuranceFee($insuranceOptions);
-
-        return $shippingFee + $insuranceFee;
+        $shippingFee = ceil($baseFee + $shippingMultipliers);
+        return $shippingFee;
     }
 
-    private function calculateInsuranceFee($insuranceOptions)
-    {
-        $insuranceRates = [
-            'fragile' => 10000,  // Phí cho sản phẩm dễ vỡ
-            'deformation' => 15000,  // Phí cho sản phẩm có nguy cơ méo móp
-        ];
-        $totalInsuranceFee = 0;
-        foreach ($insuranceOptions as $option) {
-            if (isset($insuranceRates[$option])) {
-                $totalInsuranceFee += $insuranceRates[$option];
-            }
-        }
-        return $totalInsuranceFee;
-    }
+
 }

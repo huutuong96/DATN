@@ -7,8 +7,10 @@ use App\Models\Tax;
 use App\Models\Shop;
 use App\Models\Image;
 use App\Models\Banner;
+use App\Models\insurance;
 use App\Models\Message;
 use App\Models\Product;
+use App\Models\ShipsModel;
 use App\Models\BannerShop;
 use App\Models\ColorModel;
 use App\Models\VoucherToShop;
@@ -634,4 +636,5 @@ class ShopController extends Controller
             ->first();
         return $isOwner;
     }
+
 }

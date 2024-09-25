@@ -16,6 +16,8 @@ use App\Models\product_variants;
 use App\Models\attributes;
 use App\Models\Attribute;
 use App\Models\categoryattribute;
+use Carbon\Carbon;
+
 
 use Illuminate\Support\Facades\DB;
 
@@ -72,12 +74,7 @@ class ProductController extends Controller
                 $image = $request->file('image');
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $mainImageUrl = $uploadedImage['secure_url'];
-            } else {
-                $mainImageUrl = null;
-
-
-
-
+            }
             $product = Product::create([
                 'name' => $request->name,
                 'sku' => $request->sku ?? $this->generateSKU(), // Thêm phương thức để tạo SKU
@@ -110,7 +107,7 @@ class ProductController extends Controller
             }
 
             // Kiểm tra xem có thuộc tính nào được chọn không
-
+            $variant = [];
             if (isset($request['attributes']) && is_array($request['attributes']) && !empty($request['attributes'])) {
                 // Generate all possible variants
                 $variants = $this->generateVariants($request['attributes']);
@@ -119,23 +116,15 @@ class ProductController extends Controller
                     $variantData = [
                         'product_id' => $product->id,
                         'sku' => $product->sku . '-' . implode('-', array_column($variant, 'value')),
-                        'price' => $request->base_price,
+                        'price' => $request->price,
                         'stock' => 0, // Default stock, you might want to adjust this
                         'attributes' => $variant
                     ];
-
-                    $this->storeProductVariant($variantData, $product);
-
-                }
-
-            }
-
-            // Xử lý các biến thể và hình ảnh của chúng
-            if (isset($request['variants']) && is_array($request['variants'])) {
-                foreach ($request['variants'] as $variantData) {
-                    $this->storeProductVariant($variantData, $product);
+                    $variant = $this->storeProductVariant($variantData, $product);
                 }
             }
+
+
 
             DB::commit();
 
@@ -205,7 +194,7 @@ class ProductController extends Controller
             $append = [];
             foreach ($result as $product) {
                 foreach ($attribute['values'] as $item) {
-                    dd($attribute['id']);
+                    // dd($attribute['id']);
                     $newProduct = $product;
                     $newProduct[$attribute['id']] = $item;
                     $append[] = $newProduct;
@@ -240,6 +229,110 @@ class ProductController extends Controller
         return $imageURL;
     }
 
+    public function updateStockOneVariant(Request $request, $id)
+    {
+        $variant = product_variants::find($id);
+        if (!$variant) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại biến thể nào",
+            ], 404);
+        }
+        $variant->update([
+            'stock' => $request->stock ?? $variant->stock,
+        ]);
+        return response()->json([
+            'status' => true,
+            'message' => "Cập nhật biến thể thành công",
+            'data' => $variant,
+        ], 200);
+    }
+
+    public function updateStockAllVariant(Request $request)
+    {
+        $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
+        $variants = product_variants::whereIn('id', $variantArray)
+            ->update(['stock' => $request->stock]);
+        return response()->json([
+            'status' => true,
+            'message' => "Cập nhật biến thể thành công",
+            'data' => $variants,
+        ], 200);
+    }
+
+    public function updatePriceOneVariant(Request $request, $id)
+    {
+        $variant = product_variants::find($id);
+        if (!$variant) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại biến thể nào",
+            ], 404);
+        }
+        $variant->update([
+            'price' => $request->price ?? $variant->price,
+        ]);
+        return response()->json([
+            'status' => true,
+            'message' => "Cập nhật biến thể thành công",
+            'data' => $variant,
+        ], 200);
+    }
+
+    public function updatePriceAllVariant(Request $request)
+    {
+        $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
+        $variants = product_variants::whereIn('id', $variantArray)
+            ->update(['price' => $request->price]);
+        return response()->json([
+            'status' => true,
+            'message' => "Cập nhật biến thể thành công",
+            'data' => $variants,
+        ], 200);
+    }
+
+    public function updateImageOneVariant(Request $request, $id)
+    {
+        $variant = product_variants::find($id);
+        if (!$variant) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại biến thể nào",
+            ], 404);
+        }
+        if ($request->images) {
+            $imageData = $this->storeImageVariant($request->images, $variant);
+        }
+        $variant->update([
+            'images' => isset($imageData) ? json_encode($imageData) : $variant->images,
+        ]);
+        return response()->json([
+            'status' => true,
+            'message' => "Cập nhật ảnh biến thể thành công",
+            'data' => $variant,
+        ], 200);
+    }
+
+    public function updateImageAllVariant(Request $request, $id)
+    {
+        // DỮ LIỆU MẪU ĐỂ TEST CẬP NHẬT HÀNG LOẠT
+        // $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
+        if ($request->hasFile('images')) {
+            $imageData = $this->storeImageVariant($request->file('images'), $variantArray);
+            $jsonImageData = json_encode($imageData);
+
+            product_variants::whereIn('id', $variantArray)
+                ->update(['images' => $jsonImageData]);
+        }
+        $updatedVariants = product_variants::whereIn('id', $variantArray)
+            ->get();
+        return response()->json([
+            'status' => true,
+            'message' => "Cập nhật ảnh biến thể thành công",
+            'data' => $updatedVariants,
+        ], 200);
+    }
+
     public function updateVariant(Request $request, $id)
     {
         $variant = product_variants::find($id);
@@ -249,6 +342,7 @@ class ProductController extends Controller
                 'message' => "Không tồn tại biến thể nào",
             ], 404);
         }
+
         if ($request->images) {
             $imageData = $this->storeImageVariant($request->images, $variant);
         }
