@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('slug');
             $table->unsignedBigInteger('create_by');
             $table->unsignedBigInteger('updated_by');
-            $table->timestamps();
-            // $table->is_deleted(); 
+            $table->timestamps(); 
+            $table->integer('is_deleted')->default(0);
 
             $table->foreign('create_by')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
