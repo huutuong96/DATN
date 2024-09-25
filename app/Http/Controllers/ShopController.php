@@ -37,7 +37,6 @@ class ShopController extends Controller
     {
         $this->middleware('SendNotification');
         $this->middleware('CheckShop')->except('store', 'done_learning_seller');
-
     }
 
     private function successResponse($message, $data = null, $status = 200)
@@ -78,7 +77,7 @@ class ShopController extends Controller
     public function shop_manager_store(Shop $Shop, $user_id, $role, $status)
     {
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         $dataInsert = [
@@ -100,7 +99,7 @@ class ShopController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         $shopExist = Shop::where('create_by', $user->id)->first();
-        if($shopExist){
+        if ($shopExist) {
             return $this->errorResponse("Bạn đã tạo shop rồi, không thể tạo shop khác");
         }
         try {
@@ -151,7 +150,7 @@ class ShopController extends Controller
             return $this->errorResponse("Shop không tồn tại");
         }
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         $dataInsert = [
@@ -168,8 +167,8 @@ class ShopController extends Controller
             'update_by' => auth()->user()->id,
         ];
         $product = Product::create($dataInsert);
-        if($request->hasFile('image')){
-            foreach($request->file('image') as $image){
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $image) {
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 Image::create([
@@ -182,7 +181,7 @@ class ShopController extends Controller
         }
 
         if ($request->color) {
-            foreach($request->color as $color){
+            foreach ($request->color as $color) {
                 $colorInsert = [
                     'product_id' => $product->id,
                     'title' => $color['title'],
@@ -250,7 +249,7 @@ class ShopController extends Controller
     public function update_shop_members(Request $request, string $id)
     {
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         $member = Shop_manager::where('id', $id)->first();
@@ -267,7 +266,7 @@ class ShopController extends Controller
     {
 
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         $shop = Shop::where('id', $id)->where('status', 1)->first();
@@ -276,7 +275,7 @@ class ShopController extends Controller
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
-        if($request->hasFile('image')){
+        if ($request->hasFile('image')) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
@@ -306,7 +305,7 @@ class ShopController extends Controller
     public function destroy(string $id)
     {
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         try {
@@ -326,7 +325,7 @@ class ShopController extends Controller
     public function destroy_members(string $id)
     {
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         try {
@@ -373,7 +372,7 @@ class ShopController extends Controller
     public function programe_to_shop(Request $request, string $id)
     {
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         $shop = Shop::find($id);
@@ -499,7 +498,8 @@ class ShopController extends Controller
         ]);
     }
 
-    public function VoucherToShop(Request $request, $shop_id){
+    public function VoucherToShop(Request $request, $shop_id)
+    {
         $dataInsert = [
             'title' => $request->title,
             'description' => $request->description,
@@ -599,7 +599,7 @@ class ShopController extends Controller
     public function destroy_category_shop(string $id)
     {
         $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
+        if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");
         }
         try {
@@ -636,9 +636,5 @@ class ShopController extends Controller
             ->first();
         return $isOwner;
     }
-
-
-
-
 
 }

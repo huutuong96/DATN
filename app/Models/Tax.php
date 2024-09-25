@@ -15,6 +15,7 @@ class Tax extends Model
         'title',
         'type',
         'tax_number',
+        'rate',
         'status',
         'create_by',
         'update_by',
