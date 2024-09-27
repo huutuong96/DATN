@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\support_main;
 use Illuminate\Support\Facades\Cache;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Requests\supportmainRequest;
 
 class Support_mainController extends Controller
 {
@@ -33,25 +35,44 @@ class Support_mainController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'content' => 'required',
-            'status' => 'required',
-            'index' => 'required',
-            'category_support_id' => 'required',
-            
-        ]);
+    public function store(supportmainRequest $request)
+{
+    try {
+        // Lấy thông tin người dùng đã xác thực
+        $user = JWTAuth::parseToken()->authenticate();
 
-        try {
-            $validatedData['create_by'] = auth()->user()->id;
-            $support = support_main::create($validatedData);
-            Cache::forget('all_supports');
-            return $this->successResponse("Thêm hỗ trợ thành công", $support);
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Thêm hỗ trợ không thành công", $th->getMessage());
-        }
+        // Tạo dữ liệu để lưu
+        $dataInsert = [
+            "content" => $request->content,
+            "status" => $request->status,
+            "index" => $request->index,
+            "category_support_id" => $request->category_support_id,
+            'create_by' => $user->id,
+            "created_at" => now(),
+        ];
+
+        // Lưu vào cơ sở dữ liệu
+        $supports = support_main::create($dataInsert);
+
+        // Xóa bộ nhớ cache liên quan
+        Cache::forget('all_supports');
+
+        // Phản hồi thành công
+        return response()->json([
+            'status' => true,
+            'message' => "Thêm hỗ trợ thành công",
+            'data' => $supports,
+        ], 201);
+    } catch (\Throwable $th) {
+        // Phản hồi lỗi nếu có ngoại lệ
+        return response()->json([
+            'status' => false,
+            'message' => "Thêm hỗ trợ không thành công",
+            'error' => $th->getMessage(),
+        ], 500);
     }
+}
+
 
     /**
      * Display the specified resource.
