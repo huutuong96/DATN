@@ -108,9 +108,6 @@ use App\Services\DistanceCalculatorService;
                 Route::post('purchase_to_cart', [PurchaseController::class, "purchaseToCart"]);
 
                 //SHOP
-
-
-
                     Route::post('shops', [ShopController::class, 'store']);
                     Route::put('shops/{id}', [ShopController::class, 'update']);
                     Route::delete('shops/{id}', [ShopController::class, 'destroy']);
@@ -126,7 +123,8 @@ use App\Services\DistanceCalculatorService;
                     Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]);
                     Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"]);
                     Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
-
+                    Route::get('shop/order/{id}/{status}', [ShopController::class, "get_order_to_shop_by_status"]);
+                    Route::put('shop/order/{id}', [ShopController::class, "update_status_order"]);
                 //SHOP
                 Route::resource('carts', CartController::class);
                 Route::resource('users', AuthenController::class);
@@ -181,67 +179,64 @@ use App\Services\DistanceCalculatorService;
             Route::put('/orderfeedetails/{id}', [TaxController::class, 'updateOrderFeeDetail']);
             Route::delete('/orderfeedetails/{id}', [TaxController::class, 'destroyOrderFeeDetail']);
 
-          // Route cho việc tạo yêu cầu hoàn tiền
-          Route::post('/refunds/{orderId}', [RefundController::class, 'createRefund']);
-          // Route cho việc duyệt yêu cầu hoàn tiền
-          Route::post('/refunds/approve/{refundId}', [RefundController::class, 'approveRefund']);
+            // Ship Company Routes
+            Route::get('ship_companies', [ShipsController::class, 'ship_companies_index']);
+            Route::post('ship_companies', [ShipsController::class, 'ship_companies_store']);
+            Route::get('ship_companies/{id}', [ShipsController::class, 'ship_companies_show']);
+            Route::put('ship_companies/{id}', [ShipsController::class, 'ship_companies_update']);
+            Route::delete('ship_companies/{id}', [ShipsController::class, 'ship_companies_destroy']);
 
+            // Ship Service Routes
+            Route::get('/ship_service', [ShipsController::class, 'ship_service_get_one']);
+            Route::get('/ship_service_all', [ShipsController::class, 'ship_service_get_all']);
+            Route::post('/ship_service', [ShipsController::class, 'add_ship_service']);
+            Route::put('/ship_service', [ShipsController::class, 'ship_service_update']);
+            Route::delete('/ship_service', [ShipsController::class, 'ship_service_delete']);
 
-          
+            // Insurance Routes
+            Route::get('/insurance/{id}', [ShipsController::class, 'insurance_get_one']);
+            Route::get('/insurance_all/{id}', [ShipsController::class, 'insurance_get_all']);
+            Route::post('/insurance', [ShipsController::class, 'insurance_store']);
+            Route::put('/insurance/{id}', [ShipsController::class, 'insurance_update']);
+            Route::delete('/insurance/{id}', [ShipsController::class, 'insurance_delete']);
+
+            // refnd order shop
+            Route::put('shop/refund/order/{id}', [ShopController::class, "refund_order_update"]);
+            Route::get('shop/refund/order/{id}', [ShopController::class, "refund_order_detail"]);
+            Route::get('shop/refund/order', [ShopController::class, "refund_order_list"]);
 
 });
-        Route::get('products/{id}', [ProductController::class, 'show']);
-        Route::get('products', [ProductController::class, 'index']);
 
-        Route::get('shops', [ShopController::class, 'index']);
-        Route::get('shops/{id}', [ShopController::class, 'show']);
-        Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
-        Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
 
-        Route::get('categories', [CategoriesController::class, 'index']);
-
-// Route::get('login', [MessageController::class, "login"]);
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
 Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
 
-
-Route::resource('images', ImageController::class);// đã thêm xóa sửa cơ bản kết hợp với products, nên note lại rồi nếu phát triển thì sửa thêm sau
-
 Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
-Route::get('test', [AuthenController::class, "test"]);
 
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
 
-Route::get('ship_companies', [ShipsController::class, 'ship_companies_index']);
-Route::post('ship_companies', [ShipsController::class, 'ship_companies_store']);
-Route::get('ship_companies/{id}', [ShipsController::class, 'ship_companies_show']);
-Route::put('ship_companies/{id}', [ShipsController::class, 'ship_companies_update']);
-Route::delete('ship_companies/{id}', [ShipsController::class, 'ship_companies_destroy']);
 
-// Ship Service Routes
-Route::get('/ship_service', [ShipsController::class, 'ship_service_get_one']);
-Route::get('/ship_service_all', [ShipsController::class, 'ship_service_get_all']);
-Route::post('/ship_service', [ShipsController::class, 'add_ship_service']);
-Route::put('/ship_service', [ShipsController::class, 'ship_service_update']);
-Route::delete('/ship_service', [ShipsController::class, 'ship_service_delete']);
 
-// Insurance Routes
-Route::get('/insurance/{id}', [ShipsController::class, 'insurance_get_one']);
-Route::get('/insurance_all/{id}', [ShipsController::class, 'insurance_get_all']);
-Route::post('/insurance', [ShipsController::class, 'insurance_store']);
-Route::put('/insurance/{id}', [ShipsController::class, 'insurance_update']);
-Route::delete('/insurance/{id}', [ShipsController::class, 'insurance_delete']);
 
-// Nhóm routes cho posts và blogs
-Route::group(['middleware' => 'CheckRole'], function () {
-    // posts
-    Route::resource('/posts', PostController::class);
-    
-    // blogs
-    Route::resource('/blogs', BlogsController::class);
-});
+
+
+        // NO Auth
+        Route::get('products/{id}', [ProductController::class, 'show']);
+        Route::get('products', [ProductController::class, 'index']);
+        Route::get('shops', [ShopController::class, 'index']);
+        Route::get('shops/{id}', [ShopController::class, 'show']);
+        Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+        Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
+        Route::get('categories', [CategoriesController::class, 'index']);
+
+
+        Route::get('shop/revenue_report', [ShopController::class, 'revenueReport']);
+        Route::get('shop/order_report', [ShopController::class, 'orderReport']);
+        Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
+        Route::post('shop/refund/order/{id}', [ShopController::class, "create_refund_order"]);
+        Route::get('search', [ProductController::class, 'search']);

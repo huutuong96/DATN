@@ -23,10 +23,11 @@ class BrandRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            // 'image' => 'nullable|url',
-            'status' => 'required|numeric',
-            'parent_id' => 'nullable|numeric'
+            'title' => 'required|string|max:255', // tiêu đề bắt buộc, kiểu chuỗi, tối đa 255 ký tự
+            'image' => 'required', // image bắt buộc và phải là URL hợp lệ
+            'status' => 'required',
+            'parent_id' => 'nullable|integer|exists:categories,id', // parent_id là tùy chọn, phải là số nguyên và tồn tại trong bảng categories
+            'create_by' => 'required|integer|exists:users,id', // create_by bắt buộc, phải là số nguyên và tồn tại trong bảng users
         ];
     }
     public function messages()
@@ -37,7 +38,7 @@ class BrandRequest extends FormRequest
             'title.required' => 'Tiêu đề là trường bắt buộc.',
             'title.string' => 'Tiêu đề phải là một chuỗi ký tự.',
             'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
-            // 'image.url' => 'Hình ảnh phải là một đường dẫn',
+            'image.url' => 'Hình ảnh phải là một đường dẫn',
             'status.numeric' => 'Trạng thái phải là một số',
             'parent_id.numeric' => 'Trạng thái phải là một số',
 

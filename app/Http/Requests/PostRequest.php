@@ -1,12 +1,11 @@
 <?php
 
 namespace App\Http\Requests;
-
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
 
-class CategoriessupportmainRequest extends FormRequest
+class PostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,25 +23,14 @@ class CategoriessupportmainRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'required|string|max:255',
-            'status' => 'required',
-            'index' => 'required|integer|min:0',
+            'name' => 'required|string|max:255',
         ];
-    }
-    
-    public function messages()
-    {
+    }    public function messages(){
         return [
-            'content.required' => 'Trường nội dung là bắt buộc.',
-            'content.string' => 'Nội dung phải là một chuỗi ký tự.',
-            'content.max' => 'Nội dung không được vượt quá 255 ký tự.',
-            'status.required' => 'Trường trạng thái là bắt buộc.',
-            'index.required' => 'Trường chỉ số là bắt buộc.',
-            'index.integer' => 'Chỉ số phải là một số nguyên.',
-            'index.min' => 'Chỉ số không được nhỏ hơn 0.',
+            'name.required' => 'Tên là trường bắt buộc.',
+            'name.string' => 'Tên phải là một chuỗi ký tự',
         ];
     }
-    
     protected function failedValidation(Validator $validator)
     {
         $errors = $validator->errors();

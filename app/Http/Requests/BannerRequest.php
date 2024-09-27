@@ -24,15 +24,16 @@ class BannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string',
+            'title' => 'required|string|max:255',
             'content' => 'required|string',
-            // 'URL' => 'nullable|required|url',
-            'status' => 'numeric',
-            'index' => 'numeric'
+            'URL' => 'required|url', // kiểm tra định dạng URL
+            'status' => 'required|numeric',
+            'shop_id' => 'required|integer|exists:shops,id', // kiểm tra shop_id có tồn tại trong bảng shops
         ];
     }
     public function messages(){
             return [
+                'shop_id' => 'required|integer|exists:shops,id', // kiểm tra shop_id có tồn tại trong bảng shops
                 'title.required' => 'Vui lòng nhập nội dung cho title',
                 'title.string' => 'Nội dung của title bắt buộc phải là một chuỗi',
 
@@ -44,7 +45,7 @@ class BannerRequest extends FormRequest
 
                 'status.numeric' => 'Kiểu dữ liệu của status phải là một số',
 
-                'index.numeric' => 'Kiểu dữ liệu của index phải là một số',
+                // 'index.numeric' => 'Kiểu dữ liệu của index phải là một số',
             ];
     }
 

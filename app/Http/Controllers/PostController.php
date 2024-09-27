@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Post;
+use App\Http\Requests\PostRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -27,15 +28,13 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+       
           // Tạo slug từ name
-        $slug = Str::slug($validatedData['name'], '-');
+        $slug = Str::slug( $request->name, '-');
         $post = new Post();
-        $post->name = $validatedData['name'];
+        $post->name = $request->name;
         $post->slug = $slug;
         $post->create_by = auth()->id(); 
         $post->save();
@@ -63,7 +62,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PostRequest $request, string $id)
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',

@@ -22,26 +22,23 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fullname' => 'required|string|max:255',
-            'password' => 'required',
-            'email' => 'required',
+        'fullname' => 'required|string|max:255',
+        'password' => 'required|string|min:8|max:30|confirmed', // confirmed yêu cầu password_confirmation field
+        'email' => 'required|email|unique:users,email', // kiểm tra email duy nhất
         ];
 
     }
     public function messages()
     {
         return [
-            'fullname.required' => 'Họ và tên là trường bắt buộc.',
-            'fullname.string' => 'Họ và tên phải là một chuỗi ký tự.',
-            'fullname.max' => 'Họ và tên không được vượt quá 255 ký tự.',
-
-            'password.required' => 'Mật khẩu là trường bắt buộc.',
-            'password.string' => 'Mật khẩu phải là một chuỗi ký tự.',
+            'fullname.required' => 'Họ tên là bắt buộc.',
+            'password.required' => 'Mật khẩu là bắt buộc.',
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-
-            'email.required' => 'Email là trường bắt buộc.',
-            'email.email' => 'Email phải là một địa chỉ email hợp lệ.',
-
+            'password.max' => 'Mật khẩu không được vượt quá 30 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Định dạng email không hợp lệ.',
+            'email.unique' => 'Email đã tồn tại.',
         ];
     }
 

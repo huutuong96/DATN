@@ -28,6 +28,7 @@ class CommentsRequest extends FormRequest
             'content' => 'required|string',
             'rate' => 'required|integer|min:1|max:5',
             'status' => 'required',
+            'image' => 'nullable|url',
             'parent_id' => 'nullable',
             'product_id' => 'required|exists:products,id',
           
@@ -37,6 +38,7 @@ class CommentsRequest extends FormRequest
     {
         return [
             'title.required' => 'Trường tiêu đề là bắt buộc.',
+            'image.url' => 'Hình ảnh phải là một đường dẫn',
             'title.string' => 'Tiêu đề phải là chuỗi ký tự.',
             'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
             'content.required' => 'Trường nội dung là bắt buộc.',

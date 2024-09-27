@@ -5,6 +5,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Blog;
+use App\Http\Requests\Blogrequest;
 
 class BlogsController extends Controller
 {
@@ -14,21 +15,16 @@ class BlogsController extends Controller
         $blogs = Blog::where('is_deleted', false)->get();
         return response()->json($blogs);
     }
-    public function store(Request $request)
+    public function store(BlogRequest $request)
     {  
           
-        $validatedData = $request->validate([
-           'post_id' => 'required|exists:posts,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'content' => 'required|string',
-        ]);
-        $slug = Str::slug($validatedData['title'], '-');
+       
+        $slug = Str::slug($request->title, '-');
         $blog = new Blog();
-        $blog->post_id = $validatedData['post_id'];
-        $blog->title = $validatedData['title'];
-        $blog->description = $validatedData['description'];
-        $blog->content = $validatedData['content'];
+        $blog->post_id = $request->post_id;
+        $blog->title = $request->title;
+        $blog->description = $request->description;
+        $blog->content = $request->content;
         $blog->slug = $slug;
         $blog->create_by = auth()->id(); 
         $blog->save();
@@ -44,36 +40,21 @@ class BlogsController extends Controller
     }
 
    
-    public function update(Request $request, string $id)
+    public function update(BlogRequest $request, string $id)
     {
 
     //    ;  dd($request->all())
-        $validator = Validator::make($request->all(), [
-            'post_id' => 'required|exists:posts,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'content' => 'required|string',
 
-        ]);
-        
-        if ($validator->fails()) {
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(), // Lấy các lỗi chi tiết
-            ], 422);
-        }
         
         // Tiếp tục xử lý nếu không có lỗi xác thực
-        $validatedData = $validator->validated();
+        // $validatedData = $validator->validated();
         // dd('ok');
         $blog = Blog::where('is_deleted', false)->findOrFail($id);
-        $blog->post_id = $validatedData['post_id'];
-        $blog->title = $validatedData['title'];
-        $slug = Str::slug($validatedData['title'], '-');
-        $blog->description = $validatedData['description'];
-        $blog->content = $validatedData['content'];
+        $blog->post_id = $request->post_id;
+        $blog->title = $request->title;
+        $slug = Str::slug($request->title, '-');
+        $blog->description = $request->description;
+        $blog->content = $request->content;
         $blog->slug = $slug;
         $blog->updated_by = auth()->id(); 
         $blog->save();
