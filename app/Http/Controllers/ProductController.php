@@ -160,15 +160,7 @@ class ProductController extends Controller
                 'attribute_id' => $attribute->id,
                 'value' => $valueData['value'],
             ]);
-            $variant->attributes()->attach($attribute->id, ['value_id' => $value->id]);
-        }
-        if (isset($variantData['image']) && $variantData['image'] instanceof \Illuminate\Http\UploadedFile) {
-            $uploadedImage = $cloudinary->uploadApi()->upload($variantData['image']->getRealPath());
-            Image::create([
-                'product_variant_id' => $variant->id,
-                'url' => $uploadedImage['secure_url'],
-                'status' => 1,
-            ]);
+            $variant->attributes()->attach($attribute->id, ['value_id' => $value->id, 'shop_id' => $product->shop_id, 'product_id' => $product->id]);
         }
         return $variant;
     }
@@ -497,5 +489,25 @@ class ProductController extends Controller
                 'error' => $th->getMessage(),
             ]);
         }
+    }
+
+    public function search(Request $request)
+    {
+        $products = Product::search($request->all())
+            ->with(['images', 'category', 'brand', 'shop', 'variants.attributes.values']) // Eager load related data
+            ->paginate(15); // Paginate results, 15 items per page
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại sản phẩm nào",
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $products,
+        ]);
     }
 }

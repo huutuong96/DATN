@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\voucher_to_main;
+use App\Models\voucherToMain;
 use App\Http\Requests\VoucherRequest;
 
 class VoucherToMainController extends Controller
@@ -12,7 +12,7 @@ class VoucherToMainController extends Controller
      */
     public function index()
     {
-        $voucherMains = voucher_to_main::all();
+        $voucherMains = voucherToMain::all();
 
         if ($voucherMains->isEmpty()) {
             return $this->errorResponse('Không tồn tại voucher main nào');
@@ -37,7 +37,7 @@ class VoucherToMainController extends Controller
             'status' => $request->status,
         ];
         try {
-            $voucherMain = voucher_to_main::create($dataInsert);
+            $voucherMain = voucherToMain::create($dataInsert);
             return $this->successResponse("Thêm voucher main thành công", $voucherMain);
         } catch (\Throwable $th) {
             return $this->errorResponse('Thêm voucher main không thành công', $th->getMessage());
@@ -49,7 +49,7 @@ class VoucherToMainController extends Controller
      */
     public function show(string $id)
     {
-        $voucherMain = voucher_to_main::find($id);
+        $voucherMain = voucherToMain::find($id);
 
         if (!$voucherMain) {
             return $this->errorResponse("Không tồn tại voucher main nào", null, 404);
@@ -63,7 +63,7 @@ class VoucherToMainController extends Controller
      */
     public function update(VoucherRequest $request, string $id)
     {
-        $voucherMain = voucher_to_main::find($id);
+        $voucherMain = voucherToMain::find($id);
 
         if (!$voucherMain) {
             return $this->errorResponse("Voucher main không tồn tại", null, 404);
@@ -82,7 +82,7 @@ class VoucherToMainController extends Controller
      */
     public function destroy(string $id)
     {
-        $voucherMain = voucher_to_main::find($id);
+        $voucherMain = voucherToMain::find($id);
 
         if (!$voucherMain) {
             return $this->errorResponse("Voucher main không tồn tại", null, 404);

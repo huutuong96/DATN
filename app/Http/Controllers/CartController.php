@@ -46,6 +46,8 @@ class CartController extends Controller
             ->select('variant_id')
             ->whereIn('attribute_id', $request->attribute_id)
             ->whereIn('value_id', $request->value_id)
+            ->where('shop_id', $request->shop_id)
+            ->where('product_id', $request->product_id)
             ->groupBy('variant_id');
 
         // Thêm điều kiện để đảm bảo mỗi cặp attribute_id và value_id đều tồn tại
@@ -56,12 +58,10 @@ class CartController extends Controller
         // Đảm bảo số lượng attribute khớp với số lượng đã chọn
         $query->havingRaw('COUNT(DISTINCT attribute_id) = ?', [count($request->attribute_id)]);
         $result = $query->first();
-
-        $productVariant = product_variants::where('id', $result->variant_id)->first();
-
-        if (!$productVariant) {
+        if (!$result) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
+        $productVariant = product_variants::where('id', $result->variant_id)->first();
 
         $productExist = ProducttocartModel::where('cart_id', $cart_to_users->id)
             ->where('product_id', $productVariant->product_id)
@@ -79,6 +79,7 @@ class CartController extends Controller
             'product_id' => $productVariant->product_id,
             'quantity' => $request->quantity ?? 1,
             'variant_id' => $productVariant->id,
+            'shop_id' => $request->shop_id,
             'status' => 1,
         ]);
 

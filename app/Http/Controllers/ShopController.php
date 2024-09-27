@@ -17,6 +17,7 @@ use App\Models\VoucherToShop;
 use Cloudinary\Cloudinary;
 use App\Models\ColorsModel;
 use App\Models\OrdersModel;
+use App\Models\refund_order;
 use Illuminate\Support\Str;
 use App\Models\Shop_manager;
 use Illuminate\Http\Request;
@@ -30,14 +31,16 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Categori_shopsModel;
 use App\Models\Learning_sellerModel;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
+use App\Models\Notification;
+
 
 class ShopController extends Controller
 {
     public function __construct()
     {
         $this->middleware('SendNotification');
-        $this->middleware('CheckShop')->except('store', 'done_learning_seller');
-
+        $this->middleware('CheckShop')->except('store', 'done_learning_seller', 'revenueReport', 'orderReport', 'bestSellingProducts', 'create_refund_order');
     }
 
     private function successResponse($message, $data = null, $status = 200)
@@ -77,10 +80,10 @@ class ShopController extends Controller
 
     public function shop_manager_store(Shop $Shop, $user_id, $role, $status)
     {
-        $IsOwnerShop =  $this->IsOwnerShop($id);
-        if(!$IsOwnerShop){
-            return $this->errorResponse("Bạn không phải là chủ shop");
-        }
+        // $IsOwnerShop =  $this->IsOwnerShop($Shop->id);
+        // if(!$IsOwnerShop){
+        //     return $this->errorResponse("Bạn không phải là chủ shop");
+        // }
         $dataInsert = [
             'status' => $status,
             'user_id' => $user_id,
@@ -104,6 +107,7 @@ class ShopController extends Controller
             return $this->errorResponse("Bạn đã tạo shop rồi, không thể tạo shop khác");
         }
         try {
+            DB::beginTransaction();
             $dataInsert = [
                 'shop_name' => $request->shop_name,
                 'pick_up_address' => $request->pick_up_address,
@@ -126,6 +130,7 @@ class ShopController extends Controller
             $dataInsert['tax_id'] = $tax->id;
             $Shop = Shop::create($dataInsert);
             $this->shop_manager_store($Shop, $user->id, 'owner', 1);
+
             $learningInsert = [
                 'learn_id' => $request->learn_id,
                 'shop_id' => $Shop->id,
@@ -133,6 +138,7 @@ class ShopController extends Controller
                 'create_by' => $user->id
             ];
             $learning_seller = Learning_sellerModel::create($learningInsert);
+            DB::commit();
             return $this->successResponse("Tạo Shop thành công", [
                 'data' => [
                     'Shop' => $Shop,
@@ -140,6 +146,7 @@ class ShopController extends Controller
                 ],
             ]);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return $this->errorResponse("Tạo Shop không thành công", $th->getMessage());
         }
     }
@@ -452,15 +459,31 @@ class ShopController extends Controller
         $order = OrdersModel::where('shop_id', $shop->id)->get();
         return $this->successResponse("Lấy đơn hàng thành công", $order);
     }
-    public function get_order_detail_to_shop(string $id)
+
+    public function get_order_to_shop_by_status(string $id, string $status)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        }
+        $orders = OrdersModel::with('orderDetails')
+        ->where('shop_id', $shop->id)
+        ->where('status', $status)
+        ->get();
+        return $this->successResponse("Lấy đơn hàng thành công", $orders);
+    }
+
+    public function update_status_order(Request $request, string $id)
     {
         $order = OrdersModel::find($id);
         if (!$order) {
             return $this->errorResponse("Đơn hàng không tồn tại");
         }
-        $orderDetail = OrderDetailsModel::where('order_id', $order->id)->get();
-        return $this->successResponse("Lấy chi tiết đơn hàng thành công", $orderDetail);
+        $order->status = $request->status;
+        $order->save();
+        return $this->successResponse("Cập nhật trạng thái đơn hàng thành công", $order);
     }
+
     public function get_product_to_shop(string $id)
     {
         $shop = Shop::find($id);
@@ -631,14 +654,239 @@ class ShopController extends Controller
     public function IsOwnerShop($id)
     {
         $isOwner = Shop_manager::where('shop_id', $id)
-            ->where('user_id', auth()->id())
+            ->where('user_id', auth()->user()->id)
             ->where('role', 'owner')
             ->first();
         return $isOwner;
     }
 
+    public function revenueReport(Request $request)
+    {
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        // Tổng doanh thu
+        $revenue = OrdersModel::where('shop_id', $request->shop_id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('net_amount');
 
+        // Doanh thu trung bình theo ngày
+        $dailyRevenue = OrdersModel::where('shop_id', $request->shop_id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('DATE(created_at) as date, SUM(net_amount) as total')
+            ->groupBy('date')
+            ->get()
+            ->avg('total');
 
+        // Doanh thu trung bình theo tháng
+        $monthlyRevenue = OrdersModel::where('shop_id', $request->shop_id)
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, SUM(net_amount) as total')
+        ->groupBy('year', 'month')
+        ->get()
+        ->avg('total');
 
+         // Doanh thu trung bình theo năm
+        $yearlyRevenue = OrdersModel::where('shop_id', $request->shop_id)
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->selectRaw('YEAR(created_at) as year, SUM(net_amount) as total')
+        ->groupBy('year')
+        ->get()
+        ->avg('total');
+
+        return $this->successResponse('Lấy báo cáo doanh thu thành công', [
+            'revenue' => $revenue,
+            'average_daily_revenue' => $dailyRevenue,
+            'average_monthly_revenue' => $monthlyRevenue,
+            'average_yearly_revenue' => $yearlyRevenue,
+        ]);
+    }
+    public function orderReport(Request $request)
+    {
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        // Tổng số đơn hàng
+        $totalOrders = OrdersModel::whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
+        // Tổng số đơn hàng theo ngày
+        $dailyOrders = OrdersModel::whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as total_orders')
+            ->groupBy('date')
+            ->get();
+
+        // Tổng số đơn hàng theo tháng
+        $monthlyOrders = OrdersModel::whereBetween('created_at', [$startDate, $endDate])
+        ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as total_orders')
+        ->groupBy('year', 'month')
+        ->get();
+
+         // Tổng số đơn hàng theo năm
+         $yearlyOrders = OrdersModel::whereBetween('created_at', [$startDate, $endDate])
+         ->selectRaw('YEAR(created_at) as year, COUNT(*) as total_orders')
+         ->groupBy('year')
+         ->get();
+        return $this->successResponse('Lấy báo cáo đơn hàng thành công', [
+            'total_orders' => $totalOrders,
+            'daily_orders' => $dailyOrders,
+            'monthly_orders' => $monthlyOrders,
+            'yearly_orders' => $yearlyOrders,
+        ]);
+    }
+
+    public function bestSellingProducts(Request $request)
+    {
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $shopId = $request->shop_id;
+
+        $bestSellingProducts = Product::where('shop_id', $shopId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('sold_count', 'desc')
+            ->take(10)  // Get top 10 best-selling products
+            ->get(['id', 'name', 'price', 'sold_count']);
+
+        return $this->successResponse('Lấy báo cáo sản phẩm bán chạy thành công', [
+            'best_selling_products' => $bestSellingProducts,
+        ]);
+    }
+
+    public function create_refund_order(Request $request, string $id)
+    {
+        $order = OrdersModel::find($id);
+        if (!$order) {
+            return $this->errorResponse('Đơn hàng không tồn tại', 404);
+        }
+
+        $check_order_can_refund = $this->check_order_can_refund($id);
+        if (!$check_order_can_refund) {
+            return $this->errorResponse('Đơn hàng không thể hoàn lại', 400);
+        }
+
+        $refund = refund_order::create([
+            'order_id' => $order->id,
+            'shop_id' => $order->shop_id,
+            'user_id' => $order->user_id,
+            'status' => $request->status,
+            'amount' => $order->total_amount,
+            'reason' => $request->reason,
+            'type' => $request->type,
+        ]);
+
+        $order->status = 7;
+        $order->save();
+
+        $this->notification_refund_order($order);
+        return $this->successResponse('Đã gửi yêu cầu hoàn tiền thành công, Yêu cầu của bạn đang được xử lý', $refund);
+    }
+
+    private function check_order_can_refund(string $id)
+    {
+        $status_can_refund = ['pending', 'shipping'];
+        $order = OrdersModel::find($id);
+        if (!$order) {
+            return $this->errorResponse('Đơn hàng không tồn tại', 404);
+        }
+        if (!in_array($order->status, $status_can_refund)) {
+            return $this->errorResponse('Đơn hàng không thể hoàn lại', 400);
+        }
+        if ($order->created_at < now()->subDays(14)) {
+            return $this->errorResponse('Đơn hàng không thể hoàn lại', 400);
+        }
+        return $order;
+    }
+
+    private function notification_refund_order($order)
+    {
+        if (!$order) {
+            return $this->errorResponse('Đơn hàng không tồn tại', 404);
+        }
+        $notificationData = [
+            'type' => 'main',
+            'title' => 'Yêu cầu hoàn lại đơn hàng',
+            'description' => 'Bạn đã yêu cầu hoàn lại đơn hàng, đơn hàng của bạn đang được xử lý',
+            'user_id' => $order->user_id,
+            'shop_id' => $order->shop_id,
+        ];
+        $notificationController = new NotificationController();
+        $notification = $notificationController->store(new Request($notificationData));
+        return $notification;
+    }
+
+    public function refund_order_list(Request $request)
+    {
+        $refund_order = refund_order::where('shop_id', $request->shop_id)->get();
+        return $this->successResponse('Lấy danh sách yêu cầu hoàn tiền thành công', $refund_order);
+    }
+
+    public function refund_order_detail(string $id)
+    {
+        $refund_order = refund_order::with([
+            'order',
+            'shop',
+            'user',
+            'reviewer',
+            'order.orderDetails',
+            'order.orderDetails.product',
+        ])->findOrFail($id);
+
+        $formattedData = [
+            'id' => $refund_order->id,
+            'order' => [
+                'id' => $refund_order->order->id,
+                'total_amount' => $refund_order->order->total_amount,
+                'status' => $refund_order->order->status,
+            ],
+            'shop' => [
+                'id' => $refund_order->shop->id,
+                'name' => $refund_order->shop->shop_name,
+            ],
+            'user' => [
+                'id' => $refund_order->user->id,
+                'name' => $refund_order->user->name,
+                'email' => $refund_order->user->email,
+                'phone' => $refund_order->user->phone,
+                'address' => $refund_order->user->address,
+            ],
+            'status' => $refund_order->status,
+            'reason' => $refund_order->reason,
+            'amount' => $refund_order->amount,
+            'note_admin' => $refund_order->note_admin,
+            'type' => $refund_order->type,
+            'approval_date' => $refund_order->approval_date,
+            'reviewer' => $refund_order->reviewer,
+            'order_details' => $refund_order->order->orderDetails->map(function ($detail) {
+                return [
+                    'product_id' => $detail->product_id,
+                    'quantity' => $detail->quantity,
+                    'price' => $detail->price,
+                ];
+            }),
+            'product' => $refund_order->order->orderDetails->map(function ($detail) {
+                return [
+                    'product_id' => $detail->product_id,
+                    'quantity' => $detail->quantity,
+                    'price' => $detail->price,
+                ];
+            }),
+        ];
+
+        return $this->successResponse('Lấy chi tiết yêu cầu hoàn tiền thành công', $formattedData);
+    }
+
+    public function refund_order_update(Request $request, string $id)
+    {
+
+        // SẼ CHECK XEM CÓ PHẢI LÀ CHỦ SHOP KHÔNG
+        // $isOwnerShop = $this->IsOwnerShop($request->shop_id);
+        // if (!$isOwnerShop) {
+        //     return $this->errorResponse('Bạn không phải là chủ shop', 403);
+        // }
+
+        $refund_order = refund_order::find($id);
+        $refund_order->status = $request->status;
+        $refund_order->save();
+        return $this->successResponse('Cập nhật trạng thái yêu cầu hoàn tiền thành công', $refund_order);
+    }
 
 }

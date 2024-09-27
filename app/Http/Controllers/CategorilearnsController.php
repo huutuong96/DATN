@@ -33,7 +33,7 @@ class CategorilearnsController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
