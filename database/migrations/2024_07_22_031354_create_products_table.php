@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('SKU');
             $table->string('slug');
             $table->text('description')->nullable();
             $table->text('infomation')->nullable();
-            $table->integer('price');
-            $table->integer('sale_price')->nullable();
             $table->string('image')->nullable();
             $table->integer('quantity')->default(1);
             $table->integer('sold_count')->default(0);
@@ -27,6 +26,9 @@ return new class extends Migration
             $table->integer('create_by')->nullable();
             $table->integer('update_by')->nullable();
             $table->timestamps();
+            $table->integer('is_deleted');
+            $table->integer('deleted_by')->nullable();
+            $table->integer('deleted_at')->timestamps();
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('brand_id');
             $table->unsignedBigInteger('color_id');

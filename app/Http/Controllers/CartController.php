@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Cart_to_usersModel;
 use App\Models\ProducttocartModel;
+use App\Models\product_variants;
 use App\Models\Product;
 use App\Models\product_variants;
 use App\Models\variantattribute;
@@ -39,6 +41,7 @@ class CartController extends Controller
     {
         $cart_to_users = Cart_to_usersModel::where('user_id', auth()->user()->id)->first();
 
+
         // $product = Product::where('sku', $request->sku)->first();
         $productVariant = null;
         // Tìm variant dựa trên các attribute_id và value_id đã chọn
@@ -64,8 +67,10 @@ class CartController extends Controller
         $productVariant = product_variants::where('id', $result->variant_id)->first();
 
         $productExist = ProducttocartModel::where('cart_id', $cart_to_users->id)
+
             ->where('product_id', $productVariant->product_id)
             ->where('variant_id', $productVariant->id)
+
             ->first();
 
         if ($productExist) {
@@ -74,10 +79,12 @@ class CartController extends Controller
             ]);
             return response()->json(['success' => 'Sản phẩm đã có trong giỏ hàng, cập nhật số lượng thành công'], 200);
         }
+
         $product_to_cart = ProducttocartModel::create([
             'cart_id' => $cart_to_users->id,
             'product_id' => $productVariant->product_id,
             'quantity' => $request->quantity ?? 1,
+
             'variant_id' => $productVariant->id,
             'shop_id' => $request->shop_id,
             'status' => 1,
@@ -85,6 +92,8 @@ class CartController extends Controller
 
         return response()->json($product_to_cart, 200);
     }
+
+
 
     public function update(Request $request, string $id)
     {

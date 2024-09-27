@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+
 use Cloudinary\Cloudinary;
 use App\Http\Controllers\NotificationController;
 use App\Models\CommentsModel;
 use App\Http\Requests\CommentsRequest;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
 use App\Models\Product;
+
 use Illuminate\Support\Facades\Cache;
+
 
 class CommentsController extends Controller
 {
@@ -18,6 +22,7 @@ class CommentsController extends Controller
      */
     public function index(Request $request)
     {
+
         $productId = $request->product_id; 
         $perPage = $request->per_page;
         $comments = CommentsModel::with('parent') 
@@ -46,9 +51,11 @@ class CommentsController extends Controller
     public function store(CommentsRequest $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
+
         $level = 0;
     
         // Kiểm tra và thiết lập level của comment
+
         if ($request->parent_id) {
             $parent_comment = CommentsModel::find($request->parent_id);
             if ($parent_comment) {
@@ -63,6 +70,7 @@ class CommentsController extends Controller
                 ], 404);
             }
         }
+
     
         $cloudinary = new Cloudinary();
         $imageUrls = [];
@@ -83,25 +91,29 @@ class CommentsController extends Controller
         }
     // dd( $imageUrls);
         // Chuẩn bị dữ liệu để lưu comment
+
         $dataInsert = [
             "title" => $request->title,
             "content" => $request->content,
             "rate" => $request->rate,
             "status" => $request->status,
+            "images" => $imageUrls,
             "parent_id" => $request->parent_id,
             "level" => $level,
             "product_id" => $request->product_id,
-            "user_id" => $user->id,
-            "images" => $imageUrls, // Chuyển mảng URL thành chuỗi JSON để lưu vào DB
+            "user_id" => $user->id, // Chuyển mảng URL thành chuỗi JSON để lưu vào DB
             "created_at" => now()
         ];
+
     
         $comment = CommentsModel::create($dataInsert);
     
+
         // Cache cho comment cha
         if (is_null($request->parent_id)) {
             Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
         }
+
     
         if ($request->parent_id) {
             $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 60 * 60, function () use ($request) {
@@ -132,7 +144,6 @@ class CommentsController extends Controller
             $notificationController = new NotificationController();
             $notificationController->store($notificationRequest);
         }
-    
         $dataDone = [
             'status' => true,
             'message' => "Đã lưu comment",
@@ -142,6 +153,7 @@ class CommentsController extends Controller
         return response()->json($dataDone, 200);
     }
     
+
 
 
     /**
