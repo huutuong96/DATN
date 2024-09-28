@@ -14,6 +14,8 @@ class variantattribute extends Model
         'variant_id',
         'attribute_id',
         'value_id',
+        'shop_id',
+        'product_id',
     ];
 
     public function variant()
@@ -29,5 +31,13 @@ class variantattribute extends Model
     public function value()
     {
         return $this->belongsTo(Value::class);
+    }
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
     }
 }

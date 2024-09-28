@@ -66,14 +66,13 @@ class AuthenController extends Controller
             ], 422);
         }
 
-        $role = RolesModel::where('title', 'user')->first();
-        $rank = RanksModel::where('title', 'đồng')->first();
+
         $dataInsert = [
             "fullname" => $request->fullname,
             "password" => Hash::make($request->password),
             "email" => $request->email,
-            "rank_id" => $rank->id,
-            "role_id" => $role->id,
+            "rank_id" => $request->rank_id ?? null,
+            "role_id" => $request->role_id ?? null,
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
         ];

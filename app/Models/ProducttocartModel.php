@@ -18,7 +18,21 @@ class ProducttocartModel extends Model
         'product_id',
         'create_by',
         'update_by',
-        'variant_id'
-
+        'variant_id',
+        'shop_id',
     ];
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+    public function variant()
+    {
+        return $this->belongsTo(product_variants::class, 'variant_id', 'id');
+    }
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id', 'id');
+    }
+
+
 }

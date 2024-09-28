@@ -9,12 +9,13 @@ use App\Models\CategoriesModel;
 class categoryattribute extends Model
 {
     use HasFactory;
-
+    public $timestamps = false;
     protected $table = 'categoryattribute';
     protected $primaryKey = 'id';
     protected $fillable = [
         'category_id',
         'attribute_id',
+        'status'
     ];
 
     public function category()

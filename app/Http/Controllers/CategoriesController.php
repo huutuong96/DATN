@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Tymon\JWTAuth\Facades\JWTAuth;
+
 use Cloudinary\Cloudinary;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\CategoriesModel;
+use App\Models\categoryattribute;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\CategoriesRequest;
 
 class CategoriesController extends Controller
@@ -20,8 +22,8 @@ class CategoriesController extends Controller
         if ($categories->isEmpty()) {
             return response()->json(
                 [
-                'status' => false,
-                'message' => "Không tồn tại danh mục nào"
+                    'status' => false,
+                    'message' => "Không tồn tại danh mục nào"
                 ]
             );
         }
@@ -34,12 +36,17 @@ class CategoriesController extends Controller
 
     public function store(CategoriesRequest $request)
     {
-        if($request->file('image')){
+        $dataInsert = [];
+
+        // Kiểm tra và upload ảnh
+        if ($request->file('image')) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $dataInsert['image'] = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
         }
+
         $user = JWTAuth::parseToken()->authenticate();
+
         try {
             $dataInsert = [
                 'title' => $request->title,
@@ -51,12 +58,37 @@ class CategoriesController extends Controller
                 'image' => $dataInsert['image'] ?? null,
             ];
 
-            $categories = CategoriesModel::create($dataInsert);
+            $category = CategoriesModel::create($dataInsert);
+
+            $parentId = $category->parent_id;
+            while ($parentId) {
+                $parentAttributes = CategoryAttribute::where('category_id', $parentId)->get();
+
+                foreach ($parentAttributes as $parentAttribute) {
+                    $parentAttribute->status = 0;
+                    $parentAttribute->save();
+                }
+
+                $parentCategory = CategoriesModel::find($parentId);
+                $parentId = $parentCategory ? $parentCategory->parent_id : null;
+            }
+            $subCategories = CategoriesModel::where('parent_id', $category->id)->get();
+            if ($subCategories->isEmpty()) {
+                $attributeIds = $request->attribute_ids;
+                if (is_array($attributeIds) && count($attributeIds) > 0) {
+                    foreach ($attributeIds as $attributeId) {
+                        categoryattribute::insert([
+                            'category_id' => $category->id,
+                            'attribute_id' => $attributeId,
+                        ]);
+                    }
+                }
+            }
 
             return response()->json([
                 'status' => true,
                 'message' => "Thêm danh mục thành công",
-                'data' => $categories,
+                'data' => $category,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -67,25 +99,32 @@ class CategoriesController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+
+
+
     public function show(string $id)
     {
         try {
-            $categories = CategoriesModel::find($id);
+            $category = CategoriesModel::find($id);
 
-            if (!$categories) {
+            if (!$category) {
                 return response()->json([
                     'status' => false,
                     'message' => "Danh mục không tồn tại",
                 ], 404);
             }
 
+
+            $category->subCategories = $this->getSubCategories($category->id);
+
+            if ($category->subCategories->isEmpty()) {
+                $category->attributes = $category->attributes()->get();
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => "Lấy thông tin danh mục thành công",
-                'data' => $categories,
+                'data' => $category,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -95,6 +134,24 @@ class CategoriesController extends Controller
             ], 500);
         }
     }
+
+    private function getSubCategories($categoryId)
+    {
+        $subCategories = CategoriesModel::where('parent_id', $categoryId)->get();
+
+        foreach ($subCategories as $subCategory) {
+            $sub_SubCategories = CategoriesModel::where('parent_id', $subCategory->id)->get();
+            if ($sub_SubCategories->isEmpty()) {
+                $subCategory->attributes = $subCategory->attributes()->get();
+            } else {
+                $subCategory->subCategories = $this->getSubCategories($subCategory->id);
+            }
+        }
+
+        return $subCategories;
+    }
+
+
     public function update(CategoriesRequest $request, string $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
