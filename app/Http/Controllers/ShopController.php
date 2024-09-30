@@ -272,7 +272,7 @@ class ShopController extends Controller
     }
     public function update(Request $request, string $id)
     {
-
+//   dd($id);
         $IsOwnerShop =  $this->IsOwnerShop($id);
         if (!$IsOwnerShop) {
             return $this->errorResponse("Bạn không phải là chủ shop");

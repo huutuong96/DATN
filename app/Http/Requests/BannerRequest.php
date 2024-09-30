@@ -26,9 +26,9 @@ class BannerRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'URL' => 'required|url', // kiểm tra định dạng URL
+            // 'URL' => 'required',
             'status' => 'required|numeric',
-            'shop_id' => 'required|integer|exists:shops,id', // kiểm tra shop_id có tồn tại trong bảng shops
+            'shop_id' => 'nullable', // kiểm tra shop_id có tồn tại trong bảng shops
         ];
     }
     public function messages(){

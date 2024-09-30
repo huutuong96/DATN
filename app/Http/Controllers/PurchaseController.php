@@ -384,7 +384,7 @@ class PurchaseController extends Controller
             $grandTotalPrice += $shopTotalPrice;
             // Additional processing for each shop's order (e.g., shipping, taxes)
             $shipFee = $this->calculateShippingFee($request);
-            dd($shipFee);
+            // dd($shipFee);
             $shopTotalPrice += $shipFee;
             $tax = $this->calculateStateTax($shopTotalPrice);
             $this->addStateTaxToOrder($order, $tax);

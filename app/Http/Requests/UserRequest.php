@@ -23,7 +23,7 @@ class UserRequest extends FormRequest
     {
         return [
         'fullname' => 'required|string|max:255',
-        'password' => 'required|string|min:8|max:30|confirmed', // confirmed yêu cầu password_confirmation field
+        'password' => 'required|string|min:8|max:30',
         'email' => 'required|email|unique:users,email', // kiểm tra email duy nhất
         ];
 
@@ -35,7 +35,6 @@ class UserRequest extends FormRequest
             'password.required' => 'Mật khẩu là bắt buộc.',
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
             'password.max' => 'Mật khẩu không được vượt quá 30 ký tự.',
-            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
             'email.required' => 'Email là bắt buộc.',
             'email.email' => 'Định dạng email không hợp lệ.',
             'email.unique' => 'Email đã tồn tại.',

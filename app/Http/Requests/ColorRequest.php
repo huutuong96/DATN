@@ -26,7 +26,7 @@ class ColorRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'index' => 'numeric',
-            'image' => 'nullable|url',
+            // 'image' => 'nullable|url',
             'status' => 'required|numeric'
         ];
     }
@@ -41,7 +41,7 @@ class ColorRequest extends FormRequest
 
             'index.numeric' => 'Kiểu dữ liệu của index phải là một số',
             
-            'image.url' => 'Hình ảnh phải là một đường dẫn',
+            // 'image.url' => 'Hình ảnh phải là một đường dẫn',
 
             'status.numeric' => 'Trạng thái phải là một số',
         ];

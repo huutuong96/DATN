@@ -65,8 +65,6 @@ class AuthenController extends Controller
                 'message' => 'Email đã tồn tại.',
             ], 422);
         }
-
-
         $dataInsert = [
             "fullname" => $request->fullname,
             "password" => Hash::make($request->password),
@@ -90,7 +88,6 @@ class AuthenController extends Controller
         Mail::to($user->email)->send(new ConfirmMail($user, $token));
         return response()->json($dataDone, 201);
     }
-
     public function confirm($token)
     {
         $user = UsersModel::where('refesh_token', $token)->first();
@@ -221,6 +218,8 @@ class AuthenController extends Controller
 
     public function update(UserRequest $request, string $id)
     {
+
+        dd($id);
         $user = UsersModel::where('id', $id)->where('status', 1)->first();
         $dataUpdate = [
             "status" => 103, //tài khoản bị khóa

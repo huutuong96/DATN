@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Voucher;
-use App\Models\voucher_to_main;
+use App\Models\voucherToMain;
 use App\Models\VoucherToShop;
 use App\Http\Requests\VoucherRequest;
 use Illuminate\Support\Facades\Cache;
@@ -25,7 +25,7 @@ class VoucherController extends Controller
 
     public function store(VoucherRequest $request)
     {
-        $checkvoucher_to_main = voucher_to_main::where('code', $request->code)->exists();
+        $checkvoucher_to_main = voucherToMain::where('code', $request->code)->exists();
         $checkVoucherToShop = VoucherToShop::where('code', $request->code)->exists();
 
         if (!$checkvoucher_to_main && !$checkVoucherToShop) {
