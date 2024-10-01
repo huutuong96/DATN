@@ -219,9 +219,14 @@ Route::get('/', function () {
 });
 
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
-
-
-
+// lọc sản phẩm
+Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+// duyệt sản phẩm
+Route::get('/products/pending', [ProductController::class, 'getPendingProducts']);
+Route::get('/products/approved', [ProductController::class, 'getApprovedProducts']);
+Route::get('/products/rejected', [ProductController::class, 'getRejectedProducts']);
+Route::post('/products/approve/{id}', [ProductController::class, 'approveProduct']); 
+Route::post('/products/reject/{id}', [ProductController::class, 'rejectProduct']);
 
 
 
