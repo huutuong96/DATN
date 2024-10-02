@@ -654,12 +654,15 @@ class ShopController extends Controller
 
     public function IsOwnerShop($id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $isOwner = Shop_manager::where('shop_id', $id)
             ->where('user_id', auth()->user()->id)
+
             ->where('role', 'owner')
             ->first();
         return $isOwner;
     }
+
 
     public function revenueReport(Request $request)
     {

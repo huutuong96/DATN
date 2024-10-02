@@ -22,7 +22,10 @@ class CategoriesModel extends Model
         'update_by'
     ];
 
-
+    public function attributes()
+    {
+        return $this->belongsToMany(Attribute::class, 'categoryattribute', 'category_id', 'attribute_id');
+    }
     /**
      * Các trường sẽ được tự động chuyển đổi sang kiểu dữ liệu tương ứng.
      *

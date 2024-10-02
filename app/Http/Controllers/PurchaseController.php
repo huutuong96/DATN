@@ -15,7 +15,6 @@ use App\Models\Tax;
 use App\Models\platform_fees;
 use App\Models\order_tax_details;
 use App\Models\order_fee_details;
-use App\Models\ProducttocartModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
