@@ -20,6 +20,7 @@ class ProducttocartModel extends Model
         'update_by',
         'variant_id',
         'shop_id',
+        'ship_code',
     ];
     public function product()
     {

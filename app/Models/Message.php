@@ -14,6 +14,5 @@ class Message extends Model
         'updated_at',
         'user_id',
         'shop_id',
-        
     ];
 }

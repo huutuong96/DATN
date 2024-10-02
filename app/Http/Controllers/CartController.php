@@ -6,7 +6,6 @@ use App\Models\Cart_to_usersModel;
 use App\Models\ProducttocartModel;
 use App\Models\product_variants;
 use App\Models\Product;
-use App\Models\product_variants;
 use App\Models\variantattribute;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -84,9 +83,9 @@ class CartController extends Controller
             'cart_id' => $cart_to_users->id,
             'product_id' => $productVariant->product_id,
             'quantity' => $request->quantity ?? 1,
-
             'variant_id' => $productVariant->id,
             'shop_id' => $request->shop_id,
+            'ship_code' => $request->ship_code ?? 'STANDARD',
             'status' => 1,
         ]);
 

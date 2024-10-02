@@ -33,6 +33,7 @@ use App\Models\Learning_sellerModel;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Http;
 
 
 class ShopController extends Controller
@@ -78,17 +79,32 @@ class ShopController extends Controller
         ]);
     }
 
-    public function shop_manager_store(Shop $Shop, $user_id, $role, $status)
+    public function shop_manager_store($Shop, $user_id, $role, $status)
     {
-        // $IsOwnerShop =  $this->IsOwnerShop($Shop->id);
-        // if(!$IsOwnerShop){
-        //     return $this->errorResponse("Bạn không phải là chủ shop");
-        // }
         $dataInsert = [
             'status' => $status,
             'user_id' => $user_id,
             'shop_id' => $Shop->id,
             'role' => $role,
+        ];
+        try {
+            $Shop_manager = Shop_manager::create($dataInsert);
+
+            return $this->successResponse("Thêm thành công", $Shop_manager);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Thêm không thành công", $th->getMessage());
+        }
+    }
+
+
+    public function shop_manager_add(Request $request)
+    {
+        // dd($request->user_id);
+        $dataInsert = [
+            'status' => $request->status,
+            'user_id' => $request->user_id,
+            'shop_id' => $request->shop_id,
+            'role' => $request->role,
         ];
         try {
             $Shop_manager = Shop_manager::create($dataInsert);
@@ -106,15 +122,33 @@ class ShopController extends Controller
         if ($shopExist) {
             return $this->errorResponse("Bạn đã tạo shop rồi, không thể tạo shop khác");
         }
+        $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
+        $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
+        $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
         try {
             DB::beginTransaction();
             $dataInsert = [
                 'shop_name' => $request->shop_name,
-                'pick_up_address' => $request->pick_up_address,
+                'pick_up_address' => $request->pick_up_address ?? $request->location,
                 'slug' => $request->slug ?? Str::slug($request->shop_name),
                 'cccd' => $request->cccd,
                 'status' => 101,
                 'create_by' => $user->id,
+                'tax_id' => $request->tax_id,
+                'owner_id' => $user->id,
+                'visits' => 0,
+                'revenue' => 0,
+                'rating' => 0,
+                'location' => $request->location,
+                'email' => $request->email,
+                'description' => $request->description,
+                'contact_number' => $request->contact_number,
+                'province' => $filteredCity['ProvinceName'],
+                'province_id' => $filteredCity['ProvinceID'],
+                'district' => $filteredDistrict['DistrictName'],
+                'district_id' => $filteredDistrict['DistrictID'],
+                'ward' => $filledWard['WardName'],
+                'ward_id' => $filledWard['WardCode'],
             ];
 
             if ($request->hasFile('image')) {
@@ -129,7 +163,7 @@ class ShopController extends Controller
             }
             $dataInsert['tax_id'] = $tax->id;
             $Shop = Shop::create($dataInsert);
-            $this->shop_manager_store($Shop, $user->id, 'owner', 1);
+            $shop_manager = $this->shop_manager_store($Shop, $user->id, 'owner', 1);
 
             $learningInsert = [
                 'learn_id' => $request->learn_id,
@@ -138,11 +172,15 @@ class ShopController extends Controller
                 'create_by' => $user->id
             ];
             $learning_seller = Learning_sellerModel::create($learningInsert);
+
+
             DB::commit();
             return $this->successResponse("Tạo Shop thành công", [
                 'data' => [
                     'Shop' => $Shop,
-                    'Learning_seller' => $learning_seller
+                    'Message' => 'Bạn phải hoàn thành khóa học dành cho seller',
+                    'Learning_seller' => $learning_seller,
+                    'shop_manager' => $shop_manager,
                 ],
             ]);
         } catch (\Throwable $th) {
@@ -173,6 +211,12 @@ class ShopController extends Controller
             'brand_id' => $request->brand_id,
             'create_by' => auth()->user()->id,
             'update_by' => auth()->user()->id,
+            'shop_id' => $id,
+            'status' => 1,
+            'height' => $request->height,
+            'length' => $request->length,
+            'weight' => $request->weight,
+            'width' => $request->width,
         ];
         $product = Product::create($dataInsert);
         if ($request->hasFile('image')) {
@@ -245,7 +289,7 @@ class ShopController extends Controller
             'banner' => $bannerShop,
             'Vouchers' => $VoucherToShop,
             'Programtoshop' => $Programtoshop,
-            'Programme_detail' => $Programme_detail,
+            'Programme_detail' => $Programme_detail ?? null,
             'Follow_to_shop' => $Follow_to_shop,
             'Categori_shops' => $Categori_shops
         ]);
@@ -272,14 +316,15 @@ class ShopController extends Controller
     }
     public function update(Request $request, string $id)
     {
-
-        $IsOwnerShop =  $this->IsOwnerShop($id);
-        if (!$IsOwnerShop) {
-            return $this->errorResponse("Bạn không phải là chủ shop");
-        }
+        // $IsOwnerShop =  $this->IsOwnerShop($id);
+        // if (!$IsOwnerShop) {
+        //     return $this->errorResponse("Bạn không phải là chủ shop");
+        // }
         $shop = Shop::where('id', $id)->where('status', 1)->first();
         $user = JWTAuth::parseToken()->authenticate();
-
+        $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
+        $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
+        $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
@@ -298,6 +343,12 @@ class ShopController extends Controller
             'tax_id' => $request->tax_id ?? $shop->tax_id,
             'update_by' => auth()->user()->id,
             'updated_at' => now(),
+            'province' => $request->input('address')['province'],
+            'province_id' => $filteredCity['ProvinceID'],
+            'district' => $request->input('address')['district'],
+            'district_id' => $filteredDistrict['DistrictID'],
+            'ward' => $request->input('address')['ward'],
+            'ward_id' => $filledWard,
         ];
         try {
             $shop->update($dataInsert);
@@ -640,6 +691,11 @@ class ShopController extends Controller
 
     public function done_learning_seller(string $shopId)
     {
+        $IsOwnerShop =  $this->IsOwnerShop($shopId);
+        if (!$IsOwnerShop) {
+            return $this->errorResponse("Bạn không phải là chủ shop");
+        }
+
         $learning = Learning_sellerModel::where('shop_id', $shopId)->first();
         $shop = Shop::where('id', $shopId)->first();
         if (!$learning) {
@@ -661,8 +717,22 @@ class ShopController extends Controller
         return $isOwner;
     }
 
+    public function IsStaffShop($id)
+    {
+        $isManager = Shop_manager::where('shop_id', $id)
+            ->where('user_id', auth()->user()->id)
+            // ->where('role', 'manager')
+            ->first();
+        return $isManager;
+    }
+
     public function revenueReport(Request $request)
     {
+        $IsOwnerShop =  $this->IsOwnerShop($request->shop_id);
+        if (!$IsOwnerShop) {
+            return $this->errorResponse(" không phải là chủ shop");
+        }
+
         $startDate = $request->start_date;
         $endDate = $request->end_date;
         // Tổng doanh thu
@@ -703,6 +773,10 @@ class ShopController extends Controller
     }
     public function orderReport(Request $request)
     {
+        $IsOwnerShop =  $this->IsOwnerShop($request->shop_id);
+        if (!$IsOwnerShop) {
+            return $this->errorResponse(" không phải là chủ shop");
+        }
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
@@ -737,6 +811,10 @@ class ShopController extends Controller
 
     public function bestSellingProducts(Request $request)
     {
+        $IsOwnerShop =  $this->IsOwnerShop($request->shop_id);
+        if (!$IsOwnerShop) {
+            return $this->errorResponse(" không phải là chủ shop");
+        }
         $startDate = $request->start_date;
         $endDate = $request->end_date;
         $shopId = $request->shop_id;
@@ -879,10 +957,10 @@ class ShopController extends Controller
     {
 
         // SẼ CHECK XEM CÓ PHẢI LÀ CHỦ SHOP KHÔNG
-        // $isOwnerShop = $this->IsOwnerShop($request->shop_id);
-        // if (!$isOwnerShop) {
-        //     return $this->errorResponse('Bạn không phải là chủ shop', 403);
-        // }
+        $isOwnerShop = $this->IsOwnerShop($request->shop_id);
+        if (!$isOwnerShop) {
+            return $this->errorResponse('Bạn không phải là chủ shop', 403);
+        }
 
         $refund_order = refund_order::find($id);
         $refund_order->status = $request->status;
@@ -890,4 +968,71 @@ class ShopController extends Controller
         return $this->successResponse('Cập nhật trạng thái yêu cầu hoàn tiền thành công', $refund_order);
     }
 
+    public function register_ship_giao_hang_nhanh(Request $request)
+    {
+        $token = env('TOKEN_API_REGISTER_GHN');
+        $response = Http::withHeaders([
+            'token' => $token, // Gắn token vào header
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/register', [
+            'district_id' => $request->district_id, // Thêm district_id vào tham số truy vấn
+            'name' => $request->name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+        ]);
+        $result = $response->json();
+        Shop::where('id', $request->shop_id)->update(['shopid_GHN' => $result['data']['shop_id']]);
+        return $result;
+    }
+    // public function get_store_ship_giao_hang_nhanh(Request $request)
+    // {
+    //     $token = env('TOKEN_API_REGISTER_GHN');
+    //     $response = Http::withHeaders([
+    //         'token' => $token, // Gắn token vào header
+    //     ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/all', [
+    //         'phone' => $request->phone,
+    //     ]);
+    //     $result = $response->json();
+    //     return $result;
+    // }
+
+    public function get_infomaiton_province_and_city($province)
+    {
+        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $response = Http::withHeaders([
+            'token' => $token, // Gắn token vào header
+        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province');
+        $cities = collect($response->json()['data']); // Chuyển thành Collection
+        // Lọc tỉnh dựa trên tên
+        $filteredCity = $cities->firstWhere('ProvinceName', $province);
+        return $filteredCity;
+    }
+
+    public function get_infomaiton_district($districtName)
+    {
+        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $response = Http::withHeaders([
+            'token' => $token, // Gắn token vào header
+        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district');
+        $district = collect($response->json()['data']); // Chuyển thành Collection
+        $filtereddistrict = $district->firstWhere('DistrictName', $districtName);
+        return $filtereddistrict;
+    }
+    public function get_infomaiton_ward($districtId, $wardName)
+    {
+        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $response = Http::withHeaders([
+            'token' => $token, // Gắn token vào header
+        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', [
+            'district_id' => $districtId, // Thêm district_id vào tham số truy vấn
+        ]);
+        $ward = collect($response->json());
+        foreach ($ward['data'] as $key => $value) {
+            if($ward['data'][$key]['WardName'] == $wardName){
+                $ward_id = $ward['data'][$key]['WardCode'];
+            }
+        }
+        return $ward_id;
+    }
+
 }
+

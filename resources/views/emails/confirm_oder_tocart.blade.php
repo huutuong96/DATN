@@ -37,7 +37,7 @@ $totalAmount = 0;
                 @endforeach
             @endforeach
         </table>
-        <p style="font-size: 14px; margin-bottom: 10px;"><strong>Tổng tiền:</strong> <span style="color: #e53935;">{{ number_format($totalAmount + $shipFee) }} VNĐ</span></p>
+        <p style="font-size: 14px; margin-bottom: 10px;"><strong>Tổng tiền:</strong> <span style="color: #e53935;">{{ number_format($total_amount) }} VNĐ</span></p>
         {{-- <p style="font-size: 14px; margin-bottom: 10px;"><strong>Ngày đặt hàng:</strong> {{ $ordersByShop[0]['order']->created_at->format('d/m/Y H:i:s') }}</p> --}}
     </main>
     <footer style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 12px; margin-top: 20px; border-radius: 5px;">

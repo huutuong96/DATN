@@ -44,6 +44,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\VoucherToShopController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\api_manager_controller;
 use App\Services\DistanceCalculatorService;
 
 
@@ -103,7 +104,7 @@ use App\Services\DistanceCalculatorService;
                     Route::put('shops/{id}', [ShopController::class, 'update']);
                     Route::delete('shops/{id}', [ShopController::class, 'destroy']);
                     Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
-                    Route::post('shop/manager', [ShopController::class, "shop_manager_store"]);
+                    Route::post('shop/manager', [ShopController::class, "shop_manager_add"]);
                     Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]);
                     Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
                     Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"]);
@@ -116,6 +117,9 @@ use App\Services\DistanceCalculatorService;
                     Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
                     Route::get('shop/order/{id}/{status}', [ShopController::class, "get_order_to_shop_by_status"]);
                     Route::put('shop/order/{id}', [ShopController::class, "update_status_order"]);
+                    Route::post('shop/register_ship_giao_hang_nhanh', [ShopController::class, "register_ship_giao_hang_nhanh"]);
+                    // Route::post('shop/get_store_ship_giao_hang_nhanh', [ShopController::class, "get_store_ship_giao_hang_nhanh"]);
+
                 //SHOP
                 Route::resource('carts', CartController::class);
                 Route::resource('users', AuthenController::class);
@@ -137,7 +141,7 @@ use App\Services\DistanceCalculatorService;
             Route::post('products', [ProductController::class, 'store']);
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy']);
-            Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
+            Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
             Route::delete('product/remove_variant/{id}', [ProductController::class, 'removeVariant']);
             Route::post('product/generate_variants', [ProductController::class, 'generateVariants']);
@@ -179,7 +183,7 @@ use App\Services\DistanceCalculatorService;
 
             // Ship Service Routes
             Route::get('/ship_service', [ShipsController::class, 'ship_service_get_one']);
-            Route::get('/ship_service_all', [ShipsController::class, 'ship_service_get_all']);
+            Route::get('/ship_service_all/{ship_companies_id}', [ShipsController::class, 'ship_service_get_all']);
             Route::post('/ship_service', [ShipsController::class, 'add_ship_service']);
             Route::put('/ship_service', [ShipsController::class, 'ship_service_update']);
             Route::delete('/ship_service', [ShipsController::class, 'ship_service_delete']);
@@ -195,12 +199,19 @@ use App\Services\DistanceCalculatorService;
             Route::put('shop/refund/order/{id}', [ShopController::class, "refund_order_update"]);
             Route::get('shop/refund/order/{id}', [ShopController::class, "refund_order_detail"]);
             Route::get('shop/refund/order', [ShopController::class, "refund_order_list"]);
+            Route::post('shop/refund/order/{id}', [ShopController::class, "create_refund_order"]);
+
+            Route::get('shop/revenue_report', [ShopController::class, 'revenueReport']);
+            Route::get('shop/order_report', [ShopController::class, 'orderReport']);
+            Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
 
 });
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
 Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
+Route::post('user/restore_account', [AuthenController::class, 'restore_account']);
+Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, "confirm_restore_account"])->name('confirm_restore_account');
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
@@ -225,9 +236,16 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
 
-
-        Route::get('shop/revenue_report', [ShopController::class, 'revenueReport']);
-        Route::get('shop/order_report', [ShopController::class, 'orderReport']);
-        Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
-        Route::post('shop/refund/order/{id}', [ShopController::class, "create_refund_order"]);
         Route::get('search', [ProductController::class, 'search']);
+
+
+
+        Route::get('get_infomaiton_province_and_city', [PurchaseController::class, 'get_infomaiton_province_and_city']);
+        Route::get('get_infomaiton_district', [PurchaseController::class, 'get_infomaiton_district']);
+        Route::get('get_infomaiton_ward', [PurchaseController::class, 'get_infomaiton_ward']);
+
+        // API TEST
+
+        Route::get('get_address_user', [PurchaseController::class, 'get_address_user']);
+
+        Route::post('calculateOrderFees_giao_hang_nhanh', [PurchaseController::class, 'calculateOrderFees_giao_hang_nhanh']);

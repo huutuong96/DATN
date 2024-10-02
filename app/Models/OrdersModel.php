@@ -29,6 +29,10 @@ class OrdersModel extends Model
         'create_at',
         'update_at',
         'total_amount',
+        'height',
+        'length',
+        'weight',
+        'width',
     ];
 
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\VoucherToShop;
 use App\Http\Requests\VoucherRequest;
-use Illuminate\Support\Facades\Cache;
 
 class VoucherToShopController extends Controller
 {
@@ -13,9 +12,7 @@ class VoucherToShopController extends Controller
      */
     public function index()
     {
-        $voucherShops = Cache::remember('all_voucher_shops', 60 * 60, function () {
-            return VoucherToShop::all();
-        });
+        $voucherShops = VoucherToShop::all();
 
         if ($voucherShops->isEmpty()) {
             return $this->errorResponse("Không tồn tại voucher shop nào");
@@ -31,7 +28,6 @@ class VoucherToShopController extends Controller
     {
         try {
             $voucherShop = VoucherToShop::create($request->validated());
-            Cache::forget('all_voucher_shops');
             return $this->successResponse("Thêm voucher shop thành công", $voucherShop);
         } catch (\Throwable $th) {
             return $this->errorResponse("Thêm voucher shop không thành công", $th->getMessage());
@@ -43,9 +39,7 @@ class VoucherToShopController extends Controller
      */
     public function show(string $id)
     {
-        $voucherShop = Cache::remember('voucher_shop_' . $id, 60 * 60, function () use ($id) {
-            return VoucherToShop::find($id);
-        });
+        $voucherShop = VoucherToShop::find($id);
 
         if (!$voucherShop) {
             return $this->errorResponse("Không tồn tại voucher shop nào", null, 404);
@@ -59,9 +53,7 @@ class VoucherToShopController extends Controller
      */
     public function update(VoucherRequest $request, string $id)
     {
-        $voucherShop = Cache::remember('voucher_shop_' . $id, 60 * 60, function () use ($id) {
-            return VoucherToShop::find($id);
-        });
+        $voucherShop = VoucherToShop::find($id);
 
         if (!$voucherShop) {
             return $this->errorResponse("Voucher shop không tồn tại", null, 404);
@@ -69,8 +61,6 @@ class VoucherToShopController extends Controller
 
         try {
             $voucherShop->update($request->validated());
-            Cache::forget('voucher_shop_' . $id);
-            Cache::forget('all_voucher_shops');
             return $this->successResponse("Cập nhật voucher shop thành công", $voucherShop);
         } catch (\Throwable $th) {
             return $this->errorResponse("Cập nhật voucher shop không thành công", $th->getMessage());
@@ -82,9 +72,7 @@ class VoucherToShopController extends Controller
      */
     public function destroy(string $id)
     {
-        $voucherShop = Cache::remember('voucher_shop_' . $id, 60 * 60, function () use ($id) {
-            return VoucherToShop::find($id);
-        });
+        $voucherShop = VoucherToShop::find($id);
 
         if (!$voucherShop) {
             return $this->errorResponse("Voucher shop không tồn tại", null, 404);
@@ -92,8 +80,6 @@ class VoucherToShopController extends Controller
 
         try {
             $voucherShop->delete();
-            Cache::forget('voucher_shop_' . $id);
-            Cache::forget('all_voucher_shops');
             return $this->successResponse("Xóa voucher shop thành công");
         } catch (\Throwable $th) {
             return $this->errorResponse("Xóa voucher shop không thành công", $th->getMessage());
