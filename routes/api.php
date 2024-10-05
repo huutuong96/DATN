@@ -197,7 +197,17 @@ use App\Http\Controllers\CategoriessupportmainController;
             Route::get('shop/refund/order/{id}', [ShopController::class, "refund_order_detail"]);
             Route::get('shop/refund/order', [ShopController::class, "refund_order_list"]);
 
+
+            //PAYMENT
+                //cod
+                Route::post('/cod_payment', [PaymentsController::class, "cod_payment"]);
+                //vnpay
+                Route::post('/vnpay_payment', [PaymentsController::class, "vnpay_payment"]);
+
+                
+
 });
+                Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
@@ -209,6 +219,8 @@ Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confi
 Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
+
+
 
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
 
@@ -233,3 +245,7 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
         Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
         Route::post('shop/refund/order/{id}', [ShopController::class, "create_refund_order"]);
         Route::get('search', [ProductController::class, 'search']);
+
+
+
+
