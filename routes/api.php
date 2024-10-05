@@ -283,10 +283,12 @@ use App\Http\Controllers\Learning_sellerController;
 use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\CategoriessupportmainController;
-Route::get('/test', function () {
+use App\Http\Controllers\SearchController;
+Route::get('/search', function () {
     return "start";
-})->middleware('CheckPremission:view_orders');
-
+})->middleware('CheckPremission:create_category');
+    Route::post('/test/search', [SearchController::class, "search"]);
+    Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
 
@@ -378,14 +380,15 @@ Route::get('/test', function () {
                     Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"])->middleware('CheckRole:Admin');
                     Route::post('shop/manager', [ShopController::class, "shop_manager_store"])->middleware('CheckRole:Seller');
                     Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"])->middleware('CheckRole:Seller');
-                    Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]);
-                    Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"]);
+                    Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"])->middleware('CheckRole:Seller');
+                    Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"])->middleware('CheckRole:Seller');
+
                     Route::post('shop/increase_follower/{id}', [ShopController::class, "increase_follower"]);
                     Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);
                     Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
-                    Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]);
-                    Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]);
-                    Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"]);
+                    Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"])->middleware('CheckRole:Seller');
+                    Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"])->middleware('CheckRole:Seller');
+                    Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"])->middleware('CheckRole:Seller');
                     Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
                     Route::get('shop/order/{id}/{status}', [ShopController::class, "get_order_to_shop_by_status"]);
                     Route::put('shop/order/{id}', [ShopController::class, "update_status_order"]);
