@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Message extends Model
+class tax_category extends Model
 {
     use HasFactory;
+
+    protected $table = 'tax_category';
+
     protected $fillable = [
-        'status',
-        'created_at',
-        'updated_at',
-        'user_id',
-        'shop_id',
+        'tax_id',
+        'category_id',
     ];
 }

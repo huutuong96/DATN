@@ -19,6 +19,10 @@ class OrderDetailsModel extends Model
         'variant_id',
         'create_at',
         'update_at',
+        'height',
+        'length',
+        'weight',
+        'width',
     ];
 
     public function product()

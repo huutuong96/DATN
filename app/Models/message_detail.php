@@ -12,9 +12,10 @@ class message_detail extends Model
     protected $fillable = [
         'mes_id',
         'content',
+        'attachment',
         'send_by',
         'status',
-         'images'
+        'images'
     ];
     protected $casts = [
         'images' => 'array', // Tự động convert JSON thành mảng khi lấy từ DB

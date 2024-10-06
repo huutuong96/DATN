@@ -69,6 +69,8 @@ class PaymentsController extends Controller
             ];
             return response()->json($dataDone);
         }
+
+
     }
 
     /**
@@ -141,6 +143,7 @@ class PaymentsController extends Controller
                 ]
             );
         }
+
     }
 
     /**

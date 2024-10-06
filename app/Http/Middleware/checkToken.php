@@ -15,7 +15,6 @@ class checkToken
         try {
             // Xác thực người dùng bằng token JWT
             $user = JWTAuth::parseToken()->authenticate();
-
             // Lấy token hiện tại từ request
             $currentToken = JWTAuth::getToken();
 
@@ -27,7 +26,6 @@ class checkToken
                     'message' => 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.',
                 ], 401);
             }
-
             return $next($request);
         } catch (TokenExpiredException $e) {
             return response()->json([
