@@ -19,6 +19,7 @@ use App\Models\categoryattribute;
 use Carbon\Carbon;
 
 
+
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -337,6 +338,7 @@ class ProductController extends Controller
 
     public function updateVariant(Request $request, $id)
     {
+       
         $variant = product_variants::find($id);
         if (!$variant) {
             return response()->json([
@@ -352,6 +354,7 @@ class ProductController extends Controller
             'stock' => $request->stock ?? $variant->stock,
             'price' => $request->price ?? $variant->price,
             'images' => isset($imageData) ? json_encode($imageData) : $variant->images,
+            'is_deleted' => $request->is_deleted ?? $variant->is_deleted,
         ]);
         return response()->json([
             'status' => true,
@@ -468,7 +471,6 @@ class ProductController extends Controller
         }
     }
 
-
     /**
      * Remove the specified resource from storage.
      */
@@ -536,5 +538,145 @@ class ProductController extends Controller
             'status' => true,
             'message' => "Duyệt sản phẩm thành công",
         ], 200);
+    }
+
+    public function updateProduct(Request $request, string $id)
+    // ProductRequest
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => "Sản phẩm không tồn tại",
+            ], 404);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $cloudinary = new Cloudinary();
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $mainImageUrl = $uploadedImage['secure_url']; 
+        } else {
+            $mainImageUrl = $product->image;
+        }
+
+        $dataInsert = [
+            'product_id' => $product->id,
+            'name' => $request->name ?? $product->name,
+            'sku' => $product->sku,
+            'slug' => $request->filled('slug') ? $request->slug : Str::slug($request->name ?? $product->name),
+            'description' => $request->description ?? $product->description,
+            'infomation' => $request->infomation ?? $product->infomation,
+            'price' => $request->price ?? $product->price,
+            'sale_price' => $request->sale_price ?? $product->sale_price,
+            'image' => $mainImageUrl,
+            'quantity' => $request->quantity ?? $product->quantity,
+            'parent_id' => $request->parent_id ?? $product->parent_id,
+            'update_by' => $user->id,
+            'category_id' => $request->category_id ?? $product->category_id,
+            'brand_id' => $request->brand_id ?? $product->brand_id,
+            'shop_id' => $request->shop_id ?? $product->shop_id,
+            'height' => $request->height ?? $product->height,
+            'length' => $request->length ?? $product->length,
+            'weight' => $request->weight ?? $product->weight,
+            'width' => $request->width ?? $product->width,
+            'created_at' => $product->created_at,
+            'updated_at' => now(),
+            'update_version' => $product->update_version + 1,
+            'change_of' => $request->change_of ?? null,
+        ];
+        try {
+            DB::table('update_product')->insert($dataInsert);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                    $imageUrl = $uploadedImage['secure_url'];
+
+                    Image::create([
+                        'product_id' => $product->id,
+                        'url' => $imageUrl,
+                        'status' => 0,
+                    ]);
+                }
+            }
+            return response()->json([
+                'status' => true,
+                'message' => "Yêu cầu của bạn đã được gửi vui lòng chờ xét duyệt"
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Yêu cầu Cập nhật không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function handleUpdateProduct(Request $request, string $id)
+    // ProductRequest
+    {
+    
+        try {
+            if($request-> action == "ok"){
+                $newDT = DB::table("update_product")->where("product_id", $id)->first();
+                $ollDT = DB::table("products")->where("id", $id)->first();
+                $ollData = (array) $ollDT;
+                $newData = (array) $newDT;
+                DB::table('products_oll')->insert($ollData);
+                $change_of = $newData["change_of"];
+                unset($newData["change_of"]);
+                $newData["created_at"] = $newData["updated_at"];
+                $newData["id"] = $newData["product_id"];
+                unset($newData["product_id"]);
+                DB::table('products')->where('id', $id)->update($newData);
+                DB::table('update_product')->where('id', $newDT->id)->delete();
+                if($request->change  != null){
+                    if($request->change === "all"){
+                        // lấy tất cả biến thể xong cập nhật
+                        $variants = product_variants::where('product_id', $id)->get();
+                        foreach ($variants as $key => $variant) {
+                            $variant->update([
+                                'stock' => $request->stock ?? $variant->stock,
+                                'price' => $request->price ?? $variant->price,
+                                // 'images' => isset($imageData) ? json_encode($imageData) : $variant->images, phần này cân xu lý them
+                            ]);
+                        };
+                        $output["variants"] = $variants;
+                    }else{
+                        $variants = product_variants::whereIn('id', $request->change)->get();
+                        foreach ($variants as $key => $variant) {
+                            $variant->update([
+                                'stock' => $request->stock ?? $variant->stock,
+                                'price' => $request->price ?? $variant->price,
+                                // 'images' => isset($imageData) ? json_encode($imageData) : $variant->images, phần này cân xu lý them
+                            ]);
+                        };
+                        $output["variants"] = $variants;
+                    }
+                    
+                }
+
+                // chưa xử lý việc bắn thông báo
+               
+            }else{
+                DB::table('update_product')->where('id', $newDT->id)->delete();
+                // chưa xử lý việc bắn thông báo
+            }
+            //---------------------------------
+            return response()->json([
+                'status' => true,
+                'message' => "cập nhật thành công",
+                'product' => "ok",
+            ], 200);
+            
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật thất bại",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
     }
 }
