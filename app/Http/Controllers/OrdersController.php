@@ -28,8 +28,6 @@ class OrdersController extends Controller
     public function indexOrderToShop($id)
     {
         $orders = OrdersModel::where('shop_id', $id)->get();
-
-
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
         }

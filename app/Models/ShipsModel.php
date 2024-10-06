@@ -21,6 +21,7 @@ class ShipsModel extends Model
         'description',
         'status',
         'fees',
+        'shop_id',
         'ship_company_id',
         'distance'
     ];

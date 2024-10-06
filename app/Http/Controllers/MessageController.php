@@ -14,12 +14,10 @@ class MessageController extends Controller
 
 
     public function user_send(Request $request, $shop_id){
-       
+
         $user = JWTAuth::parseToken()->authenticate();
         $notificationController = new NotificationController();
         $message = Message::where('user_id', auth()->user()->id)->where('shop_id', $shop_id)->first();
-   
-
         if (!$message) {
             $message = Message::create([
                 'user_id' => $user->id, // User id ở đây là khách hàng gửi cho shop
@@ -52,14 +50,14 @@ class MessageController extends Controller
             "images" => $imageUrls, // Chuyển mảng URL thành chuỗi JSON để lưu vào DB
             'send_by' => $user->id, // Đây là id của khách hàng gửi tin nhắn
         ]);
-        $notificationData = [   
+        $notificationData = [
             'type' => 'main',
             'user_id' => $user->id,
             'title' => 'bạn có thông báo mới',
-            'description' =>$user->fullname. ' vừa nhắn tin cho bjan',
+            'description' =>$user->fullname. ' vừa nhắn tin cho bạn',
         ];
-       
-        $notification = $notificationController->store(new Request($notificationData)); 
+
+        $notification = $notificationController->store(new Request($notificationData));
         return $this->successResponse("Gửi tin nhắn thành công", [$message,$message_detail]);
     }
 
@@ -71,32 +69,31 @@ class MessageController extends Controller
             return $this->successResponse("Lấy tin nhắn thành công", $message);
         }
         return $this->errorResponse("Bạn không có quyền truy cập");
-    }  
+    }
 
 
     public function user_get_message(Request $request){
         // Xác thực người dùng và lấy thông tin user
         $user = JWTAuth::parseToken()->authenticate();
-    
+
         // Lấy danh sách tất cả các shop_id mà user đã nhắn tin
         $shop_ids = Message::where('user_id', $user->id)->distinct()->pluck('shop_id');
-        
+
         // Lấy tất cả các tin nhắn từ các shop_id này
         $messages = Message::whereIn('shop_id', $shop_ids)->where('user_id', $user->id)->get();
-    
+
         if ($messages->isNotEmpty()) {
             return $this->successResponse("Lấy tin nhắn thành công", $messages);
         }
         return $this->errorResponse("Bạn không có tin nhắn nào");
     }
-    
-    
-    
+
+
+
     public function shop_send(Request $request, $mes_id){
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
         $imageUrls = [];
-
         // Xử lý upload hình ảnh lên Cloudinary và lưu URL của chúng
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
@@ -112,7 +109,7 @@ class MessageController extends Controller
             }
         }
         $message = Message::where('id', $mes_id)->first();
-        // dd($message);
+
         $notificationController = new NotificationController();
         $message_detail = message_detail::create([
             'mes_id' => $message->id,
@@ -126,7 +123,7 @@ class MessageController extends Controller
             'title' => 'bạn có thông báo mới từ shop',
             'description' => auth()->user()->fullname. ' vừa nhắn tin cho bạn',
         ];
-       
+
         $notification = $notificationController->store(new Request($notificationData));
         return $this->successResponse("Gửi tin nhắn thành công", [$message,$message_detail]);
     }

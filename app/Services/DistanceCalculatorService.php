@@ -10,7 +10,7 @@ class DistanceCalculatorService
 {
     protected $client;
     protected $apiKey;
-    protected $ships;
+    protected $ship;
     protected $insurance;
     protected $shipping_type;
     protected $ship_company_id;
@@ -21,13 +21,9 @@ class DistanceCalculatorService
         $this->shipping_type = $request->shipping_type;
         $this->client = new Client();
         $this->apiKey = env('HERE_API_KEY'); // Lấy API key từ file .env
-        $this->ships = $this->getShippingRates() ?? null;
         $this->insurance = $this->getInsuranceRates($request) ?? null;
     }
-    private function getShippingRates()
-    {
-        return ShipsModel::pluck('fees', 'code')->toArray();
-    }
+
     private function getInsuranceRates(Request $request)
     {
         return insurance::whereIn('code', $this->insurance_options)
@@ -72,43 +68,29 @@ class DistanceCalculatorService
      * @param float $distance
      * @return int
      */
-
-
-    public function calculateShippingFee($distance)
+    private function getShippingRates($ship_id)
     {
-        // NẾU KHÔNG CHỌN SHIP_TYPE THÌ TÍNH THEO KHOẢNG CÁCH
-        $baseRates = $this->ships;
-        // Xác định loại địa điểm dựa trên khoảng cách
-        if(!isset($this->shipping_type) || $this->shipping_type == null){
-            if ($distance <= 10) {
-                $locationType = $baseRates['NOI-THANH'];
-            } elseif ($distance <= 30) {
-                $locationType = $baseRates['NGOAI-THANH'];
-            } else {
-                $locationType = $baseRates['TINH'];
-            }
-        }
-        // NẾU CHỌN SHIP_TYPE THÌ TÍNH THEO SHIP_TYPE
-        if(isset($this->shipping_type)){
-            $locationType = $baseRates[$this->shipping_type];
+        return ShipsModel::where('id', $ship_id)->select('fees', 'code')->first();
+    }
+
+    public function calculateShippingFee($distance, $ship_id)
+    {
+        $shipType = $this->getShippingRates($ship_id);// Phí cơ bản
+        $baseFee = $shipType->fees;
+        // Tính phí dựa trên khoảng cách
+        if ($distance > 0) {
+            // Tính số km đầy đủ
+            $fullTens = floor($distance / 10);
+            // Tính phí cho số km đầy đủ
+            $additionalFee = $fullTens * 100; // 100đ cho mỗi 10 km
+            $baseFee += $additionalFee;
         }
 
-        if (!isset($locationType)) {
-            throw new \InvalidArgumentException("Loại địa điểm không hợp lệ");
-        }
-        $baseFee = $locationType;
-
-        $shippingMultipliers = 0;
+        // tính phí bảo hiểm nếu có
         if(isset($this->insurance_options)){
-            $shippingMultipliers = array_sum($this->insurance);
+            $baseFee += array_sum($this->insurance);
         }
-        // dd($shippingMultipliers);
-        if (!isset($shippingMultipliers)) {
-            throw new \InvalidArgumentException("Loại dịch vụ giao hàng không hợp lệ");
-        }
-
-        $shippingFee = ceil($baseFee + $shippingMultipliers);
-        return $shippingFee;
+        return $baseFee;
     }
 
 

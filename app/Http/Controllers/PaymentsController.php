@@ -68,7 +68,7 @@ class PaymentsController extends Controller
             ];
             return response()->json($dataDone);
         }
-        
+
     }
 
     /**
@@ -116,7 +116,7 @@ class PaymentsController extends Controller
             ], 404);
         }
 
-        $dataUpdate = [ 
+        $dataUpdate = [
             "name" => $request->name ?? $payments->name,
             "description" => $request->description ?? $payments->description,
             "status" => $request->status ?? $payments->status,
@@ -138,7 +138,7 @@ class PaymentsController extends Controller
                     'error' => $th->getMessage()
                 ]);
         }
-        
+
     }
 
     /**
@@ -156,9 +156,9 @@ class PaymentsController extends Controller
                     'message' => "Paymen không tồn tại"
                 ], 404);
             }
-    
+
             $paymens->delete();
-    
+
             return response()->json([
                 'status' => true,
                 'message' => "Paymen đã được xóa"
