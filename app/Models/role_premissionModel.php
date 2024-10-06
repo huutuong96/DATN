@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// use App\Models\
 
 class role_premissionModel extends Model
 {
@@ -18,5 +19,9 @@ class role_premissionModel extends Model
         'created_at',
         'update_by',
     ];
+    public function permission()
+    {
+        return $this->belongsTo(PremissionsModel::class, 'premission_id', 'id');
+    }
 }
 
