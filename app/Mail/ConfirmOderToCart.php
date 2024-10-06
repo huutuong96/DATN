@@ -11,14 +11,14 @@ class ConfirmOderToCart extends Mailable
     use Queueable, SerializesModels;
 
     public $ordersByShop;
-    public $grandTotalPrice;
+    public $total_amount;
     public $carts;
     public $totalQuantity;
     public $shipFee;
-    public function __construct($ordersByShop, $grandTotalPrice, $carts, $totalQuantity, $shipFee)
+    public function __construct($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee)
     {
         $this->ordersByShop = $ordersByShop;
-        $this->grandTotalPrice = $grandTotalPrice;
+        $this->total_amount = $total_amount;
         $this->carts = $carts;
         $this->totalQuantity = $totalQuantity;
         $this->shipFee = $shipFee;

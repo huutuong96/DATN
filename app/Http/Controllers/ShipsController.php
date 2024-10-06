@@ -163,6 +163,7 @@ class ShipsController extends Controller
             'description' => $request->description,
             'status' => $request->status,
             'fees' => $request->fees,
+            'shop_id' => $request->shop_id,
             'ship_company_id' => $request->ship_company_id,
             'distance' => $request->distance,
         ]);
@@ -206,9 +207,9 @@ class ShipsController extends Controller
         return $this->successResponse('Lấy dịch vụ vận chuyển thành công', $ship_service);
     }
 
-    public function ship_service_get_all(string $id)
+    public function ship_service_get_all(string $ship_companies_id)
     {
-        $ship_service = ShipsModel::where('shop_id', $id)->where('status', 1)->get();
+        $ship_service = ShipsModel::where('ship_company_id', $ship_companies_id)->get();
         if (!$ship_service) {
             return $this->errorResponse('Dịch vụ vận chuyển không tồn tại', 404);
         }
@@ -264,7 +265,8 @@ class ShipsController extends Controller
 
     public function insurance_get_all(string $id)
     {
-        $insurance = insurance::where('ship_company_id', $id)->where('status', 1)->get();
+        $insurance = insurance::where('ship_company_id', $id)->get();
+
         if (!$insurance) {
             return $this->errorResponse('Bảo hiểm không tồn tại', 404);
         }

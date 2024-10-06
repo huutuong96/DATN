@@ -182,6 +182,10 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'brand_id' => $request->brand_id,
                 'shop_id' => $request->shop_id,
+                'height' => $request->height,
+                'length' => $request->length,
+                'weight' => $request->weight,
+                'width' => $request->width,
             ]);
 
             if ($request->hasFile('images')) {
@@ -293,6 +297,12 @@ class ProductController extends Controller
     public function getVariant($id)
     {
         $variant = product_variants::where('product_id', $id)->get();
+
+        // Giải mã trường images cho mỗi biến thể
+        foreach ($variant as $v) {
+            $v->images = json_decode($v->images); // Giả sử $v->images chứa chuỗi JSON
+        }
+
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
@@ -335,8 +345,8 @@ class ProductController extends Controller
 
     public function updateStockAllVariant(Request $request)
     {
-        $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
-        $variants = product_variants::whereIn('id', $variantArray)
+        // $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
+        $variants = product_variants::whereIn('id', $request->variant_ids)
             ->update(['stock' => $request->stock]);
         return response()->json([
             'status' => true,
@@ -366,8 +376,8 @@ class ProductController extends Controller
 
     public function updatePriceAllVariant(Request $request)
     {
-        $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
-        $variants = product_variants::whereIn('id', $variantArray)
+        // $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
+        $variants = product_variants::whereIn('id', $request->variant_ids)
             ->update(['price' => $request->price]);
         return response()->json([
             'status' => true,
@@ -398,18 +408,18 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function updateImageAllVariant(Request $request, $id)
+    public function updateImageAllVariant(Request $request)
     {
         // DỮ LIỆU MẪU ĐỂ TEST CẬP NHẬT HÀNG LOẠT
-        // $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
+        $request->variant_ids = [697, 698, 699];
         if ($request->hasFile('images')) {
-            $imageData = $this->storeImageVariant($request->file('images'), $variantArray);
+            $imageData = $this->storeImageVariant($request->file('images'), $request->variant_ids);
             $jsonImageData = json_encode($imageData);
 
-            product_variants::whereIn('id', $variantArray)
+            product_variants::whereIn('id', $request->variant_ids)
                 ->update(['images' => $jsonImageData]);
         }
-        $updatedVariants = product_variants::whereIn('id', $variantArray)
+        $updatedVariants = product_variants::whereIn('id', $request->variant_ids)
             ->get();
         return response()->json([
             'status' => true,
@@ -481,11 +491,10 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(ProductRequest $request, string $id)
-
+    public function update(Request $request, string $id)
+    // ProductRequest
     {
         $product = Product::find($id);
-
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -518,11 +527,13 @@ class ProductController extends Controller
             'category_id' => $request->category_id ?? $product->category_id,
             'brand_id' => $request->brand_id ?? $product->brand_id,
             'shop_id' => $request->shop_id ?? $product->shop_id,
+            'height' => $request->height ?? $product->height,
+            'length' => $request->length ?? $product->length,
+            'weight' => $request->weight ?? $product->weight,
+            'width' => $request->width ?? $product->width,
         ];
-
         try {
             $product->update($dataInsert);
-
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
                     $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
@@ -602,5 +613,21 @@ class ProductController extends Controller
             'message' => "Lấy dữ liệu thành công",
             'data' => $products,
         ]);
+    }
+
+    public function approve_product(Request $request, $id){
+        $product = Product::find($id);
+        if(!$product){
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại sản phẩm nào",
+            ], 404);
+        }
+        $product->status = 1;
+        $product->save();
+        return response()->json([
+            'status' => true,
+            'message' => "Duyệt sản phẩm thành công",
+        ], 200);
     }
 }

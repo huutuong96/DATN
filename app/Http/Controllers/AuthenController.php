@@ -20,11 +20,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmMail;
 use App\Mail\ConfirmMailChangePassword;
+use App\Mail\ConfirmRestoreAccount;
 use App\Models\Cart_to_usersModel;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Paginate a collection.
@@ -183,18 +185,17 @@ class AuthenController extends Controller
             $user_present_rank = $user_present->rank;
             $notifications = $user_present->notifications;
             $notification_ids = $notifications->pluck('id_notification');
-            $main_notifications = Notification_to_mainModel::whereIn('id', $notification_ids)->paginate(20);
+            $main_notifications = Notification_to_mainModel::whereIn('id', $notification_ids)->paginate(3);
             $orders = $user_present->orders;
             $orderDetails = $orders->flatMap->orderDetails;
             $productIds = $orderDetails->pluck('product_id');
-            $products = Product::whereIn('id', $productIds)->paginate(20);
+            $products = Product::whereIn('id', $productIds)->paginate(3);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
                 'me' => $user_present,
                 'address' => $user_present_address,
-                'rank' => $user_present_rank,
                 'notifications' => $main_notifications,
                 'orders' => [
                     'orderDetail' => $orderDetails,
@@ -253,10 +254,31 @@ class AuthenController extends Controller
             "avatar" => $avatarUrl ?? $user->avatar,
         ];
         UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
+        if($request->input('address')){
+            if ($request->input('address')['default'] == 1) {
+                AddressModel::where('default', 1)->update(['default' => null]);
+            }
+            $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
+            $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
+            $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
+            AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
+                "province" => $request->input('address')['province'],
+                "province_id" => $filteredCity['ProvinceID'],
+                "district" => $request->input('address')['district'],
+                "district_id" => $filteredDistrict['DistrictID'],
+                "ward" => $request->input('address')['ward'],
+                "ward_id" => $filledWard,
+                "address" => $request->input('address')['address'],
+                "user_id" => $user->id,
+                "default" => $request->input('address')['default'] ?? null,
+                "type" => $request->input('address')['type'] ?? null,
+            ]);
+        }
         $dataDone = [
             'status' => true,
             'message' => "Cập nhật thành công!",
         ];
+
         return response()->json($dataDone, 200);
     }
 
@@ -307,7 +329,9 @@ class AuthenController extends Controller
     public function confirm_mail_change_password(Request $request, $token, $email)
     {
         $user = UsersModel::where('email', $email)->first();
-
+        if(!$request->newpassword){
+            return response()->json(['error' => 'vui lòng nhập mật khẩu mới'], 401);
+        }
         if ($user) {
             return $this->reset_password($request, $token, $email);
         }
@@ -318,7 +342,7 @@ class AuthenController extends Controller
         $user = UsersModel::where('email', $email)->first();
         if ($user) {
             $user->update([
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->newpassword),
             ]);
 
             $dataDone = [
@@ -351,8 +375,76 @@ class AuthenController extends Controller
 
         $dataDone = [
             'status' => true,
-            'message' => "Tài khoản đã được vô hiệu hóa",
+            'message' => "Tài khoản đã được vô hiệu hóa trong 30 ngày",
         ];
         return response()->json($dataDone, 200);
+    }
+
+    public function restore_account(Request $request)
+    {
+        $user = UsersModel::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
+        }
+        $token = JWTAuth::fromUser($user);
+        $user->update([
+            'refesh_token' => $token,
+        ]);
+        Mail::to($user->email)->send(new ConfirmRestoreAccount($user, $token));
+        $dataDone = [
+            'status' => true,
+            'message' => "Đã gữi mã xác nhận đến email",
+            'email' => $user->email,
+        ];
+        return response()->json($dataDone, 200);
+    }
+    public function confirm_restore_account(Request $request, $token, $email)
+    {
+        $user = UsersModel::where('email', $email)->first();
+        if ($user) {
+            $user->status = 1;
+            $user->save();
+            return response()->json(['error' => 'Tài khoản đã khôi phục thành công'], 200);
+        }
+        return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
+    }
+
+    public function get_infomaiton_province_and_city($province)
+    {
+        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $response = Http::withHeaders([
+            'token' => $token, // Gắn token vào header
+        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province');
+        $cities = collect($response->json()['data']); // Chuyển thành Collection
+        // Lọc tỉnh dựa trên tên
+        $filteredCity = $cities->firstWhere('ProvinceName', $province);
+        return $filteredCity;
+    }
+
+    public function get_infomaiton_district($districtName)
+    {
+        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $response = Http::withHeaders([
+            'token' => $token, // Gắn token vào header
+        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district');
+        $district = collect($response->json()['data']); // Chuyển thành Collection
+        $filtereddistrict = $district->firstWhere('DistrictName', $districtName);
+        return $filtereddistrict;
+    }
+    public function get_infomaiton_ward($districtId, $wardName)
+    {
+        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $response = Http::withHeaders([
+            'token' => $token, // Gắn token vào header
+        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', [
+            'district_id' => $districtId, // Thêm district_id vào tham số truy vấn
+        ]);
+        $ward = collect($response->json());
+        foreach ($ward['data'] as $key => $value) {
+            if($ward['data'][$key]['WardName'] == $wardName){
+                $ward_id = $ward['data'][$key]['WardCode'];
+            }
+        }
+        return $ward_id;
     }
 }

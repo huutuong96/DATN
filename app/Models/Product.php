@@ -32,6 +32,10 @@ class Product extends Model
         'shop_id',
         'color_id',
         'sku',
+        'height',
+        'length',
+        'weight',
+        'width',
     ];
 
 
