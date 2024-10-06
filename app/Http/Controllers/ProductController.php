@@ -60,8 +60,8 @@ class ProductController extends Controller
             $categoryId = $request->cartegory_id;
             $query->where('category_id', $categoryId);
         }
-         $query->orderBy('created_at', 'asc'); // Từ sản phẩm cũ nhất đến mới nhất
-
+       
+ 
         // Lọc theo từ từ khóa search chờ anh tường làm search để thêm vào
         // if ($request->has('search')) {
         //     $query->where('name', 'LIKE', '%' . $request->search . '%');
@@ -70,7 +70,9 @@ class ProductController extends Controller
         //ở product ko có stock nên chưa tìm được theo where này 
         // $query->where('stock', '>', 0)
         // ->where('status', 2);
-        $query->orderBy('sold_count', 'desc');
+
+        $query->orderByRaw('view_count DESC, sold_count DESC, created_at ASC');
+
         $products = $query->paginate(100);
         if ($products->isEmpty()) {
         return response()->json([
@@ -82,8 +84,15 @@ class ProductController extends Controller
     }
     public function getPendingProducts()
     {
-        // Lấy tất cả sản phẩm có trạng thái là '1'
-        $pendingProducts = Product::where('status', 1)->get();
+        // Lấy tất cả sản phẩm có trạng thái là '101'
+        $pendingProducts = Product::where('status', 101)->get();
+        if ($pendingProducts->isEmpty()) {
+            // Nếu rỗng, trả về phản hồi JSON với thông báo lỗi
+            return response()->json([
+                'message' => 'Chưa có sản phẩm cần duyệt.', 
+                'product' => []
+            ]);
+        }
 
         return response()->json($pendingProducts);
     }
@@ -93,7 +102,7 @@ class ProductController extends Controller
         $product = Product::find($id);
 
         if ($product) {
-            $product->status = 2;
+            $product->status = Product::STATUS_APPROVED;
             $product->save();
 
             return response()->json(['message' => 'Sản phẩm đã được duyệt.', 'product' => $product]);
@@ -107,7 +116,7 @@ class ProductController extends Controller
        
         $product = Product::find($id);
         if ($product) {
-            $product->status = 3;
+            $product->status = Product::STATUS_REJECTED;
             $product->save();
 
             return response()->json(['message' => 'Sản phẩm đã bị từ chối.', 'product' => $product]);
@@ -119,7 +128,7 @@ class ProductController extends Controller
     public function getApprovedProducts()
     {
         // Lấy tất cả sản phẩm đã được duyệt
-        $approvedProducts = Product::where('status', '2')->get();
+        $approvedProducts = Product::where('status', '1')->get();
 
         return response()->json($approvedProducts);
     }

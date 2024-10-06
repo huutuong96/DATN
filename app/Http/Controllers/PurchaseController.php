@@ -339,7 +339,6 @@ class PurchaseController extends Controller
 
     try {
         DB::beginTransaction();
-
         $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
 
         $ordersByShop = [];

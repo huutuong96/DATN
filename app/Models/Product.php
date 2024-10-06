@@ -128,5 +128,28 @@ class Product extends Model
         }
         return $query;
     }
+    public const STATUS_PENDING_APPROVAL = 101;
+    public const STATUS_APPROVED = 1;
+    public const STATUS_REJECTED = 2;
+    public const STATUS_HIDDEN = 3; 
+
+    public static function getStatusOptions()
+    {
+        return [
+            self::STATUS_PENDING_APPROVAL => 'Chờ duyệt',
+            self::STATUS_APPROVED => 'Đã duyệt',
+            self::STATUS_REJECTED => 'Đã từ chối',
+            self::STATUS_HIDDEN => 'Đã ẩn',
+        ];
+    }
+    public function getStatusLabelAttribute()
+    {
+        return self::getStatusOptions()[$this->status] ?? 'Unknown Status';
+    }
+
+    public function scopeWithStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
 }
 
