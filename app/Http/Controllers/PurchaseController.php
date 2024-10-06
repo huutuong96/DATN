@@ -649,4 +649,3 @@ class PurchaseController extends Controller
         return $orderShipGHN;
     }
 }
-
