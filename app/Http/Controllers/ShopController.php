@@ -30,6 +30,7 @@ use App\Models\ProgramtoshopModel;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Categori_shopsModel;
 use App\Models\Learning_sellerModel;
+use App\Models\AddressModel;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
@@ -710,8 +711,10 @@ class ShopController extends Controller
 
     public function IsOwnerShop($id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $isOwner = Shop_manager::where('shop_id', $id)
             ->where('user_id', auth()->user()->id)
+
             ->where('role', 'owner')
             ->first();
         return $isOwner;
@@ -983,17 +986,6 @@ class ShopController extends Controller
         Shop::where('id', $request->shop_id)->update(['shopid_GHN' => $result['data']['shop_id']]);
         return $result;
     }
-    // public function get_store_ship_giao_hang_nhanh(Request $request)
-    // {
-    //     $token = env('TOKEN_API_REGISTER_GHN');
-    //     $response = Http::withHeaders([
-    //         'token' => $token, // Gắn token vào header
-    //     ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/all', [
-    //         'phone' => $request->phone,
-    //     ]);
-    //     $result = $response->json();
-    //     return $result;
-    // }
 
     public function get_infomaiton_province_and_city($province)
     {
@@ -1033,6 +1025,25 @@ class ShopController extends Controller
         }
         return $ward_id;
     }
-
+    public function leadtime($shop_id, $order_id)
+    {
+        $order = OrdersModel::find($order_id);
+        $shopData = Shop::where('id', $shop_id)->first();
+        $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+        $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
+        $response = Http::withHeaders([
+            'token' => $token,
+            'ShopId' => $shopData->shopid_GHN,
+            'token' => env('TOKEN_API_GIAO_HANG_NHANH_DEV'),
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime', [
+            "from_district_id"=> $shopData->district_id,
+            "from_ward_code"=> $shopData->ward_id,
+            "to_district_id"=> $address->district_id,
+            "to_ward_code"=> $address->ward_id,
+            "service_id"=> $order->service_id,
+        ]);
+        $orderLeadTime = collect($response->json());
+        $formattedTime = date('Y-m-d H:i:s', $orderLeadTime['data']['leadtime']);
+        return $formattedTime;
+    }
 }
-

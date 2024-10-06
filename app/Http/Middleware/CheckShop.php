@@ -28,7 +28,6 @@ class CheckShop
             ?? $request->segment(2) // Assuming shop_id might be in the second segment of the URL
             ?? $request->header('X-Shop-ID') // In case it's passed as a custom header
             ?? $request->json('shop_id'); // For JSON payloads
-            // dd("OK");
         // dd(vars: $shopId);
         // KIỂM TRA XEM SHOP CÓ HOÀN THÀNH KHÓA HỌC CHO NHÀ BÁN HÀNG KHÔNG
         $shop_learning = Learning_sellerModel::where('shop_id', $shopId)->first();

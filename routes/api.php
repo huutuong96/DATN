@@ -1,14 +1,13 @@
 <?php
 
-use App\Http\Controllers\OrderDetailController;
-use App\Http\Controllers\Learning_sellerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\TaxController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PremissionsController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\RanksController;
 use App\Http\Controllers\RolesController;
@@ -17,35 +16,36 @@ use App\Http\Controllers\AuthenController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ColorsController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\AddressController;
-use App\Http\Controllers\PaymentsController;
-use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RefundsController;
 use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\ProgrameController;
-use App\Http\Controllers\PermissionsController;
-use App\Http\Controllers\FollowToShopController;
-use App\Http\Controllers\Support_mainController;
+use App\Services\DistanceCalculatorService;
 use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\ProgrameController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\ProducttoshopController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\OrderDetailController;
+use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\PremissionsController;
+use App\Http\Controllers\FollowToShopController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Support_mainController;
 use App\Http\Controllers\ProducttocartController;
+use App\Http\Controllers\ProducttoshopController;
 use App\Http\Controllers\ProgramtoshopController;
 use App\Http\Controllers\VoucherToMainController;
+use App\Http\Controllers\VoucherToShopController;
+use App\Http\Controllers\Categori_ShopsController;
 use App\Http\Controllers\CategorilearnsController;
+use App\Http\Controllers\Learning_sellerController;
 use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoriesController;
-use App\Http\Controllers\Categori_ShopsController;
-use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\ImageController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\VoucherToShopController;
-use App\Http\Controllers\OrdersController;
-use App\Http\Controllers\api_manager_controller;
-use App\Services\DistanceCalculatorService;
+use App\Http\Controllers\CategoriessupportmainController;
 
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
@@ -137,7 +137,7 @@ use App\Services\DistanceCalculatorService;
             Route::get('user_get_message', [MessageController::class, "user_get_message"]);
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
-
+            Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
             Route::post('products', [ProductController::class, 'store']);
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy']);
@@ -204,6 +204,7 @@ use App\Services\DistanceCalculatorService;
             Route::get('shop/revenue_report', [ShopController::class, 'revenueReport']);
             Route::get('shop/order_report', [ShopController::class, 'orderReport']);
             Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
+            Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
 
 });
 
@@ -221,10 +222,6 @@ Route::get('/', function () {
 });
 
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
-
-
-
-
 
 
         // NO Auth
@@ -249,3 +246,4 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
         Route::get('get_address_user', [PurchaseController::class, 'get_address_user']);
 
         Route::post('calculateOrderFees_giao_hang_nhanh', [PurchaseController::class, 'calculateOrderFees_giao_hang_nhanh']);
+

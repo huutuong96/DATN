@@ -89,6 +89,10 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'brand_id' => $request->brand_id,
                 'shop_id' => $request->shop_id,
+                'height' => $request->height,
+                'length' => $request->length,
+                'weight' => $request->weight,
+                'width' => $request->width,
             ]);
 
             if ($request->hasFile('images')) {
@@ -516,5 +520,21 @@ class ProductController extends Controller
             'message' => "Lấy dữ liệu thành công",
             'data' => $products,
         ]);
+    }
+
+    public function approve_product(Request $request, $id){
+        $product = Product::find($id);
+        if(!$product){
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại sản phẩm nào",
+            ], 404);
+        }
+        $product->status = 1;
+        $product->save();
+        return response()->json([
+            'status' => true,
+            'message' => "Duyệt sản phẩm thành công",
+        ], 200);
     }
 }
