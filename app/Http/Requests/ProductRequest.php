@@ -20,53 +20,50 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'description' => 'required|nullable|string|max:255',
-            'infomation' => 'string',
-            'price' => 'required|numeric',
-            'sale_price' => 'numeric',
-            'quantity' => 'required|numeric',
-            'category_id'=> 'required|numeric',
-            'brand_id'=> 'required|numeric',
-            'shop_id'=> 'numeric',
+            'name' => 'required|string|max:255',
+            'sku' => 'nullable|string|max:100', // SKU có thể là null hoặc là chuỗi tối đa 100 ký tự
+            'slug' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'infomation' => 'nullable|string',
+            'price' => 'required|numeric|min:0', // Giá phải là số dương
+            'sale_price' => 'nullable|numeric|min:0', // Giá giảm giá có thể null hoặc là số dương
+            'image' => 'required|url', // Hình ảnh bắt buộc phải là URL
+            'quantity' => 'required|integer|min:1', // Số lượng bắt buộc và phải là số nguyên lớn hơn 0
+            'category_id' => 'required|integer|exists:categories,id', // category_id bắt buộc và phải tồn tại trong bảng categories
+            'brand_id' => 'required|integer|exists:brands,id', // brand_id bắt buộc và phải tồn tại trong bảng brands
+            'shop_id' => 'required|integer|exists:shops,id', // shop_id bắt buộc và phải tồn tại trong bảng shops
         ];
     }
 
     public function messages()
 {
     return [
-        'name.required' => 'Trường tên là bắt buộc.',
-        'name.string' => 'Tên phải là một chuỗi ký tự.',
-
-        'slug.string' => 'Đường dẫn phải là một chuỗi ký tự.',
-
-        'description.required' => 'Trường mô tả là bắt buộc.',
-        'description.string' => 'Mô tả phải là một chuỗi ký tự.',
-        'description.max' => 'Mô tả không được dài quá 255 ký tự.',
-
-        'infomation.string' => 'Thông tin phải là một chuỗi ký tự.',
-
-        'price.required' => 'Trường giá là bắt buộc.',
+       'name.required' => 'Tên sản phẩm là bắt buộc.',
+        'name.string' => 'Tên sản phẩm phải là chuỗi ký tự.',
+        'name.max' => 'Tên sản phẩm không được vượt quá 255 ký tự.',
+        'sku.string' => 'SKU phải là chuỗi ký tự.',
+        'sku.max' => 'SKU không được vượt quá 100 ký tự.',
+        'slug.string' => 'Slug phải là chuỗi ký tự.',
+        'slug.max' => 'Slug không được vượt quá 255 ký tự.',
+        'price.required' => 'Giá là bắt buộc.',
         'price.numeric' => 'Giá phải là một số.',
-
-        'sale_price.numeric' => 'Giá bán phải là một số.',
-
-        'quantity.required' => 'Trường số lượng là bắt buộc.',
-        'quantity.numeric' => 'Số lượng phải là một số.',
-
-        'sold_count.numeric' => 'Số lượng đã bán phải là một số.',
-
-        'view_count.numeric' => 'Số lượng lượt xem phải là một số.',
-
-        'parent_id.nullable' => 'Trường ID cha có thể bỏ qua.',
-
-        'category_id.required' => 'Bạn phải nhập ID danh mục cho sản phẩm.',
-        'category_id.numeric' => 'ID danh mục phải là một số',
-
-        'brand_id.required' => 'Bạn phải nhập ID hãng cho sản phẩm.',
-        'brand_id.numeric' => 'ID brand phải là một số.',
-
-        'color_id.numeric' => 'Số lượng phải là một số.',
+        'price.min' => 'Giá phải lớn hơn hoặc bằng 0.',
+        'sale_price.numeric' => 'Giá giảm giá phải là một số.',
+        'sale_price.min' => 'Giá giảm giá phải lớn hơn hoặc bằng 0.',
+        'image.required' => 'Hình ảnh là bắt buộc.',
+        'image.url' => 'Hình ảnh phải là một URL hợp lệ.',
+        'quantity.required' => 'Số lượng là bắt buộc.',
+        'quantity.integer' => 'Số lượng phải là một số nguyên.',
+        'quantity.min' => 'Số lượng phải lớn hơn hoặc bằng 1.',
+        'category_id.required' => 'Danh mục là bắt buộc.',
+        'category_id.integer' => 'Danh mục phải là một số nguyên.',
+        'category_id.exists' => 'Danh mục không tồn tại.',
+        'brand_id.required' => 'Thương hiệu là bắt buộc.',
+        'brand_id.integer' => 'Thương hiệu phải là một số nguyên.',
+        'brand_id.exists' => 'Thương hiệu không tồn tại.',
+        'shop_id.required' => 'Cửa hàng là bắt buộc.',
+        'shop_id.integer' => 'Cửa hàng phải là một số nguyên.',
+        'shop_id.exists' => 'Cửa hàng không tồn tại.',
     ];
 }
 

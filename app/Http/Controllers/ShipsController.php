@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\insurance;
 use App\Models\ShipsModel;
 use App\Models\ship_companies;
+use App\Http\Requests\ShipRequest;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

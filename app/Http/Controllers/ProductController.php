@@ -47,8 +47,101 @@ class ProductController extends Controller
             ]
         );
     }
+    public function filterProducts(Request $request)
+    {
+        $query = Product::query();
+        if ($request->has('min_price') && $request->has('max_price')) {
+            $query->whereBetween('price', [$request->min_price, $request->max_price]);
+        }
+        if ($request->has('brand')) {
+            $query->where('brand', $request->brand);
+        }
+        if ($request->has('cartegory_id')) {
+            $categoryId = $request->cartegory_id;
+            $query->where('category_id', $categoryId);
+        }
+       
+ 
+        // Lọc theo từ từ khóa search chờ anh tường làm search để thêm vào
+        // if ($request->has('search')) {
+        //     $query->where('name', 'LIKE', '%' . $request->search . '%');
+        // }
 
-    public function store(Request $request)
+        //ở product ko có stock nên chưa tìm được theo where này 
+        // $query->where('stock', '>', 0)
+        // ->where('status', 2);
+
+        $query->orderByRaw('view_count DESC, sold_count DESC, created_at ASC');
+
+        $products = $query->paginate(100);
+        if ($products->isEmpty()) {
+        return response()->json([
+            'message' => 'Không có sản phẩm nào'
+        ], 404);
+        }
+
+        return response()->json($products);
+    }
+    public function getPendingProducts()
+    {
+        // Lấy tất cả sản phẩm có trạng thái là '101'
+        $pendingProducts = Product::where('status', 101)->get();
+        if ($pendingProducts->isEmpty()) {
+            // Nếu rỗng, trả về phản hồi JSON với thông báo lỗi
+            return response()->json([
+                'message' => 'Chưa có sản phẩm cần duyệt.', 
+                'product' => []
+            ]);
+        }
+
+        return response()->json($pendingProducts);
+    }
+    public function approveProduct($id)
+    {  
+        // dd($id);
+        $product = Product::find($id);
+
+        if ($product) {
+            $product->status = Product::STATUS_APPROVED;
+            $product->save();
+
+            return response()->json(['message' => 'Sản phẩm đã được duyệt.', 'product' => $product]);
+        }
+
+        return response()->json(['message' => 'Sản phẩm không tìm thấy.'], 404);
+    }
+
+    public function rejectProduct($id)
+    {
+       
+        $product = Product::find($id);
+        if ($product) {
+            $product->status = Product::STATUS_REJECTED;
+            $product->save();
+
+            return response()->json(['message' => 'Sản phẩm đã bị từ chối.', 'product' => $product]);
+        }
+
+        return response()->json(['message' => 'Sản phẩm không tìm thấy.'], 404);
+    }
+   
+    public function getApprovedProducts()
+    {
+        // Lấy tất cả sản phẩm đã được duyệt
+        $approvedProducts = Product::where('status', '1')->get();
+
+        return response()->json($approvedProducts);
+    }
+
+    public function getRejectedProducts()
+    {
+        // Lấy tất cả sản phẩm bị từ chối
+        $rejectedProducts = Product::where('status', '3')->get();
+
+        return response()->json($rejectedProducts);
+    }
+
+    public function store(ProductRequest $request)
     {
 
         // HÀM NÀY LÀ HÀM QUY ĐỊNH ATTRIBUTE THEO CATEGORY //

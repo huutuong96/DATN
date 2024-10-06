@@ -13,11 +13,11 @@ class CategoriessupportmainController extends Controller
     public function index()
     {
         try {
-            $Categori_learn = Categoriessupportmain::all();
+            $Categoriessupportmain = Categoriessupportmain::all();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Categori_learn ,
+                'data' =>  $Categoriessupportmain ,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -39,7 +39,7 @@ class CategoriessupportmainController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(request $request )
+    public function store(CategoriessupportmainRequest $request )
     {   
         $user = JWTAuth::parseToken()->authenticate();
         $dataInsert = [
@@ -64,11 +64,11 @@ class CategoriessupportmainController extends Controller
     public function show(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
+            $Categoriessupportmain = Categoriessupportmain::findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'data' => $Categori_learn,
+                'data' => $Categoriessupportmain,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -90,12 +90,12 @@ class CategoriessupportmainController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CategoriessupportmainRequest $request, string $id)
 {
     $user = JWTAuth::parseToken()->authenticate();
-    $Categori_learn = Categoriessupportmain::findOrFail($id);
+    $Categoriessupportmain = Categoriessupportmain::findOrFail($id);
 
-    $Categori_learn->update([
+    $Categoriessupportmain->update([
         "content" => $request->content,
         "status" => $request->status,
         "index"=> $request->index,
@@ -106,7 +106,7 @@ class CategoriessupportmainController extends Controller
     $dataDone = [
         'status' => true,
         'message' => "đã lưu categori",
-        'roles' =>  $Categori_learn,
+        'roles' =>  $Categoriessupportmain,
     ];
     return response()->json($dataDone, 200);
 }
@@ -117,8 +117,8 @@ class CategoriessupportmainController extends Controller
     public function destroy(string $id)
     {
         try {
-            $Categori_learn = Categoriessupportmain::findOrFail($id);
-            $Categori_learn->delete();
+            $Categoriessupportmain = Categoriessupportmain::findOrFail($id);
+            $Categoriessupportmain->delete();
             return response()->json([
                 'status' => "success",
                 'message' => 'Xóa thành công',
