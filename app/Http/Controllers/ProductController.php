@@ -658,11 +658,25 @@ class ProductController extends Controller
                     
                 }
 
-                // chưa xử lý việc bắn thông báo
+                $notificationData = [
+                    'type' => 'main',
+                    'title' => 'Chỉnh sửa sản phẩm thành công',
+                    'description' => 'Sản phẩm của bạn đã được chỉnh sửa thành công',
+                    'user_id' => $newData["shop_id"],
+                ];
+                $notificationController = new NotificationController();
+                $notification = $notificationController->store(new Request($notificationData));
                
             }else{
                 DB::table('update_product')->where('id', $newDT->id)->delete();
-                // chưa xử lý việc bắn thông báo
+                $notificationData = [
+                    'type' => 'main',
+                    'title' => 'Chỉnh sửa sản phẩm không được chấp nhận',
+                    'description' => 'Sản phẩm của bạn đã không được chấp nhận thay đổi dữ liệu',
+                    'user_id' => $newData["shop_id"],
+                ];
+                $notificationController = new NotificationController();
+                $notification = $notificationController->store(new Request($notificationData));
             }
             //---------------------------------
             return response()->json([
