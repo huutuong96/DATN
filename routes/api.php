@@ -420,7 +420,9 @@ Route::get('/search', function () {
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
 
-            Route::post('products/update_variant/{id}', [ProductController::class, 'updateVariant']);     // update variant
+            Route::post('products/update_variant/{id}', [ProductController::class, 'updateVariant']); // update variant
+                
+            Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
 
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);     // update product
             Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']); 

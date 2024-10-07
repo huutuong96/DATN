@@ -561,12 +561,12 @@ class ProductController extends Controller
         } else {
             $mainImageUrl = $product->image;
         }
-
+        // dd($request->change_of);
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
             'sku' => $product->sku,
-            'slug' => $request->filled('slug') ? $request->slug : Str::slug($request->name ?? $product->name),
+            'slug' => $request->filled('slug') ?? $request->slug,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation,
             'price' => $request->price ?? $product->price,
@@ -585,7 +585,7 @@ class ProductController extends Controller
             'created_at' => $product->created_at,
             'updated_at' => now(),
             'update_version' => $product->update_version + 1,
-            'change_of' => $request->change_of ?? null,
+            'change_of' => json_encode($request->change_of ?? []) ,
         ];
         try {
             DB::table('update_product')->insert($dataInsert);
@@ -625,7 +625,7 @@ class ProductController extends Controller
                 $ollData = (array) $ollDT;
                 $newData = (array) $newDT;
                 DB::table('products_oll')->insert($ollData);
-                $change_of = $newData["change_of"];
+                $change_of = $data = json_decode($newData["change_of"], true);
                 unset($newData["change_of"]);
                 $newData["created_at"] = $newData["updated_at"];
                 $newData["id"] = $newData["product_id"];
@@ -675,6 +675,46 @@ class ProductController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => "Cập nhật thất bại",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateFastProduct(Request $request, string $id)
+    // ProductRequest
+    {
+        
+        $ollDT = DB::table("products")->where("id", $id)->first(); 
+        $ollData = (array) $ollDT;
+        DB::table('products_oll')->insert($ollData);
+        $user = JWTAuth::parseToken()->authenticate();
+        $change_of = $request->change_of;
+
+        $dataInsert = [
+            'price' => $request->price ?? $ollData["price"],
+            'sale_price' => $request->sale_price ?? $ollData["sale_price"],
+            'quantity' => $request->quantity ?? $ollData["quantity"],
+            'update_by' => $user->id,
+            'brand_id' => $request->brand_id ?? $ollData["brand_id"],
+            'height' => $request->height ?? $ollData["height"],
+            'length' => $request->length ?? $ollData["length"],
+            'weight' => $request->weight ?? $ollData["weight"],
+            'width' => $request->width ?? $ollData["width"],
+            'created_at' => now(),
+            'updated_at' => now(),
+            'update_version' => $ollData["update_version"] + 1,
+        ];
+        try {
+            DB::table('products')->update($dataInsert);
+           
+            return response()->json([
+                'status' => true,
+                'message' => "cập nhật san phẩm thành công"
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
