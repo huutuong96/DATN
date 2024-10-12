@@ -139,7 +139,8 @@ use App\Http\Controllers\CategoriessupportmainController;
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
             Route::post('products', [ProductController::class, 'store']);
-            Route::put('products/{id}', [ProductController::class, 'update']);
+            Route::post('products/{id}', [ProductController::class, 'update']);
+            Route::post('product/upload', [ProductController::class, 'upload']);
             Route::delete('products/{id}', [ProductController::class, 'destroy']);
             Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);

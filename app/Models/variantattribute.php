@@ -18,6 +18,8 @@ class variantattribute extends Model
         'product_id',
     ];
 
+    public $timestamps = false;
+
     public function variant()
     {
         return $this->belongsTo(product_variants::class);
