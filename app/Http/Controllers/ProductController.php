@@ -13,11 +13,15 @@ use App\Models\ColorsModel;
 use App\Models\variantattribute;
 use App\Models\attributevalue;
 use App\Models\product_variants;
-use App\Models\attributes;
 use App\Models\Attribute;
 use App\Models\categoryattribute;
 use Carbon\Carbon;
-
+use App\Services\ImageUploadService;
+use App\Jobs\UploadImageJob;
+use App\Jobs\UploadImagesJob;
+use App\Jobs\UpdateStockAllVariant;
+use App\Jobs\UpdatePriceAllVariant;
+use App\Jobs\UpdateImageAllVariant;
 
 
 use Illuminate\Support\Facades\DB;
@@ -29,24 +33,27 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::where('status', 1)
-        ->with(['images', 'colors'])  // Eager load images
-        ->paginate(20);
-        if ($products->isEmpty()) {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại sản phẩm nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $products,
-            ]
-        );
+        // $products = Product::where('status', 1)
+        // ->with(['images', 'colors'])  // Eager load images
+        // ->paginate(20);
+        // if ($products->isEmpty()) {
+        //     return response()->json(
+        //         [
+        //             'status' => true,
+        //             'message' => "Không tồn tại sản phẩm nào",
+        //         ]
+        //     );
+        // }
+        // return response()->json(
+        //     [
+        //         'status' => true,
+        //         'message' => "Lấy dữ liệu thành công",
+        //         'data' => $products,
+        //     ]
+        // );
+        $products = Product::get();
+        // dd($products);
+        return $products;
     }
 
     public function store(Request $request)
@@ -60,31 +67,24 @@ class ProductController extends Controller
                 //     foreach ($categoryattribute as $attribute) {
                 //         $attributes_id[] = $attribute->attribute_id;
                 //     }
-                // // dd($attributes_id);
+                // dd($categoryattribute);
         // HÀM NÀY LÀ HÀM QUY ĐỊNH ATTRIBUTE THEO CATEGORY //
 
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
-
             DB::beginTransaction();
 
             $mainImageUrl = null;
-            if ($request->hasFile('image')) {
-
-                $image = $request->file('image');
-                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                $mainImageUrl = $uploadedImage['secure_url'];
-            }
             $product = Product::create([
                 'name' => $request->name,
-                'sku' => $request->sku ?? $this->generateSKU(), // Thêm phương thức để tạo SKU
+                'sku' => $request->sku ?? $this->generateSKU(),
                 'slug' => $request->slug ?? Str::slug($request->name),
                 'description' => $request->description,
                 'infomation' => $request->infomation,
                 'price' => $request->price,
                 'sale_price' => $request->sale_price,
-                'image' => $mainImageUrl,
+                'image' => $mainImageUrl ?? null,
                 'quantity' => $request->quantity,
                 'create_by' => $user->id,
                 'category_id' => $request->category_id,
@@ -96,43 +96,28 @@ class ProductController extends Controller
                 'width' => $request->width,
             ]);
 
-            if ($request->hasFile('images')) {
-                $imageData = [];
-                foreach ($request->file('images') as $image) {
-                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                    $imageData[] = [
-                        'product_id' => $product->id,
-                        'url' => $uploadedImage['secure_url'],
-                        'status' => 1,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-                Image::insert($imageData);
-            }
+            Image::where("product_id", null)->update(
+                ['product_id' => $product->id]
+            );
 
-            // Kiểm tra xem có thuộc tính nào được chọn không
-            $variant = [];
-            if (isset($request['attributes']) && is_array($request['attributes']) && !empty($request['attributes'])) {
-                // Generate all possible variants
-                $variants = $this->generateVariants($request['attributes']);
-                // Create variants
-                foreach ($variants as $variant) {
-                    $variantData = [
-                        'product_id' => $product->id,
-                        'sku' => $product->sku . '-' . implode('-', array_column($variant, 'value')),
-                        'price' => $request->price,
-                        'stock' => 0, // Default stock, you might want to adjust this
-                        'attributes' => $variant
-                    ];
-                    $variant = $this->storeProductVariant($variantData, $product);
+            $attributes = json_decode($request['attribute'], true);
+
+            foreach ($attributes as $key => $attribute) {
+                if (isset($attributes) && is_array($attributes) && !empty($attributes)) {
+                    $attributeData = $attribute;
+                    $attributeValue = $this->storeProductAttribute($attributeData, $product);
                 }
             }
 
+            $variants = json_decode($request['variants'], true);
 
-
+            foreach ($variants as $variant) {
+                if (isset($variants) && is_array($variants) && !empty($variants)) {
+                    $variantData = $variant;
+                    $this->storeProductVariant($variantData, $product, $attributeValue);
+                }
+            }
             DB::commit();
-
             return response()->json([
                 'status' => true,
                 'message' => "Sản phẩm đã được lưu",
@@ -149,24 +134,49 @@ class ProductController extends Controller
         }
     }
 
-    private function storeProductVariant($variantData, $product)
+    private function storeProductAttribute($attributeData, $product)
+    {
+        $attribute = Attribute::create([
+            'product_id' => $product->id,
+            'name' => $attributeData['name'],
+            'display_name' => strtoupper($attributeData['name']),
+            'type' => $attributeData['type'],
+        ]);
+        $attributeValue = attributevalue::create([
+            'attribute_id' => $attribute->id,
+            'value' => $attributeData['value'],
+        ]);
+        return $attributeValue;
+    }
+
+    private function storeProductVariant($variantData, $product, $attributeValue)
     {
         $cloudinary = new Cloudinary();
 
         $variant = $product->variants()->create([
-            'sku' => $variantData['sku'],
-            'stock' => $variantData['stock'],
+            'product_id' => $product->id,
+            'sku' => $variantData['sku'] ?? $this->generateSKU() . '-' . $attributeValue->value,
+            'stock' => $variantData['stock'] ?? $product->quantity,
             'price' => $variantData['price'] ?? $product->price,
+            'images' => $variantData['images'] ?? $product->image,
         ]);
 
-        foreach ($variantData['attributes'] as $attributeId => $valueData) {
-            $attribute = Attribute::findOrFail($attributeId);
-            $value = AttributeValue::firstOrCreate([
-                'attribute_id' => $attribute->id,
-                'value' => $valueData['value'],
-            ]);
-            $variant->attributes()->attach($attribute->id, ['value_id' => $value->id, 'shop_id' => $product->shop_id, 'product_id' => $product->id]);
-        }
+        $variantAttribute = variantattribute::create([
+            'variant_id' => $variant->id,
+            'product_id' => $product->id,
+            'shop_id' => $product->shop_id,
+            'attribute_id' => $attributeValue->attribute_id,
+            'value_id' => $attributeValue->id,
+        ]);
+
+        // foreach ($variantData['attributes'] as $attributeId => $valueData) {
+        //     $attribute = Attribute::findOrFail($attributeId);
+        //     $value = AttributeValue::firstOrCreate([
+        //         'attribute_id' => $attribute->id,
+        //         'value' => $valueData['value'],
+        //     ]);
+        //     $variant->attributes()->attach($attribute->id, ['value_id' => $value->id, 'shop_id' => $product->shop_id, 'product_id' => $product->id]);
+        // }
         return $variant;
     }
 
@@ -220,7 +230,6 @@ class ProductController extends Controller
 
     private function storeImageVariant($images, $variant)
     {
-
         $imageURL = [];
         $cloudinary = new Cloudinary();
         foreach ($images as $image) {
@@ -254,12 +263,15 @@ class ProductController extends Controller
     public function updateStockAllVariant(Request $request)
     {
         // $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
-        $variants = product_variants::whereIn('id', $request->variant_ids)
-            ->update(['stock' => $request->stock]);
+
+        // $variants = product_variants::whereIn('id', $request->variant_ids)
+        //     ->update(['stock' => $request->stock]);
+
+        updateStockAllVariant::dispatch($request->variant_ids, $request->stock);
+
         return response()->json([
             'status' => true,
             'message' => "Cập nhật biến thể thành công",
-            'data' => $variants,
         ], 200);
     }
 
@@ -285,12 +297,12 @@ class ProductController extends Controller
     public function updatePriceAllVariant(Request $request)
     {
         // $variantArray = [462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482];
-        $variants = product_variants::whereIn('id', $request->variant_ids)
-            ->update(['price' => $request->price]);
+        // $variants = product_variants::whereIn('id', $request->variant_ids)
+        //     ->update(['price' => $request->price]);
+        updatePriceAllVariant::dispatch($request->variant_ids, $request->price);
         return response()->json([
             'status' => true,
             'message' => "Cập nhật biến thể thành công",
-            'data' => $variants,
         ], 200);
     }
 
@@ -318,21 +330,12 @@ class ProductController extends Controller
 
     public function updateImageAllVariant(Request $request)
     {
-        // DỮ LIỆU MẪU ĐỂ TEST CẬP NHẬT HÀNG LOẠT
-        $request->variant_ids = [697, 698, 699];
-        if ($request->hasFile('images')) {
-            $imageData = $this->storeImageVariant($request->file('images'), $request->variant_ids);
-            $jsonImageData = json_encode($imageData);
-
-            product_variants::whereIn('id', $request->variant_ids)
-                ->update(['images' => $jsonImageData]);
-        }
-        $updatedVariants = product_variants::whereIn('id', $request->variant_ids)
-            ->get();
+        $request->variant_ids = [697,698,699];
+        UpdateImageAllVariant::dispatch($request->images, $request->variant_ids);
         return response()->json([
             'status' => true,
             'message' => "Cập nhật ảnh biến thể thành công",
-            'data' => $updatedVariants,
+            // 'data' => $updatedVariants,
         ], 200);
     }
 
@@ -422,7 +425,6 @@ class ProductController extends Controller
         } else {
             $mainImageUrl = $product->image;
         }
-
         $dataInsert = [
             'name' => $request->name ?? $product->name,
             'slug' => $request->filled('slug') ? $request->slug : Str::slug($request->name ?? $product->name),
@@ -444,18 +446,20 @@ class ProductController extends Controller
         ];
         try {
             $product->update($dataInsert);
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                    $imageUrl = $uploadedImage['secure_url'];
-
-                    Image::create([
-                        'product_id' => $product->id,
-                        'url' => $imageUrl,
-                        'status' => 1,
-                    ]);
-                }
-            }
+            // Image::where("product_id", $product->id)->delete();
+            // if ($request->hasFile('images')) {
+            //     foreach ($request->file('images') as $image) {
+            //         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            //         $imageUrl = $uploadedImage['secure_url'];
+            //         Image::create([
+            //             'product_id' => $product->id,
+            //             'url' => $imageUrl,
+            //             'status' => 1,
+            //         ]);
+            //     }
+            //     $imageUploadService = new ImageUploadService($cloudinary);
+            //     $imageUploadService->uploadImages($request->file('images'), $product->id);
+            // }
 
             return response()->json([
                 'status' => true,
@@ -471,6 +475,26 @@ class ProductController extends Controller
         }
     }
 
+
+    public function upload(Request $request){
+        $imageUrls = [];
+        $cloudinary = new Cloudinary();
+        foreach ($request->file('images') as $image) {
+                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                    $imageUrl = $uploadedImage['secure_url'];
+                    Image::create([
+                        'product_id' => null,
+                        'url' => $imageUrl,
+                        'status' => 1,
+                    ]);
+                    $imageUrls[] = $imageUrl;
+                }
+        return response()->json([
+            'status' => true,
+            'message' => "Upload ảnh thành công",
+            'product' => $imageUrls,
+        ], 200);
+    }
     /**
      * Remove the specified resource from storage.
      */

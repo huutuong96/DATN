@@ -416,6 +416,10 @@ Route::get('/search', function () {
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
             Route::post('products', [ProductController::class, 'store']);
+            Route::post('products/{id}', [ProductController::class, 'update']);
+            Route::post('product/upload', [ProductController::class, 'upload']);
+            // Route::delete('products/{id}', [ProductController::class, 'destroy']);
+            Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
@@ -427,6 +431,7 @@ Route::get('/search', function () {
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);     // update product
             Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']); 
 
+            Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
             Route::delete('product/remove_variant/{id}', [ProductController::class, 'removeVariant']);
             Route::post('product/generate_variants', [ProductController::class, 'generateVariants']);
             Route::put('product/update_stock_one_variant', [ProductController::class, 'updateStockOneVariant']);  // câp nhật số lượng kho biến thể

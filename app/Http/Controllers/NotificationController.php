@@ -5,7 +5,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
 use App\Models\Notification;
 use Illuminate\Http\Request;
-
 use App\Models\Notification_to_shop;
 use App\Models\Notification_to_mainModel;
 
