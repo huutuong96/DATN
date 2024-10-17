@@ -27,6 +27,13 @@ class CategoriesController extends Controller
                 ]
             );
         }
+        foreach ($categories as $category) {
+            $category->id = intval($category->id);
+            $category->index = intval($category->index);
+            $category->status = intval($category->status);
+            $category->parent_id = intval($category->parent_id);
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'Lấy dữ liệu thành công',

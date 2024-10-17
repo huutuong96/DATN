@@ -18,6 +18,16 @@ class Image extends Model
         'update_at',
     ];
 
+    protected $hidden = [
+        'id',
+        'product_id',
+        'product_variant_id',
+        'status',
+        'created_at',
+        'updated_at',
+        'update_version',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);

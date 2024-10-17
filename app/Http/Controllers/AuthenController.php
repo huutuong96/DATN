@@ -140,7 +140,7 @@ class AuthenController extends Controller
             'status' => true,
             'message' => 'Đăng nhập thành công',
             'token' => $token,
-            'user_present' => $user,
+            // 'user_present' => $user,
         ], 200);
     }
 
