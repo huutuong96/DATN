@@ -417,18 +417,16 @@ Route::get('/search', function () {
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
             Route::post('products', [ProductController::class, 'store']);
-<<<<<<< HEAD
+
             Route::post('products/{id}', [ProductController::class, 'update']);
             Route::post('product/upload', [ProductController::class, 'upload']);
             // Route::delete('products/{id}', [ProductController::class, 'destroy']);
             Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
-=======
->>>>>>> b72f514f3239af7df0ce0eb66a80ebae42db4c33
+
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
 
-<<<<<<< HEAD
             Route::post('products/update_variant/{id}', [ProductController::class, 'updateVariant']); // update variant
                 
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
@@ -436,8 +434,7 @@ Route::get('/search', function () {
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);     // update product
             Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']); 
 
-=======
->>>>>>> b72f514f3239af7df0ce0eb66a80ebae42db4c33
+
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
             Route::delete('product/remove_variant/{id}', [ProductController::class, 'removeVariant']);
             Route::post('product/generate_variants', [ProductController::class, 'generateVariants']);

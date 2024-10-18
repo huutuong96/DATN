@@ -1,0 +1,105 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My API",
+        "description": "API documentation for my project",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get list of users",
+                "operationId": "698f35d2a5d8779514f4146d45884831",
+                "responses": {
+                    "200": {
+                        "description": "A list of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Users"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Users": {
+                "required": [
+                    "name",
+                    "username",
+                    "email",
+                    "password",
+                    "gender",
+                    "nationality",
+                    "update_by",
+                    "delete_by"
+                ],
+                "properties": {
+                    "username": {
+                        "description": "The username of the user",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "The email of the user",
+                        "type": "email"
+                    },
+                    "phone": {
+                        "description": "The phone of the user",
+                        "type": "string"
+                    },
+                    "password": {
+                        "description": "The password of the user",
+                        "type": "string"
+                    },
+                    "gender": {
+                        "description": "The gender of the user",
+                        "type": "string"
+                    },
+                    "nationality": {
+                        "description": "The nationality of the user",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "The name of the user",
+                        "type": "string"
+                    },
+                    "birthday": {
+                        "description": "The birthday of the user",
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Enter JWT Bearer token to access the endpoints",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "users",
+            "description": "users"
+        }
+    ]
+}
