@@ -27,39 +27,20 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Services\DistanceCalculatorService;
 use Illuminate\Support\Facades\Http;
-
-
+use App\Jobs\SendMail;
+use App\Jobs\SendNotification;
+use App\Jobs\AddPointUser;
 class PurchaseController extends Controller
 {
-    protected $distanceService;
-    public function __construct(DistanceCalculatorService $distanceService)
+
+    public function __construct()
     {
-        $this->distanceService = $distanceService;
+
     }
-
-    private function calculateShippingFee(Request $request, $ship_id)
-    {
-        $originLat = $request->origin_lat;
-        $originLng = $request->origin_lng;
-        $destinationLat = $request->destination_lat;
-        $destinationLng = $request->destination_lng;
-        // $shippingType = $request->shipping_type;
-        $insuranceOptions = $request->insurance_options ?? [];
-
-        $distance = $this->distanceService->calculateDistance($originLat, $originLng, $destinationLat, $destinationLng);
-        if ($distance === null) {
-            return response()->json(['error' => 'Unable to calculate distance'], 400);
-        }
-
-        // Xác định loại vùng dựa trên khoảng cách
-
-        $shippingFee = $this->distanceService->calculateShippingFee($distance, $ship_id);
-        return $shippingFee;
-    }
-
-
     public function purchaseToCart(Request $request)
+
     {
+
         $voucherToMainCode = null;
         $voucherToShopCode = null;
 
@@ -260,20 +241,12 @@ class PurchaseController extends Controller
         if ($voucherToMainCode) {
             $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
         }
-        // User point and rank processing
-        $point = $this->add_point_to_user();
+        AddPointUser::dispatch(auth()->id());
         $checkRank = $this->check_point_to_user();
         $total_amount = $this->discountsByRank($checkRank, $total_amount);
         DB::commit();
-        Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee));
-        $notificationData = [
-                        'type' => 'main',
-                        'title' => 'Đặt hàng thành công',
-                        'description' => 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý',
-                        'user_id' => auth()->id(),
-                    ];
-                    $notificationController = new NotificationController();
-                    $notification = $notificationController->store(new Request($notificationData));
+        SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
+        SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
         return response()->json([
             'status' => true,
             'message' => 'Đặt hàng thành công',
@@ -285,7 +258,6 @@ class PurchaseController extends Controller
                 'total_amount' => $total_amount,
             ],
             'point' => auth()->user()->point,
-            'notification' => $notification
         ], 200);
 
     } catch (\Exception $e) {
@@ -296,16 +268,6 @@ class PurchaseController extends Controller
             'error' => $e->getMessage()
         ], 400);
         }
-    }
-
-    private function add_point_to_user()
-    {
-        $userId = auth()->id();
-        $user =  UsersModel::find($userId);
-        $user->update([
-            'point' => $user->point + 100,
-        ]);
-        return $user->point;
     }
     private function check_point_to_user()
     {

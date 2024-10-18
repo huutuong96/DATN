@@ -284,8 +284,9 @@ use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\configController;
 Route::get('/search', function () {
-    return "start";
+    return "API - VNSHOP";
 })->middleware('CheckPremission:create_category');
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
@@ -302,7 +303,7 @@ Route::get('/search', function () {
                 Route::resource('roles', RolesController::class)->middleware('CheckRole');
 
                 Route::resource('address', AddressController::class);
-                
+
                 Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->middleware('CheckRole:OWNER');
                 Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->middleware('CheckRole:OWNER');
@@ -372,6 +373,11 @@ Route::get('/search', function () {
 
                 Route::post('purchase', [PurchaseController::class, "purchase"]);
                 Route::post('purchase_to_cart', [PurchaseController::class, "purchaseToCart"]);
+                //PAYMENT
+                //cod
+                Route::post('/cod_payment', [PaymentsController::class, "cod_payment"]);
+                //vnpay
+                Route::post('/vnpay_payment', [PaymentsController::class, "vnpay_payment"]);
 
                 //SHOP
                     Route::post('shops', [ShopController::class, 'store']);
@@ -428,8 +434,12 @@ Route::get('/search', function () {
             Route::put('product/update_price_all_variant', [ProductController::class, 'updatePriceAllVariant']);
             Route::post('product/update_image_one_variant', [ProductController::class, 'updateImageOneVariant']);
             Route::post('product/update_image_all_variant', [ProductController::class, 'updateImageAllVariant']);
+            Route::post('product/uploadImage', [ProductController::class, 'upload']);
+            Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
+            Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);
+            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
 
-
+            
             // Platform Fees Routes
             Route::get('/platformfees', [TaxController::class, 'indexPlatformFees']);
             Route::post('/platformfees', [TaxController::class, 'storePlatformFee']);
@@ -484,14 +494,15 @@ Route::get('/search', function () {
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
 
 
-            //PAYMENT
-                //cod
-                Route::post('/cod_payment', [PaymentsController::class, "cod_payment"]);
-                //vnpay
-                Route::post('/vnpay_payment', [PaymentsController::class, "vnpay_payment"]);
+            
 
-                
-
+            Route::get('main/config', [configController::class, 'index']);
+            Route::post('main/config', [configController::class, 'store']);
+            Route::put('main/config/{id}', [configController::class, 'update']);
+            Route::delete('main/config/{id}', [configController::class, 'destroy']);
+            Route::get('main/config/restore{id}', [configController::class, 'restore']);
+            Route::get('main/config/active{id}', [configController::class, 'active']);
+>>>>>>> b72f514f3239af7df0ce0eb66a80ebae42db4c33
 });
                 Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
 

@@ -26,6 +26,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
+use App\Jobs\ConfirmMailRegister;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -87,7 +88,8 @@ class AuthenController extends Controller
             'message' => "Đăng ký thành công, chưa kích hoạt",
             'user' => $user,
         ];
-        Mail::to($user->email)->send(new ConfirmMail($user, $token));
+        // Mail::to($user->email)->send(new ConfirmMail($user, $token));
+        ConfirmMailRegister::dispatch($user, $token);
         return response()->json($dataDone, 201);
     }
 
@@ -103,8 +105,6 @@ class AuthenController extends Controller
                 'user_id' => $user->id,
                 'status' => 1,
             ]);
-
-
             $activeDone = [
                 'status' => true,
                 'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
@@ -140,7 +140,7 @@ class AuthenController extends Controller
             'status' => true,
             'message' => 'Đăng nhập thành công',
             'token' => $token,
-            'user_present' => $user,
+            // 'user_present' => $user,
         ], 200);
     }
 
@@ -277,7 +277,6 @@ class AuthenController extends Controller
             'status' => true,
             'message' => "Cập nhật thành công!",
         ];
-
         return response()->json($dataDone, 200);
     }
 
