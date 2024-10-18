@@ -38,9 +38,68 @@ use Illuminate\Support\Facades\Http;
  * @param  array  $options
  * @return LengthAwarePaginator
  */
-
+/**
+ * @OA\Schema(
+ *     schema="Users",
+ *     type="object",
+ *     @OA\Property(
+ *         property="username",
+ *         type="string",
+ *         description="The username of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="email",
+ *         type="email",
+ *         description="The email of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="phone",
+ *         type="string",
+ *         description="The phone of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="password",
+ *         type="string",
+ *         description="The password of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="gender",
+ *         type="string",
+ *         description="The gender of the user"
+ *     ),
+ *  *     @OA\Property(
+ *         property="nationality",
+ *         type="string",
+ *         description="The nationality of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="The name of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="birthday",
+ *         type="date",
+ *         description="The birthday of the user"
+ *     ),
+ *     required={"name", "username", "email", "password", "gender", "nationality", "update_by", "delete_by"}
+ * )
+ */
 class AuthenController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/users",
+     *     tags={"users"},
+     *     summary="Get list of users",
+     *     @OA\Response(
+     *         response=200,
+     *         description="A list of users",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Users"))
+     *     ),
+     *     security={{ "bearerAuth": {} }}
+     * )
+     */
     public function index()
     {
         try {

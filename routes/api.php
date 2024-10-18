@@ -290,6 +290,7 @@ Route::get('/search', function () {
 })->middleware('CheckPremission:create_category');
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
+
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
 
@@ -308,7 +309,7 @@ Route::get('/search', function () {
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->middleware('CheckRole:OWNER');
                 Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->middleware('CheckRole:OWNER');
 
-                Route::get('banners/clinet', [BannerController::class, "index"]);
+                Route::get('banners/client', [BannerController::class, "index"]);
                 Route::resource('banners', BannerController::class)->middleware('CheckPremission:handle_banner');
 
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
@@ -323,19 +324,19 @@ Route::get('/search', function () {
 
                 Route::resource('ships',ShipsController::class);//chu ro lam nen chua bat premission
 
-                Route::get('brands/clinet', [BrandsController::class, "index"]);
+                Route::get('brands/client', [BrandsController::class, "index"]);
                 Route::resource('brands',BrandsController::class)->middleware('CheckRole:Admin');
 
-                Route::get('colors/clinet', [ColorsController::class, "index"]);
+                Route::get('colors/client', [ColorsController::class, "index"]);
                 Route::resource('colors',ColorsController::class)->middleware('CheckRole:Admin');
 
-                Route::get('categori_learns/clinet', [CategorilearnsController::class, "index"]);
+                Route::get('categori_learns/client', [CategorilearnsController::class, "index"]);
                 Route::resource('categori_learns', CategorilearnsController::class)->middleware('CheckRole:Admin');
 
-                Route::get('categoriessupportmains/clinet', [CategoriessupportmainController::class, "index"]);
+                Route::get('categoriessupportmains/client', [CategoriessupportmainController::class, "index"]);
                 Route::resource('categoriessupportmains', CategoriessupportmainController::class)->middleware('CheckRole:Admin');
 
-                Route::get('learns/clinet', [LearnController::class, "index"]);
+                Route::get('learns/client', [LearnController::class, "index"]);
                 Route::resource('learns', LearnController::class)->middleware('CheckRole:Admin');
 
                 Route::resource('messages', MessageController::class);
@@ -343,7 +344,7 @@ Route::get('/search', function () {
                 Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
                 Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
 
-                Route::get('voucher_main/clinet', [VoucherToMainController::class, "index"]);
+                Route::get('voucher_main/client', [VoucherToMainController::class, "index"]);
                 Route::resource('voucher_main', VoucherToMainController::class)->middleware('CheckRole:Admin');
 
                 Route::resource('notification_to_main', Notification_to_mainController::class);
@@ -353,7 +354,7 @@ Route::get('/search', function () {
 
                 Route::resource('notification_to_shops', Notification_to_shopController::class);
 
-                Route::get('vouchers/clinet', [VoucherController::class, "index"]);
+                Route::get('vouchers/client', [VoucherController::class, "index"]);
                 Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
 
                 Route::resource('follows', FollowToShopController::class);
@@ -373,6 +374,11 @@ Route::get('/search', function () {
 
                 Route::post('purchase', [PurchaseController::class, "purchase"]);
                 Route::post('purchase_to_cart', [PurchaseController::class, "purchaseToCart"]);
+                //PAYMENT
+                //cod
+                Route::post('/cod_payment', [PaymentsController::class, "cod_payment"]);
+                //vnpay
+                Route::post('/vnpay_payment', [PaymentsController::class, "vnpay_payment"]);
 
                 //SHOP
                     Route::post('shops', [ShopController::class, 'store']);
@@ -416,25 +422,39 @@ Route::get('/search', function () {
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
             Route::post('products', [ProductController::class, 'store']);
+
+            Route::post('products/{id}', [ProductController::class, 'update']);
+            Route::post('product/upload', [ProductController::class, 'upload']);
+            // Route::delete('products/{id}', [ProductController::class, 'destroy']);
+            Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
+
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
 
+            Route::post('products/update_variant/{id}', [ProductController::class, 'updateVariant']); // update variant
+
+            Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
+
+            Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);     // update product
+            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
+
+
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
             Route::delete('product/remove_variant/{id}', [ProductController::class, 'removeVariant']);
             Route::post('product/generate_variants', [ProductController::class, 'generateVariants']);
-            Route::put('product/update_stock_one_variant', [ProductController::class, 'updateStockOneVariant']);
+            Route::put('product/update_stock_one_variant', [ProductController::class, 'updateStockOneVariant']);  // câp nhật số lượng kho biến thể
             Route::put('product/update_stock_all_variant', [ProductController::class, 'updateStockAllVariant']);
-            Route::put('product/update_price_one_variant', [ProductController::class, 'updatePriceOneVariant']);
+            Route::put('product/update_price_one_variant', [ProductController::class, 'updatePriceOneVariant']);  // cập nhật giá buieets thể
             Route::put('product/update_price_all_variant', [ProductController::class, 'updatePriceAllVariant']);
-            Route::post('product/update_image_one_variant', [ProductController::class, 'updateImageOneVariant']);
+            Route::post('product/update_image_one_variant', [ProductController::class, 'updateImageOneVariant']);  // cập nhật ảnh biến thể
             Route::post('product/update_image_all_variant', [ProductController::class, 'updateImageAllVariant']);
             Route::post('product/uploadImage', [ProductController::class, 'upload']);
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);
             Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
 
-            
+
             // Platform Fees Routes
             Route::get('/platformfees', [TaxController::class, 'indexPlatformFees']);
             Route::post('/platformfees', [TaxController::class, 'storePlatformFee']);
@@ -488,13 +508,18 @@ Route::get('/search', function () {
             Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
 
+
+
+
             Route::get('main/config', [configController::class, 'index']);
             Route::post('main/config', [configController::class, 'store']);
             Route::put('main/config/{id}', [configController::class, 'update']);
             Route::delete('main/config/{id}', [configController::class, 'destroy']);
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
+
 });
+                Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
@@ -509,6 +534,8 @@ Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
 
+
+
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
 
 
@@ -522,6 +549,7 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
         Route::get('categories', [CategoriesController::class, 'index']);
 
         Route::get('search', [ProductController::class, 'search']);
+
 
 
 
