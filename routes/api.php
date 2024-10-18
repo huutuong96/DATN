@@ -517,7 +517,6 @@ Route::get('/search', function () {
             Route::delete('main/config/{id}', [configController::class, 'destroy']);
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
->>>>>>> b72f514f3239af7df0ce0eb66a80ebae42db4c33
 });
                 Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
 
