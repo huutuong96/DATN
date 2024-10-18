@@ -19,6 +19,7 @@ class OrdersModel extends Model
 
     protected $fillable = [
         'payment_id',
+        'group_order_id',
         'ship_id',
         'voucher_id',
         'user_id',

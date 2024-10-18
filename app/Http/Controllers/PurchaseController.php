@@ -38,7 +38,8 @@ class PurchaseController extends Controller
 
     }
     public function purchaseToCart(Request $request)
-{
+
+    {
 
         $voucherToMainCode = null;
         $voucherToShopCode = null;
@@ -62,11 +63,106 @@ class PurchaseController extends Controller
             }
         }
 
-    // Validate vouchers
-    if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
-        return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
-    }
+        // Validate vouchers
+        if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
+            return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
+        }
 
+        try {
+            DB::beginTransaction();
+
+            $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
+
+            $ordersByShop = [];
+            $grandTotalPrice = 0;
+            $totalQuantity = 0;
+
+            // Group cart items by shop
+            foreach ($carts as $cart) {
+                $shopId = $cart->shop_id;
+                if (!isset($ordersByShop[$shopId])) {
+                    $ordersByShop[$shopId] = [
+                        'items' => [],
+                        'totalPrice' => 0,
+                        'order' => null,
+                    ];
+                }
+                $ordersByShop[$shopId]['items'][] = $cart;
+            }
+
+            $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
+
+            // Process each shop's order
+            foreach ($ordersByShop as $shopId => &$shopOrder) {
+                $order = $this->createOrder($request,$groupOrderIds);
+                $order->shop_id = $shopId;
+                $order->save();
+                $shopOrder['order'] = $order;
+                $shopOrder['orderDetails'] = [];
+                $shopTotalPrice = 0;
+                foreach ($shopOrder['items'] as $cart) {
+                    $variant = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
+                    $this->checkProductAvailability($variant, $cart->quantity);
+                    $totalPrice = $this->calculateTotalPrice($variant, $cart->quantity);
+
+                    $orderDetail = $this->createOrderDetail($order, $variant, $cart->quantity, $totalPrice);
+                    $shopOrder['orderDetails'][] = $orderDetail;
+
+                    $variant->decrement('stock', $cart->quantity);
+
+                    $shopTotalPrice += $totalPrice;
+                    $totalQuantity += $cart->quantity;
+                }
+
+                $shopOrder['totalPrice'] = $shopTotalPrice;
+                // Additional processing for each shop's order (e.g., shipping, taxes)
+                $shipFee = $this->calculateShippingFee($request);
+                $shopTotalPrice += $shipFee;
+                $grandTotalPrice += $shopTotalPrice;
+                $tax = $this->calculateStateTax($shopTotalPrice);
+                $this->addStateTaxToOrder($order, $tax);
+                $this->addOrderFeesToTotal($order, $shopTotalPrice - $tax);
+
+                $order->total_amount = $shopTotalPrice;
+                $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
+                if ($voucherToShopCode) {
+                    $grandTotalPrice = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                }
+                $order->save();
+            }
+            // dd($grandTotalPrice);
+            if ($voucherToMainCode) {
+                $grandTotalPrice = $this->applyVouchersToMain($voucherToMainCode, $grandTotalPrice);
+            }
+            // User point and rank processing
+            $point = $this->add_point_to_user();
+            $checkRank = $this->check_point_to_user();
+            $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
+            // dd($grandTotalPrice);
+            DB::commit();
+            Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($ordersByShop, $grandTotalPrice, $carts, $totalQuantity, $shipFee));
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Đặt hàng thành công',
+                'data' => [
+                    'orders' => array_map(function ($shopOrder) {
+                        return $shopOrder['order'];
+                    }, $ordersByShop),
+                    'totalPrice' => $grandTotalPrice,
+                ],
+                'point' => auth()->user()->point,
+                // 'notification' => $notification
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Đặt hàng thất bại',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
     try {
         DB::beginTransaction();
         $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
@@ -226,12 +322,13 @@ class PurchaseController extends Controller
         $result = Product::with(['variants' => function ($query) use ($variantId) {
             $query->where('id', $variantId);
         }])
-        ->where('id', $productId)
-        ->first();
+            ->where('id', $productId)
+            ->first();
         $result->increment('sold_count', $quantity);
         $variant = $result->variants->first();
 
         return $variant;
+
     }
 
     private function getProductForShip($productId)
@@ -287,6 +384,7 @@ class PurchaseController extends Controller
     {
         if ($voucherToShopCode) {
             // $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where('status', 1)->first();
+
             $voucherToShop = VoucherToShop::whereIn('code', $voucherToShopCode)
                                   ->where('status', 1)
                                   ->where('shop_id', $shopId)
@@ -336,8 +434,10 @@ class PurchaseController extends Controller
     {
 
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+
         $order = OrdersModel::create([
             'payment_id' => $request->payment_id,
+            'group_order_id' => $groupOrderIds,
             'user_id' => auth()->id(),
             'ship_id' => $request->ship_id,
             'delivery_address' => $request->delivery_address ?? $address->address,

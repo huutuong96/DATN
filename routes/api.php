@@ -374,6 +374,11 @@ Route::get('/search', function () {
 
                 Route::post('purchase', [PurchaseController::class, "purchase"]);
                 Route::post('purchase_to_cart', [PurchaseController::class, "purchaseToCart"]);
+                //PAYMENT
+                //cod
+                Route::post('/cod_payment', [PaymentsController::class, "cod_payment"]);
+                //vnpay
+                Route::post('/vnpay_payment', [PaymentsController::class, "vnpay_payment"]);
 
                 //SHOP
                     Route::post('shops', [ShopController::class, 'store']);
@@ -503,13 +508,18 @@ Route::get('/search', function () {
             Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
 
+
+            
+
             Route::get('main/config', [configController::class, 'index']);
             Route::post('main/config', [configController::class, 'store']);
             Route::put('main/config/{id}', [configController::class, 'update']);
             Route::delete('main/config/{id}', [configController::class, 'destroy']);
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
+>>>>>>> b72f514f3239af7df0ce0eb66a80ebae42db4c33
 });
+                Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
@@ -524,6 +534,8 @@ Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
 });
 
+
+
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
 
 
@@ -537,6 +549,7 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
         Route::get('categories', [CategoriesController::class, 'index']);
 
         Route::get('search', [ProductController::class, 'search']);
+
 
 
 
