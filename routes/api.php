@@ -284,8 +284,9 @@ use App\Http\Controllers\Notification_to_mainController;
 use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\configController;
 Route::get('/search', function () {
-    return "start";
+    return "API - VNSHOP";
 })->middleware('CheckPremission:create_category');
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
@@ -303,7 +304,7 @@ Route::get('/search', function () {
                 Route::resource('roles', RolesController::class)->middleware('CheckRole');
 
                 Route::resource('address', AddressController::class);
-                
+
                 Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->middleware('CheckRole:OWNER');
                 Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->middleware('CheckRole:OWNER');
@@ -416,14 +417,18 @@ Route::get('/search', function () {
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
             Route::post('products', [ProductController::class, 'store']);
+<<<<<<< HEAD
             Route::post('products/{id}', [ProductController::class, 'update']);
             Route::post('product/upload', [ProductController::class, 'upload']);
             // Route::delete('products/{id}', [ProductController::class, 'destroy']);
             Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
+=======
+>>>>>>> b72f514f3239af7df0ce0eb66a80ebae42db4c33
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
 
+<<<<<<< HEAD
             Route::post('products/update_variant/{id}', [ProductController::class, 'updateVariant']); // update variant
                 
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
@@ -431,6 +436,8 @@ Route::get('/search', function () {
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);     // update product
             Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']); 
 
+=======
+>>>>>>> b72f514f3239af7df0ce0eb66a80ebae42db4c33
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
             Route::delete('product/remove_variant/{id}', [ProductController::class, 'removeVariant']);
             Route::post('product/generate_variants', [ProductController::class, 'generateVariants']);
@@ -440,8 +447,12 @@ Route::get('/search', function () {
             Route::put('product/update_price_all_variant', [ProductController::class, 'updatePriceAllVariant']);
             Route::post('product/update_image_one_variant', [ProductController::class, 'updateImageOneVariant']);  // cập nhật ảnh biến thể
             Route::post('product/update_image_all_variant', [ProductController::class, 'updateImageAllVariant']);
+            Route::post('product/uploadImage', [ProductController::class, 'upload']);
+            Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
+            Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);
+            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
 
-
+            
             // Platform Fees Routes
             Route::get('/platformfees', [TaxController::class, 'indexPlatformFees']);
             Route::post('/platformfees', [TaxController::class, 'storePlatformFee']);
@@ -495,6 +506,12 @@ Route::get('/search', function () {
             Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
 
+            Route::get('main/config', [configController::class, 'index']);
+            Route::post('main/config', [configController::class, 'store']);
+            Route::put('main/config/{id}', [configController::class, 'update']);
+            Route::delete('main/config/{id}', [configController::class, 'destroy']);
+            Route::get('main/config/restore{id}', [configController::class, 'restore']);
+            Route::get('main/config/active{id}', [configController::class, 'active']);
 });
 
 

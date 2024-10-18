@@ -32,6 +32,14 @@ class UsersModel extends Authenticatable implements JWTSubject {
         'status',
     ];
 
+    protected $hidden = [
+        'password',
+        'refesh_token',
+        'created_at',
+        'updated_at',
+        'update_version',
+    ];
+
      public function getJWTIdentifier()
     {
         return $this->getKey();
