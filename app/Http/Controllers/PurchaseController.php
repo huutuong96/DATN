@@ -16,6 +16,7 @@ use App\Models\platform_fees;
 use App\Models\order_tax_details;
 use App\Models\order_fee_details;
 use App\Models\ProducttocartModel;
+use App\Models\PaymentsModel;
 use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,8 +39,14 @@ class PurchaseController extends Controller
 
     }
     public function purchaseToCart(Request $request)
-
     {
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user->phone) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Vui lòng nhập số điện thoại',
+            ], 400);
+        }
 
         $voucherToMainCode = null;
         $voucherToShopCode = null;
@@ -71,12 +78,26 @@ class PurchaseController extends Controller
         try {
             DB::beginTransaction();
 
-            $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
+            $payment = PaymentsModel::where('name', $request->payment)->first();
+            if (!$payment) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Phương thức thanh toán không hợp lệ',
+                ], 400);
+            }
 
+            $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
             $ordersByShop = [];
             $grandTotalPrice = 0;
             $totalQuantity = 0;
-
+            $total_amount = 0;
+            $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+            if (!$addressUser) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Vui lòng cập nhật địa chỉ giao hàng',
+                ], 400);
+            }
             // Group cart items by shop
             foreach ($carts as $cart) {
                 $shopId = $cart->shop_id;
@@ -89,186 +110,103 @@ class PurchaseController extends Controller
                 }
                 $ordersByShop[$shopId]['items'][] = $cart;
             }
+            // Process each shop's order
 
             $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
 
-            // Process each shop's order
             foreach ($ordersByShop as $shopId => &$shopOrder) {
-                $order = $this->createOrder($request,$groupOrderIds);
+                $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
+                $order = $this->createOrder($request, $ship_id, $groupOrderIds, $payment);
                 $order->shop_id = $shopId;
                 $order->save();
                 $shopOrder['order'] = $order;
                 $shopOrder['orderDetails'] = [];
                 $shopTotalPrice = 0;
+                $height = 0;
+                $length = 0;
+                $weight = 0;
+                $width = 0;
+                $productIds = [];
                 foreach ($shopOrder['items'] as $cart) {
+                    $productIds[] = $cart->product_id;
                     $variant = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
                     $this->checkProductAvailability($variant, $cart->quantity);
                     $totalPrice = $this->calculateTotalPrice($variant, $cart->quantity);
-
-                    $orderDetail = $this->createOrderDetail($order, $variant, $cart->quantity, $totalPrice);
+                    $orderDetail = $this->createOrderDetail($order, $variant, $cart->quantity, $totalPrice, $cart->product_id);
+                    $height += $orderDetail->height;
+                    $length += $orderDetail->length;
+                    $weight += $orderDetail->weight;
+                    $width += $orderDetail->width;
                     $shopOrder['orderDetails'][] = $orderDetail;
-
                     $variant->decrement('stock', $cart->quantity);
-
                     $shopTotalPrice += $totalPrice;
                     $totalQuantity += $cart->quantity;
+                    $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+                    $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                 }
-
+                $order->height = $height;
+                $order->length = $length;
+                $order->weight = $weight;
+                $order->width = $width;
                 $shopOrder['totalPrice'] = $shopTotalPrice;
-                // Additional processing for each shop's order (e.g., shipping, taxes)
-                $shipFee = $this->calculateShippingFee($request);
-                $shopTotalPrice += $shipFee;
                 $grandTotalPrice += $shopTotalPrice;
-                $tax = $this->calculateStateTax($shopTotalPrice);
-                $this->addStateTaxToOrder($order, $tax);
-                $this->addOrderFeesToTotal($order, $shopTotalPrice - $tax);
-
+                $shopData = Shop::find($shopId);
+                $service = $this->get_infomaiton_services($shopData, $addressUser);
+                $productForShip = $this->getProductForShip($productIds);
+                $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice);
+                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails']);
+                $order->order_infomation = $orderInfomation;
+                $grandTotalPrice += $shipFee;
                 $order->total_amount = $shopTotalPrice;
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
                 if ($voucherToShopCode) {
-                    $grandTotalPrice = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                    $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                    $totalPrice -= $totalAdded;
                 }
+                $order->total_amount = $totalPrice;
+                $total_amount += $order->total_amount;
+                $this->addOrderFeesToTotal($order, $shopTotalPrice);
                 $order->save();
             }
-            // dd($grandTotalPrice);
             if ($voucherToMainCode) {
-                $grandTotalPrice = $this->applyVouchersToMain($voucherToMainCode, $grandTotalPrice);
+                $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
             }
-            // User point and rank processing
-            $point = $this->add_point_to_user();
+            AddPointUser::dispatch(auth()->id());
             $checkRank = $this->check_point_to_user();
-            $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
-            // dd($grandTotalPrice);
-            DB::commit();
-            Mail::to(auth()->user()->email)->send(new ConfirmOderToCart($ordersByShop, $grandTotalPrice, $carts, $totalQuantity, $shipFee));
-
+            $total_amount = $this->discountsByRank($checkRank, $total_amount);
+            // DB::commit();
+            if ($payment->name == 'VNPAY') {
+                $PaymentsController = new PaymentsController();
+                $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
+            }
+            dd('ok');
+            SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
+            SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
                 'data' => [
-                    'orders' => array_map(function ($shopOrder) {
+                    'orders' => array_map(function($shopOrder) {
                         return $shopOrder['order'];
                     }, $ordersByShop),
                     'totalPrice' => $grandTotalPrice,
+                    'total_amount' => $total_amount,
                 ],
                 'point' => auth()->user()->point,
-                // 'notification' => $notification
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'status' => false,
+                'status' => 400,
                 'message' => 'Đặt hàng thất bại',
                 'error' => $e->getMessage()
             ], 400);
-        }
-    }
-    try {
-        DB::beginTransaction();
-        $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
-        $ordersByShop = [];
-        $grandTotalPrice = 0;
-        $totalQuantity = 0;
-        $total_amount = 0;
-        $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
-        // Group cart items by shop
-        foreach ($carts as $cart) {
-            $shopId = $cart->shop_id;
-            if (!isset($ordersByShop[$shopId])) {
-                $ordersByShop[$shopId] = [
-                    'items' => [],
-                    'totalPrice' => 0,
-                    'order' => null,
-                ];
             }
-            $ordersByShop[$shopId]['items'][] = $cart;
         }
-        // Process each shop's order
-        foreach ($ordersByShop as $shopId => &$shopOrder) {
-            $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
-            $order = $this->createOrder($request, $ship_id);
-            $order->shop_id = $shopId;
-            $order->save();
-            $shopOrder['order'] = $order;
-            $shopOrder['orderDetails'] = [];
-            $shopTotalPrice = 0;
-            $height = 0;
-            $length = 0;
-            $weight = 0;
-            $width = 0;
-            $productIds = [];
-            foreach ($shopOrder['items'] as $cart) {
-                $productIds[] = $cart->product_id;
-                $variant = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
-                $this->checkProductAvailability($variant, $cart->quantity);
-                $totalPrice = $this->calculateTotalPrice($variant, $cart->quantity);
-                $orderDetail = $this->createOrderDetail($order, $variant, $cart->quantity, $totalPrice, $cart->product_id);
-                $height += $orderDetail->height;
-                $length += $orderDetail->length;
-                $weight += $orderDetail->weight;
-                $width += $orderDetail->width;
-                $shopOrder['orderDetails'][] = $orderDetail;
-                $variant->decrement('stock', $cart->quantity);
-                $shopTotalPrice += $totalPrice;
-                $totalQuantity += $cart->quantity;
-                $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
-                $this->addStateTaxToOrder($order, $tax, $cart->product_id);
-            }
-            $order->height = $height;
-            $order->length = $length;
-            $order->weight = $weight;
-            $order->width = $width;
-            $shopOrder['totalPrice'] = $shopTotalPrice;
-            $grandTotalPrice += $shopTotalPrice;
-            $shopData = Shop::find($shopId);
-            $service = $this->get_infomaiton_services($shopData, $addressUser);
-            $productForShip = $this->getProductForShip($productIds);
-            $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice);
-            $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails']);
-            $order->order_infomation = $orderInfomation;
-            $grandTotalPrice += $shipFee;
-            $order->total_amount = $shopTotalPrice;
-            $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
-            if ($voucherToShopCode) {
-                $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
-                $totalPrice -= $totalAdded;
-            }
-            $order->total_amount = $totalPrice;
-            $total_amount += $order->total_amount;
-            $this->addOrderFeesToTotal($order, $shopTotalPrice);
-            $order->save();
-        }
-        if ($voucherToMainCode) {
-            $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
-        }
-        AddPointUser::dispatch(auth()->id());
-        $checkRank = $this->check_point_to_user();
-        $total_amount = $this->discountsByRank($checkRank, $total_amount);
-        DB::commit();
-        SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
-        SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
-        return response()->json([
-            'status' => true,
-            'message' => 'Đặt hàng thành công',
-            'data' => [
-                'orders' => array_map(function($shopOrder) {
-                    return $shopOrder['order'];
-                }, $ordersByShop),
-                'totalPrice' => $grandTotalPrice,
-                'total_amount' => $total_amount,
-            ],
-            'point' => auth()->user()->point,
-        ], 200);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'status' => false,
-            'message' => 'Đặt hàng thất bại',
-            'error' => $e->getMessage()
-        ], 400);
-        }
-    }
+
+
+
     private function check_point_to_user()
     {
         $userId = auth()->id();
@@ -430,19 +368,23 @@ class PurchaseController extends Controller
         }
     }
 
-    private function createOrder(Request $request, $ship_id)
+    private function createOrder(Request $request, $ship_id, $groupOrderIds, $payment)
     {
 
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+        $status = 1;
+        if ($payment->name == 'VNPAY') {
+            $status = 2;
+        }
 
         $order = OrdersModel::create([
-            'payment_id' => $request->payment_id,
+            'payment_id' => $payment->id,
             'group_order_id' => $groupOrderIds,
             'user_id' => auth()->id(),
             'ship_id' => $request->ship_id,
             'delivery_address' => $request->delivery_address ?? $address->address,
             'ship_id' => $ship_id->id,
-            'status' => 1,
+            'status' => $status,
         ]);
         return $order;
     }
@@ -574,15 +516,16 @@ class PurchaseController extends Controller
 
     public function calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice)
     {
+
         if ($order->weight >= 2000) {
             $service_id = 100039;
         } else {
             $service_id = 53320;
         }
-        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
             'token' => $token, // Gắn token vào header
-        ])->get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', [
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', [
             "service_id" => $service_id,
             "insurance_value" => $shopTotalPrice,
             "from_district_id" => $shopData->district_id,
@@ -592,6 +535,21 @@ class PurchaseController extends Controller
             "length" => $order->length,
             "weight" => $order->weight,
             "width" => $order->width,
+            "service_type_id "=> null,
+
+            "from_district_id"=>$shopData->district_id,
+            "from_ward_code"=>$shopData->ward_id,
+            "service_id"=>$service_id,
+            "service_type_id"=>null,
+            "to_district_id"=>$addressUser->district_id,
+            "to_ward_code"=>$addressUser->ward_id,
+            "height" => $order->height,
+            "length" => $order->length,
+            "weight" => $order->weight,
+            "width" => $order->width,
+            "insurance_value"=>$shopTotalPrice,
+            "cod_failed_amount"=>2000,
+            "coupon"=> null
         ]);
         $OrderFee = $response->json();
         return $OrderFee['data']['total'];
@@ -601,7 +559,6 @@ class PurchaseController extends Controller
     public function shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $orderDetails){
         $user = JWTAuth::parseToken()->authenticate();
         $address = AddressModel::where('user_id', $user->id)->where('default', 1)->first();
-
         // Tạo mảng items bằng array_map
         $items = array_map(function($detail) {
             $product = $detail->product;
@@ -620,10 +577,8 @@ class PurchaseController extends Controller
                 ]
             ];
         }, $orderDetails);
-
         $service_id = $order->weight >= 2000 ? 100039 : 53320;
         $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
-
         $response = Http::withHeaders([
             'token' => $token,
             'Content-Type' => 'application/json',
@@ -666,8 +621,9 @@ class PurchaseController extends Controller
             "pick_shift" => [2],
             "items" => $items,
         ]);
+
         $orderShipGHN = $response->json();
-        // dd($orderShipGHN['data']['order_code']);
+
         // Cập nhật đơn hàng chỉ một lần
         $order->update([
             "payment_type_id" => 2,
@@ -707,6 +663,7 @@ class PurchaseController extends Controller
             "pick_shift" => [2],
             "items" => $items,
         ]);
+
         return $orderShipGHN;
     }
 }
