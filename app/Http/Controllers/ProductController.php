@@ -648,7 +648,7 @@ class ProductController extends Controller
                 $ollDT = DB::table("products")->where("id", $id)->first();
                 $ollData = (array) $ollDT;
                 $newData = (array) $newDT;
-                DB::table('products_oll')->insert($ollData);
+                DB::table('products_old')->insert($ollData);
                 $change_of = $data = json_decode($newData["change_of"], true);
                 unset($newData["change_of"]);
                 $newData["created_at"] = $newData["updated_at"];
@@ -724,7 +724,7 @@ class ProductController extends Controller
         
         $ollDT = DB::table("products")->where("id", $id)->first(); 
         $ollData = (array) $ollDT;
-        DB::table('products_oll')->insert($ollData);
+        DB::table('products_old')->insert($ollData);
         $user = JWTAuth::parseToken()->authenticate();
         $change_of = $request->change_of;
 
