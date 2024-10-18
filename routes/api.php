@@ -510,14 +510,12 @@ Route::get('/search', function () {
 
 
 
-
             Route::get('main/config', [configController::class, 'index']);
             Route::post('main/config', [configController::class, 'store']);
             Route::put('main/config/{id}', [configController::class, 'update']);
             Route::delete('main/config/{id}', [configController::class, 'destroy']);
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
-
 });
                 Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
 
