@@ -87,6 +87,7 @@ class PurchaseController extends Controller
                 ], 400);
             }
             $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
+ 
             $ordersByShop = [];
             $grandTotalPrice = 0;
             $totalQuantity = 0;
