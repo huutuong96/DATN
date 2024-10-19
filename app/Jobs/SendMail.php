@@ -31,7 +31,7 @@ class SendMail implements ShouldQueue
         $this->totalQuantity = $totalQuantity;
         $this->shipFee = $shipFee;
         $this->email = $email;
-        // dd($this->email);
+        $this->handle();
     }
 
     /**

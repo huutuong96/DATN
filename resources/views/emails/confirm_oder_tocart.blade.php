@@ -23,21 +23,23 @@ $totalAmount = 0;
                 <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Đơn giá</th>
             </tr>
             @foreach ($ordersByShop as $order)
+            
                 @foreach ($order['items'] as $item)
+   
                 @php
-                    $subtotal = $item->variant->price * $item->quantity;
+                    $subtotal = $item["variant"]["price"] * $item["quantity"];
                     $totalAmount += $subtotal;
                 @endphp
                 <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ $item->order_id }}</span></td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ $item->variant->sku }}</span></td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ $item->quantity }}</span></td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ number_format($item->variant->price * $item->quantity) }} VNĐ</span></td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ $item["id"]}}</span></td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ $item["variant"]["sku"] }}</span></td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ $item["quantity"] }}</span></td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;"><span style="color: #4CAF50;">{{ number_format($item["variant"]["price"] * $item["quantity"]) }} VNĐ</span></td>
                 </tr>
                 @endforeach
             @endforeach
         </table>
-        <p style="font-size: 14px; margin-bottom: 10px;"><strong>Tổng tiền:</strong> <span style="color: #e53935;">{{ number_format($total_amount) }} VNĐ</span></p>
+        <p style="font-size: 14px; margin-bottom: 10px;"><strong>Tổng tiền:</strong> <span style="color: #e53935;">{{ number_format($totalAmount) }} VNĐ</span></p>
         {{-- <p style="font-size: 14px; margin-bottom: 10px;"><strong>Ngày đặt hàng:</strong> {{ $ordersByShop[0]['order']->created_at->format('d/m/Y H:i:s') }}</p> --}}
     </main>
     <footer style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 12px; margin-top: 20px; border-radius: 5px;">

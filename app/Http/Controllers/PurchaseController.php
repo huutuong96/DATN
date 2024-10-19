@@ -31,9 +31,12 @@ use Illuminate\Support\Facades\Http;
 use App\Jobs\SendMail;
 use App\Jobs\SendNotification;
 use App\Jobs\AddPointUser;
+use App\Models\vnpay_transaction;
+use Illuminate\Support\Facades\Cache;
+
 class PurchaseController extends Controller
 {
-
+  
     public function __construct()
     {
 
@@ -156,10 +159,11 @@ class PurchaseController extends Controller
                 $shopData = Shop::find($shopId);
                 $service = $this->get_infomaiton_services($shopData, $addressUser);
                 $productForShip = $this->getProductForShip($productIds);
+             
                 $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice);
 
-                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails']);
-                $order->order_infomation = $orderInfomation;
+                // $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], 99999);
+                // $order->order_infomation = $orderInfomation;
                 $grandTotalPrice += $shipFee;
                 $order->total_amount = $shopTotalPrice;
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
@@ -170,7 +174,7 @@ class PurchaseController extends Controller
                 $order->total_amount = $totalPrice;
                 $total_amount += $order->total_amount;
                 $this->addOrderFeesToTotal($order, $shopTotalPrice);
-                $order->save();
+                // $order->save();
             }
             if ($voucherToMainCode) {
                 $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
@@ -179,24 +183,53 @@ class PurchaseController extends Controller
             $checkRank = $this->check_point_to_user();
             $total_amount = $this->discountsByRank($checkRank, $total_amount);
 
-            // DB::commit();
+            DB::commit();
             if ($payment->name == 'VNPAY') {
                 $PaymentsController = new PaymentsController();
-                $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
+                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
+                $order->order_infomation = $orderInfomation;
+                $order->save();
+
+                DB::table("data_mail")->insert( [
+                    'groupOrderIds' => $groupOrderIds,
+                    'ordersByShop' => json_encode($ordersByShop),
+                    'total_amount' => $total_amount,
+                    'carts' => $carts,
+                    'total_quantity' => json_encode($totalQuantity),
+                    'ship_fee' => $shipFee,
+                    'email' => auth()->user()->email,
+                ]);
+
+
+                $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
+                dd($url);
+                // return redirect()->away($url);
+                // $order = vnpay_transaction::where("vnp_TxnRef", $groupOrderIds)->first();
+                // if(!$order->vnp_ResponseCode == "00"){
+                //     return response()->json([
+                //         'status' => 400,
+                //         'message' => 'Đặt hàng thất bại',
+                //     ], 400);
+                // }
+                // $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails']);
+            }else if($payment->name == 'COD'){
+                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
             }
+            $order->order_infomation = $orderInfomation;
+            $order->save();
             SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
-                'data' => [
-                    'orders' => array_map(function($shopOrder) {
-                        return $shopOrder['order'];
-                    }, $ordersByShop),
-                    'totalPrice' => $grandTotalPrice,
-                    'total_amount' => $total_amount,
-                ],
-                'point' => auth()->user()->point,
+                // 'data' => [
+                //     'orders' => array_map(function($shopOrder) {
+                //         return $shopOrder['order'];
+                //     }, $ordersByShop),
+                //     'totalPrice' => $grandTotalPrice,
+                //     'total_amount' => $total_amount,
+                // ],
+                // 'point' => auth()->user()->point,
             ], 200);
     
         } catch (\Exception $e) {
@@ -208,6 +241,46 @@ class PurchaseController extends Controller
             ], 400);
             }
         }
+
+    public function handlePaymenAndSendEmail($groupOrderIds){
+        
+            $vnpay_transaction = vnpay_transaction::where("vnp_TxnRef", $groupOrderIds)->first();
+            $order = OrdersModel::where('group_order_id', $groupOrderIds)->first();
+            if(!$vnpay_transaction->vnp_ResponseCode == "00"){
+                //thay đổi trạng thái order hoắc xóa nếu không thành công
+                //$order->delete();
+                //xóa luôn phần gửi lên giao hàng nhanh
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Đặt hàng thất bại',
+                ], 400);
+            }
+            $response = Http::withHeaders([
+                'Token' => env('TOKEN_API_GIAO_HANG_NHANH_DEV'),
+                'Content-Type' => 'application/json',
+            ])->post('https://services.giaohangtietkiem.vn/services/shipment/update', [
+                "order_id" => $groupOrderIds, // Mã đơn hàng đã tạo với GHTK
+                "cod_amount" => 0
+            ]);
+           
+            $order->update([
+                "cod_amount" => 0
+            ]);
+            $order->save();
+            $data = DB::table("data_mail")->where("groupOrderIds", $groupOrderIds)->first();
+            $user = UsersModel::where("email", $data->email)->first();
+            SendMail::dispatch(json_decode($data->ordersByShop, true) ?? null, $data->total_amount ?? null, json_decode($data->carts, true), $data->totalQuantity ?? null, $data->shipFee ?? null, $data->email);
+            DB::table('data_mail')->where("groupOrderIds", $groupOrderIds)->delete();
+            // dd(response()->json([
+            //     'status' => true,
+            //     'message' => 'Đặt hàng thành công',]));
+            SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', $user->id);
+            return response()->json([
+                'status' => true,
+                'message' => 'Đặt hàng thành công'
+            ], 200);
+    }
+    
     private function check_point_to_user()
     {
         $userId = auth()->id();
@@ -558,7 +631,7 @@ class PurchaseController extends Controller
     }
 
 
-    public function shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $orderDetails){
+    public function shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $orderDetails, $cod_amount = 0){
         $user = JWTAuth::parseToken()->authenticate();
         $address = AddressModel::where('user_id', $user->id)->where('default', 1)->first();
         // Tạo mảng items bằng array_map
@@ -579,6 +652,7 @@ class PurchaseController extends Controller
                 ]
             ];
         }, $orderDetails);
+        
         $service_id = $order->weight >= 2000 ? 100039 : 53320;
         $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
@@ -606,7 +680,7 @@ class PurchaseController extends Controller
             "to_ward_name" => $address->ward,
             "to_district_name" => $address->district,
             "to_province_name" => $address->province,
-            "cod_amount" => 0,
+            "cod_amount" => $cod_amount,
             "content" => $request->content ?? "",
             "weight" => $order->weight ?? 1000,
             "length" => $order->length ?? 20,
@@ -623,8 +697,10 @@ class PurchaseController extends Controller
             "pick_shift" => [2],
             "items" => $items,
         ]);
-
+        // lưu đơn hàng lên db
+        
         $orderShipGHN = $response->json();
+   
 
         // Cập nhật đơn hàng chỉ một lần
         $order->update([
@@ -648,7 +724,7 @@ class PurchaseController extends Controller
             "to_ward_name" => $address->ward,
             "to_district_name" => $address->district,
             "to_province_name" => $address->province,
-            "cod_amount" => 0,
+            "cod_amount" => $cod_amount,
             "content" => $request->content ?? "",
             "weight" => $order->weight ?? 1000,
             "length" => $order->length ?? 20,
@@ -665,7 +741,36 @@ class PurchaseController extends Controller
             "pick_shift" => [2],
             "items" => $items,
         ]);
-
         return $orderShipGHN;
+    }
+    //----------------------------------------------------------------------
+
+    public function checkoutdone(Request $request){
+        // xử lý
+        $PaymentsController = new PaymentsController();
+        $data = ($PaymentsController->vnpay_return($request));
+        // dd($data);
+        $insertData = [
+            'vnp_Amount' => $data["vnp_Amount"] ?? 0, // Giá trị mặc định nếu không có
+            'vnp_BankCode' => "".$data['vnp_BankCode']."",
+            'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
+            'vnp_CardType' => $data["vnp_CardType"] ?? '',
+            // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
+            'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
+            'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
+            'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
+            'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
+            'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
+            'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
+            'vnp_SecureHash' => "".$data['vnp_SecureHash']."",
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        // dd($insertData);
+
+        // Chèn dữ liệu vào bảng
+        vnpay_transaction::create($insertData);
+        $this->handlePaymenAndSendEmail($data["vnp_TxnRef"]);
+        
     }
 }
