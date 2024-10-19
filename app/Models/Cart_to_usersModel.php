@@ -26,4 +26,8 @@ class Cart_to_usersModel extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    public function users()
+    {
+        return $this->belongsTo(UsersModel::class, 'user_id');
+    }
 }

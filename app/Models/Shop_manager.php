@@ -22,6 +22,6 @@ class Shop_manager extends Model
 
     public function users()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(UsersModel::class, 'user_id');
     }
 }

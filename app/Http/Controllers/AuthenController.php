@@ -11,6 +11,8 @@ use App\Models\Notification;
 use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\Product;
+use App\Models\shop_manager;
+use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -233,13 +235,13 @@ class AuthenController extends Controller
     {
         try {
             $user_present = JWTAuth::parseToken()->authenticate();
+            $shop = Shop::where('owner_id', $user_present->id)->first();
 
+            $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
             // Eager load related models
             // $user_present->load([
-            //     'address',
-            //     'rank',
-            //     'notifications',
-            //     'orders.orderDetails.product'
+            //     'shop_manager',
+            //     'cart_to_user',
             // ]);
 
             // Extract necessary data
@@ -257,6 +259,8 @@ class AuthenController extends Controller
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
                 'me' => $user_present,
+                'shop' => $shop->id ?? null,
+                'cart' => $cartUser->id ?? null,
                 // 'address' => $user_present_address,
                 // 'notifications' => $main_notifications,
                 // 'orders' => [
