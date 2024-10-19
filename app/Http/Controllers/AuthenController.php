@@ -235,12 +235,12 @@ class AuthenController extends Controller
             $user_present = JWTAuth::parseToken()->authenticate();
 
             // Eager load related models
-            $user_present->load([
-                'address',
-                'rank',
-                'notifications',
-                'orders.orderDetails.product'
-            ]);
+            // $user_present->load([
+            //     'address',
+            //     'rank',
+            //     'notifications',
+            //     'orders.orderDetails.product'
+            // ]);
 
             // Extract necessary data
             // $user_present_address = $user_present->address;
