@@ -243,26 +243,26 @@ class AuthenController extends Controller
             ]);
 
             // Extract necessary data
-            $user_present_address = $user_present->address;
-            $user_present_rank = $user_present->rank;
-            $notifications = $user_present->notifications;
-            $notification_ids = $notifications->pluck('id_notification');
-            $main_notifications = Notification_to_mainModel::whereIn('id', $notification_ids)->paginate(3);
-            $orders = $user_present->orders;
-            $orderDetails = $orders->flatMap->orderDetails;
-            $productIds = $orderDetails->pluck('product_id');
-            $products = Product::whereIn('id', $productIds)->paginate(3);
+            // $user_present_address = $user_present->address;
+            // $user_present_rank = $user_present->rank;
+            // $notifications = $user_present->notifications;
+            // $notification_ids = $notifications->pluck('id_notification');
+            // $main_notifications = Notification_to_mainModel::whereIn('id', $notification_ids)->paginate(3);
+            // $orders = $user_present->orders;
+            // $orderDetails = $orders->flatMap->orderDetails;
+            // $productIds = $orderDetails->pluck('product_id');
+            // $products = Product::whereIn('id', $productIds)->paginate(3);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
                 'me' => $user_present,
-                'address' => $user_present_address,
-                'notifications' => $main_notifications,
-                'orders' => [
-                    'orderDetail' => $orderDetails,
-                    'product' => $products,
-                ],
+                // 'address' => $user_present_address,
+                // 'notifications' => $main_notifications,
+                // 'orders' => [
+                //     'orderDetail' => $orderDetails,
+                //     'product' => $products,
+                // ],
             ], 200);
         } catch (JWTException $e) {
             return response()->json([
