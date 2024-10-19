@@ -15,6 +15,6 @@ use App\Http\Controllers\PaymentsController;
 */
 
 Route::get('/', function () {
-    return "API - VNSHOP";
+    return "API - VNSHOPssssssss";
 });
 
