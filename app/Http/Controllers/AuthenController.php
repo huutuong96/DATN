@@ -198,8 +198,10 @@ class AuthenController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
-            'token' => $token,
-            // 'user_present' => $user,
+            'data' => [
+                'token' => $token,
+                // 'user' => $user,
+            ],
         ], 200);
     }
 
