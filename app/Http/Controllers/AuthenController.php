@@ -236,37 +236,17 @@ class AuthenController extends Controller
         try {
             $user_present = JWTAuth::parseToken()->authenticate();
             $shop = Shop::where('owner_id', $user_present->id)->first();
-
             $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
-            // Eager load related models
-            // $user_present->load([
-            //     'shop_manager',
-            //     'cart_to_user',
-            // ]);
-
-            // Extract necessary data
-            // $user_present_address = $user_present->address;
-            // $user_present_rank = $user_present->rank;
-            // $notifications = $user_present->notifications;
-            // $notification_ids = $notifications->pluck('id_notification');
-            // $main_notifications = Notification_to_mainModel::whereIn('id', $notification_ids)->paginate(3);
-            // $orders = $user_present->orders;
-            // $orderDetails = $orders->flatMap->orderDetails;
-            // $productIds = $orderDetails->pluck('product_id');
-            // $products = Product::whereIn('id', $productIds)->paginate(3);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'me' => $user_present,
-                'shop' => $shop->id ?? null,
-                'cart' => $cartUser->id ?? null,
-                // 'address' => $user_present_address,
-                // 'notifications' => $main_notifications,
-                // 'orders' => [
-                //     'orderDetail' => $orderDetails,
-                //     'product' => $products,
-                // ],
+                'data' => [
+                    $user_present,
+                    $shop->id ?? null,
+                    $cartUser->id ?? null,
+                ],
+
             ], 200);
         } catch (JWTException $e) {
             return response()->json([
