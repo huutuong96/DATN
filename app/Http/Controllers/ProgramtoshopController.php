@@ -1,59 +1,42 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\ProgramtoshopRequest;
 use App\Models\ProgramtoshopModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProgramtoshopController extends Controller
 {
-   /**
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        try {
-            $Program_to_shop = ProgramtoshopModel::all();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $Program_to_shop ,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 500);
+        $programToShops = Cache::remember('all_program_to_shops', 60 * 60, function () {
+            return ProgramtoshopModel::all();
+        });
+
+        if ($programToShops->isEmpty()) {
+            return $this->errorResponse("Không tồn tại liên kết chương trình-cửa hàng nào");
         }
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return $this->successResponse("Lấy dữ liệu thành công", $programToShops);
     }
-
+    
     /**
      * Store a newly created resource in storage.
      */
     public function store(ProgramtoshopRequest $request)
     {
-       
-        $dataInsert = [
-            "program_id"=> $request->program_id,
-            "shop_id"=> $request->shop_id,
-            "created_at"=> now(),
-        ];
-        ProgramtoshopModel::create($dataInsert);
-        $dataDone = [
-            'status' => true,
-            'message' => "đã lưu Program_to_shop",
-            'data' => $dataInsert,
-        ];
-        return response()->json($dataDone, 200);
+        try {
+            $programToShop = ProgramtoshopModel::create($request->validated());
+            Cache::forget('all_program_to_shops');
+            return $this->successResponse("Thêm liên kết chương trình-cửa hàng thành công", $programToShop);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Thêm liên kết chương trình-cửa hàng không thành công", $th->getMessage());
+        }
     }
 
     /**
@@ -61,70 +44,56 @@ class ProgramtoshopController extends Controller
      */
     public function show(string $id)
     {
-        try {
-            $Program_to_shop = ProgramtoshopModel::findOrFail($id);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lấy dữ liệu thành công',
-                'data' => $Program_to_shop,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 400);
-        }
-    }
+        $programToShop = Cache::remember('program_to_shop_' . $id, 60 * 60, function () use ($id) {
+            return ProgramtoshopModel::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$programToShop) {
+            return $this->errorResponse("Liên kết chương trình-cửa hàng không tồn tại", 404);
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $programToShop);
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(ProgramtoshopRequest $request, string $id)
-{
-    $Program_to_shop = ProgramtoshopModel::findOrFail($id);
+    {
+        $programToShop = ProgramtoshopModel::find($id);
 
-    $Program_to_shop->update([
-           "program_id"=> $request->program_id,
-            "shop_id"=> $request->shop_id,
-            "update"=> now(),
-    ]);
+        if (!$programToShop) {
+            return $this->errorResponse("Liên kết chương trình-cửa hàng không tồn tại", 404);
+        }
 
-    $dataDone = [
-        'status' => true,
-        'message' => "đã lưu Program_to_shop",
-        'roles' =>     $Program_to_shop,
-    ];
-    return response()->json($dataDone, 200);
-}
+        try {
+            $programToShop->update($request->validated());
+            Cache::forget('program_to_shop_' . $id);
+            Cache::forget('all_program_to_shops');
+            return $this->successResponse("Cập nhật liên kết chương trình-cửa hàng thành công", $programToShop);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Cập nhật liên kết chương trình-cửa hàng không thành công", $th->getMessage());
+        }
+    }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
+        $programToShop = ProgramtoshopModel::find($id);
+
+        if (!$programToShop) {
+            return $this->errorResponse("Liên kết chương trình-cửa hàng không tồn tại", 404);
+        }
+
         try {
-            $Program_to_shop = ProgramtoshopModel::findOrFail($id);
-            $Program_to_shop->delete();
-            return response()->json([
-                'status' => "success",
-                'message' => 'Xóa thành công',
-                'data' => null,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 500);
+            $programToShop->delete();
+            Cache::forget('program_to_shop_' . $id);
+            Cache::forget('all_program_to_shops');
+            return $this->successResponse("Xóa liên kết chương trình-cửa hàng thành công");
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Xóa liên kết chương trình-cửa hàng không thành công", $th->getMessage());
         }
     }
 }

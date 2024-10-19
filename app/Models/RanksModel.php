@@ -15,6 +15,9 @@ class RanksModel extends Model
     protected $fillable = [
         'title',
         'description',
+        'condition',
+        'value',
+        'limitValue',
         'status',
         'create_by',
         'update_by',

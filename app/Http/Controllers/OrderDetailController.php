@@ -1,39 +1,27 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\OrderDetailRequest;
 use App\Models\OrderDetailsModel;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class OrderDetailController extends Controller
 {
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        try {
-            $OrderDetails = OrderDetailsModel::all();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Dữ liệu được lấy thành công',
-                'data' =>  $OrderDetails ,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 500);
-        }
-    }
+        $orderDetails = Cache::remember('all_order_details', 60 * 60, function () {
+            return OrderDetailsModel::all();
+        });
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if ($orderDetails->isEmpty()) {
+            return $this->errorResponse("Không tồn tại chi tiết đơn hàng nào");
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $orderDetails);
     }
 
     /**
@@ -41,22 +29,7 @@ class OrderDetailController extends Controller
      */
     public function store(OrderDetailRequest $request)
     {
-       
-        $dataInsert = [
-            "subtotal"=> $request->subtotal,
-            "status"=> $request->status,
-            "order_id"=> $request->order_id,
-            "product_id"=> $request->category_id,
-            'create_by' => $request->input('create_by') ?? null,
-            "created_at"=> now(),
-        ];
-        OrderDetailsModel::create($dataInsert);
-        $dataDone = [
-            'status' => true,
-            'message' => "đã lưu OrderDetail",
-            'data' => $dataInsert,
-        ];
-        return response()->json($dataDone, 200);
+        "Thường là tự động tạo";
     }
 
     /**
@@ -64,73 +37,61 @@ class OrderDetailController extends Controller
      */
     public function show(string $id)
     {
-        try {
-            $OrderDetails = OrderDetailsModel::findOrFail($id);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lấy dữ liệu thành công',
-                'data' => $OrderDetails,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 400);
-        }
-    }
+        $orderDetail = Cache::remember('order_detail_' . $id, 60 * 60, function () use ($id) {
+            return OrderDetailsModel::find($id);
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        if (!$orderDetail) {
+            return $this->errorResponse("Chi tiết đơn hàng không tồn tại", 404);
+        }
+
+        return $this->successResponse("Lấy dữ liệu thành công", $orderDetail);
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(OrderDetailRequest $request, string $id)
-{
-    $OrderDetails = OrderDetailsModel::findOrFail($id);
+    {
+        $orderDetail = OrderDetailsModel::find($id);
 
-    $OrderDetails->update([
-            "subtotal"=> $request->subtotal,
-            "status"=> $request->status,
-            // "order_id"=> $request->order_id,
-            // "product_id"=> $request->product_id,
-            'update_by' => $request->input('update_by') ?? null,
-            "created_at"=> now(),
-    ]);
+        if (!$orderDetail) {
+            return $this->errorResponse("Chi tiết đơn hàng không tồn tại", 404);
+        }
 
-    $dataDone = [
-        'status' => true,
-        'message' => "đã lưu Learn",
-        'roles' =>     $OrderDetails,
-    ];
-    return response()->json($dataDone, 200);
-}
+        try {
+            $orderDetail->update([
+                "subtotal" => $request->subtotal,
+                "status" => $request->status,
+                'update_by' => auth()->id(),
+            ]);
+
+            Cache::forget('order_detail_' . $id);
+            Cache::forget('all_order_details');
+            return $this->successResponse("Đã cập nhật chi tiết đơn hàng", $orderDetail);
+        } catch (\Exception $e) {
+            return $this->errorResponse("Cập nhật chi tiết đơn hàng không thành công", $e->getMessage());
+        }
+    }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
+        $orderDetail = OrderDetailsModel::find($id);
+
+        if (!$orderDetail) {
+            return $this->errorResponse("Chi tiết đơn hàng không tồn tại", 404);
+        }
+
         try {
-            $OrderDetails = OrderDetailsModel::findOrFail($id);
-            $OrderDetails->delete();
-            return response()->json([
-                'status' => "success",
-                'message' => 'Xóa thành công',
-                'data' => null,
-            ], 200);
+            $orderDetail->update(['status' => 101]);
+            Cache::forget('order_detail_' . $id);
+            Cache::forget('all_order_details');
+            return $this->successResponse("Xóa chi tiết đơn hàng thành công");
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-                'data' => null,
-            ], 500);
+            return $this->errorResponse("Xóa chi tiết đơn hàng không thành công", $e->getMessage());
         }
     }
 }

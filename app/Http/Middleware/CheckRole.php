@@ -14,7 +14,7 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string $role = null): Response
     {
 
         $user = JWTAuth::parseToken()->authenticate();
@@ -25,18 +25,17 @@ class CheckRole
             ], 401);
         }
         $role = DB::table('roles')->where('id', $user->role_id)->first();
-        $string = $role->title;
-        $parts = explode('-', $string);
-        $result = $parts[0]; // 'admin'
-        if ($result == 'admin') {
+        
+        if ($role->title == 'OWNER') {
             return $next($request);
         }
-        if ($result != 'admin') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Bạn không có quyền vào trang này',
-            ], 401);
+        if ($role->title == $role) {
+            return $next($request);
         }
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Bạn không có quyền vào trang này',
+        ], 401);
 
     }
 }

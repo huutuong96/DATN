@@ -45,11 +45,11 @@ class FollowToShopController extends Controller
             'user_id'=> $user->id,
             'shop_id' => $request->shop_id,
         ];
-        Follow_to_shop::create($dataInsert);
+           $follow = Follow_to_shop::create($dataInsert);
         $dataDone = [
             'status' => true,
             'message' => "follow Đã được lưu",
-            'follows' => Follow_to_shop::all(),
+            'follows' => $follow,
         ];
         return response()->json($dataDone, 200);
     }

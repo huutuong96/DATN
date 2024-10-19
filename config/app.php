@@ -182,9 +182,9 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class,
 
-
-
+        // TranslateTool\Providers\TranslateServiceProvider::class,
         /*
          * Package Service Providers...
          */

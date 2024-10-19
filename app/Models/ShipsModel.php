@@ -17,8 +17,13 @@ class ShipsModel extends Model
      */
     protected $fillable = [
         'name',
+        'code',
         'description',
-        'status'
+        'status',
+        'fees',
+        'shop_id',
+        'ship_company_id',
+        'distance'
     ];
 
     /**

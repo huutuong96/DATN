@@ -66,7 +66,7 @@ class ProducttocartController extends Controller
             ];
             return response()->json($dataDone);
         }
-        
+
     }
 
     /**
@@ -138,9 +138,9 @@ class ProducttocartController extends Controller
                     'message' => "Product_to_cart không tồn tại"
                 ], 404);
             }
-    
+
             $Product_to_cart->delete();
-    
+
             return response()->json([
                 'status' => true,
                 'message' => "Product_to_cart đã được xóa"

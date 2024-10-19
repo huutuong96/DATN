@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\WishlistModel;
-use Illuminate\Http\Request;
 use App\Http\Requests\WishlistRequest;
+use Illuminate\Support\Facades\Cache;
+
 class WishlistController extends Controller
 {
     /**
@@ -11,30 +13,15 @@ class WishlistController extends Controller
      */
     public function index()
     {
-        $Wishlist = WishlistModel::all();
+        $wishlists = Cache::remember('all_wishlists', 60 * 60, function () {
+            return WishlistModel::all();
+        });
 
-        if($Wishlist->isEmpty()){
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Không tồn tại Wishlist nào",
-                ]
-            );
+        if ($wishlists->isEmpty()) {
+            return $this->errorResponse("Không tồn tại Wishlist nào");
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Lấy dữ liệu thành công',
-            'data' => $Wishlist
-        ], 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return $this->successResponse('Lấy dữ liệu thành công', $wishlists);
     }
 
     /**
@@ -42,29 +29,13 @@ class WishlistController extends Controller
      */
     public function store(WishlistRequest $request)
     {
-        $dataInsert = [
-            'status' => $request->status,
-            'user_id' => $request->user_id,
-            'product_id' => $request->product_id
-        ];
-
         try {
-            $Wishlist = WishlistModel::create($dataInsert);
-            $dataDone = [
-                'status' => true,
-                'message' => "Thêm Wishlist thành công",
-                'data' => $Wishlist
-            ];
-            return response()->json($dataDone, 200);
-        } catch (\Exception $e ) {
-            $dataDone = [
-                'status' => false,
-                'message' => "Thêm Wishlist không thành công",
-                'error' =>$e->getMessage()
-            ];
-            return response()->json($dataDone);
+            $wishlist = WishlistModel::create($request->validated());
+            Cache::forget('all_wishlists');
+            return $this->successResponse("Thêm Wishlist thành công", $wishlist);
+        } catch (\Exception $e) {
+            return $this->errorResponse("Thêm Wishlist không thành công", $e->getMessage());
         }
-        
     }
 
     /**
@@ -72,28 +43,15 @@ class WishlistController extends Controller
      */
     public function show(string $id)
     {
-        $Wishlist = WishlistModel::find($id);
+        $wishlist = Cache::remember('wishlist_' . $id, 60 * 60, function () use ($id) {
+            return WishlistModel::find($id);
+        });
 
-        if (!$Wishlist) {
-            return response()->json([
-                'status' => false,
-                'message' => "Wishlist không tồn tại"
-            ], 404);
+        if (!$wishlist) {
+            return $this->errorResponse("Wishlist không tồn tại", null, 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => "Lấy dữ liệu thành công",
-            'data' => $Wishlist
-        ], 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return $this->successResponse("Lấy dữ liệu thành công", $wishlist);
     }
 
     /**
@@ -101,35 +59,21 @@ class WishlistController extends Controller
      */
     public function update(WishlistRequest $request, string $id)
     {
-        $Wishlist = WishlistModel::find($id);
+        $wishlist = Cache::remember('wishlist_' . $id, 60 * 60, function () use ($id) {
+            return WishlistModel::find($id);
+        });
 
-        if (!$Wishlist) {
-            return response()->json([
-                'status' => false,
-                'message' => "Ship không tồn tại"
-            ], 404);
+        if (!$wishlist) {
+            return $this->errorResponse("Wishlist không tồn tại", null, 404);
         }
 
-        $dataUpdate = [
-            "status" => $request->status ?? $Wishlist->status,
-            'product_id' => $request->product_id,
-        ];
-
         try {
-            $Wishlist->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Wishlist đã được cập nhật",
-                    'data' => $Wishlist
-                ], 200);
+            $wishlist->update($request->validated());
+            Cache::forget('wishlist_' . $id);
+            Cache::forget('all_wishlists');
+            return $this->successResponse("Wishlist đã được cập nhật", $wishlist);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật Wishlist không thành công",
-                    'error' => $th->getMessage()
-                ]);
+            return $this->errorResponse("Cập nhật Wishlist không thành công", $th->getMessage());
         }
     }
 
@@ -138,30 +82,45 @@ class WishlistController extends Controller
      */
     public function destroy(string $id)
     {
-        $Wishlist = WishlistModel::find($id);
+        $wishlist = Cache::remember('wishlist_' . $id, 60 * 60, function () use ($id) {
+            return WishlistModel::find($id);
+        });
+
+        if (!$wishlist) {
+            return $this->errorResponse("Wishlist không tồn tại", null, 404);
+        }
 
         try {
-            if (!$Wishlist) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "Wishlist không tồn tại"
-                ], 404);
-            }
-    
-            $Wishlist->delete();
-    
-            return response()->json([
-                'status' => true,
-                'message' => "Wishlist đã được xóa"
-            ]);
+            $wishlist->update(['status' => 101]);
+            Cache::forget('wishlist_' . $id);
+            Cache::forget('all_wishlists');
+            return $this->successResponse("Wishlist đã được xóa");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa Wishlist không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa Wishlist không thành công", $th->getMessage());
         }
+    }
+
+    /**
+     * Return success response
+     */
+    private function successResponse(string $message, $data = null, int $status = 200)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
+    }
+
+    /**
+     * Return error response
+     */
+    private function errorResponse(string $message, $error = null, int $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
     }
 }

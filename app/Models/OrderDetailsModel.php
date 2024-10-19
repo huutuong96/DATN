@@ -16,7 +16,21 @@ class OrderDetailsModel extends Model
         'status',
         'order_id',
         'product_id',
+        'variant_id',
         'create_at',
         'update_at',
+        'height',
+        'length',
+        'weight',
+        'width',
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+    public function variant()
+    {
+        return $this->belongsTo(product_variants::class, 'variant_id');
+    }
 }

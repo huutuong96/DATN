@@ -27,7 +27,8 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // Các middleware khác...
         'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
-
+        'SendNotification' => \App\Http\Middleware\SendNotification::class,
+        'CheckShop' => \App\Http\Middleware\CheckShop::class,
     ];
     /**
      * The application's route middleware groups.
@@ -74,5 +75,6 @@ class Kernel extends HttpKernel
         'CheckStatusUser' => \App\Http\Middleware\CheckStatusUser::class,
         'CheckRole' => \App\Http\Middleware\CheckRole::class,
         'CheckPermission' => \App\Http\Middleware\CheckPermission::class,
+        'CheckPremission' => \App\Http\Middleware\CheckPremission::class,
     ];
 }

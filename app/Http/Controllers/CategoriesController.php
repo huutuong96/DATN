@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Tymon\JWTAuth\Facades\JWTAuth;
+
 use Cloudinary\Cloudinary;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\CategoriesModel;
+use App\Models\categoryattribute;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\CategoriesRequest;
 
 class CategoriesController extends Controller
@@ -15,16 +17,23 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = CategoriesModel::all();
+        $categories = CategoriesModel::where('status', 1)->get();
 
         if ($categories->isEmpty()) {
             return response()->json(
                 [
                     'status' => false,
-                    'message' => "Không tồn tại Categories nào"
+                    'message' => "Không tồn tại danh mục nào"
                 ]
             );
         }
+        foreach ($categories as $category) {
+            $category->id = intval($category->id);
+            $category->index = intval($category->index);
+            $category->status = intval($category->status);
+            $category->parent_id = intval($category->parent_id);
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'Lấy dữ liệu thành công',
@@ -32,113 +41,141 @@ class CategoriesController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CategoriesRequest $request)
     {
-        $image = $request->file('image');
-        $cloudinary = new Cloudinary();
-        $user = JWTAuth::parseToken()->authenticate();
-        try {
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $dataInsert = [];
 
+        // Kiểm tra và upload ảnh
+        if ($request->file('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $dataInsert['image'] = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        try {
             $dataInsert = [
                 'title' => $request->title,
-                'slug' => Str::slug($request->title),
-                'index' => $request->index,
-                'image' => $uploadedImage['secure_url'],
-                'status' => $request->status,
-                'parent_id' => $request->parent_id,
-                'create_by' => $user->id
+                'slug' => $request->slug ?? Str::slug($request->title, '-'),
+                'index' => $request->index ?? 1,
+                'status' => $request->status ?? 1,
+                'parent_id' => $request->parent_id ?? null,
+                'create_by' => $user->id,
+                'image' => $dataInsert['image'] ?? null,
             ];
 
-            $categories = CategoriesModel::create($dataInsert);
+            $category = CategoriesModel::create($dataInsert);
+
+            $parentId = $category->parent_id;
+            while ($parentId) {
+                $parentAttributes = CategoryAttribute::where('category_id', $parentId)->get();
+
+                foreach ($parentAttributes as $parentAttribute) {
+                    $parentAttribute->status = 0;
+                    $parentAttribute->save();
+                }
+
+                $parentCategory = CategoriesModel::find($parentId);
+                $parentId = $parentCategory ? $parentCategory->parent_id : null;
+            }
+            $subCategories = CategoriesModel::where('parent_id', $category->id)->get();
+            if ($subCategories->isEmpty()) {
+                $attributeIds = $request->attribute_ids;
+                if (is_array($attributeIds) && count($attributeIds) > 0) {
+                    foreach ($attributeIds as $attributeId) {
+                        categoryattribute::insert([
+                            'category_id' => $category->id,
+                            'attribute_id' => $attributeId,
+                        ]);
+                    }
+                }
+            }
 
             return response()->json([
                 'status' => true,
-                'message' => "Thêm Categories thành công",
-                'data' => $categories,
+                'message' => "Thêm danh mục thành công",
+                'data' => $category,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Thêm Categories không thành công",
+                'message' => "Thêm danh mục không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+
+
+
     public function show(string $id)
     {
         try {
-            $categories = CategoriesModel::find($id);
+            $category = CategoriesModel::find($id);
 
-            if (!$categories) {
+            if (!$category) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Categories không tồn tại",
+                    'message' => "Danh mục không tồn tại",
                 ], 404);
+            }
+
+
+            $category->subCategories = $this->getSubCategories($category->id);
+
+            if ($category->subCategories->isEmpty()) {
+                $category->attributes = $category->attributes()->get();
             }
 
             return response()->json([
                 'status' => true,
-                'message' => "Lấy thông tin Categories thành công",
-                'data' => $categories,
+                'message' => "Lấy thông tin danh mục thành công",
+                'data' => $category,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Lỗi khi lấy thông tin Categories",
+                'message' => "Lỗi khi lấy thông tin danh mục",
                 'error' => $th->getMessage(),
             ], 500);
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    private function getSubCategories($categoryId)
     {
-        //
+        $subCategories = CategoriesModel::where('parent_id', $categoryId)->get();
+
+        foreach ($subCategories as $subCategory) {
+            $sub_SubCategories = CategoriesModel::where('parent_id', $subCategory->id)->get();
+            if ($sub_SubCategories->isEmpty()) {
+                $subCategory->attributes = $subCategory->attributes()->get();
+            } else {
+                $subCategory->subCategories = $this->getSubCategories($subCategory->id);
+            }
+        }
+
+        return $subCategories;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(CategoriesRequest $request, string $id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         try {
             $categories = CategoriesModel::find($id);
 
             if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Categories không tồn tại",
+                    'message' => "Danh mục không tồn tại",
                 ], 404);
             }
-
-            $image = $request->file('image');
-
-            // Check xem co anh moi duoc tai len khong
-            if ($image) {
+            if ($request->file('image')) {
+                $image = $request->file('image');
                 $cloudinary = new Cloudinary();
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $imageUrl = $uploadedImage['secure_url'];
-            } else {
-                // Neu khong co anh moi thi giu nguyen URL cua anh hien tai
-                $imageUrl = $categories->image;
             }
 
             $dataUpdate = [
@@ -148,21 +185,22 @@ class CategoriesController extends Controller
                 'image' => $imageUrl ?? $categories->image,
                 'status' => $request->status ?? $categories->status,
                 'parent_id' => $request->parent_id ?? $categories->parent_id,
-                'update_by' => $request->update_by ?? $categories->update_by,
+                'update_by' => $user->id,
                 'updated_at' => now(),
             ];
 
             $categories->update($dataUpdate);
+            $categories->update(['status' => 0]);
 
             return response()->json([
                 'status' => true,
-                'message' => "Cập nhật Categories thành công",
+                'message' => "Cập nhật danh mục thành công",
                 'data' => $categories,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Cập nhật Categories không thành công",
+                'message' => "Cập nhật danh mục không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -179,20 +217,20 @@ class CategoriesController extends Controller
             if (!$categories) {
                 return response()->json([
                     'status' => false,
-                    'message' => "Categories không tồn tại",
+                    'message' => "Danh mục không tồn tại",
                 ], 404);
             }
 
-            $categories->delete();
+            $categories->update(['status' => 0]);
 
             return response()->json([
                 'status' => true,
-                'message' => "Xóa Categories thành công",
+                'message' => "Xóa danh mục thành công",
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => "Xóa Categories không thành công",
+                'message' => "Xóa danh mục không thành công",
                 'error' => $th->getMessage(),
             ], 500);
         }

@@ -12,31 +12,32 @@ class checkToken
 {
     public function handle($request, Closure $next)
     {
-        // Lấy token từ header
         try {
             // Xác thực người dùng bằng token JWT
             $user = JWTAuth::parseToken()->authenticate();
-            $token = DB::table('users')->where('refesh_token', $user->refesh_token)->first();
-            if (!$token) {
+            // Lấy token hiện tại từ request
+            $currentToken = JWTAuth::getToken();
+
+            // Kiểm tra xem token hiện tại có khớp với token được lưu trong database không
+            $storedToken = DB::table('users')->where('id', $user->id)->value('refesh_token');
+            if (!$storedToken || $currentToken != $storedToken) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Token không hợp lệ. Vui lòng đăng nhập lại.',
+                    'message' => 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.',
                 ], 401);
             }
             return $next($request);
         } catch (TokenExpiredException $e) {
-            // Token đã hết hạn
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token đã hết hạn, vui lòng đăng nhập lại',
             ], 401);
-
         } catch (JWTException $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token không hợp lệ hoặc không tồn tại',
                 'error' => $e->getMessage(),
-            ], 401); // Sử dụng 401 cho lỗi xác thực
+            ], 401);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -44,7 +45,5 @@ class checkToken
                 'error' => $e->getMessage(),
             ], 500);
         }
-
-
     }
 }

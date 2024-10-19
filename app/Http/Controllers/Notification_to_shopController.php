@@ -54,7 +54,7 @@ class Notification_to_shopController extends Controller
             'status' => $request->status,
             'shop_id' => $request->shop_id,
             'created_at' => now(),
-            // 'create_by',
+            'create_by'=>auth()->user()->id,
             // 'update_by',
         ];
 

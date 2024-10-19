@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Categoriessupportmain;
 use App\Http\Requests\CategoriessupportmainRequest;
 use Illuminate\Http\Request;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 class CategoriessupportmainController extends Controller
 {
     /**
@@ -40,19 +40,20 @@ class CategoriessupportmainController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(request $request )
-    {
+    {   
+        $user = JWTAuth::parseToken()->authenticate();
         $dataInsert = [
             "content"=> $request->content,
             "status"=> $request->status,
             "index"=> $request->index,
-            'create_by' => $request->input('create_by') ?? null,
+            'create_by' => $user->id,
             "created_at"=> now(),
         ];
-        Categoriessupportmain::create($dataInsert);
+        $category_suport_main =Categoriessupportmain::create($dataInsert);
         $dataDone = [
             'status' => true,
             'message' => "đã lưu categori_learn",
-            'data' => Categoriessupportmain::all(),
+            'data' => $category_suport_main,
         ];
         return response()->json($dataDone, 200);
     }
@@ -91,20 +92,21 @@ class CategoriessupportmainController extends Controller
      */
     public function update(Request $request, string $id)
 {
+    $user = JWTAuth::parseToken()->authenticate();
     $Categori_learn = Categoriessupportmain::findOrFail($id);
 
     $Categori_learn->update([
         "content" => $request->content,
         "status" => $request->status,
         "index"=> $request->index,
-        'create_by' => $request->input('create_by') ?? null,
-        "updated_at" => now(),
+        'update_by' =>  $user->id,
+        'updated_at' => now(),
     ]);
 
     $dataDone = [
         'status' => true,
-        'message' => "đã lưu categori_learn",
-        'roles' => Categoriessupportmain::all(),
+        'message' => "đã lưu categori",
+        'roles' =>  $Categori_learn,
     ];
     return response()->json($dataDone, 200);
 }

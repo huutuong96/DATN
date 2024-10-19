@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ShopRequest extends FormRequest
 {
@@ -23,33 +25,35 @@ class ShopRequest extends FormRequest
     {
         return [
             'shop_name' => 'required|string',
-            'pickup_address' => 'string',
-            // 'image' => 'required|url',
-            'tax_id' => 'required|number',
+            'pickup_address' => 'nullable|string',
+            'image' => 'url',
+            'tax_id' => 'required|numeric',
             'cccd' => 'required|string',
-            'status' => 'number|required',
+            'status' => 'integer',
         ];
     }
-    public function messages(){
+
+    public function messages()
+    {
         return [
             'shop_name.required' => 'Tên cửa hàng là bắt buộc.',
             'shop_name.string' => 'Tên cửa hàng phải là chuỗi ký tự.',
 
             'pickup_address.string' => 'Địa chỉ nhận hàng phải là chuỗi ký tự.',
 
-            'image.required' => 'Hình ảnh là bắt buộc.',
             'image.url' => 'Hình ảnh phải là một đường dẫn URL hợp lệ.',
 
-            'tax_id.required' => 'Mã số thuế là bắt buộc.',
-            'tax_id.number' => 'Mã số thuế phải là một số.',
+            // 'tax_id.required' => 'Mã số thuế là bắt buộc.',
+            'tax_id.numeric' => 'Mã số thuế phải là một số.',
 
             'cccd.required' => 'Số CCCD là bắt buộc.',
             'cccd.string' => 'Số CCCD phải là chuỗi ký tự.',
 
             'status.required' => 'Trạng thái là bắt buộc.',
-            'status.number' => 'Trạng thái phải là một số.',
+            'status.integer' => 'Trạng thái phải là một số nguyên.',
         ];
     }
+
     protected function failedValidation(Validator $validator)
     {
         $errors = $validator->errors();

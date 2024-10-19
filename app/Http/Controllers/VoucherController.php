@@ -1,204 +1,96 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\Models\Voucher;
-use App\Http\Requests\Vouchers;
-use Illuminate\Http\Request;
+use App\Models\voucherToMain;
+use App\Models\VoucherToShop;
+use App\Http\Requests\VoucherRequest;
+use Illuminate\Support\Facades\Cache;
 
 class VoucherController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $voucher = Voucher::all();
-        if($voucher->isEmpty()){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại voucher nào",
-                ]
-            );
+        $vouchers = Voucher::all();
+
+        if ($vouchers->isEmpty()) {
+            return $this->errorResponse("Không tồn tại voucher nào");
         }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $voucher,
-            ]
-        );
+
+        return $this->successResponse("Lấy dữ liệu thành công", $vouchers);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(VoucherRequest $request)
     {
-        //
-    }
+        $checkvoucherToMain = voucherToMain::where('code', $request->code)->exists();
+        $checkVoucherToShop = VoucherToShop::where('code', $request->code)->exists();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Vouchers $request)
-    {
+        if (!$checkvoucherToMain && !$checkVoucherToShop) {
+            return $this->errorResponse("Mã voucher không khớp với bất kỳ voucher nào của shop hoặc sàn.");
+        }
 
-        $checkVoucherToMain = voucher_to_main::where('code', $request->code)->first();
-        $checkVoucherToShop = VoucherToShop::where('code', $request->code)->first();
-
-        if ($checkVoucherToMain || $checkVoucherToShop) {
-            $dataInsert = [
-                'type' => $request->type,
-                'status' => $request->status,
-                // 'URL' => $uploadedImage['secure_url'],
-                'code' => $request->code,
-                // 'create_by',
-                // 'update_by',
-            ];
-
-            try {
-                $voucher = Voucher::create($dataInsert);
-
-                return response()->json(
-                    [
-                        'status' => true,
-                        'message' => "Thêm voucher thành công",
-                        'data' => $voucher,
-                    ]
-                );
-            } catch (\Throwable $th) {
-                return response()->json(
-                    [
-                        'status' => true,
-                        'message' => "Thêm voucher không thành công",
-                        'error' => $th->getMessage(),
-                    ]
-                );
-            }
-        } else {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Mã voucher không khớp với bất kỳ voucher nào của shop hoặc sàn.",
-                ]
-            );
+        try {
+            $voucher = Voucher::create($request->validated());
+            return $this->successResponse("Thêm voucher thành công", $voucher);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Thêm voucher không thành công", $th->getMessage());
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $voucher = Voucher::find($id);
 
-        if(!$voucher){
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Không tồn tại voucher nào",
-                ]
-            );
-        }
-        return response()->json(
-            [
-                'status' => true,
-                'message' => "Lấy dữ liệu thành công",
-                'data' => $voucher,
-            ]
-        );
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        // $image = $rqt->file('image');
-        // if ($image) {
-        //     $cloudinary = new Cloudinary();
-        //     $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        // }
-        // Tìm voucher theo ID
-        $voucher = Voucher::find($id);
-        // Kiểm tra xem voucher có tồn tại không
         if (!$voucher) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "voucher không tồn tại",
-                ],
-                404
-            );
+            return $this->errorResponse("Không tồn tại voucher nào");
         }
-        // Cập nhật dữ liệu
-        $dataUpdate = [
-            'type' => $request->type ?? $voucher->type,
-            'status' => $request->status ?? $voucher->status,
-            'code' => $request->code ?? $voucher->code,
-            'update_at' => now(), // Đặt giá trị mặc định nếu không có trong yêu cầu
-        ];
 
+        return $this->successResponse("Lấy dữ liệu thành công", $voucher);
+    }
+
+    public function update(VoucherRequest $request, string $id)
+    {
+        $voucher = Voucher::find($id);
+
+        if (!$voucher) {
+            return $this->errorResponse("Voucher không tồn tại", 404);
+        }
 
         try {
-            // Cập nhật bản ghi
-            $voucher->update($dataUpdate);
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Cập nhật voucher thành công",
-                    'data' => $voucher,
-                ]
-            );
+            $voucher->update($request->validated());
+            return $this->successResponse("Cập nhật voucher thành công", $voucher);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "Cập nhật voucher không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Cập nhật voucher không thành công", $th->getMessage());
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {
-            $voucher = Voucher::find($id);
-
-            if (!$voucher) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'voucher không tồn tại',
-                ], 404);
-            }
-
-            // Xóa bản ghi
+            $voucher = Voucher::findOrFail($id);
             $voucher->delete();
-
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Xóa voucher thành công',
-                ]);
+            return $this->successResponse("Xóa voucher thành công");
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => "xóa voucher không thành công",
-                    'error' => $th->getMessage(),
-                ]
-            );
+            return $this->errorResponse("Xóa voucher không thành công", $th->getMessage());
         }
+    }
+
+    private function successResponse($message, $data = null, $status = 200)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
+    }
+
+    private function errorResponse($message, $error = null, $status = 400)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'error' => $error
+        ], $status);
     }
 }

@@ -28,9 +28,9 @@ class CommentsRequest extends FormRequest
             'content' => 'required|string',
             'rate' => 'required|integer|min:1|max:5',
             'status' => 'required',
-            'parent_id' => 'nullable|exists:reviews,id',
+            'parent_id' => 'nullable',
             'product_id' => 'required|exists:products,id',
-            'user_id' => 'required|exists:users,id',
+          
         ];
     }
     public function messages()
@@ -51,7 +51,6 @@ class CommentsRequest extends FormRequest
             'product_id.exists' => 'Sản phẩm không tồn tại.',
             'user_id.required' => 'Trường người dùng là bắt buộc.',
             'user_id.exists' => 'Người dùng không tồn tại.',
-
         ];
     }
     protected function failedValidation(Validator $validator)

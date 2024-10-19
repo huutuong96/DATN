@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+
+
 
 class UsersModel extends Authenticatable implements JWTSubject {
 
@@ -28,8 +29,15 @@ class UsersModel extends Authenticatable implements JWTSubject {
         'login_at',
         'rank_id',
         'role_id',
-        'address_id',
         'status',
+    ];
+
+    protected $hidden = [
+        'password',
+        'refesh_token',
+        'created_at',
+        'updated_at',
+        'update_version',
     ];
 
      public function getJWTIdentifier()
@@ -44,4 +52,26 @@ class UsersModel extends Authenticatable implements JWTSubject {
     {
         return [];
     }
+
+    // Define the address relationship
+    public function address()
+    {
+        return $this->hasMany(AddressModel::class, 'user_id');
+    }
+
+    public function rank()
+    {
+        return $this->belongsTo(RanksModel::class, 'rank_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(OrdersModel::class, 'user_id');
+    }
+
 }

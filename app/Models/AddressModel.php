@@ -14,11 +14,18 @@ class AddressModel extends Model
     // Các trường có thể được gán hàng loạt
     protected $fillable = [
         'address',
+        'province',
+        'province_id',
+        'district',
+        'district_id',
+        'ward',
+        'ward_id',
         'type',
         'default',
         'status',
         'create_by',
         'update_by',
+        'user_id'
     ];
 
     // Các trường không được gán hàng loạt

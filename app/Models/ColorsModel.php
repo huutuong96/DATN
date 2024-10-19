@@ -13,6 +13,7 @@ class ColorsModel extends Model
 
     protected $fillable = [
         'title',
+        'product_id',
         'index',
         'image',
         'status',
@@ -30,4 +31,8 @@ class ColorsModel extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
