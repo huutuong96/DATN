@@ -193,9 +193,6 @@ class PaymentsController extends Controller
             ]);
         }
     }
-
-    
-
     // THANH TOÁN BẰNG CỔNG THANH TOÁN
 
     // Hàm này được tạo ra để cho VNPay có chỗ để return về, sẽ được thay thế bằng hàm view trang Checkout SuccessFul
@@ -203,10 +200,10 @@ class PaymentsController extends Controller
         $this->vnpay_return($request);
         echo "<< Giao diện checkout thành công >>";
     }
-    public function vnpay_payment(Request $request)
+    public function vnpay_payment(Request $request, $total_amount, $groupOrderIds)
     {
         $grandTotalPrice = 0;
-        $orders = OrdersModel::where('group_order_id', $request->group_order_id)->where('status', 1)->get();
+        $orders = OrdersModel::where('group_order_id', $groupOrderIds)->where('status', 1)->get();
         if ($orders->isEmpty()) {
             return response()->json([
                 'status' => 'false',
@@ -218,8 +215,8 @@ class PaymentsController extends Controller
         }
 
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://127.0.0.1:8000/api/checkoutdone"; // Đổi đường dẫn này thành đường dẫn đến trang Checkout SuccessFul 
-        $vnp_TmnCode = "TIGDFWL4"; //Mã website tại VNPAY 
+        $vnp_Returnurl = "http://127.0.0.1:8000/api/checkoutdone"; // Đổi đường dẫn này thành đường dẫn đến trang Checkout SuccessFul
+        $vnp_TmnCode = "TIGDFWL4"; //Mã website tại VNPAY
         $vnp_HashSecret = "W09DJQ9Y0K214BWC48SNRZR7UWVE8OPT"; //Chuỗi bí mật
 
         $vnp_TxnRef = $order->group_order_id;
@@ -231,7 +228,6 @@ class PaymentsController extends Controller
 
         $vnp_Locale = 'vn';
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
-        //Add Params of 2.0.1 Version
 
         $inputData = array(
             "vnp_Version" => "2.1.0",
@@ -252,7 +248,6 @@ class PaymentsController extends Controller
             $inputData['vnp_BankCode'] = $vnp_BankCode;
         }
 
-        //var_dump($inputData);
         ksort($inputData);
         $query = "";
         $i = 0;
@@ -269,7 +264,7 @@ class PaymentsController extends Controller
 
         $vnp_Url = $vnp_Url . "?" . $query;
         if (isset($vnp_HashSecret)) {
-            $vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret); //  
+            $vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret); //
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
 
