@@ -11,6 +11,8 @@ use App\Models\Notification;
 use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\Product;
+use App\Models\shop_manager;
+use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -383,8 +385,10 @@ class AuthenController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
-            'token' => $token,
-            // 'user_present' => $user,
+            'data' => [
+                'token' => $token,
+                // 'user' => $user,
+            ],
         ], 200);
     }
 
@@ -541,36 +545,17 @@ class AuthenController extends Controller
     {
         try {
             $user_present = JWTAuth::parseToken()->authenticate();
+            $shop = Shop::where('owner_id', $user_present->id)->first();
+            $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
 
-            // Eager load related models
-            $user_present->load([
-                'address',
-                'rank',
-                'notifications',
-                'orders.orderDetails.product'
-            ]);
-
-            // Extract necessary data
-            $user_present_address = $user_present->address;
-            $user_present_rank = $user_present->rank;
-            $notifications = $user_present->notifications;
-            $notification_ids = $notifications->pluck('id_notification');
-            $main_notifications = Notification_to_mainModel::whereIn('id', $notification_ids)->paginate(3);
-            $orders = $user_present->orders;
-            $orderDetails = $orders->flatMap->orderDetails;
-            $productIds = $orderDetails->pluck('product_id');
-            $products = Product::whereIn('id', $productIds)->paginate(3);
+            $user_present->shop_id = $shop->id;
+            $user_present->cart_id = $cartUser->id;
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
-                'me' => $user_present,
-                'address' => $user_present_address,
-                'notifications' => $main_notifications,
-                'orders' => [
-                    'orderDetail' => $orderDetails,
-                    'product' => $products,
-                ],
+                'data' => $user_present,
+
             ], 200);
         } catch (JWTException $e) {
             return response()->json([

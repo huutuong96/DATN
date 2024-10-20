@@ -75,4 +75,13 @@ class UsersModel extends Authenticatable implements JWTSubject {
         return $this->hasMany(OrdersModel::class, 'user_id');
     }
 
+    public function shop_manager()
+    {
+        return $this->hasMany(Shop_manager::class, 'user_id');
+    }
+
+    public function cart_to_user()
+    {
+        return $this->belongsTo(RolesModel::class, 'user_id');
+    }
 }
