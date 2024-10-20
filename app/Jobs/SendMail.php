@@ -23,7 +23,8 @@ class SendMail implements ShouldQueue
     protected $shipFee;
     protected $email;
 
-    public function __construct($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, $email)
+    protected $typeCheckout;
+    public function __construct($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, $email, $typeCheckout)
     {
         $this->ordersByShop = $ordersByShop;
         $this->total_amount = $total_amount;
@@ -31,7 +32,8 @@ class SendMail implements ShouldQueue
         $this->totalQuantity = $totalQuantity;
         $this->shipFee = $shipFee;
         $this->email = $email;
-        // dd($this->email);
+        $this->typeCheckout = $typeCheckout;
+        $this->handle();
     }
 
     /**
@@ -39,6 +41,6 @@ class SendMail implements ShouldQueue
      */
     public function handle(): void
     {
-            Mail::to($this->email)->send(new ConfirmOderToCart($this->ordersByShop, $this->total_amount, $this->carts, $this->totalQuantity, $this->shipFee));
+            Mail::to($this->email)->send(new ConfirmOderToCart($this->ordersByShop, $this->total_amount, $this->carts, $this->totalQuantity, $this->shipFee, $this->typeCheckout));
     }
 }

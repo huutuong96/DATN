@@ -87,6 +87,7 @@ class OrdersModel extends Model
     public const STATUS_REFUND_CONFIRM = 7;
     public const STATUS_REFUNDING = 8;
     public const STATUS_REFUNDED = 9;
+    public const STATUS_PAID_PENDING_PICKUP = 10;
 
     public static function getStatusOptions()
     {
@@ -100,6 +101,7 @@ class OrdersModel extends Model
             self::STATUS_REFUND_CONFIRM => 'Chờ hoàn tiền',
             self::STATUS_REFUNDING => 'Đang hoàn tiền',
             self::STATUS_REFUNDED => 'Đã hoàn tiền',
+            self::STATUS_PAID_PENDING_PICKUP => 'Đã thanh toán chờ lấy hàng',
         ];
     }
 
