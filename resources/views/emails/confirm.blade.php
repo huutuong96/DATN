@@ -80,7 +80,8 @@
         <p>Xin chào <b>{{ $user->fullname }}</b>,</p>
         <p>Cảm ơn bạn đã đăng ký tài khoản để truy cập và sử dụng các dịch vụ của website chúng tôi. Vui lòng nhấn nút bên dưới để xác nhận đăng ký tài khoản của bạn:</p>
         <div class="confirmation-button">
-            <a href="{{ route('confirm', ['token' => $token]) }}">Xác nhận đăng ký tài khoản</a>
+            {{-- <a href="{{ route('confirm', ['token' => $token]) }}">Xác nhận đăng ký tài khoản</a> --}}
+            <h1 style="color: #000000">{{ $verifyCode }}</h1>
         </div>
         <p>Mail này sẽ hết hạn trong 24 giờ.</p>
         <p>Nếu bạn không tạo tài khoản, vui lòng bỏ qua email này.</p>

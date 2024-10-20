@@ -16,10 +16,11 @@ class ConfirmMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $token)
+    public function __construct($user, $token, $verifyCode)
     {
         $this->user = $user;
         $this->token = $token;
+        $this->verifyCode = $verifyCode;
     }
 
     /**
@@ -42,6 +43,7 @@ class ConfirmMail extends Mailable
             with: [
                 'user' => $this->user,
                 'token' => $this->token,
+                'verifyCode' => $this->verifyCode,
             ],
         );
     }

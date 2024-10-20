@@ -408,7 +408,8 @@ Route::get('/search', function () {
                 Route::resource('users', AuthenController::class);
                 Route::get('user/me', [AuthenController::class, "me"]);
                 Route::post('user/change_password', [AuthenController::class, "change_password"]);
-                Route::patch('user/update_profile', [AuthenController::class, "update_profile"]);
+                Route::post('user/update_profile', [AuthenController::class, "update_profile"]);
+                Route::post('user/reset_password', [AuthenController::class, "reset_password"]);
 
                 Route::resource('orders', OrdersController::class);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
@@ -517,7 +518,7 @@ Route::get('/search', function () {
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
 });
-                Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
+            Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
@@ -527,6 +528,7 @@ Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, 
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
 Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
+Route::post('confirmVerifyCode', [AuthenController::class, "confirmVerifyCode"]);
 
 Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
@@ -561,3 +563,6 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
 
         Route::post('calculateOrderFees_giao_hang_nhanh', [PurchaseController::class, 'calculateOrderFees_giao_hang_nhanh']);
 
+        Route::get('/api/documentation', function () {
+            return view('swagger');
+        });

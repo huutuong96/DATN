@@ -23,7 +23,6 @@ use App\Jobs\UpdateStockAllVariant;
 use App\Jobs\UpdatePriceAllVariant;
 use App\Jobs\UpdateImageAllVariant;
 
-
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -31,11 +30,25 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::where('status', 1)
+        $status = 1;
+        if($request->status){
+            $status = $request->status;
+        }
+        $products = Product::where('status', $status)
         ->with(['images', 'colors'])  // Eager load images
         ->paginate(20);
+        $products->appends(['status' => $status]); // Append status to pagination links
+        if($request->status == 0){
+            $products = Product::
+            with(['images', 'colors'])  // Eager load images
+            ->paginate(20);
+            $products->appends(['status' => 0]); // Append status to pagination links
+        }
+
+
+
         if ($products->isEmpty()) {
             return response()->json(
                 [
@@ -100,6 +113,7 @@ class ProductController extends Controller
                 'length' => $request->length,
                 'weight' => $request->weight,
                 'width' => $request->width,
+                'show_price' => $request->price ?? $request->sale_price,
             ];
             $product = Product::create($dataInsert);
             foreach ($request->images as $image) {
@@ -144,6 +158,20 @@ class ProductController extends Controller
                         'value_id' => $attributeValue->id,
                     ];
                     $variantattribute = variantattribute::create($variantAttributeData);
+                }
+
+                $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
+                $highest_price = $product_variants_get_price->max('price');
+                $lowest_price = $product_variants_get_price->min('price');
+                if($highest_price == $lowest_price){
+                    $product->update([
+                        'show_price' => $highest_price,
+                    ]);
+                }
+                if($highest_price != $lowest_price){
+                    $product->update([
+                        'show_price' => $lowest_price . " - " . $highest_price,
+                    ]);
                 }
             }
             DB::commit();
@@ -369,7 +397,6 @@ class ProductController extends Controller
 
     public function updateVariant(Request $request, $id)
     {
-       
         $variant = product_variants::find($id);
         if (!$variant) {
             return response()->json([
@@ -385,7 +412,6 @@ class ProductController extends Controller
             'stock' => $request->stock ?? $variant->stock,
             'price' => $request->price ?? $variant->price,
             'images' => isset($imageData) ? json_encode($imageData) : $variant->images,
-            'is_deleted' => $request->is_deleted ?? $variant->is_deleted,
         ]);
         return response()->json([
             'status' => true,
@@ -420,7 +446,7 @@ class ProductController extends Controller
         $product = Product::with(['images', 'variants'])->find($id);
         $product->view_count += 1;
         $product->save();
-        
+
             $product->quantity = intval($product->quantity);
             $product->sold_count = intval($product->sold_count);
             $product->view_count = intval($product->view_count);
@@ -438,7 +464,7 @@ class ProductController extends Controller
             $product->update_version = intval($product->update_version);
             $product->price = intval($product->price);
             $product->sale_price = intval($product->sale_price);
-        
+
         foreach ($product->variants as $variant) {
             $variant->product_id = intval($variant->product_id);
             $variant->stock = intval($variant->stock);
@@ -503,7 +529,7 @@ class ProductController extends Controller
             'created_at' => $product->created_at,
             'updated_at' => now(),
             'update_version' => $product->update_version + 1,
-            'change_of' => json_encode($request->change_of ?? []) 
+            'change_of' => json_encode($request->change_of ?? [])
         ];
         try {
             $product->update($dataInsert);
@@ -535,7 +561,6 @@ class ProductController extends Controller
             ], 500);
         }
     }
-
 
     public function upload(Request $request){
         $imageUrls = [];
@@ -625,86 +650,10 @@ class ProductController extends Controller
             'message' => "Duyệt sản phẩm thành công",
         ], 200);
     }
-
-    public function updateProduct(Request $request, string $id)
-    // ProductRequest
-    {
-        $product = Product::find($id);
-        if (!$product) {
-            return response()->json([
-                'status' => false,
-                'message' => "Sản phẩm không tồn tại",
-            ], 404);
-        }
-
-        $user = JWTAuth::parseToken()->authenticate();
-        $cloudinary = new Cloudinary();
-
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $mainImageUrl = $uploadedImage['secure_url']; 
-        } else {
-            $mainImageUrl = $product->image;
-        }
-        // dd($request->change_of);
-        $dataInsert = [
-            'product_id' => $product->id,
-            'name' => $request->name ?? $product->name,
-            'sku' => $product->sku,
-            'slug' => $request->filled('slug') ?? $request->slug,
-            'description' => $request->description ?? $product->description,
-            'infomation' => $request->infomation ?? $product->infomation,
-            'price' => $request->price ?? $product->price,
-            'sale_price' => $request->sale_price ?? $product->sale_price,
-            'image' => $mainImageUrl,
-            'quantity' => $request->quantity ?? $product->quantity,
-            'parent_id' => $request->parent_id ?? $product->parent_id,
-            'update_by' => $user->id,
-            'category_id' => $request->category_id ?? $product->category_id,
-            'brand_id' => $request->brand_id ?? $product->brand_id,
-            'shop_id' => $request->shop_id ?? $product->shop_id,
-            'height' => $request->height ?? $product->height,
-            'length' => $request->length ?? $product->length,
-            'weight' => $request->weight ?? $product->weight,
-            'width' => $request->width ?? $product->width,
-            'created_at' => $product->created_at,
-            'updated_at' => now(),
-            'update_version' => $product->update_version + 1,
-            'change_of' => json_encode($request->change_of ?? []) ,
-        ];
-        try {
-            DB::table('update_product')->insert($dataInsert);
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                    $imageUrl = $uploadedImage['secure_url'];
-
-                    Image::create([
-                        'product_id' => $product->id,
-                        'url' => $imageUrl,
-                        'status' => 0,
-                    ]);
-                }
-            }
-            return response()->json([
-                'status' => true,
-                'message' => "Yêu cầu của bạn đã được gửi vui lòng chờ xét duyệt"
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => "Yêu cầu Cập nhật không thành công",
-                'error' => $th->getMessage(),
-            ], 500);
-        }
-    }
-
-
     public function handleUpdateProduct(Request $request, string $id)
     // ProductRequest
     {
-    
+
         try {
             if($request-> action == "ok"){
                 $newDT = DB::table("update_product")->where("product_id", $id)->first();
@@ -742,7 +691,7 @@ class ProductController extends Controller
                         };
                         $output["variants"] = $variants;
                     }
-                    
+
                 }
 
                 $notificationData = [
@@ -753,7 +702,7 @@ class ProductController extends Controller
                 ];
                 $notificationController = new NotificationController();
                 $notification = $notificationController->store(new Request($notificationData));
-               
+
             }else{
                 DB::table('update_product')->where('id', $newDT->id)->delete();
                 $notificationData = [
@@ -763,8 +712,7 @@ class ProductController extends Controller
                     'user_id' => $newData["shop_id"],
                 ];
                 $notificationController = new NotificationController();
-                $notification = $notificationController->store(new Request($notificationData));
-
+$notification = $notificationController->store(new Request($notificationData));
             }
             //---------------------------------
             return response()->json([
@@ -772,7 +720,7 @@ class ProductController extends Controller
                 'message' => "cập nhật thành công",
                 'product' => "ok",
             ], 200);
-            
+
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -785,8 +733,8 @@ class ProductController extends Controller
     public function updateFastProduct(Request $request, string $id)
     // ProductRequest
     {
-        
-        $ollDT = DB::table("products")->where("id", $id)->first(); 
+
+        $ollDT = DB::table("products")->where("id", $id)->first();
         $ollData = (array) $ollDT;
         DB::table('products_old')->insert($ollData);
         $user = JWTAuth::parseToken()->authenticate();
@@ -808,7 +756,7 @@ class ProductController extends Controller
         ];
         try {
             DB::table('products')->update($dataInsert);
-           
+
             return response()->json([
                 'status' => true,
                 'message' => "cập nhật san phẩm thành công"
@@ -821,4 +769,5 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
 }

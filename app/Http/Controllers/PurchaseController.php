@@ -179,7 +179,6 @@ class PurchaseController extends Controller
                 $PaymentsController = new PaymentsController();
                 $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
             }
-            dd('ok');
             SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
             return response()->json([
@@ -386,6 +385,7 @@ class PurchaseController extends Controller
             'ship_id' => $ship_id->id,
             'status' => $status,
         ]);
+        // dd($order);
         return $order;
     }
 
@@ -469,20 +469,20 @@ class PurchaseController extends Controller
 
     public function get_infomaiton_province_and_city()
     {
-        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
             'token' => $token, // Gắn token vào header
-        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province');
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province');
         $cities = $response->json();
         return $cities;
     }
 
     public function get_infomaiton_district()
     {
-        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
             'token' => $token, // Gắn token vào header
-        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district');
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district');
         $district = $response->json();
         return $district;
     }
@@ -490,10 +490,10 @@ class PurchaseController extends Controller
     {
         // Lấy district_id từ yêu cầu
         $districtId = $request->district_id;
-        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
             'token' => $token, // Gắn token vào header
-        ])->get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', [
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id', [
             'district_id' => $districtId, // Thêm district_id vào tham số truy vấn
         ]);
         $ward = $response->json();
@@ -502,10 +502,10 @@ class PurchaseController extends Controller
 
     public function get_infomaiton_services($shopData, $addressUser)
     {
-        $token = env('TOKEN_API_GIAO_HANG_NHANH');
+        $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
             'token' => $token, // Gắn token vào header
-        ])->get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services', [
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services', [
             "shop_id" => $shopData->shopid_GHN,
             "from_district"=> $shopData->district_id,
             "to_district"=> $addressUser->district_id

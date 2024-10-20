@@ -30,6 +30,7 @@ class UsersModel extends Authenticatable implements JWTSubject {
         'rank_id',
         'role_id',
         'status',
+        'verify_code',
     ];
 
     protected $hidden = [

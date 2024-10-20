@@ -20,10 +20,12 @@ class ConfirmMailRegister implements ShouldQueue
 
     protected $user;
     protected $token;
-    public function __construct($user, $token)
+    protected $verifyCode;
+    public function __construct($user, $token, $verifyCode)
     {
         $this->user = $user;
         $this->token = $token;
+        $this->verifyCode = $verifyCode;
     }
 
     /**
@@ -31,6 +33,6 @@ class ConfirmMailRegister implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->user->email)->send(new ConfirmMail($this->user, $this->token));
+        Mail::to($this->user->email)->send(new ConfirmMail($this->user, $this->token, $this->verifyCode));
     }
 }
