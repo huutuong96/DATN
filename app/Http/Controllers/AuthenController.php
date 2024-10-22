@@ -231,8 +231,8 @@ class AuthenController extends Controller
             'message' => "Đăng ký thành công, chưa kích hoạt",
             'user' => $user,
         ];
-        // Mail::to($user->email)->send(new ConfirmMail($user, $token));
-        ConfirmMailRegister::dispatch($user, $token, $verifyCode);
+        Mail::to($user->email)->send(new ConfirmMail($user, $token));
+        // ConfirmMailRegister::dispatch($user, $token, $verifyCode);
         return response()->json($dataDone, 201);
     }
 
