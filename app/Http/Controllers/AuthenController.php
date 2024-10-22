@@ -548,8 +548,8 @@ class AuthenController extends Controller
             $shop = Shop::where('owner_id', $user_present->id)->first();
             $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
 
-            $user_present->shop_id = $shop->id;
-            $user_present->cart_id = $cartUser->id;
+            $user_present->shop_id = $shop?->id;
+            $user_present->cart_id = $cartUser?->id;
 
             return response()->json([
                 'status' => 'success',
