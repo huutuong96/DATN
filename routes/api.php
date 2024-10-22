@@ -518,7 +518,8 @@ Route::get('/search', function () {
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
 });
-            Route::get('/checkoutdone', [PaymentsController::class, "checkoutdone"]);
+
+            Route::get('/checkoutdone', [PurchaseController::class, "checkoutdone"]);
 
 
 Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
