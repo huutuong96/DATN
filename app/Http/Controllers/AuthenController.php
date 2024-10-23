@@ -268,9 +268,9 @@ class AuthenController extends Controller
  *     )
  * )
  */
-    public function confirm($token)
+    public function confirm(Request $request)
     {
-        $user = UsersModel::where('refesh_token', $token)->first();
+        $user = UsersModel::where('refesh_token', $request->token)->first();
         if ($user) {
             $user->update([
                 'status' => 1,
