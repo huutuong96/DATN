@@ -528,7 +528,7 @@ Route::post('user/restore_account', [AuthenController::class, 'restore_account']
 Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, "confirm_restore_account"])->name('confirm_restore_account');
 Route::post('users/register', [AuthenController::class, "register"]);
 Route::post('users/login', [AuthenController::class, "login"]);
-Route::get('confirm/{token}', [AuthenController::class, "confirm"])->name('confirm');
+Route::post('confirm', [AuthenController::class, "confirm"])->name('confirm');
 Route::post('confirmVerifyCode', [AuthenController::class, "confirmVerifyCode"]);
 
 Route::get('/', function () {
