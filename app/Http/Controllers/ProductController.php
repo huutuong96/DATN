@@ -772,7 +772,8 @@ $notification = $notificationController->store(new Request($notificationData));
 
     public function variantattribute(Request $request, $shop_id, $id)
     {
-        $variantattribute = variantattribute::where('product_id', $id)->where('shop_id', $shop_id)->get();
+        $variantattribute = variantattribute::where('product_id', $id)->where('shop_id', $shop_id)->with("variant")->get();
+        
         foreach ($variantattribute as $value) {
             $value->attribute_id = intval($value->attribute_id);
             $value->value_id = intval($value->value_id);
