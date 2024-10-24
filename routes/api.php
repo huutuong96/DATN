@@ -547,6 +547,7 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
         // NO Auth
         Route::get('products/{id}', [ProductController::class, 'show']);
         Route::get('products', [ProductController::class, 'index']);
+        Route::get('variantattribute', [ProductController::class, 'variantattribute']);
         Route::get('shops', [ShopController::class, 'index']);
         Route::get('shops/{id}', [ShopController::class, 'show']);
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);

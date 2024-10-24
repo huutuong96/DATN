@@ -770,4 +770,14 @@ $notification = $notificationController->store(new Request($notificationData));
         }
     }
 
+    public function variantattribute(Request $request, $id)
+    {
+        $variantattribute = variantattribute::all();
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $variantattribute,
+        ]);
+    }
+
 }
