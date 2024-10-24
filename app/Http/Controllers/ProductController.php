@@ -772,7 +772,7 @@ $notification = $notificationController->store(new Request($notificationData));
 
     public function variantattribute(Request $request, $id)
     {
-        $variantattribute = variantattribute::all();
+        $variantattribute = variantattribute::where('product_id', $id)->get();
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
