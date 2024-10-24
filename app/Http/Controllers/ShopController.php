@@ -116,7 +116,7 @@ class ShopController extends Controller
         }
     }
 
-    public function store(ShopRequest $request)
+    public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
         $shopExist = Shop::where('create_by', $user->id)->first();
