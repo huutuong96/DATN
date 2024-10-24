@@ -107,7 +107,7 @@ class ProductController extends Controller
                 'quantity' => $request->stock ?? 0,
                 'create_by' => $user->id,
                 'category_id' => $request->category_id,
-                'brand_id' => $request->brand ?? null,
+                'brand' => $request->brand ?? null,
                 'shop_id' => $request->shop_id,
                 'height' => $request->height,
                 'length' => $request->length,
