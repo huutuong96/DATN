@@ -324,7 +324,7 @@ Route::get('/search', function () {
 
                 Route::resource('ships',ShipsController::class);//chu ro lam nen chua bat premission
 
-                Route::get('brands/client', [BrandsController::class, "index"]);
+                
                 Route::resource('brands',BrandsController::class)->middleware('CheckRole:Admin');
 
                 Route::get('colors/client', [ColorsController::class, "index"]);
