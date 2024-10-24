@@ -427,7 +427,6 @@ Route::get('/search', function () {
             Route::post('products/{id}', [ProductController::class, 'update']);
             Route::post('product/upload', [ProductController::class, 'upload']);
             // Route::delete('products/{id}', [ProductController::class, 'destroy']);
-            Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
 
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
@@ -545,6 +544,7 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
 
 
         // NO Auth
+        Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
         Route::get('products/{id}', [ProductController::class, 'show']);
         Route::get('products', [ProductController::class, 'index']);
         Route::get('variantattribute/{shop_id}/{id}', [ProductController::class, 'variantattribute']);
