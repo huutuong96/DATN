@@ -541,6 +541,7 @@ class AuthenController extends Controller
  */
     public function me()
     {
+
         try {
             $user_present = JWTAuth::parseToken()->authenticate();
             $shop = Shop::where('owner_id', $user_present->id)->first();

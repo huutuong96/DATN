@@ -123,33 +123,33 @@ class ShopController extends Controller
         if ($shopExist) {
             return $this->errorResponse("Bạn đã tạo shop rồi, không thể tạo shop khác");
         }
-        $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
-        $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
-        $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
+        // $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
+        // $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
+        // $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
         try {
             DB::beginTransaction();
             $dataInsert = [
-                'shop_name' => $request->shop_name,
-                'pick_up_address' => $request->pick_up_address ?? $request->location,
-                'slug' => $request->slug ?? Str::slug($request->shop_name),
+                'shop_name' => $request->name,
+                'pick_up_address' => $request->address_shop,
+                'slug' => $request->slug ?? Str::slug($request->shop_name . - . $user->id),
                 'cccd' => $request->cccd,
-                'status' => 101,
+                'status' => 1,
                 'create_by' => $user->id,
-                'tax_id' => $request->tax_id,
+                'tax_id' => $request->tax_id ?? null,
                 'owner_id' => $user->id,
                 'visits' => 0,
                 'revenue' => 0,
                 'rating' => 0,
-                'location' => $request->location,
-                'email' => $request->email,
+                'location' => $request->location ?? $request->address_shop,
+                'email' => $request->email ?? $user->email,
                 'description' => $request->description,
-                'contact_number' => $request->contact_number,
-                'province' => $filteredCity['ProvinceName'],
-                'province_id' => $filteredCity['ProvinceID'],
-                'district' => $filteredDistrict['DistrictName'],
-                'district_id' => $filteredDistrict['DistrictID'],
-                'ward' => $filledWard['WardName'],
-                'ward_id' => $filledWard['WardCode'],
+                'contact_number' => $request->phone,
+                'province' => $filteredCity['ProvinceName'] ?? null,
+                'province_id' => $request->province_id,
+                'district' => $filteredDistrict['DistrictName'] ?? null,
+                'district_id' => $request->district_id,
+                'ward' => $filledWard['WardName'] ?? null,
+                'ward_id' => $request->ward_id,
             ];
 
             if ($request->hasFile('image')) {
@@ -158,30 +158,13 @@ class ShopController extends Controller
                 $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
                 $dataInsert['image'] = $uploadedImage['secure_url'];
             }
-            $tax = Tax::find($request->tax_id);
-            if (!$tax) {
-                return $this->errorResponse("Mã số thuế không tồn tại");
-            }
-            $dataInsert['tax_id'] = $tax->id;
             $Shop = Shop::create($dataInsert);
-            $shop_manager = $this->shop_manager_store($Shop, $user->id, 'owner', 1);
-
-            $learningInsert = [
-                'learn_id' => $request->learn_id,
-                'shop_id' => $Shop->id,
-                'status' => 101, // Chưa học
-                'create_by' => $user->id
-            ];
-            $learning_seller = Learning_sellerModel::create($learningInsert);
-
+            // $shop_manager = $this->shop_manager_store($Shop, $user->id, 'owner', 1);
 
             DB::commit();
             return $this->successResponse("Tạo Shop thành công", [
                 'data' => [
                     'Shop' => $Shop,
-                    'Message' => 'Bạn phải hoàn thành khóa học dành cho seller',
-                    'Learning_seller' => $learning_seller,
-                    'shop_manager' => $shop_manager,
                 ],
             ]);
         } catch (\Throwable $th) {
