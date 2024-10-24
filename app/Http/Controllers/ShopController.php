@@ -131,7 +131,7 @@ class ShopController extends Controller
             $dataInsert = [
                 'shop_name' => $request->name,
                 'pick_up_address' => $request->address_shop,
-                'slug' => $request->slug ?? Str::slug($request->shop_name . - . $user->id),
+                'slug' => $request->slug ?? Str::slug($request->shop_name .'-'. $user->id),
                 'cccd' => $request->cccd,
                 'status' => 1,
                 'create_by' => $user->id,
