@@ -522,14 +522,18 @@ Route::get('/search', function () {
             Route::get('/checkoutdone', [PurchaseController::class, "checkoutdone"]);
 
 
-Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
-Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
-Route::post('user/restore_account', [AuthenController::class, 'restore_account']);
-Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, "confirm_restore_account"])->name('confirm_restore_account');
-Route::post('users/register', [AuthenController::class, "register"]);
-Route::post('users/login', [AuthenController::class, "login"]);
-Route::post('confirm', [AuthenController::class, "confirm"])->name('confirm');
-Route::post('confirmVerifyCode', [AuthenController::class, "confirmVerifyCode"]);
+                Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
+                Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
+                Route::post('user/restore_account', [AuthenController::class, 'restore_account']);
+                Route::post('users/login', [AuthenController::class, "login"]);
+                Route::post('confirm', [AuthenController::class, "confirm"])->name('confirm');
+                Route::post('confirmVerifyCode', [AuthenController::class, "confirmVerifyCode"]);
+
+            Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, "confirm_restore_account"])->name('confirm_restore_account');
+            Route::post('users/register', [AuthenController::class, "register"]);
+
+
+
 
 Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
