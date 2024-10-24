@@ -116,7 +116,7 @@ class ShopController extends Controller
         }
     }
 
-    public function store(ShopRequest $request)
+    public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
         $shopExist = Shop::where('create_by', $user->id)->first();
@@ -131,7 +131,7 @@ class ShopController extends Controller
             $dataInsert = [
                 'shop_name' => $request->name,
                 'pick_up_address' => $request->address_shop,
-                'slug' => $request->slug ?? Str::slug($request->shop_name . - . $user->id),
+                'slug' => $request->slug ?? Str::slug($request->shop_name .'-'. $user->id),
                 'cccd' => $request->cccd,
                 'status' => 1,
                 'create_by' => $user->id,
@@ -144,11 +144,11 @@ class ShopController extends Controller
                 'email' => $request->email ?? $user->email,
                 'description' => $request->description,
                 'contact_number' => $request->phone,
-                'province' => $filteredCity['ProvinceName'] ?? null,
+                'province' => $request->province ?? null,
                 'province_id' => $request->province_id,
-                'district' => $filteredDistrict['DistrictName'] ?? null,
+                'district' => $request->district ?? null,
                 'district_id' => $request->district_id,
-                'ward' => $filledWard['WardName'] ?? null,
+                'ward' => $request->ward ?? null,
                 'ward_id' => $request->ward_id,
             ];
 

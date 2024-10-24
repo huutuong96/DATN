@@ -24,12 +24,12 @@ class ShopRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shop_name' => 'required|string',
-            'pickup_address' => 'nullable|string',
-            'image' => 'url',
-            'tax_id' => 'required|numeric',
-            'cccd' => 'required|string',
-            'status' => 'integer',
+            // 'shop_name' => 'required|string',
+            // 'pickup_address' => 'nullable|string',
+            // 'image' => 'url',
+            // 'tax_id' => 'required|numeric',
+            // 'cccd' => 'required|string',
+            // 'status' => 'integer',
         ];
     }
 
