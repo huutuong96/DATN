@@ -16,6 +16,7 @@ class CheckStatusUser
     public function handle(Request $request, Closure $next): Response
     {
         $user = JWTAuth::parseToken()->authenticate();
+
         if (!$user) {
             return response()->json([
                 'status' => 'error',
@@ -28,6 +29,10 @@ class CheckStatusUser
                 'message' => 'Tài khoản đã bị tạm khóa',
             ], 401);
         }
-        return $next($request);
+
+        if ($user->status == 1) {
+            return $next($request);
+        }
+
     }
 }
