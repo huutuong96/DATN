@@ -788,12 +788,14 @@ $notification = $notificationController->store(new Request($notificationData));
                 $addedattributevalueIds[] = $vaAttribute->value_id;
             }
         }
-        $variantattribute['attribute'] = $Attribute;
-        $variantattribute['value'] = $attributevalue;
+        $data = [];
+        $data['attribute'] = $Attribute;
+        $data['value'] = $attributevalue;
+        $data['data'] = $variantattribute;
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
-            'data' => $variantattribute,
+            'data' => $data,
         ]);
     }
 

@@ -17,7 +17,6 @@ class attributevalue extends Model
     ];
 
     protected $hidden = [
-        'attribute_id',
         'created_at',
         'updated_at',
     ];
