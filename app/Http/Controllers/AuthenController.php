@@ -373,7 +373,8 @@ class AuthenController extends Controller
             return response()->json(['error' => 'Không thể tạo token'], 500);
         }
         $user = JWTAuth::user();
-        if ($user->status == 1) {
+        // dd($user);
+        if ($user->status == 101) {
             return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
         }
 
