@@ -19,6 +19,16 @@ class Attribute extends Model
         'is_deleted',
     ];
 
+    protected $hidden = [
+        'display_name',
+        'type',
+        'deleted_at',
+        'deleted_by',
+        'is_deleted',
+        'created_at',
+        'updated_at',
+    ];
+
     protected $casts = [
         'is_deleted' => 'boolean',
         'deleted_at' => 'datetime',

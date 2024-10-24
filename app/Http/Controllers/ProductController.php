@@ -770,16 +770,26 @@ $notification = $notificationController->store(new Request($notificationData));
         }
     }
 
-    public function variantattribute(Request $request, $id)
+    public function variantattribute(Request $request, $shop_id, $id)
     {
-        $variantattribute = variantattribute::where('product_id', $id)->get();
-        foreach ($variantattribute as $va) {
-            $va->variant_id = intval($va->variant_id);
-            $va->attribute_id = intval($va->attribute_id);
-            $va->value_id = intval($va->value_id);
-            $va->shop_id = intval($va->shop_id);
-            $va->product_id = intval($va->product_id);
+        $variantattribute = variantattribute::where('product_id', $id)->where('shop_id', $shop_id)->get();
+        $attributevalue = [];
+        $Attribute = [];
+        $addedAttributeIds = [];
+        $addedattributevalueIds = [];
+        foreach ($variantattribute as $vaAttribute) {
+            $attribute = Attribute::where('id', $vaAttribute->attribute_id)->get();
+            if (!in_array($vaAttribute->attribute_id, $addedAttributeIds)) {
+                $Attribute[] = $attribute;
+                $addedAttributeIds[] = $vaAttribute->attribute_id;
+            }
+            if (!in_array($vaAttribute->value_id, $addedattributevalueIds)) {
+                $attributevalue[] = attributevalue::where('id', $vaAttribute->value_id)->get();
+                $addedattributevalueIds[] = $vaAttribute->value_id;
+            }
         }
+        $variantattribute['attribute'] = $Attribute;
+        $variantattribute['value'] = $attributevalue;
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",

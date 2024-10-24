@@ -16,6 +16,12 @@ class attributevalue extends Model
         'attribute_id',
     ];
 
+    protected $hidden = [
+        'attribute_id',
+        'created_at',
+        'updated_at',
+    ];
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

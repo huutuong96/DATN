@@ -372,7 +372,10 @@ class AuthenController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' => 'Không thể tạo token'], 500);
         }
-        $user = JWTAuth::user();
+        $user = UsersModel::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['error' => 'Tài khoản không tồn tại'], 404);
+        }
         if ($user->status == 101) {
             return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
         }
