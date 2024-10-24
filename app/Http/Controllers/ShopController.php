@@ -144,11 +144,11 @@ class ShopController extends Controller
                 'email' => $request->email ?? $user->email,
                 'description' => $request->description,
                 'contact_number' => $request->phone,
-                'province' => $filteredCity['ProvinceName'] ?? null,
+                'province' => $request->province ?? null,
                 'province_id' => $request->province_id,
-                'district' => $filteredDistrict['DistrictName'] ?? null,
+                'district' => $request->district ?? null,
                 'district_id' => $request->district_id,
-                'ward' => $filledWard['WardName'] ?? null,
+                'ward' => $request->ward ?? null,
                 'ward_id' => $request->ward_id,
             ];
 
