@@ -203,12 +203,7 @@ class AuthenController extends Controller
     public function register(UserRequest $request)
     {
         $existingUser = UsersModel::where('email', $request->email)->first();
-        if ($existingUser) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Email đã tồn tại.',
-            ], 422);
-        }
+
         $dataInsert = [
             "fullname" => $request->fullname,
             "password" => Hash::make($request->password),
@@ -370,7 +365,6 @@ class AuthenController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
@@ -378,8 +372,14 @@ class AuthenController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' => 'Không thể tạo token'], 500);
         }
+        $user = UsersModel::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['error' => 'Tài khoản không tồn tại'], 404);
+        }
+        if ($user->status == 101) {
+            return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
+        }
 
-        $user = JWTAuth::user();
         $user->refesh_token = $token;
         $user->save();
 
@@ -544,6 +544,7 @@ class AuthenController extends Controller
  */
     public function me()
     {
+
         try {
             $user_present = JWTAuth::parseToken()->authenticate();
             $shop = Shop::where('owner_id', $user_present->id)->first();

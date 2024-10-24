@@ -30,10 +30,11 @@ class variantattribute extends Model
         return $this->belongsTo(Attribute::class);
     }
 
-    public function value()
+    public function values()
     {
-        return $this->belongsTo(Value::class);
+        return $this->hasMany(attributevalue::class);
     }
+
     public function product()
     {
         return $this->belongsTo(Product::class);

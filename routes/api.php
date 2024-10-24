@@ -427,7 +427,6 @@ Route::get('/search', function () {
             Route::post('products/{id}', [ProductController::class, 'update']);
             Route::post('product/upload', [ProductController::class, 'upload']);
             // Route::delete('products/{id}', [ProductController::class, 'destroy']);
-            Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
 
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
@@ -522,14 +521,18 @@ Route::get('/search', function () {
             Route::get('/checkoutdone', [PurchaseController::class, "checkoutdone"]);
 
 
-Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
-Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
-Route::post('user/restore_account', [AuthenController::class, 'restore_account']);
-Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, "confirm_restore_account"])->name('confirm_restore_account');
-Route::post('users/register', [AuthenController::class, "register"]);
-Route::post('users/login', [AuthenController::class, "login"]);
-Route::post('confirm', [AuthenController::class, "confirm"])->name('confirm');
-Route::post('confirmVerifyCode', [AuthenController::class, "confirmVerifyCode"]);
+                Route::post('user/fogot_password', [AuthenController::class, "fogot_password"]);
+                Route::get('user/confirm_mail_change_password/{token}/{email}', [AuthenController::class, "confirm_mail_change_password"])->name('confirm_mail_change_password');
+                Route::post('user/restore_account', [AuthenController::class, 'restore_account']);
+                Route::post('users/login', [AuthenController::class, "login"]);
+                Route::post('confirm', [AuthenController::class, "confirm"])->name('confirm');
+                Route::post('confirmVerifyCode', [AuthenController::class, "confirmVerifyCode"]);
+
+            Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, "confirm_restore_account"])->name('confirm_restore_account');
+            Route::post('users/register', [AuthenController::class, "register"]);
+
+
+
 
 Route::get('/', function () {
     return response()->json(['message' => 'Đây là API VNSHOP']);
@@ -541,8 +544,10 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
 
 
         // NO Auth
+        Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
         Route::get('products/{id}', [ProductController::class, 'show']);
         Route::get('products', [ProductController::class, 'index']);
+        Route::get('variantattribute/{shop_id}/{id}', [ProductController::class, 'variantattribute']);
         Route::get('shops', [ShopController::class, 'index']);
         Route::get('shops/{id}', [ShopController::class, 'show']);
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);

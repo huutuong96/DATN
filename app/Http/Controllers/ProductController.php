@@ -107,7 +107,7 @@ class ProductController extends Controller
                 'quantity' => $request->stock ?? 0,
                 'create_by' => $user->id,
                 'category_id' => $request->category_id,
-                'brand_id' => $request->brand ?? null,
+                'brand' => $request->brand ?? null,
                 'shop_id' => $request->shop_id,
                 'height' => $request->height,
                 'length' => $request->length,
@@ -768,6 +768,33 @@ $notification = $notificationController->store(new Request($notificationData));
                 'error' => $th->getMessage(),
             ], 500);
         }
+    }
+
+    public function variantattribute(Request $request, $shop_id, $id)
+    {
+        $variantattribute = variantattribute::where('product_id', $id)->where('shop_id', $shop_id)->get();
+        $attributevalue = [];
+        $Attribute = [];
+        $addedAttributeIds = [];
+        $addedattributevalueIds = [];
+        foreach ($variantattribute as $vaAttribute) {
+            $attribute = Attribute::where('id', $vaAttribute->attribute_id)->get();
+            if (!in_array($vaAttribute->attribute_id, $addedAttributeIds)) {
+                $Attribute[] = $attribute;
+                $addedAttributeIds[] = $vaAttribute->attribute_id;
+            }
+            if (!in_array($vaAttribute->value_id, $addedattributevalueIds)) {
+                $attributevalue[] = attributevalue::where('id', $vaAttribute->value_id)->get();
+                $addedattributevalueIds[] = $vaAttribute->value_id;
+            }
+        }
+        $variantattribute['attribute'] = $Attribute;
+        $variantattribute['value'] = $attributevalue;
+        return response()->json([
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $variantattribute,
+        ]);
     }
 
 }
