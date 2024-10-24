@@ -773,6 +773,13 @@ $notification = $notificationController->store(new Request($notificationData));
     public function variantattribute(Request $request, $id)
     {
         $variantattribute = variantattribute::where('product_id', $id)->get();
+        foreach ($variantattribute as $va) {
+            $va->variant_id = intval($va->variant_id);
+            $va->attribute_id = intval($va->attribute_id);
+            $va->value_id = intval($va->value_id);
+            $va->shop_id = intval($va->shop_id);
+            $va->product_id = intval($va->product_id);
+        }
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
