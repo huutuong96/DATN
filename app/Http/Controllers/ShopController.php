@@ -129,7 +129,7 @@ class ShopController extends Controller
         try {
             DB::beginTransaction();
             $dataInsert = [
-                'shop_name' => $request->name,
+                'shop_name' => $request->shop_name,
                 'pick_up_address' => $request->address_shop,
                 'slug' => $request->slug ?? Str::slug($request->shop_name .'-'. $user->id),
                 'cccd' => $request->cccd,
