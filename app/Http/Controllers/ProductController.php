@@ -798,7 +798,6 @@ $notification = $notificationController->store(new Request($notificationData));
         $data = [];
         $data['attribute'] = $Attribute;
         $data['value'] = $attributevalue;
-        $data['data'] = $variantattribute;
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
