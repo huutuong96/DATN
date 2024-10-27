@@ -12,6 +12,7 @@ class product_variants extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'product_id',
+        'name',
         'sku',
         'stock',
         'price',

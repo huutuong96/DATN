@@ -141,6 +141,7 @@ class ProductController extends Controller
                         $attributeValue = attributevalue::create($attributeValueData);
                     }
                 }
+                // $attributeValue = attributevalue::where()
                 foreach ($request->variant['variantProducts'] as $variant) {
                     $product_variantsData = [
                         'product_id' => $product->id,
@@ -150,7 +151,14 @@ class ProductController extends Controller
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
-
+                    $values = [];
+                    foreach ($variant['variants'] as $item) {
+                        $values[] = $item['value'];
+                    }
+                    $concatenated_values = implode(', ', $values);
+                    $product_variants->update([
+                        'name' => $concatenated_values,
+                    ]);
                     $variantAttributeData = [
                         'variant_id' => $product_variants->id,
                         'product_id' => $product->id,
@@ -175,7 +183,7 @@ class ProductController extends Controller
                     ]);
                 }
             }
-            DB::commit();
+            // DB::commit();
             return response()->json([
                 'status' => true,
                 'message' => "Sản phẩm đã được lưu",
