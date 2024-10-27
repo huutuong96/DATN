@@ -89,7 +89,8 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // return $request->all();
+        // dd($request->images);
+
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -123,7 +124,7 @@ class ProductController extends Controller
                     'status' => 1,
                 ]);
             }
-            // return $request->variant;
+            // dd($request->variant['variantItems']);
             if($request->variant != null){
                 foreach ($request->variant['variantItems'] as $attribute) {
 
