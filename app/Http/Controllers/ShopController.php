@@ -529,6 +529,7 @@ class ShopController extends Controller
             ], 404);
         }
         $product = Product::where('shop_id', $shop->id)->get();
+        $product->load('variants');
         return response()->json([
             'status' => true,
             'message' => 'Lấy sản phẩm thành công',
