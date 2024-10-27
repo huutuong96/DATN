@@ -430,7 +430,7 @@ Route::get('/search', function () {
             // Route::delete('products/{id}', [ProductController::class, 'destroy']);
 
             Route::put('products/{id}', [ProductController::class, 'update']);
-            route::get('shop/product/remove', [ProductController::class, 'shop_remove_product']);
+            route::delete('shop/product/remove/{id}', [ShopController::class, 'shop_remove_product']);
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
 
