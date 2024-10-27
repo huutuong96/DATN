@@ -532,11 +532,13 @@ class ShopController extends Controller
 
         if ($request->status) {
             $status = $request->status;
-            $product = Product::where('shop_id', $shop->id)->where('status', $status)->paginate(20);
+            $product = Product::where('shop_id', $shop->id)
+                              ->where('status', $status)
+                              ->where('status', '!=', 5)
+                              ->paginate(20);
             $product->appends(['status' => $status]);
-        }
         if ($request->status == 1) {
-            $product = Product::where('shop_id', $shop->id)->paginate(20);
+            $product = Product::where('shop_id', $shop->id)->where('status', '!=', 5)->paginate(20);
         }
 
         $product->load('variants', 'attributes' );
@@ -1039,5 +1041,19 @@ class ShopController extends Controller
         $orderLeadTime = collect($response->json());
         $formattedTime = date('Y-m-d H:i:s', $orderLeadTime['data']['leadtime']);
         return $formattedTime;
+    }
+
+    public function shop_remove_product(Request $request, string $id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return $this->errorResponse('Sản phẩm không tồn tại', 404);
+        }
+        $product->status = 5;
+        $product->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Xóa sản phẩm thành công',
+        ], 200);
     }
 }

@@ -38,6 +38,8 @@ class Product extends Model
         'width',
         'version',
         'show_price',
+        'status',
+        'is_delete',
     ];
 
 
