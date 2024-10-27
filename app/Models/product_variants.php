@@ -34,8 +34,8 @@ class product_variants extends Model
     }
     public function attributes()
     {
-        return $this->belongsToMany(Attribute::class, 'variantattribute', 'variant_id', 'attribute_id')
-                    ->withPivot('value_id', 'shop_id', 'product_id');
+        return $this->belongsToMany(Attribute::class, 'variantattribute', 'variant_id', 'attribute_id', 'value_id')
+                    ->withPivot('variant_id', 'attribute_id', 'value_id');
     }
     public function images()
     {
