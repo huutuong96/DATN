@@ -1044,11 +1044,14 @@ class ShopController extends Controller
         return $formattedTime;
     }
 
-    public function shop_remove_product(Request $request, string $id)
+    public function shop_remove_product(string $id)
     {
         $product = Product::find($id);
         if (!$product) {
-            return $this->errorResponse('Sản phẩm không tồn tại', 404);
+            return response()->json([
+                'status' => false,
+                'message' => 'Sản phẩm không tồn tại',
+            ], 404);
         }
         $product->status = 5;
         $product->save();
