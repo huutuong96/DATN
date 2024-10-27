@@ -530,15 +530,16 @@ class ShopController extends Controller
             ], 404);
         }
         $product = Product::where('shop_id', $shop->id)->get();
-        $status = 1;
+        $status = 3;
+        if($status == 3){
+            $product = Product::where('shop_id', $shop->id)->paginate(20);
+        }
         if ($request->status) {
             $status = $request->status;
             $product = Product::where('shop_id', $shop->id)->where('status', $status)->paginate(20);
             $product->appends(['status' => $status]);
         }
-        if($request->status == 3){
-            $product = Product::where('shop_id', $shop->id)->paginate(20);
-        }
+
         $product->load('variants', 'attributes' );
         return response()->json([
             'status' => true,
