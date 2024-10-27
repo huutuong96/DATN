@@ -90,7 +90,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         // dd($request->images);
-
+        // dd($request->images[0]);
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -104,7 +104,7 @@ class ProductController extends Controller
                 'infomation' => json_encode($request->infomation),
                 'price' => $request->price,
                 'sale_price' => $request->sale_price ?? null,
-                'image' => $request->thumbnail ?? null,
+                'image' => $request->images[0] ?? null,
                 'quantity' => $request->stock ?? 0,
                 'create_by' => $user->id,
                 'category_id' => $request->category_id,
