@@ -519,7 +519,7 @@ class ShopController extends Controller
         return $this->successResponse("Cập nhật trạng thái đơn hàng thành công", $order);
     }
 
-    public function get_product_to_shop(Request $request string $id)
+    public function get_product_to_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
