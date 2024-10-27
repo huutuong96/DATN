@@ -183,7 +183,7 @@ class ProductController extends Controller
                     ]);
                 }
             }
-            // DB::commit();
+            DB::commit();
             return response()->json([
                 'status' => true,
                 'message' => "Sản phẩm đã được lưu",
