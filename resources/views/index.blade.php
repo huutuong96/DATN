@@ -1190,11 +1190,17 @@
                                     <span data-key="t-dashboards"
                                         >Danh sách cửa hàng</span>
                                 </a>
-                                    </ul>
-                                </div>
                             </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="{{ route('product-waiting-approval', , ['token' => $token]) }}">
+                                    <i class="ri-dashboard-3-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Sản phẩm chờ duyệt</span>
+                                </a>
 
-
+                            </li>
                         </ul>
                     </div>
                     <!-- Sidebar -->

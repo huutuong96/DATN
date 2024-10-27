@@ -648,17 +648,11 @@ class ProductController extends Controller
     public function approve_product(Request $request, $id){
         $product = Product::find($id);
         if(!$product){
-            return response()->json([
-                'status' => false,
-                'message' => "Không tồn tại sản phẩm nào",
-            ], 404);
+            return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
         }
         $product->status = 1;
         $product->save();
-        return response()->json([
-            'status' => true,
-            'message' => "Duyệt sản phẩm thành công",
-        ], 200);
+        return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
     public function handleUpdateProduct(Request $request, string $id)
     // ProductRequest
@@ -814,5 +808,14 @@ $notification = $notificationController->store(new Request($notificationData));
             'data' => $data,
         ]);
     }
+
+    public function productWaitingApproval()
+    {
+        $products = Product::where('status', 0)
+            ->with(['images', 'variants'])  // Eager load images
+            ->paginate(20);
+        return view('products.list_product', ['products' => $products]);
+    }
+
 
 }

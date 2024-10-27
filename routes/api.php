@@ -422,7 +422,7 @@ Route::get('/search', function () {
             Route::get('user_get_message', [MessageController::class, "user_get_message"]);
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
-            Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
+            Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
             Route::post('products', [ProductController::class, 'store']);
 
             Route::post('products/{id}', [ProductController::class, 'update']);
