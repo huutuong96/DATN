@@ -1185,7 +1185,7 @@
                             <li class="nav-item">
                                 <a
                                     class="nav-link menu-link"
-                                    href="#sidebarDashboards">
+                                    href="{{ route('store', ['token' => auth()->user()->refesh_token]) }}">
                                     <i class="ri-dashboard-2-line"></i>
                                     <span data-key="t-dashboards"
                                         >Danh sách cửa hàng</span>
@@ -1194,7 +1194,7 @@
                             <li class="nav-item">
                                 <a
                                     class="nav-link menu-link"
-                                    href="{{ route('product-waiting-approval', , ['token' => $token]) }}">
+                                    href="{{ route('product-waiting-approval', ['token' => auth()->user()->refesh_token]) }}">
                                     <i class="ri-dashboard-3-line"></i>
                                     <span data-key="t-dashboards"
                                         >Sản phẩm chờ duyệt</span>

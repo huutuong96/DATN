@@ -411,13 +411,13 @@ class AuthenController extends Controller
         if ($user->status == 101) {
             return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
         }
-
+        $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
         $user->save();
         $user->load('role');
-        $user = Auth::user();
-        $tokenSession = session('token', $token);
-        return redirect()->route('dashboard', ['token' => $token]);
+        $user = auth::user();
+        // dd(auth()->user()->refesh_token);
+        return redirect()->route('dashboard', ['token' => auth()->user()->refesh_token]);
     }
 
     public function show(string $id)
