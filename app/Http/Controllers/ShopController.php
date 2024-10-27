@@ -521,6 +521,7 @@ class ShopController extends Controller
 
     public function get_product_to_shop(Request $request, string $id)
     {
+        // dd($request->status);
         $shop = Shop::find($id);
         if (!$shop) {
             return response()->json([
@@ -529,9 +530,12 @@ class ShopController extends Controller
             ], 404);
         }
         $product = Product::where('shop_id', $shop->id)->get();
+        $status = 1;
         if ($request->status) {
-            $product->where('status', $request->status);
+            $status = $request->status;
+            $product = Product::where('shop_id', $shop->id)->where('status', $status)->paginate(10);
         }
+        $product->appends(['status' => $status]);
         $product->load('variants', 'attributes' );
         return response()->json([
             'status' => true,
