@@ -136,7 +136,7 @@ class ProductController extends Controller
                     foreach ($attribute['values'] as $value) {
                         $attributeValueData = [
                             'attribute_id' => $attributeId->id,
-                            'value' => $value,
+                            'value' => $value['value'],
                         ];
                         $attributeValue = attributevalue::create($attributeValueData);
                     }
@@ -145,7 +145,7 @@ class ProductController extends Controller
                     $product_variantsData = [
                         'product_id' => $product->id,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
-                        'stock' => $variant['inStock'] ?? $request->inStock,
+                        'stock' => $variant['stock'] ?? $request->stock,
                         'price' => $variant['price'] ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
