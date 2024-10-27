@@ -324,7 +324,7 @@ Route::get('/search', function () {
 
                 Route::resource('ships',ShipsController::class);//chu ro lam nen chua bat premission
 
-                
+
                 Route::resource('brands',BrandsController::class)->middleware('CheckRole:Admin');
 
                 Route::get('colors/client', [ColorsController::class, "index"]);
@@ -410,6 +410,7 @@ Route::get('/search', function () {
                 Route::post('user/change_password', [AuthenController::class, "change_password"]);
                 Route::post('user/update_profile', [AuthenController::class, "update_profile"]);
                 Route::post('user/reset_password', [AuthenController::class, "reset_password"]);
+                Route::get('user/admin/logout', [AuthenController::class, "adminLogout"])->name('adminLogout');
 
                 Route::resource('orders', OrdersController::class);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
@@ -516,6 +517,8 @@ Route::get('/search', function () {
             Route::delete('main/config/{id}', [configController::class, 'destroy']);
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
+
+
 });
 
             Route::get('/checkoutdone', [PurchaseController::class, "checkoutdone"]);
@@ -572,3 +575,15 @@ Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculate
         Route::get('/api/documentation', function () {
             return view('swagger');
         });
+
+
+
+
+
+
+
+
+
+
+        // TRUY CẬP ADMIN SÀN VNSHOP
+        Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');

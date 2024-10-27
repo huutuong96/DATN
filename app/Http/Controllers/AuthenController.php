@@ -393,55 +393,33 @@ class AuthenController extends Controller
         ], 200);
     }
 
-    /**
- * @OA\Get(
- *     path="api/users/{id}",
- *     summary="Get user details",
- *     description="Retrieves details of a user by ID if the user is active.",
- *     tags={"Users"},
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="string"),
- *         description="The ID of the user"
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Data retrieved successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thành công"),
- *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="fullname", type="string", example="John Doe"),
- *                 @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *                 @OA\Property(property="status", type="integer", example=1),
- *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-01T12:00:00Z"),
- *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-01T12:00:00Z")
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid or missing token",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Token không hợp lệ hoặc không tồn tại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Data retrieval failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thất bại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
+
+    public function adminLogin(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+        try {
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Không thể tạo token'], 500);
+        }
+        $user = UsersModel::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['error' => 'Tài khoản không tồn tại'], 404);
+        }
+        if ($user->status == 101) {
+            return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
+        }
+
+        $user->refesh_token = $token;
+        $user->save();
+        $user->load('role');
+        $user = Auth::user();
+        $tokenSession = session('token', $token);
+        return redirect()->route('dashboard', ['token' => $token]);
+    }
+
     public function show(string $id)
     {
         try {
@@ -466,82 +444,7 @@ class AuthenController extends Controller
         }
     }
 
-    /**
- * @OA\Get(
- *     path="api/me",
- *     summary="Get current authenticated user details",
- *     description="Retrieves details of the currently authenticated user, including address, rank, notifications, and orders.",
- *     tags={"Users"},
- *     @OA\Response(
- *         response=200,
- *         description="Data retrieved successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thành công"),
- *             @OA\Property(property="me", type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="fullname", type="string", example="John Doe"),
- *                 @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *                 @OA\Property(property="status", type="integer", example=1),
- *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-01T12:00:00Z"),
- *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-01T12:00:00Z")
- *             ),
- *             @OA\Property(property="address", type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="user_id", type="integer", example=1),
- *                 @OA\Property(property="address", type="string", example="123 Main St"),
- *                 @OA\Property(property="city", type="string", example="Hanoi"),
- *                 @OA\Property(property="country", type="string", example="Vietnam")
- *             ),
- *             @OA\Property(property="notifications", type="array",
- *                 @OA\Items(
- *                     @OA\Property(property="id", type="integer", example=1),
- *                     @OA\Property(property="title", type="string", example="Notification Title"),
- *                     @OA\Property(property="content", type="string", example="Notification Content"),
- *                     @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-01T12:00:00Z")
- *                 )
- *             ),
- *             @OA\Property(property="orders", type="object",
- *                 @OA\Property(property="orderDetail", type="array",
- *                     @OA\Items(
- *                         @OA\Property(property="id", type="integer", example=1),
- *                         @OA\Property(property="order_id", type="integer", example=1),
- *                         @OA\Property(property="product_id", type="integer", example=1),
- *                         @OA\Property(property="quantity", type="integer", example=2),
- *                         @OA\Property(property="price", type="number", format="float", example=100.0)
- *                     )
- *                 ),
- *                 @OA\Property(property="product", type="array",
- *                     @OA\Items(
- *                         @OA\Property(property="id", type="integer", example=1),
- *                         @OA\Property(property="name", type="string", example="Product Name"),
- *                         @OA\Property(property="description", type="string", example="Product Description"),
- *                         @OA\Property(property="price", type="number", format="float", example=100.0)
- *                     )
- *                 )
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid or missing token",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Token không hợp lệ hoặc không tồn tại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Data retrieval failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thất bại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
+
     public function me()
     {
 
@@ -996,6 +899,17 @@ class AuthenController extends Controller
             'status' => true,
             'message' => "Đăng xuất thành công",
         ], 200);
+    }
+
+    public function adminLogout()
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        $user->update([
+            'refesh_token' => null,
+        ]);
+        JWTAuth::invalidate(JWTAuth::getToken());
+        session()->forget('token');
+        return redirect()->route('login');
     }
 
     /**
