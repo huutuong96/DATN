@@ -529,9 +529,9 @@ class ShopController extends Controller
             ], 404);
         }
         $product = Product::where('shop_id', $shop->id)->get();
-        if ($request->status) {
-            $product->where('status', $request->status);
-        }
+        // if ($request->status) {
+        //     $product->where('status', $request->status);
+        // }
         $product->load('variants', 'attributes' );
         return response()->json([
             'status' => true,
