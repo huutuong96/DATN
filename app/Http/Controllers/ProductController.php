@@ -115,6 +115,7 @@ class ProductController extends Controller
                 'weight' => $request->weight,
                 'width' => $request->width,
                 'show_price' => $request->price ?? $request->sale_price,
+                'status' => 0,
             ];
             $product = Product::create($dataInsert);
             foreach ($request->images as $image) {
