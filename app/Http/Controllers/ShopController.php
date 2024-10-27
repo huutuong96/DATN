@@ -535,6 +535,9 @@ class ShopController extends Controller
             $product = Product::where('shop_id', $shop->id)->where('status', $status)->paginate(20);
             $product->appends(['status' => $status]);
         }
+        if ($request->status == 3) {
+            $product = Product::where('shop_id', $shop->id)->paginate(20);
+        }
 
         $product->load('variants', 'attributes' );
         return response()->json([
