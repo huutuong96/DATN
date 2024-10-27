@@ -529,7 +529,7 @@ class ShopController extends Controller
                 'message' => 'Shop không tồn tại',
             ], 404);
         }
-        $product = Product::where('shop_id', $shop->id)->paginate(20);
+        // $product = Product::where('shop_id', $shop->id)->paginate(20);
         if ($request->status) {
             $status = $request->status;
             $product = Product::where('shop_id', $shop->id)->where('status', $status)->paginate(20);
