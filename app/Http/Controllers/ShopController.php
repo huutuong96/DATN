@@ -534,9 +534,10 @@ class ShopController extends Controller
             $status = $request->status;
             $product = Product::where('shop_id', $shop->id)
                               ->where('status', $status)
-                              ->where('status', '!=', 5)
+                            //   ->where('status', '!=', 5)
                               ->paginate(20);
             $product->appends(['status' => $status]);
+        }
         if ($request->status == 1) {
             $product = Product::where('shop_id', $shop->id)->where('status', '!=', 5)->paginate(20);
         }
