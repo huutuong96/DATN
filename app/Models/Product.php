@@ -37,6 +37,7 @@ class Product extends Model
         'weight',
         'width',
         'version',
+        'show_price',
     ];
 
 
