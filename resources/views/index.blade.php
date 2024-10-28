@@ -839,7 +839,7 @@
                                     <span class="d-flex align-items-center">
                                         <img
                                             class="rounded-circle header-profile-user"
-                                            src="{{ auth()->user()->avatar }}"
+                                            src="{{ auth()->user()->avatar ?? 'https://th.bing.com/th/id/OIP.audMX4ZGbvT2_GJTx2c4GgHaHw?w=188&h=196&c=7&r=0&o=5&dpr=1.3&pid=1.7'}}"
                                             alt="Header Avatar"
                                         />
                                         <span class="text-start ms-xl-2">
@@ -1101,20 +1101,20 @@
                             <li class="nav-item">
                                 <a
                                     class="nav-link menu-link"
-                                    href="#sidebarDashboards"
+                                    href="#quanlydoanhthu"
                                     data-bs-toggle="collapse"
                                     role="button"
                                     aria-expanded="false"
                                     aria-controls="sidebarDashboards"
                                 >
-                                    <i class="ri-dashboard-2-line"></i>
+                                    <i class=" ri-currency-line"></i>
                                     <span data-key="t-dashboards"
-                                        >VNSHOP</span
+                                        >Quản lý doanh thu</span
                                     >
                                 </a>
                                 <div
                                     class="collapse menu-dropdown"
-                                    id="sidebarDashboards"
+                                    id="quanlydoanhthu"
                                 >
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
@@ -1185,16 +1185,675 @@
                             <li class="nav-item">
                                 <a
                                     class="nav-link menu-link"
-                                    href="#sidebarDashboards">
-                                    <i class="ri-dashboard-2-line"></i>
+                                    href="#quanlycuahang"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-home-heart-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Danh sách cửa hàng</span>
+                                        >Quản lý cửa hàng</span
+                                    >
                                 </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlycuahang"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
                                     </ul>
                                 </div>
                             </li>
-
-
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyxetduyet"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-file-edit-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý xét duyệt</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyxetduyet"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlydanhmuc"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-align-justify"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý danh mục</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlydanhmuc"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlykhoahoc"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-youtube-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý khóa học</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlykhoahoc"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyblog"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-terminal-window-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý blog</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyblog"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlynguoidung"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-dashboard-2-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý người dùng</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlynguoidung"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyphanquyen"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-git-repository-private-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý, Phân quyền</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyphanquyen"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#thongtinsan"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-building-2-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý thông tin sàn</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="thongtinsan"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý doanh thu
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Sản phẩm chờ duyệt
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Crypto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                Projects
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-nft.html"
+                                                class="nav-link"
+                                                data-key="t-nft"
+                                            >
+                                                NFT</a
+                                            >
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-job.html"
+                                                class="nav-link"
+                                                data-key="t-job"
+                                                >Job</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                     <!-- Sidebar -->
@@ -1279,6 +1938,8 @@
     <!-- Dashboard init -->
     <script src="assets/js/pages/dashboard-ecommerce.init.js"></script>
 
+    <!-- linecharts init -->
+    <!-- <script src="assets/js/pages/apexcharts-line.init.js"></script> -->
     <!-- App js -->
     <script src="assets/js/app.js"></script>
     </body>
