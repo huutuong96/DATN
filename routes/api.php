@@ -428,7 +428,7 @@ Route::get('/search', function () {
             Route::get('user_get_message', [MessageController::class, "user_get_message"]);
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
-            Route::get('product/approve/{id}', [ProductController::class, 'approve_product']);
+            Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
             Route::post('products', [ProductController::class, 'store']);
 
             Route::post('products/{id}', [ProductController::class, 'update']);
@@ -436,6 +436,8 @@ Route::get('/search', function () {
             // Route::delete('products/{id}', [ProductController::class, 'destroy']);
 
             Route::put('products/{id}', [ProductController::class, 'update']);
+            Route::post('shop/product/remove/{id}', [ShopController::class, 'shop_remove_product']);
+
             Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
 

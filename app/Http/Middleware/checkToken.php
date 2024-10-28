@@ -12,6 +12,20 @@ class checkToken
 {
     public function handle($request, Closure $next)
     {
+        if ($request->token) {
+            try {
+                    $user = JWTAuth::parseToken()->authenticate();
+                    return $next($request);
+            } catch (TokenExpiredException $e) {
+                return redirect()->route('login');
+
+            } catch (JWTException $e) {
+                return redirect()->route('login');
+
+            } catch (\Exception $e) {
+                return redirect()->route('login');
+            }
+        }
         try {
             // Xác thực người dùng bằng token JWT
             $user = JWTAuth::parseToken()->authenticate();

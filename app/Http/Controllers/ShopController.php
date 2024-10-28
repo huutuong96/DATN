@@ -519,8 +519,9 @@ class ShopController extends Controller
         return $this->successResponse("Cập nhật trạng thái đơn hàng thành công", $order);
     }
 
-    public function get_product_to_shop(string $id)
+    public function get_product_to_shop(Request $request, string $id)
     {
+        // dd($request->status);
         $shop = Shop::find($id);
         if (!$shop) {
             return response()->json([
@@ -528,7 +529,20 @@ class ShopController extends Controller
                 'message' => 'Shop không tồn tại',
             ], 404);
         }
-        $product = Product::where('shop_id', $shop->id)->get();
+
+        if ($request->status) {
+            $status = $request->status;
+            $product = Product::where('shop_id', $shop->id)
+                              ->where('status', $status)
+                            //   ->where('status', '!=', 5)
+                              ->paginate(20);
+            $product->appends(['status' => $status]);
+        }
+        if ($request->status == 1) {
+            $product = Product::where('shop_id', $shop->id)->where('status', '!=', 5)->paginate(20);
+        }
+
+        $product->load('variants', 'attributes' );
         return response()->json([
             'status' => true,
             'message' => 'Lấy sản phẩm thành công',
@@ -1028,5 +1042,22 @@ class ShopController extends Controller
         $orderLeadTime = collect($response->json());
         $formattedTime = date('Y-m-d H:i:s', $orderLeadTime['data']['leadtime']);
         return $formattedTime;
+    }
+
+    public function shop_remove_product(string $id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Sản phẩm không tồn tại',
+            ], 404);
+        }
+        $product->status = 5;
+        $product->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Xóa sản phẩm thành công',
+        ], 200);
     }
 }

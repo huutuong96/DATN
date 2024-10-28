@@ -37,6 +37,9 @@ class Product extends Model
         'weight',
         'width',
         'version',
+        'show_price',
+        'status',
+        'is_delete',
     ];
 
 
@@ -55,16 +58,9 @@ class Product extends Model
     }
     public function attributes()
     {
-        return $this->hasManyThrough(
-            Attribute::class,
-            product_variants::class,
-            'product_id', // Khóa ngoại trên bảng product_variants
-            'id', // Khóa chính trên bảng attributes
-            'id', // Khóa chính trên bảng products
-            'attribute_id' // Khóa ngoại trên bảng variantattribute
-        );
+        return $this->belongsToMany(Attribute::class, 'variantattribute', 'product_id', 'attribute_id')
+                    ->withPivot('value_id', 'shop_id', 'variant_id');
     }
-
     public function orderDetails()
     {
         return $this->hasMany(OrderDetailsModel::class);

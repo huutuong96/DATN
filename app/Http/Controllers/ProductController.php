@@ -90,7 +90,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         // dd($request->images);
-
+        // dd($request->images[0]);
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -104,7 +104,7 @@ class ProductController extends Controller
                 'infomation' => json_encode($request->infomation),
                 'price' => $request->price,
                 'sale_price' => $request->sale_price ?? null,
-                'image' => $request->thumbnail ?? null,
+                'image' => $request->images[0] ?? null,
                 'quantity' => $request->stock ?? 0,
                 'create_by' => $user->id,
                 'category_id' => $request->category_id,
@@ -115,6 +115,7 @@ class ProductController extends Controller
                 'weight' => $request->weight,
                 'width' => $request->width,
                 'show_price' => $request->price ?? $request->sale_price,
+                'status' => 3,
             ];
             $product = Product::create($dataInsert);
             foreach ($request->images as $image) {
@@ -136,21 +137,29 @@ class ProductController extends Controller
                     foreach ($attribute['values'] as $value) {
                         $attributeValueData = [
                             'attribute_id' => $attributeId->id,
-                            'value' => $value,
+                            'value' => $value['value'],
                         ];
                         $attributeValue = attributevalue::create($attributeValueData);
                     }
                 }
+                // $attributeValue = attributevalue::where()
                 foreach ($request->variant['variantProducts'] as $variant) {
                     $product_variantsData = [
                         'product_id' => $product->id,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
-                        'stock' => $variant['inStock'] ?? $request->inStock,
+                        'stock' => $variant['stock'] ?? $request->stock,
                         'price' => $variant['price'] ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
-
+                    $values = [];
+                    foreach ($variant['variants'] as $item) {
+                        $values[] = $item['value'];
+                    }
+                    $concatenated_values = implode(', ', $values);
+                    $product_variants->update([
+                        'name' => $concatenated_values,
+                    ]);
                     $variantAttributeData = [
                         'variant_id' => $product_variants->id,
                         'product_id' => $product->id,
@@ -639,17 +648,11 @@ class ProductController extends Controller
     public function approve_product(Request $request, $id){
         $product = Product::find($id);
         if(!$product){
-            return response()->json([
-                'status' => false,
-                'message' => "Không tồn tại sản phẩm nào",
-            ], 404);
+            return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
         }
         $product->status = 1;
         $product->save();
-        return response()->json([
-            'status' => true,
-            'message' => "Duyệt sản phẩm thành công",
-        ], 200);
+        return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
     public function handleUpdateProduct(Request $request, string $id)
     // ProductRequest
@@ -805,5 +808,14 @@ $notification = $notificationController->store(new Request($notificationData));
             'data' => $data,
         ]);
     }
+
+    public function productWaitingApproval()
+    {
+        $products = Product::where('status', 0)
+            ->with(['images', 'variants'])  // Eager load images
+            ->paginate(20);
+        return view('products.list_product', ['products' => $products]);
+    }
+
 
 }

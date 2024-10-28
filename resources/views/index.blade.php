@@ -1192,6 +1192,7 @@
                                     aria-controls="sidebarDashboards"
                                 >
                                     <i class=" ri-home-heart-line"></i>
+                                    
                                     <span data-key="t-dashboards"
                                         >Quản lý cửa hàng</span
                                     >
@@ -1203,11 +1204,11 @@
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-analytics.html"
+                                                href="{{ route('store', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                Danh sách cửa hàng
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1853,6 +1854,16 @@
                                         </li>
                                     </ul>
                                 </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="{{ route('product-waiting-approval', ['token' => auth()->user()->refesh_token]) }}">
+                                    <i class="ri-dashboard-3-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Sản phẩm chờ duyệt</span>
+                                </a>
+
                             </li>
                         </ul>
                     </div>

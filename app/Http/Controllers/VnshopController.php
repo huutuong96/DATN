@@ -60,4 +60,8 @@ class VnshopController extends Controller
     {
         return view('stores.list_store');
     }
+    public function productWaitingApproval()
+    {
+        return view('products.list_product');
+    }
 }
