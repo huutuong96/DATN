@@ -290,6 +290,8 @@ Route::get('/search', function () {
 })->middleware('CheckPremission:create_category');
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
+    // Route không áp dụng middleware
+    Route::get('banners/client', [BannerController::class, "index"]);
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
@@ -309,8 +311,12 @@ Route::get('/search', function () {
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->middleware('CheckRole:OWNER');
                 Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->middleware('CheckRole:OWNER');
 
-                Route::get('banners/client', [BannerController::class, "index"]);
-                Route::resource('banners', BannerController::class)->middleware('CheckPremission:handle_banner');
+                
+
+                // Route áp dụng middleware
+                Route::middleware('CheckPremission:handle_banner')->group(function () {
+                    Route::resource('banners', BannerController::class)->except(['index']);
+                });
 
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
 
