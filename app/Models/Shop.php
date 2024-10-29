@@ -40,10 +40,13 @@ class Shop extends Model
         'ward_id',
     ];
     public function learns()
-        {
-            return $this->belongsToMany(LearnModel::class, 'Learning_seller', 'shop_id', 'learn_id');
-        }
-
+    {
+        return $this->belongsToMany(LearnModel::class, 'Learning_seller', 'shop_id', 'learn_id');
+    }
+    public function user()
+    {
+        return $this->belongsToMany(User::class, 'shop_managers', 'shop_id', 'user_id');
+    }
 
 
 

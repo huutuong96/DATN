@@ -47,7 +47,7 @@
                         <div class="d-flex">
                             <!-- LOGO -->
                             <div class="navbar-brand-box horizontal-logo">
-                                <a href="index.html" class="logo logo-dark">
+                                <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}"  class="logo logo-dark">
                                     <span class="logo-sm">
                                         <img
                                             src="assets/images/logo-sm.png"
@@ -64,7 +64,7 @@
                                     </span>
                                 </a>
 
-                                <a href="index.html" class="logo logo-light">
+                                <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}"class="logo logo-light">
                                     <span class="logo-sm">
                                         <img
                                             src="assets/images/logo-sm.png"
@@ -952,7 +952,7 @@
                 <!-- LOGO -->
                 <div class="navbar-brand-box">
                     <!-- Dark Logo-->
-                    <a href="index.html" class="logo logo-dark">
+                    <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}" class="logo logo-dark">
                         <span class="logo-sm">
                             <img
                                 src="assets/images/logo-sm.png"
@@ -969,7 +969,7 @@
                         </span>
                     </a>
                     <!-- Light Logo-->
-                    <a href="index.html" class="logo logo-light">
+                    <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}" class="logo logo-light">
                         <span class="logo-sm">
                             <img
                                 src="assets/images/logo-sm.png"
@@ -1372,11 +1372,11 @@
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-analytics.html"
+                                                href="{{ route('list_category', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                list danh mục
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1385,7 +1385,7 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Thêm danh mục
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1394,43 +1394,8 @@
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
-                                                Sản phẩm chờ duyệt
+                                                Danh mục đã xóa
                                             </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crypto.html"
-                                                class="nav-link"
-                                                data-key="t-crypto"
-                                            >
-                                                Crypto
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
                                         </li>
                                     </ul>
                                 </div>
@@ -1858,7 +1823,8 @@
                             <li class="nav-item">
                                 <a
                                     class="nav-link menu-link"
-                                    href="{{ route('product-waiting-approval', ['token' => auth()->user()->refesh_token]) }}">
+                                    href="{{ route('product-waiting-approval', ['token' => auth()->user()->refesh_token]) }}"
+                                >
                                     <i class="ri-dashboard-3-line"></i>
                                     <span data-key="t-dashboards"
                                         >Sản phẩm chờ duyệt</span>

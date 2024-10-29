@@ -190,7 +190,6 @@ class CategoriesController extends Controller
             ];
 
             $categories->update($dataUpdate);
-            $categories->update(['status' => 0]);
 
             return response()->json([
                 'status' => true,
