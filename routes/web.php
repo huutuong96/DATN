@@ -56,6 +56,8 @@ Route::get('/', [VnshopController::class, 'login'])->name('login');
 Route::group(['middleware' => ['checkToken']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
     Route::get('/store', [VnshopController::class, 'store'])->name('store');
+    Route::get('/list-category', [VnshopController::class, 'list_category'])->name('list_category');
+    Route::get('/change-category', [VnshopController::class, 'changeCategory'])->name('change_category');
     Route::get('/product-waiting-approval', [ProductController::class, 'productWaitingApproval'])->name('product-waiting-approval');
 });
 

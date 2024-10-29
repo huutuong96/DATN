@@ -218,7 +218,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            feedback
+                                            Tổng số cửa hàng đang hoạt động
                                         </p>
                                     </div>
                                     <!-- <div
@@ -243,7 +243,7 @@
                                         >
                                             <span
                                                 class="counter-value"
-                                                data-target="255"
+                                                data-target="{{$shopAC}}"
                                                 >0</span
                                             >
                                         </h4>
@@ -296,11 +296,11 @@
                         </li>
                         <li style="margin-right: 10px;">
                             <span style="display: inline-block; background-color: green; height: 10px; width: 10px;"></span>
-                            Số lượng sp bán ra
+                            Lượt mua sản phẩm
                         </li>
                         <li>
                             <span style="display: inline-block; background-color: blue; height: 10px; width: 10px;"></span>
-                            Doanh thu 
+                            Doanh thu * 1.000.000 vnd
                         </li>
                     </ul>
                 </div>
@@ -328,14 +328,14 @@
     </div>
     <!-- end row -->
     <div class="row">
-        <div class="col-xl-7">
+        <div class="col-xl-12">
             <div class="card">
                 <div class="card-header align-items-center d-flex">
                     <h4 class="card-title mb-0 flex-grow-1">Hot shop</h4>
                     <div class="flex-shrink-0">
                         <div class="dropdown card-header-dropdown">
                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted">01-01-2024 to 28-10-2024<i class="mdi mdi-chevron-down ms-1"></i></span>
+                                <span class="text-muted">Tháng {{ \Carbon\Carbon::now()->format('m') }}<i class="mdi mdi-chevron-down ms-1"></i></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="#">Today</a>
@@ -361,18 +361,20 @@
                             </thead>
 
                             <tbody>
+                                @foreach($listShop as $shop)
                                 <tr>
-                                    <td>Absternet LLC</td>
-                                    <td>Nghệ an</td>
-                                    <td><img src="assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                        <a href="#javascript: void(0);" class="text-body fw-medium">Donald Risher</a>
+                                    <td>{{$shop->shop_name}}</td>
+                                    <td>{{$shop->pick_up_address}} <br> {{$shop->ward}} <br> {{$shop->district}} <br> {{$shop->province}}</td>
+                                    <td><img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
+                                        <a href="#javascript: void(0);" class="text-body fw-medium">{{$shop->user[0]->fullname ?? null}}</a>
                                     </td>
-                                    <td><span class="badge bg-success-subtle text-success p-2">Deal Won</span></td>
+                                    <td><span class="badge bg-success-subtle text-success p-2">Cửa hàng nổi bật</span></td>
                                     <td>
-                                        <div class="text-nowrap">$100.1K</div>
+                                        <div class="text-nowrap">{{number_format($shop->doanhthu)}}vnđ</div>
                                     </td>
                                 </tr>
-                                <tr>
+                                @endforeach
+                                <!-- <tr>
                                     <td>Raitech Soft</td>
                                     <td>Hà nội</td>
                                     <td><img src="assets/images/users/avatar-2.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
@@ -415,7 +417,7 @@
                                     <td>
                                         <div class="text-nowrap">$78.9K</div>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </tbody><!-- end tbody -->
                         </table><!-- end table -->
                     </div><!-- end table responsive -->
@@ -423,7 +425,7 @@
             </div><!-- end card -->
         </div><!-- end col -->
 
-        <div class="col-xl-5">
+        <!-- <div class="col-xl-5">
             <div class="card card-height-100">
                 <div class="card-header align-items-center d-flex">
                     <h4 class="card-title mb-0 flex-grow-1">My Tasks</h4>
@@ -438,7 +440,7 @@
                             </div>
                         </div>
                     </div>
-                </div><!-- end card header -->
+                </div>
 
                 <div class="card-body p-0">
 
@@ -447,7 +449,7 @@
                             <div class="text-muted"><span class="fw-semibold">4</span> of <span class="fw-semibold">10</span> remaining</div>
                         </div>
                         <button type="button" class="btn btn-sm btn-success"><i class="ri-add-line align-middle me-1"></i> Add Task</button>
-                    </div><!-- end card header -->
+                    </div>
 
                     <div data-simplebar style="max-height: 219px;">
                         <ul class="list-group list-group-flush border-dashed px-3">
@@ -529,14 +531,15 @@
                                     </div>
                                 </div>
                             </li>
-                        </ul><!-- end ul -->
+                        </ul>
                     </div>
                     <div class="p-3 pt-2">
                         <a href="javascript:void(0);" class="text-muted text-decoration-underline">Show more...</a>
                     </div>
-                </div><!-- end card body -->
-            </div><!-- end card -->
-        </div><!-- end col -->
+                </div>
+            </div>
+        </div> -->
+        <!-- end col -->
     </div><!-- end row -->
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
@@ -545,8 +548,8 @@
 const xValues1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 
 // Lấy dữ liệu từ PHP cho biểu đồ màu xanh
-var red_data = @json($doanhthuJson);
-var green_data = @json($doanhthuJson);
+var red_data = @json($luongtrahangJson);
+var green_data = @json($luotmuaJson);
 var blue_data = @json($doanhthuJson);
 
 new Chart("myChart", {
@@ -555,16 +558,12 @@ new Chart("myChart", {
     labels: xValues1,
     datasets: [
       { 
-        data: [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, 
-       1100000, 1200000, 1300000, 1400000, 1500000, 1600000, 1700000, 1800000, 1900000, 2000000, 
-       2100000, 2200000, 2300000, 2400000, 2500000, 2600000, 2700000, 2800000],
+        data: red_data,
         borderColor: "red",
         fill: false
       }, 
       { 
-        data: [100000, 200000, 300000, 250000, 150000, 100000, 200000, 400000, 500000, 600000, 
-       550000, 700000, 800000, 750000, 600000, 900000, 1000000, 1100000, 1200000, 1300000, 
-       1400000, 1500000, 1600000, 1700000, 1800000, 1900000, 2000000, 2100000],
+        data: green_data,
         borderColor: "green",
         fill: false
       },
@@ -582,9 +581,11 @@ new Chart("myChart", {
 </script>
 
 <script>
-const xValues2 = ["Italy", "France", "Spain", "USA", "Argentina", "France", "Spain", "USA", "Argentina", "France", "Spain", "USA", "Argentina"];
-const yValues = [55, 49, 44, 24, 15, 49, 44, 24, 15, 49, 44, 24, 15];
-const barColors = ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145"];
+const xValues2 = @json($listCategoryJson);
+const yValues =  @json($listCategorydoanhthu);
+const barColors = @json($listCategoryColors);
+console.log( barColors);
+
 
 new Chart("chart", {
   type: "pie",

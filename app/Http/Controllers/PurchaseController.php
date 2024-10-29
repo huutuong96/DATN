@@ -473,6 +473,7 @@ class PurchaseController extends Controller
         $product = Product::find($product_id);
         return OrderDetailsModel::create([
             'order_id' => $order->id,
+            'category_id'=>$product->category_id,
             'product_id' => $variant->product_id,
             'variant_id' => $variant->id,
             'quantity' => $quantity,
