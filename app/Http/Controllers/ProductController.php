@@ -87,6 +87,26 @@ class ProductController extends Controller
         return $products;
     }
 
+    public function getProductToSlug($slug) {
+        if (empty($slug)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Sản phẩm không tồn tại'
+            ], 400);
+        }
+        $products = Product::where('slug', $slug)->get();
+        if ($products->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'không tìm thấy sản phẩm nào'
+            ], 404);
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $products
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         // dd($request->images);
