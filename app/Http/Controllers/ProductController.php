@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\CategoriesModel;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Image;
@@ -664,6 +664,27 @@ class ProductController extends Controller
             'data' => $products,
         ]);
     }
+    public function filterProducts(Request $request)
+    {
+        $query = Product::query();
+        if ($request->has('min_price') && $request->has('max_price')) {
+            $query->whereBetween('price', [$request->min_price, $request->max_price]);
+        }
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        $products = $query->paginate(100
+    );
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'message' => 'Không có sản phẩm nào'
+            ], 404);
+        }
+    
+        return response()->json($products);
+    }
+    
 
     public function approve_product(Request $request, $id){
         $product = Product::find($id);
@@ -674,6 +695,7 @@ class ProductController extends Controller
         $product->save();
         return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
+    
     public function handleUpdateProduct(Request $request, string $id)
     // ProductRequest
     {
