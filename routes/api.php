@@ -292,6 +292,8 @@ Route::get('/search', function () {
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
     // Route không áp dụng middleware
     Route::get('banners/client', [BannerController::class, "index"]);
+    Route::get('voucher_main/client', [VoucherToMainController::class, "index"]);
+    Route::get('voucher_shop', [VoucherToMainController::class, "index"]);
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
@@ -316,8 +318,18 @@ Route::get('/search', function () {
                 // Route áp dụng middleware
                 Route::middleware('CheckPremission:handle_banner')->group(function () {
                     Route::resource('banners', BannerController::class)->except(['index']);
+                   
                 });
-
+                Route::middleware('CheckPremission:handle_voucher_main')->group(function () {
+                    Route::resource('voucher_main', VoucherToMainController::class)->except(['index']);
+                   
+                });
+                Route::middleware('CheckPremission:handle_voucher_shop')->group(function () {
+                    Route::resource('voucher_shop', VoucherToShopController::class)->except(['index']);
+                   
+                });
+                
+               
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
 
                 Route::resource('taxs', TaxController::class)->middleware('CheckRole');
@@ -350,8 +362,8 @@ Route::get('/search', function () {
                 Route::get('messages/detail/{id}', [MessageController::class, "show_message_detail"]);
                 Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
 
-                Route::get('voucher_main/client', [VoucherToMainController::class, "index"]);
-                Route::resource('voucher_main', VoucherToMainController::class)->middleware('CheckRole:Admin');
+               
+                // Route::resource('voucher_main', VoucherToMainController::class)->middleware('CheckRole:Admin');
 
                 Route::resource('notification_to_main', Notification_to_mainController::class);
                 Route::resource('notifications', NotificationController::class);
@@ -368,7 +380,7 @@ Route::get('/search', function () {
                 Route::resource('Comments', CommentsController::class);
                 Route::resource('Wishlists', WishlistController::class);
                 Route::resource('Product_to_carts', ProducttocartController::class);
-                Route::resource('voucher_shop', VoucherToShopController::class);
+                // Route::resource('voucher_shop', VoucherToShopController::class);
 
                 Route::get('learning_seller/{shop_id}', [Learning_sellerController::class, 'index'])->middleware('CheckRole:Seller');
                 Route::get('learning_seller/{shop_id}/{learn_id}', [Learning_sellerController::class, 'show'])->middleware('CheckRole:Seller');

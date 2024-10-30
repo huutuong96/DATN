@@ -3,28 +3,31 @@
 
 @section('main')
    <div class="container-fluid">
-    
+    @php 
+    $index=5;
+        
+    @endphp
     
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Tất cả</button>
+            <button class="nav-link {{ $tab == 1 ? 'active' : '' }}" id="home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="all-products" aria-selected="{{ $tab == 1 ? 'true' : 'false' }}">Tất cả</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Chờ duyệt</button>
-          </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#hoat-dong" type="button" role="tab" aria-controls="hoat-dong" aria-selected="false">Đang hoạt động</button>
+            <button class="nav-link {{ $tab == 2 ? 'active' : '' }}" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-products" type="button" role="tab" aria-controls="pending-products" aria-selected="{{ $tab == 2 ? 'true' : 'false' }}">Chờ duyệt</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Đã từ chối duyệt</button>
+            <button class="nav-link {{ $tab == 3 ? 'active' : '' }}" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-products" type="button" role="tab" aria-controls="active-products" aria-selected="{{ $tab == 3 ? 'true' : 'false' }}">Đang hoạt động</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link"  id="vi-pham-tab" data-bs-toggle="tab" data-bs-target="#vi-pham-tab-pane" type="button" role="tab" aria-controls="vi-pham-tab-pane" aria-selected="false">vi phạm</button>
-          </li>
-       
-      </ul>
-      <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0"> <div class="row">    
+            <button class="nav-link {{ $tab == 4 ? 'active' : '' }}" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected-products" type="button" role="tab" aria-controls="rejected-products" aria-selected="{{ $tab == 4 ? 'true' : 'false' }}">Đã từ chối</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ $tab == 5 ? 'active' : '' }}" id="violating-tab" data-bs-toggle="tab" data-bs-target="#violating-products" type="button" role="tab" aria-controls="violating-products" aria-selected="{{ $tab == 5 ? 'true' : 'false' }}">Vi phạm</button>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade {{ $tab == 1 ? 'show active' : '' }}" id="all-products" role="tabpanel" aria-labelledby="home-tab">
             <div class="col-xl-12">
                 @if(session('message'))
                 <div class="alert alert-success">
@@ -152,8 +155,9 @@
                 </div><!-- end card -->
             </div>
             <!-- end col -->
-        </div></div>
-        <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0"> <div class="row">
+        </div>
+       
+        <div class="tab-pane fade {{ $tab == 2 ? 'show active' : '' }}" id="pending-products" role="tabpanel" aria-labelledby="pending-tab">
             <div class="col-xl-12">
                 @if(session('message'))
                 <div class="alert alert-success">
@@ -265,8 +269,9 @@
                 </div><!-- end card -->
             </div>
             <!-- end col -->
-        </div></div>
-        <div class="tab-pane fade" id="hoat-dong" role="tabpanel" aria-labelledby="profile-tab" tabindex="0"> <div class="row">
+        </div>
+        
+        <div class="tab-pane fade {{ $tab == 3 ? 'show active' : '' }}" id="active-products" role="tabpanel" aria-labelledby="active-tab">
             <div class="col-xl-12">
                 @if(session('message'))
                 <div class="alert alert-success">
@@ -355,8 +360,9 @@
                 </div><!-- end card -->
             </div>
             <!-- end col -->
-        </div></div>
-        <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0"> <div class="row">
+        </div>
+        
+        <div class="tab-pane fade {{ $tab == 4 ? 'show active' : '' }}" id="rejected-products" role="tabpanel" aria-labelledby="rejected-tab">
             <div class="col-xl-12">
                 @if(session('message'))
                 <div class="alert alert-success">
@@ -452,8 +458,9 @@
                 </div><!-- end card -->
             </div>
             <!-- end col -->
-        </div></div>
-        <div class="tab-pane fade" id="vi-pham-tab-pane" role="tabpanel" aria-labelledby="vi-pham-tab" tabindex="0"> <div class="row">
+        </div>
+       
+        <div class="tab-pane fade {{ $tab == 5 ? 'show active' : '' }}" id="violating-products" role="tabpanel" aria-labelledby="violating-tab">
             <div class="col-xl-12">
                 @if(session('message'))
                 <div class="alert alert-success">
@@ -468,7 +475,7 @@
             @endif
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm từ chối</h4>
+                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm vi phạm</h4>
                     </div><!-- end card header -->
     
                     <div class="card-body">
@@ -545,7 +552,10 @@
                 </div><!-- end card -->
             </div>
             <!-- end col -->
-        </div></div>
+        </div>
+        
+    </div>
+    
 
         
 

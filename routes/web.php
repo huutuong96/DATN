@@ -64,4 +64,3 @@ Route::group(['middleware' => ['checkToken']], function () {
     Route::post('/products/{id}/reject', [ProductController::class, 'rejectProduct'])->name('products.reject');
     // Route::post('/products/{id}/report', [ProductController::class, 'reportProduct'])->name('products.report');
 });
-
