@@ -552,8 +552,8 @@ Route::get('/', function () {
 
 
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
-
-
+// lọc sản phẩm
+Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         // NO Auth
         Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
         Route::get('products/{id}', [ProductController::class, 'show']);

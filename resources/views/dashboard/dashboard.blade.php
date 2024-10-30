@@ -364,11 +364,11 @@
                                 @foreach($listShop as $shop)
                                 <tr>
                                     <td>{{$shop->shop_name}}</td>
-                                    <td>{{$shop->district}}</td>
+                                    <td>{{$shop->pick_up_address}} <br> {{$shop->ward}} <br> {{$shop->district}} <br> {{$shop->province}}</td>
                                     <td><img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
                                         <a href="#javascript: void(0);" class="text-body fw-medium">{{$shop->user[0]->fullname ?? null}}</a>
                                     </td>
-                                    <td><span class="badge bg-success-subtle text-success p-2">Hot shop</span></td>
+                                    <td><span class="badge bg-success-subtle text-success p-2">Cửa hàng nổi bật</span></td>
                                     <td>
                                         <div class="text-nowrap">{{number_format($shop->doanhthu)}}vnđ</div>
                                     </td>
