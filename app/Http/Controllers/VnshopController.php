@@ -51,7 +51,7 @@ class VnshopController extends Controller
             $day = $order->created_at->day; 
             if ($day <= Carbon::now()->day) { 
 
-                $doanhthu[$day] += ($order->total_amount / 1000000 );
+                $doanhthu[$day] += ($order->total_amount / 100000 );
                 if($order->status == 5){
                     $luongtrahang[$day] += 1;
                 }
@@ -114,7 +114,7 @@ class VnshopController extends Controller
             $shop["doanhthu"] = $doanhthu ;
             $listShop[] = $shop;
         }
-        // dd($listShop[0]->user[0]->fullname);
+        // dd($listShop);
         usort($listShop, function($a, $b) {
             return $b->doanhthu <=> $a->doanhthu;
         });

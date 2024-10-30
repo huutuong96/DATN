@@ -366,7 +366,7 @@
                                     <td>{{$shop->shop_name}}</td>
                                     <td>{{$shop->district}}</td>
                                     <td><img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                        <a href="#javascript: void(0);" class="text-body fw-medium">{{$shop->user[0]->fullname}}</a>
+                                        <a href="#javascript: void(0);" class="text-body fw-medium">{{$shop->user[0]->fullname ?? null}}</a>
                                     </td>
                                     <td><span class="badge bg-success-subtle text-success p-2">Hot shop</span></td>
                                     <td>
