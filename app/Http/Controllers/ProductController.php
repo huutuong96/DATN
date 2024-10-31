@@ -40,15 +40,12 @@ class ProductController extends Controller
         ->with(['images', 'colors'])  // Eager load images
         ->paginate(20);
         $products->appends(['status' => $status]); // Append status to pagination links
-        if($request->status == 0){
-            $products = Product::
-            with(['images', 'colors'])  // Eager load images
-            ->paginate(20);
-            $products->appends(['status' => 0]); // Append status to pagination links
-        }
-
-
-
+        // if($request->status == 2){
+        //     $products = Product::
+        //     with(['images', 'colors'])  // Eager load images
+        //     ->paginate(20);
+        //     $products->appends(['status' => 2]); // Append status to pagination links
+        // }
         if ($products->isEmpty()) {
             return response()->json(
                 [
@@ -77,6 +74,8 @@ class ProductController extends Controller
             $product->price = intval($product->price);
             $product->sale_price = intval($product->sale_price);
         }
+        dd($products);
+
         return response()->json(
             [
                 'status' => true,
