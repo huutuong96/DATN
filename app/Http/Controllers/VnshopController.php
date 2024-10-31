@@ -9,13 +9,15 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\order_fee_details;
 use App\Models\CategoriesModel;
+use App\Models\RolesModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class VnshopController extends Controller
 {
     public function __construct() {
-     
+        $this->middleware('checkRole')->only('list_role');
+
     }
     public function login()
     {
@@ -181,5 +183,12 @@ class VnshopController extends Controller
         }
     }
     
+    public function list_role(Request $request){
+        $limit = $request->limit ?? 10;
+        $roles = RolesModel::orderBy('created_at', 'desc')->paginate($limit);
+        return view('roles.list_role',compact(
+            'roles'
+        ));
+    }
     
 }

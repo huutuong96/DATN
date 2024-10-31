@@ -306,6 +306,9 @@ Route::get('/search', function () {
                 Route::resource('categori_shops', Categori_ShopsController::class);
 
                 Route::resource('roles', RolesController::class)->middleware('CheckRole');
+                Route::get('role/destroy/{id}', [RolesController::class, 'destroy'])->name('role_destroy');
+                Route::put('roles/{id}', [RolesController::class, 'update'])->name('role_update');
+                Route::post('roles', [RolesController::class, 'store'])->name('role_store');
 
                 Route::resource('address', AddressController::class);
 
@@ -425,8 +428,8 @@ Route::get('/search', function () {
                 Route::resource('carts', CartController::class);
                 Route::resource('users', AuthenController::class);
                 Route::get('user/me', [AuthenController::class, "me"]);
-                Route::post('user/change_password', [AuthenController::class, "change_password"]);
-                Route::post('user/update_profile', [AuthenController::class, "update_profile"]);
+                Route::post('user/change_password', [AuthenController::class, "change_password"])->name('change_password');
+                Route::post('user/update_profile', [AuthenController::class, "update_profile"])->name('update_profile');
                 Route::post('user/reset_password', [AuthenController::class, "reset_password"]);
                 Route::get('user/admin/logout', [AuthenController::class, "adminLogout"])->name('adminLogout');
 
@@ -578,7 +581,7 @@ Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         Route::get('categories', [CategoriesController::class, 'index']);
 
         Route::get('search', [ProductController::class, 'search']);
-        Route::get('/products/slug/{slug}', [ProductController::class, 'getProductToSlug']);
+        Route::get('/products/{slug}', [ProductController::class, 'getProductToSlug']);
 
 
         Route::get('get_infomaiton_province_and_city', [PurchaseController::class, 'get_infomaiton_province_and_city']);

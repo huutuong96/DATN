@@ -861,7 +861,7 @@
                                     </h6>
                                     <a
                                         class="dropdown-item"
-                                        href="pages-profile.html"
+                                        href="{{ route('admin_profile', ['token' => auth()->user()->refesh_token]) }}"
                                         ><i
                                             class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"
                                         ></i>
@@ -1673,11 +1673,11 @@
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-analytics.html"
+                                                href="{{ route('list_role', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                Danh sách ROLE
                                             </a>
                                         </li>
                                         <li class="nav-item">

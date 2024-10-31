@@ -414,7 +414,7 @@ class AuthenController extends Controller
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
         $user->save();
-        $user->load('role');
+        $user->load('role', 'address');
         $user = auth::user();
         // dd(auth()->user()->refesh_token);
         return redirect()->route('dashboard', ['token' => auth()->user()->refesh_token]);
@@ -523,61 +523,7 @@ class AuthenController extends Controller
         return response()->json($dataDone, 200);
     }
 
-    /**
- * @OA\Post(
- *     path="api/update_profile",
- *     summary="Update user profile",
- *     description="Updates the profile of the authenticated user, including avatar, personal details, and address.",
- *     tags={"Users"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             @OA\Property(property="fullname", type="string", example="John Doe"),
- *             @OA\Property(property="phone", type="string", example="123456789"),
- *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *             @OA\Property(property="description", type="string", example="A brief description"),
- *             @OA\Property(property="genre", type="string", example="Male"),
- *             @OA\Property(property="datebirth", type="string", format="date", example="1990-01-01"),
- *             @OA\Property(property="avatar", type="string", format="binary"),
- *             @OA\Property(property="address", type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="province", type="string", example="Hanoi"),
- *                 @OA\Property(property="district", type="string", example="Hoan Kiem"),
- *                 @OA\Property(property="ward", type="string", example="Phuc Tan"),
- *                 @OA\Property(property="address", type="string", example="123 Main St"),
- *                 @OA\Property(property="default", type="integer", example=1),
- *                 @OA\Property(property="type", type="string", example="Home")
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Profile updated successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Cập nhật thành công!")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid or missing token",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Token không hợp lệ hoặc không tồn tại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Profile update failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Cập nhật thất bại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
+    
     public function update_profile(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -596,6 +542,7 @@ class AuthenController extends Controller
             "datebirth" => $request->datebirth ?? $user->datebirth,
             "updated_at" => now(),
             "avatar" => $avatarUrl ?? $user->avatar,
+            "description" => $request->description ?? $user->description,
         ];
         UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
         if($request->input('address')){
@@ -622,6 +569,10 @@ class AuthenController extends Controller
             'status' => true,
             'message' => "Cập nhật thành công!",
         ];
+        if($request->token){
+            return redirect()->back()->with('message', 'Cập nhật thành công!');
+        }
+
         return response()->json($dataDone, 200);
     }
 
@@ -687,6 +638,9 @@ class AuthenController extends Controller
             'status' => true,
             'message' => "Mật khẩu đã được thay đổi thành công",
         ];
+        if ($request->token) {
+            return redirect()->back()->with('message', 'Mật khẩu đã được thay đổi thành công');
+        }
         return response()->json($dataDone, 200);
     }
 
@@ -741,57 +695,6 @@ class AuthenController extends Controller
         return response()->json($dataDone, 200);
     }
 
-    /**
- * @OA\Post(
- *     path="api/confirm_mail_change_password/{token}/{email}",
- *     summary="Confirm mail change password",
- *     description="Confirms the password change request using a token and email, and resets the password.",
- *     tags={"Authentication"},
- *     @OA\Parameter(
- *         name="token",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="string"),
- *         description="The token for password reset"
- *     ),
- *     @OA\Parameter(
- *         name="email",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="string", format="email"),
- *         description="The email of the user"
- *     ),
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"newpassword"},
- *             @OA\Property(property="newpassword", type="string", example="new_password123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Password reset successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Mật khẩu đã được thay đổi thành công")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid request",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="vui lòng nhập mật khẩu mới")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="User not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Tài khoản không tồn tại")
- *         )
- *     )
- * )
- */
     public function confirm_mail_change_password(Request $request, $token, $email)
     {
         $user = UsersModel::where('email', $email)->first();
@@ -1196,5 +1099,14 @@ class AuthenController extends Controller
             }
         }
         return $ward_id;
+    }
+
+
+    public function admin_profile(Request $request)
+    {
+        $user = JWTAuth::parseToken()->authenticate() ?? null;
+        $user->load('role', 'address');
+        return view('profile.profile', ['user' => $user]);
+
     }
 }
