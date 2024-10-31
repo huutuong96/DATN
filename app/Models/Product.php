@@ -40,6 +40,7 @@ class Product extends Model
         'show_price',
         'status',
         'is_delete',
+        'admin_note',
     ];
 
 
