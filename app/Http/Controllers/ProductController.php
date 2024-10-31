@@ -851,38 +851,41 @@ $notification = $notificationController->store(new Request($notificationData));
         ]);
     }
 
-    public function productWaitingApproval(Request $request)
-    {
-        $tab = $request->input('tab', 1);
+    // public function productWaitingApproval(Request $request)
+    // {
+
+    //     $tab = $request->input('tab', 1);
     
-        $products = Product::where('status', 0)
-            ->with(['images', 'variants']) 
-            ->orderBy('created_at', 'ASC') 
-            ->paginate(20);
+    //     $products = Product::where('status', 0)
+    //         ->with(['images', 'variants']) 
+    //         ->orderBy('created_at', 'ASC') 
+    //         ->paginate(20);
     
-        return view('products.list_product', [
-            'products' => $products,
-            'tab' => $tab 
-        ]);
-    }
+    //     return view('products.list_product', [
+    //         'products' => $products,
+    //         'tab' => $tab 
+    //     ]);
+    // }
     
 
-    public function approveProduct($id)
+    public function approveProduct( Request $request, $id)
     {  
+        $tab = $request->tab;
         $product = Product::find($id);
         if ($product) {
             $product->status = 1;
             $product->save();
             return redirect()->route('product_all', [
                 'token' => auth()->user()->refesh_token,
-                'tab' => 2
+                'tab' => $tab
             ])->with('message', 'Sản phẩm đã được duyệt.');
         }
-        return redirect()->route('product_all', ['tab' => 2])->with('error', 'Sản phẩm không tìm thấy.');
+        return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
     }
     
-    public function rejectProduct($id)
+    public function rejectProduct(Request $request,$id)
     {
+        $tab = $request->tab;
         $product = Product::find($id);
         if ($product) {
             $product->status = 2;
@@ -890,12 +893,35 @@ $notification = $notificationController->store(new Request($notificationData));
     
             return redirect()->route('product_all', [
                 'token' => auth()->user()->refesh_token,
-                'tab' => 2
+                'tab' => $tab
             ])->with('message', 'Sản phẩm đã không được duyệt');
         }
     
-        return redirect()->route('product_all', ['tab' => 2])->with('error', 'Sản phẩm không tìm thấy.');
+        return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
     }
+    public function reportProduct(Request $request, $id)
+{
+    $tab = $request->query('tab');
+    $token = $request->query('token'); // Lấy token từ URL
+    $reason = $request->input('reason');
+    $product = Product::find($id);
+
+    if ($product) {
+        $product->status = 3;
+        $product->admin_note = $reason;
+        $product->save();
+
+        return redirect()->route('product_all', [
+            'token' => $token,
+            'tab' => $tab
+        ])->with('message', 'Sản phẩm đã bị đánh dấu là vi phạm');
+    }
+
+    return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
+}
+
+    
+
     
     public function ProductAll(Request $request)
     {
@@ -909,7 +935,19 @@ $notification = $notificationController->store(new Request($notificationData));
     
         return view('products.list_product', compact('allProducts', 'pendingProducts', 'activeProducts', 'rejectedProducts', 'violatingProducts', 'tab'));
     }
+    public function showReportForm(Request $request, $id)
+    {
+        $token = $request->query('token'); // Lấy token từ URL
+        $tab = $request->query('tab');
+        $product = Product::find($id);
     
+        if (!$product) {
+            return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
+        }
+    
+        return view('products.report_form', compact('product', 'token', 'tab'));
+    }
+      
 
 
 }
