@@ -1132,7 +1132,7 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Quản lý doanh thu tổng quát
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1141,44 +1141,10 @@
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
-                                                Sản phẩm chờ duyệt
+                                                Quản lý doanh thu theo shop
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crypto.html"
-                                                class="nav-link"
-                                                data-key="t-crypto"
-                                            >
-                                                Crypto
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
-                                        </li>
+                                    
                                     </ul>
                                 </div>
                             </li>
@@ -1217,7 +1183,7 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Danh sách chờ duyệt
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1226,7 +1192,7 @@
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
-                                                Sản phẩm chờ duyệt
+                                                Cửa hàng đã xóa
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1235,34 +1201,8 @@
                                                 class="nav-link"
                                                 data-key="t-crypto"
                                             >
-                                                Crypto
+                                                Cửa hàng vi phạm
                                             </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
                                         </li>
                                     </ul>
                                 </div>
@@ -1292,7 +1232,7 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                Xét duyệt cửa hàng
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1301,7 +1241,7 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Xét duyệt sản phẩm (new)
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1310,7 +1250,7 @@
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
-                                                Sản phẩm chờ duyệt
+                                                Xét duyệt sản phẩm (cập nhật)
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1319,34 +1259,8 @@
                                                 class="nav-link"
                                                 data-key="t-crypto"
                                             >
-                                                Crypto
+                                                ...
                                             </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
                                         </li>
                                     </ul>
                                 </div>
@@ -1377,15 +1291,6 @@
                                                 data-key="t-analytics"
                                             >
                                                 list danh mục
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crm.html"
-                                                class="nav-link"
-                                                data-key="t-crm"
-                                            >
-                                                Thêm danh mục
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1425,7 +1330,7 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                Danh sách khóa học
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1434,52 +1339,8 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Khóa học đã xóa
                                             </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="index.html"
-                                                class="nav-link"
-                                                data-key="t-ecommerce"
-                                            >
-                                                Sản phẩm chờ duyệt
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crypto.html"
-                                                class="nav-link"
-                                                data-key="t-crypto"
-                                            >
-                                                Crypto
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
                                         </li>
                                     </ul>
                                 </div>
@@ -1509,7 +1370,7 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                Danh sách blog
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1518,53 +1379,10 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Các blog đã xóa
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="index.html"
-                                                class="nav-link"
-                                                data-key="t-ecommerce"
-                                            >
-                                                Sản phẩm chờ duyệt
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crypto.html"
-                                                class="nav-link"
-                                                data-key="t-crypto"
-                                            >
-                                                Crypto
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
-                                        </li>
+                                       
                                     </ul>
                                 </div>
                             </li>
@@ -1593,7 +1411,7 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                Danh sách khách hàng
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1602,7 +1420,7 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                               Danh sách quản lý
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1611,44 +1429,10 @@
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
-                                                Sản phẩm chờ duyệt
+                                                Các tài khoản đã bị khóa
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crypto.html"
-                                                class="nav-link"
-                                                data-key="t-crypto"
-                                            >
-                                                Crypto
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
-                                        </li>
+                                       
                                     </ul>
                                 </div>
                             </li>
@@ -1686,53 +1470,10 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Danh sách các quyền
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="index.html"
-                                                class="nav-link"
-                                                data-key="t-ecommerce"
-                                            >
-                                                Sản phẩm chờ duyệt
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crypto.html"
-                                                class="nav-link"
-                                                data-key="t-crypto"
-                                            >
-                                                Crypto
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-projects.html"
-                                                class="nav-link"
-                                                data-key="t-projects"
-                                            >
-                                                Projects
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
-                                        </li>
+                                        
                                     </ul>
                                 </div>
                             </li>
