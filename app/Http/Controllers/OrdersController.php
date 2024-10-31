@@ -45,7 +45,18 @@ class OrdersController extends Controller
 
         return $this->successResponse('Lấy dữ liệu thành công', $orders);
     }
-
+    public function HistoryOrderToUser()
+    {
+        $orders = OrdersModel::where('user_id', auth()->id())
+            ->where('status', 5)
+            ->get();
+        if ($orders->isEmpty()) {
+            return $this->errorResponse("Không tồn tại Order nào", 404);
+        }
+    
+        return $this->successResponse('Lấy dữ liệu thành công', $orders);
+    }
+    
     public function show(string $id)
     {
         $order = OrdersModel::find($id);
