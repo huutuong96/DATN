@@ -32,7 +32,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $status = 1;
+        $status = 2;
         if($request->status){
             $status = $request->status;
         }
