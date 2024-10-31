@@ -273,6 +273,7 @@ class ProductController extends Controller
                         ];
                         $attributeValue = attributevalue::create($attributeValueData);
                         $variantAttributeData = [
+                            'variant_id' => $product->id,
                             'product_id' => $product->id,
                             'shop_id' => $product->shop_id,
                             'attribute_id' => $attributeId->id,
