@@ -92,7 +92,7 @@ class ProductController extends Controller
                 'message' => 'Sản phẩm không tồn tại'
             ], 400);
         }
-        $products = Product::where('slug', $slug)->with('images')->get();
+        $products = Product::where('slug', $slug)->where('status', 2)->with('images')->get();
         if ($products->isEmpty()) {
             return response()->json([
                 'status' => 'error',
