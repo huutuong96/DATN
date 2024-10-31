@@ -28,40 +28,20 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-body text-center p-5">
-                                    <form id="addCategoryForm">
+                                    <form action="{{ route('role_store', ['token' => auth()->user()->refesh_token]) }}" method="POST">
+                                        @csrf
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="mb-3">
-                                                    <label for="title" class="form-label">Title</label>
-                                                    <input type="text" class="form-control" placeholder="Enter category title" id="title" required>
+                                                    <label for="title" class="form-label">Tên</label>
+                                                    <input name="title" type="text" class="form-control" placeholder="Enter category title" id="title" required>
                                                 </div><!--end mb-3-->
                                             </div><!--end col-->
 
                                             <div class="col-6">
                                                 <div class="mb-3">
-                                                    <label for="index" class="form-label">Index</label>
-                                                    <input type="number" class="form-control" value="1" id="index" required>
-                                                </div><!--end mb-3-->
-                                            </div><!--end col-->
-
-                                            <div class="col-12">
-                                                <div class="mb-3">
-                                                    <label for="image" class="form-label">Image URL</label>
-                                                    <input type="file" class="form-control" placeholder="Enter image URL" id="image">
-                                                </div><!--end mb-3-->
-                                            </div><!--end col-->
-
-                                            <div class="col-6">
-                                                <div class="mb-3">
-                                                    <label for="status" class="form-label">Status</label>
-                                                    <input type="number" class="form-control" value="1" id="status" required>
-                                                </div><!--end mb-3-->
-                                            </div><!--end col-->
-
-                                            <div class="col-6">
-                                                <div class="mb-3">
-                                                    <label for="parentId" class="form-label">Parent ID</label>
-                                                    <input type="number" class="form-control" placeholder="Enter parent ID" id="parentId">
+                                                    <label for="index" class="form-label">Mô tả</label>
+                                                    <input name="description" type="number" class="form-control" value="1" id="index" required>
                                                 </div><!--end mb-3-->
                                             </div><!--end col-->
 

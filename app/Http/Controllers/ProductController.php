@@ -955,11 +955,19 @@ $notification = $notificationController->store(new Request($notificationData));
                 $addedattributevalueIds[] = $vaAttribute->value_id;
             }
         }
-        // return $attributevalue;
-
+        $variant = product_variants::where('product_id', $id)->get();
+        foreach ($variant as $value) {
+            $value->product_id = intval($value->product_id);
+            $value->stock = intval($value->stock);
+            $value->price = intval($value->price);
+            $value->is_deleted = intval($value->is_deleted);
+            $value->deleted_by = intval($value->deleted_by);
+        }
+        
         $data = [];
         $data['attribute'] = $Attribute;
         $data['value'] = $attributevalue;
+        $data['variant'] = $variant;
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",

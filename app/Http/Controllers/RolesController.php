@@ -26,18 +26,17 @@ class RolesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoleRequest $request)
+    public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
-        
-        try {
-            $validatedData = $request->validated();
-            $validatedData['create_by'] = $user->id;
-            $role = RolesModel::create($validatedData);
-            return $this->successResponse("Thêm vai trò thành công", $role);
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Thêm vai trò không thành công", $th->getMessage());
-        }
+        $role = RolesModel::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => $request->status,
+            'create_by' => $user->id,
+            'update_by' => $user->id,
+        ]);
+        return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'Thêm vai trò thành công!');
     }
 
     /**
