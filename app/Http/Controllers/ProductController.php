@@ -74,7 +74,6 @@ class ProductController extends Controller
             $product->price = intval($product->price);
             $product->sale_price = intval($product->sale_price);
         }
-        dd($products);
 
         return response()->json(
             [
