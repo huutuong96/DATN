@@ -26,18 +26,17 @@ class RolesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoleRequest $request)
+    public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
-        
-        try {
-            $validatedData = $request->validated();
-            $validatedData['create_by'] = $user->id;
-            $role = RolesModel::create($validatedData);
-            return $this->successResponse("Thêm vai trò thành công", $role);
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Thêm vai trò không thành công", $th->getMessage());
-        }
+        $role = RolesModel::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => $request->status ?? 1,
+            'create_by' => $user->id,
+            'update_by' => $user->id,
+        ]);
+        return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'Thêm vai trò thành công!');
     }
 
     /**
@@ -57,23 +56,19 @@ class RolesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RoleRequest $request, string $id)
+    public function update(Request $request)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $role = RolesModel::find($id);
-
-        if (!$role) {
-            return $this->errorResponse("Vai trò không tồn tại", 404);
-        }
-
-        try {
-            $user = JWTAuth::parseToken()->authenticate();
-            $validateDate = $request->validated();
-            $validateDate['update_by'] = $user->id;
-            $role->update($validateDate);
-            return $this->successResponse("Cập nhật vai trò thành công", $role);
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Cập nhật vai trò không thành công", $th->getMessage());
-        }
+        
+        $role->title = $request->title ?? $role->title;
+        $role->description = $request->description ?? $role->description;
+        $role->status = $request->status ?? $role->status;
+        $role->update_by = $user->id;
+        $role->updated_at = now();
+        $role->updated_by = $user->id;
+        $role->save();
+        return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'cập nhật vai trò thành công!');
     }
 
     /**

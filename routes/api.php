@@ -307,9 +307,9 @@ Route::get('/search', function () {
 
                 Route::resource('categori_shops', Categori_ShopsController::class);
 
-                Route::resource('roles', RolesController::class)->middleware('CheckRole');
+                // Route::resource('roles', RolesController::class)->middleware('CheckRole');
                 Route::get('role/destroy/{id}', [RolesController::class, 'destroy'])->name('role_destroy');
-                Route::put('roles/{id}', [RolesController::class, 'update'])->name('role_update');
+                Route::put('roles/update}', [RolesController::class, 'update'])->name('role_update');
                 Route::post('roles', [RolesController::class, 'store'])->name('role_store');
 
                 Route::resource('address', AddressController::class);
