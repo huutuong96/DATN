@@ -135,9 +135,18 @@ class VnshopController extends Controller
 
         ));
     }
-    public function store()
-    {
-        return view('stores.list_store');
+    public function store($limit = 5)
+    {    $shops = Shop::where("status", "!=", 1)
+                        ->where("status", "!=", 4)->with('user')->paginate($limit);
+         foreach ($shops as $Key => $shop) {
+            $doanhthu = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+                                    ->where('shop_id', $shop->id)->sum('net_amount');
+            $shop["doanhthu"] = $doanhthu;
+    
+         }
+        return view('stores.list_store',compact(
+            'shops'
+        ));
     }
     public function productWaitingApproval()
     {
@@ -177,6 +186,15 @@ class VnshopController extends Controller
         if ($category) {
             $category->status =$rqt->status; 
             $category->save(); 
+            return Back();
+        }
+    }
+    public function changeShop(Request $rqt){
+       
+        $shop = Shop::find($rqt->id);
+        if ($shop) {
+            $shop->status =$rqt->status; 
+            $shop->save(); 
             return Back();
         }
     }
