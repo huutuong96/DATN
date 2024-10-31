@@ -933,7 +933,6 @@ $notification = $notificationController->store(new Request($notificationData));
     public function variantattribute(Request $request, $shop_id, $id)
     {
         $variantattribute = variantattribute::where('product_id', $id)->where('shop_id', $shop_id)->with("variant")->get();
-
         foreach ($variantattribute as $value) {
             $value->attribute_id = intval($value->attribute_id);
             $value->value_id = intval($value->value_id);
@@ -944,6 +943,7 @@ $notification = $notificationController->store(new Request($notificationData));
         $Attribute = [];
         $addedAttributeIds = [];
         $addedattributevalueIds = [];
+        // return $variantattribute;
         foreach ($variantattribute as $vaAttribute) {
             $attribute = Attribute::where('id', $vaAttribute->attribute_id)->get();
             if (!in_array($vaAttribute->attribute_id, $addedAttributeIds)) {
@@ -955,6 +955,8 @@ $notification = $notificationController->store(new Request($notificationData));
                 $addedattributevalueIds[] = $vaAttribute->value_id;
             }
         }
+        // return $attributevalue;
+
         $data = [];
         $data['attribute'] = $Attribute;
         $data['value'] = $attributevalue;
