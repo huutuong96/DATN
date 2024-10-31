@@ -521,7 +521,6 @@ class ShopController extends Controller
 
     public function get_product_to_shop(Request $request, string $id)
     {
-        // dd($request->status);
         $shop = Shop::find($id);
         if (!$shop) {
             return response()->json([
@@ -529,7 +528,7 @@ class ShopController extends Controller
                 'message' => 'Shop không tồn tại',
             ], 404);
         }
-
+        
         if ($request->status) {
             $status = $request->status;
             $product = Product::where('shop_id', $shop->id)

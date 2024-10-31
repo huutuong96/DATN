@@ -32,7 +32,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $status = 1;
+        $status = 2;
         if($request->status){
             $status = $request->status;
         }
@@ -40,15 +40,12 @@ class ProductController extends Controller
         ->with(['images', 'colors'])  // Eager load images
         ->paginate(20);
         $products->appends(['status' => $status]); // Append status to pagination links
-        if($request->status == 0){
-            $products = Product::
-            with(['images', 'colors'])  // Eager load images
-            ->paginate(20);
-            $products->appends(['status' => 0]); // Append status to pagination links
-        }
-
-
-
+        // if($request->status == 2){
+        //     $products = Product::
+        //     with(['images', 'colors'])  // Eager load images
+        //     ->paginate(20);
+        //     $products->appends(['status' => 2]); // Append status to pagination links
+        // }
         if ($products->isEmpty()) {
             return response()->json(
                 [
@@ -77,6 +74,7 @@ class ProductController extends Controller
             $product->price = intval($product->price);
             $product->sale_price = intval($product->sale_price);
         }
+
         return response()->json(
             [
                 'status' => true,
@@ -94,7 +92,7 @@ class ProductController extends Controller
                 'message' => 'Sản phẩm không tồn tại'
             ], 400);
         }
-        $products = Product::where('slug', $slug)->with('images')->get();
+        $products = Product::where('slug', $slug)->where('status', 2)->with('images')->get();
         if ($products->isEmpty()) {
             return response()->json([
                 'status' => 'error',
