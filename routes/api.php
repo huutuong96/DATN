@@ -442,8 +442,8 @@ Route::get('/search', function () {
                 Route::resource('orders', OrdersController::class);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
-
-
+                Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);
+                
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
             Route::get('shop_get_message/{shop_id}', [MessageController::class, "shop_get_message"]);
             Route::get('user_get_message', [MessageController::class, "user_get_message"]);
