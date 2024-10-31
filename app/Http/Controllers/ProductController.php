@@ -851,13 +851,65 @@ $notification = $notificationController->store(new Request($notificationData));
         ]);
     }
 
-    public function productWaitingApproval()
+    public function productWaitingApproval(Request $request)
     {
+        $tab = $request->input('tab', 1);
+    
         $products = Product::where('status', 0)
-            ->with(['images', 'variants'])  // Eager load images
+            ->with(['images', 'variants']) 
+            ->orderBy('created_at', 'ASC') 
             ->paginate(20);
-        return view('products.list_product', ['products' => $products]);
+    
+        return view('products.list_product', [
+            'products' => $products,
+            'tab' => $tab 
+        ]);
     }
+    
+
+    public function approveProduct($id)
+    {  
+        $product = Product::find($id);
+        if ($product) {
+            $product->status = 1;
+            $product->save();
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => 2
+            ])->with('message', 'Sản phẩm đã được duyệt.');
+        }
+        return redirect()->route('product_all', ['tab' => 2])->with('error', 'Sản phẩm không tìm thấy.');
+    }
+    
+    public function rejectProduct($id)
+    {
+        $product = Product::find($id);
+        if ($product) {
+            $product->status = 2;
+            $product->save();
+    
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => 2
+            ])->with('message', 'Sản phẩm đã không được duyệt');
+        }
+    
+        return redirect()->route('product_all', ['tab' => 2])->with('error', 'Sản phẩm không tìm thấy.');
+    }
+    
+    public function ProductAll(Request $request)
+    {
+        $tab = $request->input('tab', 1); 
+    
+        $allProducts = Product::all(); // Tất cả sản phẩm
+        $pendingProducts = Product::where('status', 0)->get(); // Chờ duyệt
+        $activeProducts = Product::where('status', 1)->get(); // Đang hoạt động
+        $rejectedProducts = Product::where('status', 2)->get(); // Đã từ chối
+        $violatingProducts = Product::where('status', 3)->get(); // Vi phạm
+    
+        return view('products.list_product', compact('allProducts', 'pendingProducts', 'activeProducts', 'rejectedProducts', 'violatingProducts', 'tab'));
+    }
+    
 
 
 }
