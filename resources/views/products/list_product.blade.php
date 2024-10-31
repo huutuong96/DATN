@@ -254,7 +254,7 @@
                                                                         <form action="{{ route('products.submitReport', [
                                                                             'id' => $product->id,
                                                                             'token' => auth()->user()->refesh_token,
-                                                                            'tab' => 3
+                                                                            'tab' => 2
                                                                         ]) }}" method="POST">
                                                                             @csrf
                                                                             <div class="mb-3">
