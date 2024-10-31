@@ -581,7 +581,7 @@ Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         Route::get('categories', [CategoriesController::class, 'index']);
 
         Route::get('search', [ProductController::class, 'search']);
-        Route::get('/products/{slug}', [ProductController::class, 'getProductToSlug']);
+        Route::get('/products/slug/{slug}', [ProductController::class, 'getProductToSlug']);
 
 
         Route::get('get_infomaiton_province_and_city', [PurchaseController::class, 'get_infomaiton_province_and_city']);
