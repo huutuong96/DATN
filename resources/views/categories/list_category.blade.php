@@ -73,10 +73,11 @@
                                     
                                     const title = document.getElementById('title').value;
                                     const index = document.getElementById('index').value;
-                                    const image = document.getElementById('image').value; // Nếu bạn có URL của ảnh
+                                    const image = document.getElementById('image').files; // Nếu bạn có URL của ảnh
                                     const status = document.getElementById('status').value;
                                     const parentId = document.getElementById('parentId').value;
-
+                                    console.log(image);
+                                    
                                     const data = {
                                         title: title,
                                         index: index,
@@ -113,7 +114,7 @@
                         </div>
                     </div>
                 </div><!-- end card header -->
-                </div>
+                
                 <div class="card-body">
                     <div class="live-preview">
                         <div class="table-responsive">
@@ -289,11 +290,6 @@
             </div><!-- end card -->
         </div>
         <!-- end col -->
-        <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">...</div>
-  <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">...</div>
-  <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">...</div>
-
-
     </div>
    </div>
 

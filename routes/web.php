@@ -52,12 +52,14 @@ use App\Http\Controllers\configController;
 
 
 
+
 Route::get('/', [VnshopController::class, 'login'])->name('login');
 Route::group(['middleware' => ['checkToken']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
     Route::get('/store', [VnshopController::class, 'store'])->name('store');
     Route::get('/list-category', [VnshopController::class, 'list_category'])->name('list_category');
     Route::get('/change-category', [VnshopController::class, 'changeCategory'])->name('change_category');
+    Route::get('/list-role', [VnshopController::class, 'list_role'])->name('list_role');
     Route::get('/product_all', [ProductController::class, 'ProductAll'])->name('product_all');
     Route::get('/product-waiting-approval', [ProductController::class, 'productWaitingApproval'])->name('product-waiting-approval');
     Route::post('/products/{id}/approve', [ProductController::class, 'approveProduct'])->name('products.approve');
@@ -66,4 +68,6 @@ Route::group(['middleware' => ['checkToken']], function () {
     Route::post('/products/report/{id}', [ProductController::class, 'reportProduct'])->name('products.submitReport');
     
     
+    
+    Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
 });

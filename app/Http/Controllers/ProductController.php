@@ -103,7 +103,7 @@ class ProductController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => $products
+            'data' => $products->first()
         ], 200);
     }
 

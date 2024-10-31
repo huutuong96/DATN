@@ -9,13 +9,15 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\order_fee_details;
 use App\Models\CategoriesModel;
+use App\Models\RolesModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class VnshopController extends Controller
 {
     public function __construct() {
-     
+        $this->middleware('checkRole')->only('list_role');
+
     }
     public function login()
     {
@@ -51,7 +53,7 @@ class VnshopController extends Controller
             $day = $order->created_at->day; 
             if ($day <= Carbon::now()->day) { 
 
-                $doanhthu[$day] += ($order->total_amount / 1000000 );
+                $doanhthu[$day] += ($order->total_amount / 100000 );
                 if($order->status == 5){
                     $luongtrahang[$day] += 1;
                 }
@@ -114,7 +116,7 @@ class VnshopController extends Controller
             $shop["doanhthu"] = $doanhthu ;
             $listShop[] = $shop;
         }
-        // dd($listShop[0]->user[0]->fullname);
+        // dd($listShop);
         usort($listShop, function($a, $b) {
             return $b->doanhthu <=> $a->doanhthu;
         });
@@ -135,9 +137,18 @@ class VnshopController extends Controller
 
         ));
     }
-    public function store()
-    {
-        return view('stores.list_store');
+    public function store($limit = 5)
+    {    $shops = Shop::where("status", "!=", 1)
+                        ->where("status", "!=", 4)->with('user')->paginate($limit);
+         foreach ($shops as $Key => $shop) {
+            $doanhthu = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+                                    ->where('shop_id', $shop->id)->sum('net_amount');
+            $shop["doanhthu"] = $doanhthu;
+    
+         }
+        return view('stores.list_store',compact(
+            'shops'
+        ));
     }
     public function productWaitingApproval()
     {
@@ -180,6 +191,22 @@ class VnshopController extends Controller
             return Back();
         }
     }
+    public function changeShop(Request $rqt){
+       
+        $shop = Shop::find($rqt->id);
+        if ($shop) {
+            $shop->status =$rqt->status; 
+            $shop->save(); 
+            return Back();
+        }
+    }
     
+    public function list_role(Request $request){
+        $limit = $request->limit ?? 10;
+        $roles = RolesModel::orderBy('created_at', 'desc')->paginate($limit);
+        return view('roles.list_role',compact(
+            'roles'
+        ));
+    }
     
 }

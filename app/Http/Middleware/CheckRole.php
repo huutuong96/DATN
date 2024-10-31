@@ -32,6 +32,9 @@ class CheckRole
         if ($role->title == $role) {
             return $next($request);
         }
+        if ($request->token) {
+            return redirect()->back()->with('message', 'Bạn không có quyền vào trang này');
+        }
         return response()->json([
             'status' => 'error',
             'message' => 'Bạn không có quyền vào trang này',

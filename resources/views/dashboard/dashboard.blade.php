@@ -374,50 +374,7 @@
                                     </td>
                                 </tr>
                                 @endforeach
-                                <!-- <tr>
-                                    <td>Raitech Soft</td>
-                                    <td>Hà nội</td>
-                                    <td><img src="assets/images/users/avatar-2.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                        <a href="#javascript: void(0);" class="text-body fw-medium">Sofia Cunha</a>
-                                    </td>
-                                    <td><span class="badge bg-warning-subtle text-warning p-2">Intro Call</span></td>
-                                    <td>
-                                        <div class="text-nowrap">$150K</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>William PVT</td>
-                                    <td>Phú quốc</td>
-                                    <td><img src="assets/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                        <a href="#javascript: void(0);" class="text-body fw-medium">Luis Rocha</a>
-                                    </td>
-                                    <td><span class="badge bg-danger-subtle text-danger p-2">Stuck</span></td>
-                                    <td>
-                                        <div class="text-nowrap">$78.18K</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Loiusee LLP</td>
-                                    <td>Tp. Hồ Chí Minh</td>
-                                    <td><img src="assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                        <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
-                                    </td>
-                                    <td><span class="badge bg-success-subtle text-success p-2">Deal Won</span></td>
-                                    <td>
-                                        <div class="text-nowrap">$180K</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Apple Inc.</td>
-                                    <td>Huế</td>
-                                    <td><img src="assets/images/users/avatar-6.jpg" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                        <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
-                                    </td>
-                                    <td><span class="badge bg-info-subtle text-info p-2">New Lead</span></td>
-                                    <td>
-                                        <div class="text-nowrap">$78.9K</div>
-                                    </td>
-                                </tr> -->
+                                
                             </tbody><!-- end tbody -->
                         </table><!-- end table -->
                     </div><!-- end table responsive -->
