@@ -963,11 +963,13 @@ $notification = $notificationController->store(new Request($notificationData));
             $value->is_deleted = intval($value->is_deleted);
             $value->deleted_by = intval($value->deleted_by);
         }
+        $
         
         $data = [];
         $data['attribute'] = $Attribute;
         $data['value'] = $attributevalue;
         $data['variant'] = $variant;
+        $data['variantattribute'] = $variantattribute;
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
