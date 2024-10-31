@@ -16,7 +16,6 @@ class OrderDetailController extends Controller
         $orderDetails = Cache::remember('all_order_details', 60 * 60, function () {
             return OrderDetailsModel::all();
         });
-
         if ($orderDetails->isEmpty()) {
             return $this->errorResponse("Không tồn tại chi tiết đơn hàng nào");
         }
