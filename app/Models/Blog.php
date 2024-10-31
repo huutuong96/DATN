@@ -20,4 +20,8 @@ class Blog extends Model
         'updated_by',
         'is_deleted',
     ];
+    public function postCategory()
+    {
+        return $this->belongsTo(Post::class, 'post_id', 'id'); // Chỉnh sửa theo cần thiết
+    }
 }
