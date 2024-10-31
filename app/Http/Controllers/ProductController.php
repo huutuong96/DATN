@@ -928,10 +928,10 @@ $notification = $notificationController->store(new Request($notificationData));
         $tab = $request->input('tab', 1); 
     
         $allProducts = Product::all(); // Tất cả sản phẩm
-        $pendingProducts = Product::where('status', 0)->get(); // Chờ duyệt
-        $activeProducts = Product::where('status', 1)->get(); // Đang hoạt động
-        $rejectedProducts = Product::where('status', 2)->get(); // Đã từ chối
-        $violatingProducts = Product::where('status', 3)->get(); // Vi phạm
+        $pendingProducts = Product::where('status', 3)->get(); // Chờ duyệt
+        $activeProducts = Product::where('status', 2)->get(); // Đang hoạt động
+        $rejectedProducts = Product::where('status', 5)->get(); // Đã từ chối
+        $violatingProducts = Product::where('status', 4)->get(); // Vi phạm
     
         return view('products.list_product', compact('allProducts', 'pendingProducts', 'activeProducts', 'rejectedProducts', 'violatingProducts', 'tab'));
     }

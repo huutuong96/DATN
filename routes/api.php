@@ -285,6 +285,8 @@ use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\BlogsController;
 Route::get('/search', function () {
     return "API - VNSHOP";
 })->middleware('CheckPremission:create_category');
@@ -316,7 +318,8 @@ Route::get('/search', function () {
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->middleware('CheckRole:OWNER');
                 Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->middleware('CheckRole:OWNER');
 
-                
+              
+
 
                 // Route áp dụng middleware
                 Route::middleware('CheckPremission:handle_banner')->group(function () {
@@ -377,6 +380,9 @@ Route::get('/search', function () {
 
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
                 Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
+
+                Route::resource('blogs', BlogsController::class);
+                Route::resource('posts', PostController::class);
 
                 Route::resource('follows', FollowToShopController::class);
                 Route::resource('support_main', Support_mainController::class);
