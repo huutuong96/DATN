@@ -285,6 +285,8 @@ use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\BlogsController;
 Route::get('/search', function () {
     return "API - VNSHOP";
 })->middleware('CheckPremission:create_category');
@@ -305,7 +307,10 @@ Route::get('/search', function () {
 
                 Route::resource('categori_shops', Categori_ShopsController::class);
 
-                Route::resource('roles', RolesController::class)->middleware('CheckRole');
+                // Route::resource('roles', RolesController::class)->middleware('CheckRole');
+                Route::get('role/destroy/{id}', [RolesController::class, 'destroy'])->name('role_destroy');
+                Route::put('roles/update}', [RolesController::class, 'update'])->name('role_update');
+                Route::post('roles', [RolesController::class, 'store'])->name('role_store');
 
                 Route::resource('address', AddressController::class);
 
@@ -313,7 +318,8 @@ Route::get('/search', function () {
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->middleware('CheckRole:OWNER');
                 Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->middleware('CheckRole:OWNER');
 
-                
+              
+
 
                 // Route áp dụng middleware
                 Route::middleware('CheckPremission:handle_banner')->group(function () {
@@ -375,6 +381,9 @@ Route::get('/search', function () {
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
                 Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
 
+                Route::resource('blogs', BlogsController::class);
+                Route::resource('posts', PostController::class);
+
                 Route::resource('follows', FollowToShopController::class);
                 Route::resource('support_main', Support_mainController::class);
                 Route::resource('Comments', CommentsController::class);
@@ -425,16 +434,16 @@ Route::get('/search', function () {
                 Route::resource('carts', CartController::class);
                 Route::resource('users', AuthenController::class);
                 Route::get('user/me', [AuthenController::class, "me"]);
-                Route::post('user/change_password', [AuthenController::class, "change_password"]);
-                Route::post('user/update_profile', [AuthenController::class, "update_profile"]);
+                Route::post('user/change_password', [AuthenController::class, "change_password"])->name('change_password');
+                Route::post('user/update_profile', [AuthenController::class, "update_profile"])->name('update_profile');
                 Route::post('user/reset_password', [AuthenController::class, "reset_password"]);
                 Route::get('user/admin/logout', [AuthenController::class, "adminLogout"])->name('adminLogout');
 
                 Route::resource('orders', OrdersController::class);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
-
-
+                Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);
+                
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
             Route::get('shop_get_message/{shop_id}', [MessageController::class, "shop_get_message"]);
             Route::get('user_get_message', [MessageController::class, "user_get_message"]);

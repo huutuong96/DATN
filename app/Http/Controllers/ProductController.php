@@ -32,7 +32,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $status = 1;
+        $status = 2;
         if($request->status){
             $status = $request->status;
         }
@@ -40,15 +40,12 @@ class ProductController extends Controller
         ->with(['images', 'colors'])  // Eager load images
         ->paginate(20);
         $products->appends(['status' => $status]); // Append status to pagination links
-        if($request->status == 0){
-            $products = Product::
-            with(['images', 'colors'])  // Eager load images
-            ->paginate(20);
-            $products->appends(['status' => 0]); // Append status to pagination links
-        }
-
-
-
+        // if($request->status == 2){
+        //     $products = Product::
+        //     with(['images', 'colors'])  // Eager load images
+        //     ->paginate(20);
+        //     $products->appends(['status' => 2]); // Append status to pagination links
+        // }
         if ($products->isEmpty()) {
             return response()->json(
                 [
@@ -77,6 +74,7 @@ class ProductController extends Controller
             $product->price = intval($product->price);
             $product->sale_price = intval($product->sale_price);
         }
+
         return response()->json(
             [
                 'status' => true,
@@ -94,7 +92,7 @@ class ProductController extends Controller
                 'message' => 'Sản phẩm không tồn tại'
             ], 400);
         }
-        $products = Product::where('slug', $slug)->with('images')->get();
+        $products = Product::where('slug', $slug)->where('status', 2)->with('images')->get();
         if ($products->isEmpty()) {
             return response()->json([
                 'status' => 'error',
@@ -103,9 +101,122 @@ class ProductController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => $products
+            'data' => $products->first()
         ], 200);
     }
+
+    // public function store(Request $request)
+    // {
+    //     // dd($request->images);
+    //     // dd($request->images[0]);
+    //     try {
+    //         $user = JWTAuth::parseToken()->authenticate();
+    //         $cloudinary = new Cloudinary();
+    //         DB::beginTransaction();
+    //         $mainImageUrl = null;
+    //         $dataInsert = [
+    //             'name' => $request->name,
+    //             'sku' => $request->sku ?? $this->generateSKU(),
+    //             'slug' => $request->slug ?? Str::slug($request->name),
+    //             'description' => $request->description,
+    //             'infomation' => json_encode($request->infomation),
+    //             'price' => $request->price,
+    //             'sale_price' => $request->sale_price ?? null,
+    //             'image' => $request->images[0] ?? null,
+    //             'quantity' => $request->stock ?? 0,
+    //             'create_by' => $user->id,
+    //             'category_id' => $request->category_id,
+    //             'brand' => $request->brand ?? null,
+    //             'shop_id' => $request->shop_id,
+    //             'height' => $request->height,
+    //             'length' => $request->length,
+    //             'weight' => $request->weight,
+    //             'width' => $request->width,
+    //             'show_price' => $request->price ?? $request->sale_price,
+    //             'status' => 3,
+    //         ];
+    //         $product = Product::create($dataInsert);
+    //         foreach ($request->images as $image) {
+    //             $imageModel = Image::create([
+    //                 'product_id' => $product->id,
+    //                 'url' => $image ?? null,
+    //                 'status' => 1,
+    //             ]);
+    //         }
+    //         // dd($request->variant['variantItems']);
+    //         if($request->variant != null){
+    //             foreach ($request->variant['variantItems'] as $attribute) {
+
+    //                 $attributeData = [
+    //                     'name' => $attribute['name'],
+    //                     'display_name' => strtoupper($attribute['name']),
+    //                 ];
+    //                 $attributeId = Attribute::create($attributeData);
+    //                 foreach ($attribute['values'] as $value) {
+    //                     $attributeValueData = [
+    //                         'attribute_id' => $attributeId->id,
+    //                         'value' => $value['value'],
+    //                     ];
+    //                     $attributeValue = attributevalue::create($attributeValueData);
+    //                 }
+    //             }
+    //             // $attributeValue = attributevalue::where()
+    //             foreach ($request->variant['variantProducts'] as $variant) {
+    //                 $product_variantsData = [
+    //                     'product_id' => $product->id,
+    //                     'sku' => $variant['sku'] ?? $this->generateSKU(),
+    //                     'stock' => $variant['stock'] ?? $request->stock,
+    //                     'price' => $variant['price'] ?? $product->price,
+    //                     'images' => $variant['image'] ?? $product->image,
+    //                 ];
+    //                 $product_variants = product_variants::create($product_variantsData);
+    //                 $values = [];
+    //                 foreach ($variant['variants'] as $item) {
+    //                     $values[] = $item['value'];
+    //                 }
+    //                 $concatenated_values = implode(', ', $values);
+    //                 $product_variants->update([
+    //                     'name' => $concatenated_values,
+    //                 ]);
+    //                 $variantAttributeData = [
+    //                     'variant_id' => $product_variants->id,
+    //                     'product_id' => $product->id,
+    //                     'shop_id' => $product->shop_id,
+    //                     'attribute_id' => $attributeValue->attribute_id,
+    //                     'value_id' => $attributeValue->id,
+    //                 ];
+    //                 $variantattribute = variantattribute::create($variantAttributeData);
+    //             }
+
+    //             $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
+    //             $highest_price = $product_variants_get_price->max('price');
+    //             $lowest_price = $product_variants_get_price->min('price');
+    //             if($highest_price == $lowest_price){
+    //                 $product->update([
+    //                     'show_price' => $highest_price,
+    //                 ]);
+    //             }
+    //             if($highest_price != $lowest_price){
+    //                 $product->update([
+    //                     'show_price' => $lowest_price . " - " . $highest_price,
+    //                 ]);
+    //             }
+    //         }
+    //         DB::commit();
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => "Sản phẩm đã được lưu",
+    //             'product' => $product->load('images', 'variants'),
+    //         ], 200);
+    //     } catch (\Throwable $th) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => "Thêm product không thành công",
+    //             'error' => $th->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     public function store(Request $request)
     {
@@ -154,12 +265,21 @@ class ProductController extends Controller
                         'display_name' => strtoupper($attribute['name']),
                     ];
                     $attributeId = Attribute::create($attributeData);
+                    
                     foreach ($attribute['values'] as $value) {
                         $attributeValueData = [
                             'attribute_id' => $attributeId->id,
                             'value' => $value['value'],
                         ];
                         $attributeValue = attributevalue::create($attributeValueData);
+                        $variantAttributeData = [
+                            'variant_id' => $product->id,
+                            'product_id' => $product->id,
+                            'shop_id' => $product->shop_id,
+                            'attribute_id' => $attributeId->id,
+                            'value_id' => $attributeValue->id,
+                        ];
+                        $variantattribute = variantattribute::create($variantAttributeData);
                     }
                 }
                 // $attributeValue = attributevalue::where()
@@ -180,14 +300,8 @@ class ProductController extends Controller
                     $product_variants->update([
                         'name' => $concatenated_values,
                     ]);
-                    $variantAttributeData = [
-                        'variant_id' => $product_variants->id,
-                        'product_id' => $product->id,
-                        'shop_id' => $product->shop_id,
-                        'attribute_id' => $attributeValue->attribute_id,
-                        'value_id' => $attributeValue->id,
-                    ];
-                    $variantattribute = variantattribute::create($variantAttributeData);
+                    $variantattribute->variant_id = $product_variants->id;
+                    
                 }
 
                 $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
@@ -819,7 +933,6 @@ $notification = $notificationController->store(new Request($notificationData));
     public function variantattribute(Request $request, $shop_id, $id)
     {
         $variantattribute = variantattribute::where('product_id', $id)->where('shop_id', $shop_id)->with("variant")->get();
-
         foreach ($variantattribute as $value) {
             $value->attribute_id = intval($value->attribute_id);
             $value->value_id = intval($value->value_id);
@@ -830,6 +943,7 @@ $notification = $notificationController->store(new Request($notificationData));
         $Attribute = [];
         $addedAttributeIds = [];
         $addedattributevalueIds = [];
+        // return $variantattribute;
         foreach ($variantattribute as $vaAttribute) {
             $attribute = Attribute::where('id', $vaAttribute->attribute_id)->get();
             if (!in_array($vaAttribute->attribute_id, $addedAttributeIds)) {
@@ -841,9 +955,20 @@ $notification = $notificationController->store(new Request($notificationData));
                 $addedattributevalueIds[] = $vaAttribute->value_id;
             }
         }
+        $variant = product_variants::where('product_id', $id)->get();
+        foreach ($variant as $value) {
+            $value->product_id = intval($value->product_id);
+            $value->stock = intval($value->stock);
+            $value->price = intval($value->price);
+            $value->is_deleted = intval($value->is_deleted);
+            $value->deleted_by = intval($value->deleted_by);
+        }
+        
         $data = [];
         $data['attribute'] = $Attribute;
         $data['value'] = $attributevalue;
+        $data['variant'] = $variant;
+        $data['variantattribute'] = $variantattribute;
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
@@ -851,38 +976,41 @@ $notification = $notificationController->store(new Request($notificationData));
         ]);
     }
 
-    public function productWaitingApproval(Request $request)
-    {
-        $tab = $request->input('tab', 1);
+    // public function productWaitingApproval(Request $request)
+    // {
+
+    //     $tab = $request->input('tab', 1);
     
-        $products = Product::where('status', 0)
-            ->with(['images', 'variants']) 
-            ->orderBy('created_at', 'ASC') 
-            ->paginate(20);
+    //     $products = Product::where('status', 0)
+    //         ->with(['images', 'variants']) 
+    //         ->orderBy('created_at', 'ASC') 
+    //         ->paginate(20);
     
-        return view('products.list_product', [
-            'products' => $products,
-            'tab' => $tab 
-        ]);
-    }
+    //     return view('products.list_product', [
+    //         'products' => $products,
+    //         'tab' => $tab 
+    //     ]);
+    // }
     
 
-    public function approveProduct($id)
+    public function approveProduct( Request $request, $id)
     {  
+        $tab = $request->tab;
         $product = Product::find($id);
         if ($product) {
             $product->status = 1;
             $product->save();
             return redirect()->route('product_all', [
                 'token' => auth()->user()->refesh_token,
-                'tab' => 2
+                'tab' => $tab
             ])->with('message', 'Sản phẩm đã được duyệt.');
         }
-        return redirect()->route('product_all', ['tab' => 2])->with('error', 'Sản phẩm không tìm thấy.');
+        return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
     }
     
-    public function rejectProduct($id)
+    public function rejectProduct(Request $request,$id)
     {
+        $tab = $request->tab;
         $product = Product::find($id);
         if ($product) {
             $product->status = 2;
@@ -890,26 +1018,61 @@ $notification = $notificationController->store(new Request($notificationData));
     
             return redirect()->route('product_all', [
                 'token' => auth()->user()->refesh_token,
-                'tab' => 2
+                'tab' => $tab
             ])->with('message', 'Sản phẩm đã không được duyệt');
         }
     
-        return redirect()->route('product_all', ['tab' => 2])->with('error', 'Sản phẩm không tìm thấy.');
+        return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
     }
+    public function reportProduct(Request $request, $id)
+{
+    $tab = $request->query('tab');
+    $token = $request->query('token'); // Lấy token từ URL
+    $reason = $request->input('reason');
+    $product = Product::find($id);
+
+    if ($product) {
+        $product->status = 3;
+        $product->admin_note = $reason;
+        $product->save();
+
+        return redirect()->route('product_all', [
+            'token' => $token,
+            'tab' => $tab
+        ])->with('message', 'Sản phẩm đã bị đánh dấu là vi phạm');
+    }
+
+    return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
+}
+
+    
+
     
     public function ProductAll(Request $request)
     {
         $tab = $request->input('tab', 1); 
     
         $allProducts = Product::all(); // Tất cả sản phẩm
-        $pendingProducts = Product::where('status', 0)->get(); // Chờ duyệt
-        $activeProducts = Product::where('status', 1)->get(); // Đang hoạt động
-        $rejectedProducts = Product::where('status', 2)->get(); // Đã từ chối
-        $violatingProducts = Product::where('status', 3)->get(); // Vi phạm
+        $pendingProducts = Product::where('status', 3)->get(); // Chờ duyệt
+        $activeProducts = Product::where('status', 2)->get(); // Đang hoạt động
+        $rejectedProducts = Product::where('status', 5)->get(); // Đã từ chối
+        $violatingProducts = Product::where('status', 4)->get(); // Vi phạm
     
         return view('products.list_product', compact('allProducts', 'pendingProducts', 'activeProducts', 'rejectedProducts', 'violatingProducts', 'tab'));
     }
+    public function showReportForm(Request $request, $id)
+    {
+        $token = $request->query('token'); // Lấy token từ URL
+        $tab = $request->query('tab');
+        $product = Product::find($id);
     
+        if (!$product) {
+            return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
+        }
+    
+        return view('products.report_form', compact('product', 'token', 'tab'));
+    }
+      
 
 
 }

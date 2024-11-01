@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Blog extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'post_id',
+        'title',
+        'description',
+        'content',
+        'slug',
+        'create_by',
+        'updated_by',
+        'is_deleted',
+    ];
+    public function postCategory()
+    {
+        return $this->belongsTo(Post::class, 'post_id', 'id'); // Chỉnh sửa theo cần thiết
+    }
+}

@@ -225,6 +225,7 @@
                                                         <form action="{{ route( 'products.approve' ,[
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $product->id,
+                                                                                                'tab'=>2,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
                                                             <button type="submit" class="btn btn-success" title="Duyệt">
@@ -233,17 +234,46 @@
                                                         </form>
                                                      
                                                         <!-- Báo cáo vi phạm -->
-                                                        {{-- <form action="{{ route('products.report', $product->id) }}" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-danger" title="Báo cáo vi phạm">
-                                                                <i class="ri-error-warning-line align-middle"></i> 
-                                                            </button>
-                                                        </form> --}}
+                                                        
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#reportModal">
+                                                                <button type="submit" class="btn btn-danger" title="Báo cáo vi phạm">
+                                                                    <i class="ri-error-warning-line align-middle"></i> 
+                                                                </button>
+                                                            </a>
+                                                        
+                        
+                                                        <!-- Modal Báo cáo vi phạm -->
+                                                        <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="reportModalLabel">Báo cáo vi phạm</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <form action="{{ route('products.submitReport', [
+                                                                            'id' => $product->id,
+                                                                            'token' => auth()->user()->refesh_token,
+                                                                            'tab' => 2
+                                                                        ]) }}" method="POST">
+                                                                            @csrf
+                                                                            <div class="mb-3">
+                                                                                <label for="reason" class="form-label">Lý do vi phạm:</label>
+                                                                                <textarea name="reason" id="reason" class="form-control" required></textarea>
+                                                                            </div>
+                                                                            <button type="submit" class="btn btn-danger">Gửi báo cáo</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                        
                                                     
                                                         <!-- Không duyệt -->
                                                         <form action="{{ route('products.reject',[
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $product->id,
+                                                                                                'tab'=>2,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
                                                             <button type="submit" class="btn btn-warning" title="Không duyệt">
@@ -309,7 +339,7 @@
                                     <tbody>
                                         @if($activeProducts->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
+                                                <td colspan="6" class="text-center">Không có sản phẩm nào hoạt động.</td>
                                             </tr>
                                         @else
                                             @foreach($activeProducts as $product)
@@ -329,19 +359,41 @@
                                                        Đang hoạt động
                                                     @endif
                                                     <td>{{ $product->created_at}}</td>
+                                                   <!-- Nút Báo cáo vi phạm -->
                                                     <td>
-                                                       
-                                                     
-                                                        <!-- Báo cáo vi phạm -->
-                                                        <form action="" method="POST" style="display:inline;">
-                                                            @csrf
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#reportModal">
                                                             <button type="submit" class="btn btn-danger" title="Báo cáo vi phạm">
                                                                 <i class="ri-error-warning-line align-middle"></i> 
                                                             </button>
-                                                        </form>
-                                                    
-                                                        
+                                                        </a>
                                                     </td>
+
+                                                    <!-- Modal Báo cáo vi phạm -->
+                                                    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="reportModalLabel">Báo cáo vi phạm</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form action="{{ route('products.submitReport', [
+                                                                        'id' => $product->id,
+                                                                        'token' => auth()->user()->refesh_token,
+                                                                        'tab' => 3
+                                                                    ]) }}" method="POST">
+                                                                        @csrf
+                                                                        <div class="mb-3">
+                                                                            <label for="reason" class="form-label">Lý do vi phạm:</label>
+                                                                            <textarea name="reason" id="reason" class="form-control" required></textarea>
+                                                                        </div>
+                                                                        <button type="submit" class="btn btn-danger">Gửi báo cáo</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                     
                                                     
                                                 </tr>
@@ -431,6 +483,7 @@
                                                         <form action="{{ route( 'products.approve' ,[
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $product->id,
+                                                                                                'tab'=>4,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
                                                             <button type="submit" class="btn btn-success" title="Duyệt">
@@ -525,6 +578,7 @@
                                                         <form action="{{ route( 'products.approve' ,[
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $product->id,
+                                                                                                'tab'=>5,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
                                                             <button type="submit" class="btn btn-success" title="Duyệt">

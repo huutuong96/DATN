@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\RolesModel;
+use App\Models\role_premissionModel;
 use App\Http\Requests\RoleRequest;
-use Illuminate\Support\Facades\Cache;
 use Tymon\JWTAuth\Facades\JWTAuth;
-
+use Illuminate\Http\Request;
 class RolesController extends Controller
 {
     /**
@@ -14,9 +14,7 @@ class RolesController extends Controller
      */
     public function index()
     {
-        $roles = Cache::remember('all_roles', 60 * 60, function () {
-            return RolesModel::all();
-        });
+        $roles = RolesModel::all();
 
         if ($roles->isEmpty()) {
             return $this->errorResponse("Không tồn tại vai trò nào");
@@ -28,19 +26,17 @@ class RolesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoleRequest $request)
+    public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
-        
-        try {
-            $validatedData = $request->validated();
-            $validatedData['create_by'] = $user->id;
-            $role = RolesModel::create($validatedData);
-            Cache::forget('all_roles');
-            return $this->successResponse("Thêm vai trò thành công", $role);
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Thêm vai trò không thành công", $th->getMessage());
-        }
+        $role = RolesModel::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => $request->status ?? 1,
+            'create_by' => $user->id,
+            'update_by' => $user->id,
+        ]);
+        return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'Thêm vai trò thành công!');
     }
 
     /**
@@ -48,9 +44,7 @@ class RolesController extends Controller
      */
     public function show(string $id)
     {
-        $role = Cache::remember('role_' . $id, 60 * 60, function () use ($id) {
-            return RolesModel::find($id);
-        });
+        $role = RolesModel::find($id);
 
         if (!$role) {
             return $this->errorResponse("Vai trò không tồn tại", 404);
@@ -62,48 +56,39 @@ class RolesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RoleRequest $request, string $id)
+    public function update(Request $request)
     {
-        $role = Cache::remember('role_' . $id, 60 * 60, function () use ($id) {
-            return RolesModel::find($id);
-        });
-
-        if (!$role) {
-            return $this->errorResponse("Vai trò không tồn tại", 404);
-        }
-
-        try {
-            $user = JWTAuth::parseToken()->authenticate();
-            $validateDate = $request->validated();
-            $validateDate['update_by'] = $user->id;
-            $role->update($validateDate);
-            Cache::forget('role_' . $id);
-            Cache::forget('all_roles');
-            return $this->successResponse("Cập nhật vai trò thành công", $role);
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Cập nhật vai trò không thành công", $th->getMessage());
-        }
+        $user = JWTAuth::parseToken()->authenticate();
+        $role = RolesModel::find($id);
+        
+        $role->title = $request->title ?? $role->title;
+        $role->description = $request->description ?? $role->description;
+        $role->status = $request->status ?? $role->status;
+        $role->update_by = $user->id;
+        $role->updated_at = now();
+        $role->updated_by = $user->id;
+        $role->save();
+        return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'cập nhật vai trò thành công!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        
         $role = RolesModel::find($id);
-
-        if (!$role) {
-            return $this->errorResponse("Vai trò không tồn tại", 404);
-        }
-
-        try {
+        $permissionsRole = role_premissionModel::where('role_id', $id)->get();
+            if (!$role) {
+                if($request->token){
+                    return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'Vai trò không tồn tại!');
+                }
+            }   
+            foreach ($permissionsRole as $permission) {
+                $permission->delete();
+            }
             $role->delete();
-            Cache::forget('role_' . $id);
-            Cache::forget('all_roles');
-            return $this->successResponse("Xóa vai trò thành công");
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Xóa vai trò không thành công", $th->getMessage());
-        }
+            return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'Xóa vai trò thành công!');
     }
 
     public function successResponse($message, $data = null)

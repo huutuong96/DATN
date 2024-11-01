@@ -52,6 +52,7 @@ use App\Http\Controllers\configController;
 
 
 
+
 Route::get('/', [VnshopController::class, 'login'])->name('login');
 Route::group(['middleware' => ['checkToken']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
@@ -74,9 +75,15 @@ Route::group(['middleware' => ['checkToken']], function () {
     Route::get('/change-category', [VnshopController::class, 'changeCategory'])->name('change_category');
 
     Route::get('/change-shop', [VnshopController::class, 'changeShop'])->name('change_shop');
+    Route::get('/list-role', [VnshopController::class, 'list_role'])->name('list_role');
     Route::get('/product_all', [ProductController::class, 'ProductAll'])->name('product_all');
     Route::get('/product-waiting-approval', [ProductController::class, 'productWaitingApproval'])->name('product-waiting-approval');
     Route::post('/products/{id}/approve', [ProductController::class, 'approveProduct'])->name('products.approve');
     Route::post('/products/{id}/reject', [ProductController::class, 'rejectProduct'])->name('products.reject');
-    // Route::post('/products/{id}/report', [ProductController::class, 'reportProduct'])->name('products.report');
+    Route::get('/products/report/{id}', [ProductController::class, 'showReportForm'])->name('products.report');
+    Route::post('/products/report/{id}', [ProductController::class, 'reportProduct'])->name('products.submitReport');
+    
+    
+    
+    Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
 });
