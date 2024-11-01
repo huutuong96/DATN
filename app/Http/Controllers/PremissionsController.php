@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\RolesModel;
 use Illuminate\Http\Request;
 use App\Models\PremissionsModel;
-use App\Models\role_permissionModel;
+use App\Models\role_premissionModel;
 use App\Http\Requests\PermissionsRequest;
 use Tymon\JWTAuth\Exceptions\JWTException;
 

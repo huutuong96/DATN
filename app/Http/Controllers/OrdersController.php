@@ -52,7 +52,7 @@ class OrdersController extends Controller
 {
     $orders = OrdersModel::with('orderDetails')
         ->where('user_id', auth()->id())
-        ->where('status', 5)
+        ->where('status', 4)
         ->get();
 
 

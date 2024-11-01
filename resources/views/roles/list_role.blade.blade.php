@@ -78,25 +78,33 @@
                                         <td>{{$role->title}}</td>
                                         <td>{{$role->parent_id ?? "Đây là phân quyền cha"}}</td>
                                         <td>
-                                            <ul class="list-inline">
-                                                @if ($role->status == 1)
+                                            <ul class="list-inline">                                   
                                                 <li class="list-inline-item">
                                                     <a
-                                                        href="{{ route('change_category', [
+                                                        href="{{ route('list_permission', ['token' => auth()->user()->refesh_token,
+                                                                                        'id' => $role->id]) }}">
+                                                        <button type="button" class="btn btn-info waves-effect waves-light">Cấp Quyền</button>
+                                                    </a>
+                                                </li>
+
+                                                @if ($role->status == 2)
+                                                <li class="list-inline-item">
+                                                    <a
+                                                        href="{{ route('change_role', [
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $role->id,
-                                                                                                'status' => 2,
+                                                                                                'status' => 3,
                                                                                                 ]) }}">
                                                         <button type="button" class="btn btn-warning waves-effect waves-light">Tắt</button>
                                                     </a>
                                                 </li>
-                                                @elseif ($role->status == 2)
+                                                @elseif ($role->status == 3)
                                                 <li class="list-inline-item">
                                                     <a
-                                                        href="{{ route('change_category', [
+                                                        href="{{ route('change_role', [
                                                                                             'token' => auth()->user()->refesh_token,
                                                                                             'id' => $role->id,
-                                                                                            'status' => 1,
+                                                                                            'status' => 2,
                                                                                             ]) }}">
                                                         <button type="button" class="btn btn-success waves-effect waves-light">Bật</button>
 

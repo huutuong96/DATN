@@ -59,14 +59,21 @@ class RolesController extends Controller
     public function update(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
-        $role = RolesModel::find($id);
+        $role = RolesModel::find($request->id);
         
         $role->title = $request->title ?? $role->title;
         $role->description = $request->description ?? $role->description;
         $role->status = $request->status ?? $role->status;
         $role->update_by = $user->id;
         $role->updated_at = now();
-        $role->updated_by = $user->id;
+        $role->save();
+        return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'cập nhật vai trò thành công!');
+    }
+
+    public function change_role(Request $request){
+        $user = JWTAuth::parseToken()->authenticate();
+        $role = RolesModel::find($request->id);
+        $role->status = $request->status ?? $role->status;
         $role->save();
         return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'cập nhật vai trò thành công!');
     }
