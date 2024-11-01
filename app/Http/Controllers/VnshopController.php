@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\Tax;
+use App\Models\Blog;
+use App\Models\UsersModel;
+use App\Models\RolesModel;
 use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\order_fee_details;
@@ -136,8 +139,7 @@ class VnshopController extends Controller
         ));
     }
     public function store($limit = 5)
-    {    $shops = Shop::where("status", "!=", 1)
-                        ->where("status", "!=", 4)->with('user')->paginate($limit);
+    {    $shops = Shop::whereIn("status", [1, 2])->with('user')->paginate($limit);
          foreach ($shops as $Key => $shop) {
             $doanhthu = OrdersModel::whereMonth('created_at', Carbon::now()->month)
                                     ->where('shop_id', $shop->id)->sum('net_amount');
@@ -175,9 +177,33 @@ class VnshopController extends Controller
         return $totalSubtotal;
     }
     public function list_category($limit = 5){
-        $categories = CategoriesModel::orderBy('created_at', 'desc')->where('status', "!=", 0)->paginate($limit);
+        $categories = CategoriesModel::orderBy('created_at', 'desc')->whereIn("status", [1, 2])->paginate($limit);
         return view('categories.list_category',compact(
             'categories'
+        ));
+    }
+    public function trash_category($limit = 5){
+        $categories = CategoriesModel::orderBy('updated_at', 'desc')->where('status', "=", 5 )->paginate($limit);
+        return view('categories.trash',compact(
+            'categories'
+        ));
+    }
+    public function trash_stores($limit = 5){
+        $shops = Shop::orderBy('updated_at', 'desc')->where('status', "=", 5 )->paginate($limit);
+        return view('stores.trash',compact(
+            'shops'
+        ));
+    }
+    public function violation_stores($limit = 5){
+        $shops = Shop::orderBy('updated_at', 'desc')->where('status', "=", 4 )->paginate($limit);
+        return view('stores.violation',compact(
+            'shops'
+        ));
+    }
+    public function pending_approval_stores($limit = 5){
+        $shops = Shop::orderBy('updated_at', 'desc')->whereIn("status", [101, 3])->paginate($limit);
+        return view('stores.pending_approval',compact(
+            'shops'
         ));
     }
     public function changeCategory(Request $rqt){
@@ -198,6 +224,50 @@ class VnshopController extends Controller
             return Back();
         }
     }
-    
+    public function blog($limit = 5){
+        $blogs = Blogs::orderBy('created_at', 'desc')->where('is_delete', "!=", 0)->where('is_delete', "!=", 5)->paginate($limit);
+        return view('blogs.blogs',compact(
+            'blogs'
+        ));
+    }
+    public function costomer($limit = 5){
+        $customer_id = RolesModel::where('title', 'CUSTOMER')->first('id');
+        // dd($customer_id->id);
+        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->where('role_id', $customer_id->id)->paginate($limit);
+        // dd($users);
+        return view('users.list_customer',compact(
+            'users'
+        ));
+    }
+    public function manager($limit = 5){
+        $customer_id = RolesModel::where('title', '!=', 'CUSTOMER')->where('title', '!=', 'OWNER')->pluck('id');
+        // dd($customer_id);
+        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->whereIn('role_id', $customer_id)->paginate($limit);
+        // dd($users);
+        return view('users.list_manager',compact(
+            'users'
+        ));
+    }
+    public function changeUser(Request $rqt){
+       
+        $user = UsersModel::find($rqt->id);
+        if ($user) {
+            $user->status =$rqt->status; 
+            $user->save(); 
+            return Back();
+        }
+    }
+    public function trashUser($limit = 5){
+        $users = UsersModel::orderBy('updated_at', 'desc')->with('address')->with('rank')->where('status', "=", 5 )->paginate($limit);
+        return view('users.trash',compact(
+            'users'
+        ));
+    }
+    public function pendingApproval($limit = 5){
+        $users = UsersModel::orderBy('updated_at', 'desc')->with('address')->with('rank')->whereIn("status", [101, 3])->paginate($limit);
+        return view('users.pending_approval',compact(
+            'users'
+        ));
+    }
     
 }
