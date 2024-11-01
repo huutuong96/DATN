@@ -302,6 +302,7 @@ class ProductController extends Controller
                         'name' => $concatenated_values,
                     ]);
                     $variantattribute->variant_id = $product_variants->id;
+                    $variantattribute->save();
                     
                 }
 
