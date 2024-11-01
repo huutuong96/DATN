@@ -3,10 +3,6 @@
 
 @section('main')
    <div class="container-fluid">
-    @php 
-    $index=5;
-        
-    @endphp
     
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">

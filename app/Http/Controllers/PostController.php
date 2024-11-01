@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Post;
 use App\Http\Requests\PostRequest;
 use Illuminate\Http\Request;
@@ -13,16 +14,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::where('is_deleted', false)->get(); 
+        $posts = Post::where('deleted_at', null)->get(); 
         return response()->json($posts);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -30,16 +23,14 @@ class PostController extends Controller
      */
     public function store(PostRequest $request)
     {
-       
-        
         $post = new Post();
-        $post->name = $request->name;
-          // Tạo slug từ name
-          $slug = Str::slug( $request->name, '-');
-        $post->slug = $slug;
-        $post->created_by =  auth()->user()->id; 
+        $post->title = $request->name;
+        $post->slug = Str::slug($request->name, '-'); 
+        $post->create_by = auth()->user()->id; 
+        $post->content = $request->content; 
+        $post->blog_id = $request->blog_id; 
         $post->save();
-    
+
         return response()->json(['message' => 'Post created successfully!', 'post' => $post], 201);
     }
 
@@ -48,16 +39,8 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
-        $post = Post::where('is_deleted', false)->findOrFail($id); 
+        $post = Post::where('deleted_at', null)->findOrFail($id); 
         return response()->json($post);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
@@ -65,29 +48,26 @@ class PostController extends Controller
      */
     public function update(PostRequest $request, string $id)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-        $post = Post::where('is_deleted', false)->findOrFail($id);
-        $post->name = $validatedData['name'];
-        $post->slug = Str::slug($validatedData['name'], '-');
-        $post->updated_by = auth()->id();
+        $post = Post::where('deleted_at', null)->findOrFail($id);
+        $post->title = $request->title; 
+        $post->slug = Str::slug($request->name, '-'); 
+        $post->update_by = auth()->user()->id;
         $post->updated_at = now();
+        $post->content = $request->content;
+        $post->blog_id = $request->blog_id; 
         $post->save();
-    
+
         return response()->json(['message' => 'Post updated successfully!', 'post' => $post], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $post = Post::where('is_deleted', false)->findOrFail($id);
-        $post->is_deleted = true;
-        $post->updated_by = auth()->id();
-        $post->updated_at = now();
-        $post->save();
-        return response()->json(['message' => 'Post deleted successfully!'], 200);
+    public function destroy(Request $request, $id)
+    {   $token = $request->query('token');
+        $tab = $request->query('tab');
+        $post = Post::where('deleted_at', null)->findOrFail($id);
+        $post->delete(); 
+        return redirect()->route('post',['token' => $token,'tab' => $tab])->with('success', 'post đã được xóa thành công!');
     }
 }

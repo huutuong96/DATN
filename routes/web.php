@@ -49,6 +49,8 @@ use App\Http\Controllers\Notification_to_shopController;
 use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
+use App\Http\Controllers\BlogsController;
+use App\Http\Controllers\PostController;
 
 
 
@@ -58,6 +60,7 @@ Route::group(['middleware' => ['checkToken']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/blog', [VnshopController::class, 'blog'])->name('blog');
+    Route::get('/posts', [VnshopController::class, 'post'])->name('post');
 
     Route::get('/costomer', [VnshopController::class, 'costomer'])->name('costomer');
     Route::get('/change-user', [VnshopController::class, 'changeUser'])->name('change_user');
@@ -83,6 +86,14 @@ Route::group(['middleware' => ['checkToken']], function () {
     Route::get('/products/report/{id}', [ProductController::class, 'showReportForm'])->name('products.report');
     Route::post('/products/report/{id}', [ProductController::class, 'reportProduct'])->name('products.submitReport');
     Route::get('/list_permission', [VnshopController::class, 'list_permission'])->name('list_permission');
+    Route::delete('/blogs/{id}', [BlogsController::class, 'destroy'])->name('blogs.destroy');
+    Route::put('/blogs/{id}', [VnshopController::class, 'updateBlog'])->name('blogs.update');
+    Route::post('/blogs/{id}/restore', [VnshopController::class, 'restoreBlog'])->name('blogs.restore');
+    Route::put('/posts/{id}', [VnshopController::class, 'updatepost'])->name('post.update');
+    Route::delete('/post/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::post('/post/{id}/restore', [VnshopController::class, 'restorepost'])->name('post.restore');
+
+
     
     
     

@@ -4,28 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $table = 'post_categories';
+    // Các thuộc tính có thể được gán
     protected $fillable = [
-        'name',
+        'blog_id',
         'slug',
-        'created_by',
+        'title',
+        'content',
         'updated_by',
-        'is_deleted',
+        'create_by', 
     ];
 
-    public $timestamps = true;
+    public $timestamps = true; 
 
-    public function creator()
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
+
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function blog()
+    {
+        return $this->hasMany(Blog::class, 'id'); 
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'create_by'); 
+    }
+    
+    
 }

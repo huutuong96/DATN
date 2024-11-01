@@ -1323,7 +1323,7 @@
                                 >
                                     <i class="ri-terminal-window-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý blog xxx</span
+                                        >Quản lý blog </span
                                     >
                                 </a>
                                 <div
@@ -1342,11 +1342,11 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crm.html"
+                                                href="{{ route('post', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Các blog đã xóa
+                                               Danh sách bài viết
                                             </a>
                                         </li>
                                        
