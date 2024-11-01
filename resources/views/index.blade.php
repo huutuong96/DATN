@@ -1527,7 +1527,7 @@
                                 >
                                     <i class="ri-dashboard-3-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Sản phẩm chờ duyệt</span>
+                                        >Quản lý sản phẩm</span>
                                 </a>
 
                             </li>

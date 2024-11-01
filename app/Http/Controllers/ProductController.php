@@ -22,6 +22,7 @@ use App\Jobs\UploadImagesJob;
 use App\Jobs\UpdateStockAllVariant;
 use App\Jobs\UpdatePriceAllVariant;
 use App\Jobs\UpdateImageAllVariant;
+use App\Models\update_product;
 
 use Illuminate\Support\Facades\DB;
 
@@ -998,16 +999,19 @@ $notification = $notificationController->store(new Request($notificationData));
     public function approveProduct( Request $request, $id)
     {  
         $tab = $request->tab;
+        $tabchill = $request->tabchill;
+        // dd($tabchill);
         $product = Product::find($id);
         if ($product) {
             $product->status = 1;
             $product->save();
             return redirect()->route('product_all', [
                 'token' => auth()->user()->refesh_token,
-                'tab' => $tab
+                'tab' => $tab,
+                'tabchill' => $tabchill,
             ])->with('message', 'Sản phẩm đã được duyệt.');
         }
-        return redirect()->route('product_all', ['tab' => $tab])->with('error', 'Sản phẩm không tìm thấy.');
+        return redirect()->route('product_all', ['tab' => $tab,'tabchill'=>$tabchill])->with('error', 'Sản phẩm không tìm thấy.');
     }
     
     public function rejectProduct(Request $request,$id)
@@ -1050,18 +1054,36 @@ $notification = $notificationController->store(new Request($notificationData));
     
 
     
-    public function ProductAll(Request $request)
-    {
-        $tab = $request->input('tab', 1); 
+public function ProductAll(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+
+    $allProductsCount = Product::count(); 
+    $newProductsCount = Product::where('status', 3)->count(); 
+    $activeProductsCount = Product::where('status', 2)->count(); 
+    $rejectedProductsCount = Product::where('status', 5)->count(); 
+    $violatingProductsCount = Product::where('status', 4)->count(); 
+    $allUpdateProductsCount = update_product::all()->count();
+    $pendingProductsCount = $allUpdateProductsCount + $newProductsCount;
     
-        $allProducts = Product::all(); // Tất cả sản phẩm
-        $pendingProducts = Product::where('status', 3)->get(); // Chờ duyệt
-        $activeProducts = Product::where('status', 2)->get(); // Đang hoạt động
-        $rejectedProducts = Product::where('status', 5)->get(); // Đã từ chối
-        $violatingProducts = Product::where('status', 4)->get(); // Vi phạm
-    
-        return view('products.list_product', compact('allProducts', 'pendingProducts', 'activeProducts', 'rejectedProducts', 'violatingProducts', 'tab'));
-    }
+    $allProducts = Product::all(); 
+    $allUpdateProducts = update_product::all();
+    $mergedProducts = $allProducts->merge($allUpdateProducts);
+    $pendingProducts = Product::where('status', 3)->get();
+    $activeProducts = Product::where('status', 2)->get();
+    $rejectedProducts = Product::where('status', 5)->get();
+    $violatingProducts = Product::where('status', 4)->get();
+
+
+
+    return view('products.list_product', compact(
+        'allProductsCount', 'pendingProductsCount', 'activeProductsCount', 
+        'rejectedProductsCount', 'violatingProductsCount', 'mergedProducts','newProductsCount','allUpdateProductsCount','allUpdateProducts',
+        'pendingProducts', 'activeProducts', 'rejectedProducts', 
+        'violatingProducts', 'tab'
+    ));
+}
+
     public function showReportForm(Request $request, $id)
     {
         $token = $request->query('token'); // Lấy token từ URL
