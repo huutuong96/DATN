@@ -311,12 +311,14 @@ Route::get('/search', function () {
                 Route::get('role/destroy/{id}', [RolesController::class, 'destroy'])->name('role_destroy');
                 Route::put('roles/update}', [RolesController::class, 'update'])->name('role_update');
                 Route::post('roles', [RolesController::class, 'store'])->name('role_store');
+                Route::get('change_role', [RolesController::class, 'change_role'])->name('change_role');
+
 
                 Route::resource('address', AddressController::class);
 
                 Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
-                Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->middleware('CheckRole:OWNER');
-                Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->middleware('CheckRole:OWNER');
+                Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckRole:OWNER');
+                Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access')->middleware('CheckRole:OWNER');
 
               
 

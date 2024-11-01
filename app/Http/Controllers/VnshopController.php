@@ -10,13 +10,14 @@ use App\Models\OrderDetailsModel;
 use App\Models\order_fee_details;
 use App\Models\CategoriesModel;
 use App\Models\RolesModel;
+use App\Models\role_permissionModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class VnshopController extends Controller
 {
     public function __construct() {
-        $this->middleware('checkRole')->only('list_role');
+        $this->middleware('checkRole')->only('list_role', 'list_permission');
 
     }
     public function login()
@@ -206,6 +207,14 @@ class VnshopController extends Controller
         $roles = RolesModel::orderBy('created_at', 'desc')->paginate($limit);
         return view('roles.list_role',compact(
             'roles'
+        ));
+    }
+
+    public function list_permission(Request $request){
+        $permission = role_permissionModel::where('role_id', $request->id)->where('status', 2)->first();
+        dd($permission);
+        return view('roles.list_permission',compact(
+            'permission'
         ));
     }
     

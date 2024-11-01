@@ -66,6 +66,7 @@ Route::group(['middleware' => ['checkToken']], function () {
     Route::post('/products/{id}/reject', [ProductController::class, 'rejectProduct'])->name('products.reject');
     Route::get('/products/report/{id}', [ProductController::class, 'showReportForm'])->name('products.report');
     Route::post('/products/report/{id}', [ProductController::class, 'reportProduct'])->name('products.submitReport');
+    Route::get('/list_permission', [VnshopController::class, 'list_permission'])->name('list_permission');
     
     
     
