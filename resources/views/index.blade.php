@@ -94,7 +94,14 @@
                                 </span>
                             </button>
                         </div>
-
+                         <form class="col-xl-6 p-3">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                    <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+                                </div>
+                            </div>
+                        </form>
                         <div class="d-flex align-items-center">
                             <div
                                 class="dropdown d-md-none topbar-head-dropdown header-item"
@@ -1109,7 +1116,7 @@
                                 >
                                     <i class=" ri-currency-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý doanh thu</span
+                                        >Quản lý doanh thu xxx</span
                                     >
                                 </a>
                                 <div
@@ -1179,7 +1186,7 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crm.html"
+                                                href="{{ route('pending_approval_stores', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
@@ -1187,17 +1194,17 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a
-                                                href="index.html"
-                                                class="nav-link"
-                                                data-key="t-ecommerce"
-                                            >
-                                                Cửa hàng đã xóa
-                                            </a>
+                                        <a
+                                            href="{{ route('trash_stores',['token' => auth()->user()->refesh_token]) }}"
+                                            class="nav-link"
+                                            data-key="t-crm"
+                                        >
+                                            Cửa hàng đã xóa
+                                        </a>
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crypto.html"
+                                                 href="{{ route('violation_stores',['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-crypto"
                                             >
@@ -1295,51 +1302,11 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="index.html"
+                                                href="{{ route('trash_category', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
                                                 Danh mục đã xóa
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link menu-link"
-                                    href="#quanlykhoahoc"
-                                    data-bs-toggle="collapse"
-                                    role="button"
-                                    aria-expanded="false"
-                                    aria-controls="sidebarDashboards"
-                                >
-                                    <i class=" ri-youtube-fill"></i>
-                                    <span data-key="t-dashboards"
-                                        >Quản lý khóa học</span
-                                    >
-                                </a>
-                                <div
-                                    class="collapse menu-dropdown"
-                                    id="quanlykhoahoc"
-                                >
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-analytics.html"
-                                                class="nav-link"
-                                                data-key="t-analytics"
-                                            >
-                                                Danh sách khóa học
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crm.html"
-                                                class="nav-link"
-                                                data-key="t-crm"
-                                            >
-                                                Khóa học đã xóa
                                             </a>
                                         </li>
                                     </ul>
@@ -1356,7 +1323,7 @@
                                 >
                                     <i class="ri-terminal-window-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý blog</span
+                                        >Quản lý blog xxx</span
                                     >
                                 </a>
                                 <div
@@ -1366,7 +1333,7 @@
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-analytics.html"
+                                                 href="{{ route('blog', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
@@ -1407,7 +1374,7 @@
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-analytics.html"
+                                                href="{{ route('costomer', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
@@ -1416,7 +1383,7 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crm.html"
+                                                href="{{ route('manager',['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
@@ -1425,11 +1392,20 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="index.html"
+                                                href="{{ route('trash_user',['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
-                                                Các tài khoản đã bị khóa
+                                                Các tài khoản đã bị xóa
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('pending_approval',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Các tài chưa được xác thực qua mail
                                             </a>
                                         </li>
                                        
@@ -1447,7 +1423,7 @@
                                 >
                                     <i class="ri-git-repository-private-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý, Phân quyền</span
+                                        >Quản lý, Phân quyền xxx</span
                                     >
                                 </a>
                                 <div
@@ -1488,7 +1464,7 @@
                                 >
                                     <i class=" ri-building-2-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý thông tin sàn</span
+                                        >Quản lý thông tin sàn x........</span
                                     >
                                 </a>
                                 <div
@@ -1502,7 +1478,7 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Quản lý doanh thu
+                                                Thông tin cơ bản của sàn
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1511,7 +1487,7 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Quản lý cửa hàng
+                                                Quản lý voucher
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1520,7 +1496,7 @@
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
-                                                Sản phẩm chờ duyệt
+                                                Quản lý banner
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1529,7 +1505,7 @@
                                                 class="nav-link"
                                                 data-key="t-crypto"
                                             >
-                                                Crypto
+                                                quản lý bên ship
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1538,25 +1514,8 @@
                                                 class="nav-link"
                                                 data-key="t-projects"
                                             >
-                                                Projects
+                                                quản lý thuế
                                             </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-nft.html"
-                                                class="nav-link"
-                                                data-key="t-nft"
-                                            >
-                                                NFT</a
-                                            >
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-job.html"
-                                                class="nav-link"
-                                                data-key="t-job"
-                                                >Job</a
-                                            >
                                         </li>
                                     </ul>
                                 </div>

@@ -36,7 +36,6 @@ class AddressModel extends Model
     ];
 
 
-
     /**
      * Các phương thức và quan hệ với các model khác có thể được định nghĩa ở đây
      */

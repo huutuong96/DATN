@@ -7,7 +7,15 @@
         <div class="col-xl-12">
         <div class="card">
                     <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm đang hoạt động</h4>
+                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm đã xóa</h4>
+                        <a
+                            href="{{ route('store', ['token' => auth()->user()->refesh_token]) }}"
+                            class="nav-link text-primary"
+                            style="font-weight: bold;"
+                            data-key="t-ecommerce"
+                        >
+                            Danh sách cửa hàng
+                        </a> 
                     </div><!-- end card header -->
     
                     <div class="card-body">
@@ -55,20 +63,7 @@
                                                         {{number_format($shop->doanhthu)}} vnđ
                                                     <td>
                                                     <ul class="list-inline">
-                                                        @if ($shop->status == 2)
-                                                            <li class="list-inline-item">
-                                                                <a 
-                                                                    href="{{ route('change_shop', [
-                                                                                                        'token' => auth()->user()->refesh_token,
-                                                                                                        'id' => $shop->id,
-                                                                                                        'status' => 1,
-                                                                                                        ]) }}"
-                                                                >
-                                                                    <button type="button" class="btn rounded-pill btn-warning waves-effect waves-light">Khóa shop</button>
-                                                                </a>
-                                                            </li>
-                                                        @elseif ($shop->status == 1)
-                                                            <li class="list-inline-item">
+                                                        <li class="list-inline-item">
                                                             <a 
                                                                 href="{{ route('change_shop', [
                                                                                                     'token' => auth()->user()->refesh_token,
@@ -77,18 +72,6 @@
                                                                                                     ]) }}"
                                                             >
                                                                 <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">Khôi phục</button>
-                                                            </li>
-                                                        @endif
-                                                        <li class="list-inline-item">
-                                                            <a 
-                                                                    href="{{ route('change_shop', [
-                                                                                                        'token' => auth()->user()->refesh_token,
-                                                                                                        'id' => $shop->id,
-                                                                                                        'status' => 5,
-                                                                                                        ]) }}"
-                                                            >
-                                                                <button type="button" class="btn rounded-pill btn-danger waves-effect waves-light">Xóa</button>
-                                                            </a>
                                                         </li>
                                                     </ul>
                                                        
@@ -109,14 +92,6 @@
                                 <div class="mt-3">
                                     {{ $shops->appends(['token' => auth()->user()->refesh_token])->links() }}
                                 </div>
-                                <a
-                                    href="{{ route('trash_stores',['token' => auth()->user()->refesh_token]) }}"
-                                    class="nav-link text-primary"
-                                    style="font-weight: bold;"
-                                    data-key="t-ecommerce"
-                                >
-                                    Cửa hàng đã xóa
-                                </a>
                             </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->

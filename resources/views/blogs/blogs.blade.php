@@ -7,9 +7,9 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Danh sách danh mục</h4>
+                    <h4 class="card-title mb-0 flex-grow-1">Danh sách bài viết</h4>
                     <!-- Toggle Between Modals -->
-                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal">Thêm danh mục</button>
+                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal">Thêm bài viết</button>
                     <!-- First modal dialog -->
                     <div class="modal fade" id="firstmodal" aria-hidden="true" aria-labelledby="..." tabindex="-1">
                         <div class="modal-dialog modal-dialog-centered">

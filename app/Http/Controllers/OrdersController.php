@@ -36,26 +36,33 @@ class OrdersController extends Controller
     }
     public function indexOrderToUser()
     {
-
-        $orders = OrdersModel::where('user_id', auth()->id())->get();
-
-        if ($orders->isEmpty()) {
-            return $this->errorResponse("Không tồn tại Order nào", 404);
-        }
-
-        return $this->successResponse('Lấy dữ liệu thành công', $orders);
-    }
-    public function HistoryOrderToUser()
-    {
-        $orders = OrdersModel::where('user_id', auth()->id())
-            ->where('status', 5)
+        $orders = OrdersModel::with('orderDetails')
+            ->where('user_id', auth()->id())
             ->get();
+    
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
         }
     
         return $this->successResponse('Lấy dữ liệu thành công', $orders);
     }
+    
+    
+    public function HistoryOrderToUser()
+{
+    $orders = OrdersModel::with('orderDetails')
+        ->where('user_id', auth()->id())
+        ->where('status', 5)
+        ->get();
+
+
+    if ($orders->isEmpty()) {
+        return $this->errorResponse("Không tồn tại Order nào", 404);
+    }
+
+    return $this->successResponse('Lấy dữ liệu thành công', $orders);
+}
+
     
     public function show(string $id)
     {
