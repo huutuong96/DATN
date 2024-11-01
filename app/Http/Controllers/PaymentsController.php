@@ -228,7 +228,7 @@ class PaymentsController extends Controller
     // }
     public function vnpay_payment(Request $request, $total_amount, $groupOrderIds)
     {
-        $grandTotalPrice = 0;
+
         $orders = OrdersModel::where('group_order_id', $groupOrderIds)->where('status', 1)->get();
         if ($orders->isEmpty()) {
             return response()->json([
@@ -236,21 +236,18 @@ class PaymentsController extends Controller
                 'message' => 'Không tìm thấy đơn hàng.'
             ]);
         }
-        foreach($orders as $order){
-            $grandTotalPrice += $order->total_amount;
-        }
-
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://127.0.0.1:8000/api/checkoutdone"; // Đổi đường dẫn này thành đường dẫn đến trang Checkout SuccessFul
+        $vnp_Returnurl = "http://127.0.0.1:8000/api/checkoutdone";
         $vnp_TmnCode = "TIGDFWL4"; //Mã website tại VNPAY
         $vnp_HashSecret = "W09DJQ9Y0K214BWC48SNRZR7UWVE8OPT"; //Chuỗi bí mật
 
-        $vnp_TxnRef = $order->group_order_id;
+        $vnp_TxnRef = $groupOrderIds;
 
         $vnp_OrderInfo = 'Thanh toán đơn hàng';
         $vnp_OrderType = 'Bill';
 
-        $vnp_Amount = $grandTotalPrice * 100;
+
+        $vnp_Amount = $total_amount * 100;
 
         $vnp_Locale = 'vn';
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
@@ -294,19 +291,16 @@ class PaymentsController extends Controller
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
 
-        // if (isset($_POST['vnpay_payment'])) {
+        dd($vnp_Url);
+        // header("Location: $vnp_Url");
 
-            // dd( $vnp_Url);
-            return $vnp_Url;
-        //     die();
-        // }
     }
 
     public function vnpay_return(Request $request)
     {
+
         // dd();
         //  phải lưu lại giá trị trả về ở bảng nào đó
-
 
         $vnp_HashSecret = "W09DJQ9Y0K214BWC48SNRZR7UWVE8OPT"; // Chuỗi bí mật
 
@@ -332,13 +326,17 @@ class PaymentsController extends Controller
         // So sánh mã bảo mật trả về từ VNPAY với mã bảo mật tự tính toán
         if ($secureHash === $vnp_SecureHash) {
 
-            $orders = OrdersModel::where('group_order_id', $vnp_TxnRef)->where('status', 1)->get();
-            if ($orders) {
-                foreach($orders as $order){
-                    $order->status = 2;
-                    $order->save();
-                }
-                return  $request->all();}
+
+            // Kiểm tra mã thanh toán thành công (code = 00)
+            if ($vnp_ResponseCode == '00') {
+                return $request->all();
+            } else {
+                // Trường hợp mã thanh toán không thành công
+                return response()->json([
+                    'code' => '99',
+                    'message' => 'Thanh toán không thành công.'
+                ]);
+            }
         } else {
             // Mã bảo mật không hợp lệ
             return response()->json([

@@ -71,7 +71,7 @@ class CartController extends Controller
             ->where('variant_id', $productVariant->id)
 
             ->first();
-
+        
         if ($productExist) {
             ProducttocartModel::where('id', $productExist->id)->update([
                 'quantity' => $productExist->quantity + ($request->quantity ?? 1),
