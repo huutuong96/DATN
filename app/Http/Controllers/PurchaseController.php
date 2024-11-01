@@ -209,7 +209,7 @@ class PurchaseController extends Controller
                 $orders = OrdersModel::where('group_order_id', $groupOrderIds)->where('status', 1)->get();
                 if ($orders) {
                     foreach ($orders as $order) {
-                        $order->status = 2; // Cập nhật trạng thái
+                        $order->status = OrdersModel::STATUS_PENDING_PICKUP; // Cập nhật trạng thái
                         $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $shopOrder['orderDetails'], $order->total_amount);
                         $order->order_infomation = $orderInfomation;
                         $order->save();
@@ -745,30 +745,43 @@ class PurchaseController extends Controller
             $orders = OrdersModel::where('group_order_id', $request->vnp_TxnRef)->where('status', 1)->get();
             if ($orders) {
                 foreach ($orders as $order) {
-                    $order->status = 10; // Cập nhật trạng thái
+                    $order->status = OrdersModel::STATUS_PAID_PENDING_PICKUP; // Cập nhật trạng thái
                     $order->save();
                 }
             }
+            $insertData = [
+                'vnp_Amount' => $data["vnp_Amount"] / 100 ?? 0, // Giá trị mặc định nếu không có
+                'vnp_BankCode' => "" . $data['vnp_BankCode'] . "",
+                'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
+                'vnp_CardType' => $data["vnp_CardType"] ?? '',
+                // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
+                'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
+                'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
+                'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
+                'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
+                'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
+                'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
+                'vnp_SecureHash' => "" . $data['vnp_SecureHash'] . "",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            vnpay_transaction::create($insertData);
+            // dd($insertData);
+            // Chèn dữ liệu vào bảng
+            $this->handlePaymenAndSendEmail($data["vnp_TxnRef"]);
+        }else{
+            $orders = OrdersModel::where('group_order_id', $request->vnp_TxnRef)->where('status', 1)->get();
+            if ($orders) {
+                foreach ($orders as $order) {
+                    $order->status = OrdersModel::STATUS_CANCELLED; // Cập nhật trạng thái hủy đơn hàng
+                    $order->save();
+                }
+            }
+            return response()->json([
+                'status' => false,
+                'message' => 'Bạn đã hủy giao dịch'
+            ], 200);
         }
-        $insertData = [
-            'vnp_Amount' => $data["vnp_Amount"] / 100 ?? 0, // Giá trị mặc định nếu không có
-            'vnp_BankCode' => "" . $data['vnp_BankCode'] . "",
-            'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
-            'vnp_CardType' => $data["vnp_CardType"] ?? '',
-            // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
-            'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
-            'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
-            'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
-            'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
-            'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
-            'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
-            'vnp_SecureHash' => "" . $data['vnp_SecureHash'] . "",
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-        vnpay_transaction::create($insertData);
-        // dd($insertData);
-        // Chèn dữ liệu vào bảng
-        $this->handlePaymenAndSendEmail($data["vnp_TxnRef"]);
+        
     }
 }
