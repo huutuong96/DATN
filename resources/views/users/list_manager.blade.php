@@ -45,56 +45,35 @@
                                 <div class="modal-body text-center p-5">
                                 <form id="addUser">
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-12">
                                             <div class="mb-3">
-                                                <label for="firstNameinput" class="form-label">First Name</label>
-                                                <input type="text" class="form-control" placeholder="Enter your firstname" id="firstNameinput">
-                                            </div>
-                                        </div><!--end col-->
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="lastNameinput" class="form-label">Last Name</label>
-                                                <input type="text" class="form-control" placeholder="Enter your lastname" id="lastNameinput">
+                                                <label for="fullname" class="form-label">Họ Tên</label>
+                                                <input type="text" class="form-control" placeholder="Enter your firstname" id="fullname">
                                             </div>
                                         </div><!--end col-->
                                         <div class="col-12">
                                             <div class="mb-3">
-                                                <label for="compnayNameinput" class="form-label">Company Name</label>
-                                                <input type="text" class="form-control" placeholder="Enter company name" id="compnayNameinput">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" placeholder="example@gamil.com" id="email">
                                             </div>
                                         </div><!--end col-->
                                         <div class="col-6">
                                             <div class="mb-3">
-                                                <label for="phonenumberInput" class="form-label">Phone Number</label>
-                                                <input type="tel" class="form-control" placeholder="+(245) 451 45123" id="phonenumberInput">
+                                                <label for="password" class="form-label">Mật Khẩu</label>
+                                                <input type="text" class="form-control" placeholder="Enter your city" id="password">
                                             </div>
                                         </div><!--end col-->
                                         <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="emailidInput" class="form-label">Email Address</label>
-                                                <input type="email" class="form-control" placeholder="example@gamil.com" id="emailidInput">
-                                            </div>
-                                        </div><!--end col-->
-                                        <div class="col-12">
-                                            <div class="mb-3">
-                                                <label for="address1ControlTextarea" class="form-label">Address</label>
-                                                <input type="text" class="form-control" placeholder="Address 1" id="address1ControlTextarea">
-                                            </div>
-                                        </div><!--end col-->
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="citynameInput" class="form-label">City</label>
-                                                <input type="email" class="form-control" placeholder="Enter your city" id="citynameInput">
-                                            </div>
-                                        </div><!--end col-->
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="ForminputState" class="form-label">State</label>
-                                                <select id="ForminputState" class="form-select">
-                                                    <option selected>Choose...</option>
-                                                    <option>...</option>
-                                                </select>
-                                            </div>
+                                        <div class="mb-3">
+                                            <label for="role_id" class="form-label">Chức vụ</label>
+                                            <select id="role_id" class="form-select" name="role">
+                                                <!-- <option value="customer" selected>Khách hàng</option> -->
+                                               
+                                                @foreach($roles as $role)
+                                                    <option value="{{ $role->id }}">{{ $role->title }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         </div><!--end col-->
                                         <div class="col-lg-12">
                                             <div class="text-end">
@@ -105,7 +84,7 @@
                                 </form>
 
                                 <script>
-                                document.getElementById('addCategoryForm').addEventListener('submit', async function (event) {
+                                document.getElementById('firstmodal').addEventListener('submit', async function (event) {
                                     event.preventDefault(); // Ngăn chặn hành vi mặc định của form
                                     await addCategory();
                                 });
@@ -113,26 +92,23 @@
                                 async function addCategory() {
                                     const urlParams = new URLSearchParams(window.location.search);
                                     const token = urlParams.get('token');
-                                    console.log(token);
+                                    // console.log(token);
                                     
-                                    const title = document.getElementById('title').value;
-                                    const index = document.getElementById('index').value;
-                                    const image = document.getElementById('image').files; // Nếu bạn có URL của ảnh
-                                    const status = document.getElementById('status').value;
-                                    const parentId = document.getElementById('parentId').value;
-                                    console.log(image);
+                                    const fullname = document.getElementById('fullname').value;
+                                    const password = document.getElementById('password').value;
+                                    const email = document.getElementById('email').value; // Nếu bạn có URL của ảnh
+                                    const role_id = document.getElementById('role_id').value;
                                     
                                     const data = {
-                                        title: title,
-                                        index: index,
-                                        image: image,
-                                        status: status,
-                                        parent_id: parentId,
-                                        update_by: {{ auth()->user()->id }}
+                                        fullname: fullname,
+                                        password: password,
+                                        email: email,
+                                        role_id: role_id
                                     };
-
+                                    // console.log(data);
+                                    
                                     try {
-                                        const res = await fetch(`https://vnshop.top/api/categories`, {
+                                        const res = await fetch(`https://vnshop.top/api/users/register`, {
                                             method: 'POST',
                                             headers: {
                                                 'Content-Type': 'application/json',
@@ -143,7 +119,7 @@
                                         if(!res.ok) {
                                             throw new Error('Network response was not ok');
                                         }
-                                        alert('Thêm danh mục thành công!');
+                                        alert('Thêm Tài khoản thành công!');
                                         window.location.reload();
                                         } catch (error) {
                                         console.error('Error:', error);

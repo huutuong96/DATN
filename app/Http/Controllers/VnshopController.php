@@ -244,9 +244,12 @@ class VnshopController extends Controller
         $customer_id = RolesModel::where('title', '!=', 'CUSTOMER')->where('title', '!=', 'OWNER')->pluck('id');
         // dd($customer_id);
         $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->whereIn('role_id', $customer_id)->paginate($limit);
+        $roles = RolesModel::all();
+        // dd($roles[0]->title);
         // dd($users);
         return view('users.list_manager',compact(
-            'users'
+            'users',
+            'roles'
         ));
     }
     public function changeUser(Request $rqt){
