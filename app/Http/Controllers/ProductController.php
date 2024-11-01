@@ -273,7 +273,7 @@ class ProductController extends Controller
                         ];
                         $attributeValue = attributevalue::create($attributeValueData);
                         $variantAttributeData = [
-                            'variant_id' => $product->id,
+                            'variant_id' => null,
                             'product_id' => $product->id,
                             'shop_id' => $product->shop_id,
                             'attribute_id' => $attributeId->id,
@@ -300,6 +300,7 @@ class ProductController extends Controller
                     $product_variants->update([
                         'name' => $concatenated_values,
                     ]);
+                    $variantattribute = new variantattribute(); 
                     $variantattribute->variant_id = $product_variants->id;
                     $variantattribute->save();
                     
