@@ -59,7 +59,7 @@
                                             <th scope="col">Tên Shop</th> 
                                             <th scope="col">Trạng thái</th>
                                             <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Hành động</th>
+                                          
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -86,59 +86,18 @@
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
                                                     <td>{{$product->shop->shop_name}}</td> 
                                                     <td>
-                                                        @if($product->status == 0)
+                                                        @if($product->status == 3)
                                                         Chưa duyệt
-                                                    @elseif($product->status == 1)
-                                                        Đang hoạt động
                                                     @elseif($product->status == 2)
+                                                        Đang hoạt động
+                                                    @elseif($product->status == 5)
                                                         Đã từ chối
-                                                    @elseif($product->status == 3)
+                                                    @elseif($product->status == 4)
                                                         Vi phạm
+                             
                                                    
                                                     @endif
-                                                    <td>{{ $product->created_at}}</td>
-                                                    <td>
-                                                        @if($product->status == 0)
-                                                        <form action="{{ route('products.approve', [
-                                                                                        'token' => auth()->user()->refesh_token,
-                                                                                        'id' => $product->id,
-                                                                                        ]) }}" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-success" title="Duyệt">
-                                                                <i class="ri-check-line align-middle"></i>
-                                                            </button>
-                                                        </form>
-                                                    
-                                                        <form action="" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-warning" title="Không duyệt">
-                                                                <i class="ri-close-circle-line align-middle"></i>
-                                                            </button>
-                                                        </form>
-                                                    @elseif($product->status == 1)
-
-                                                        <form action="" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-danger" title="Báo cáo vi phạm">
-                                                                <i class="ri-error-warning-line align-middle"></i>
-                                                            </button>
-                                                        </form>
-                                                    @elseif($product->status == 2 || $product->status == 3)
-                                                        <form action="{{ route('products.approve', [
-                                                                                        'token' => auth()->user()->refesh_token,
-                                                                                        'id' => $product->id,
-                                                                                        ]) }}" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-success" title="Duyệt">
-                                                                <i class="ri-check-line align-middle"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                    
-                                                    
-                                                    </td>
-                                                    
-                                                    
+                                                    <td>{{ $product->created_at}}</td>    
                                                 </tr>
                                             @endforeach
                                         @endif
@@ -216,7 +175,7 @@
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
                                                     <td>{{$product->shop->shop_name}}</td> 
                                                     <td>
-                                                        @if($product->status == 0)
+                                                        @if($product->status == 3)
                                                         Chưa duyệt
                                                     @endif
                                                     <td>{{ $product->created_at}}</td>
@@ -355,7 +314,7 @@
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
                                                     <td>{{$product->shop->shop_name}}</td> 
                                                     <td>
-                                                        @if($product->status == 1)
+                                                        @if($product->status == 2)
                                                        Đang hoạt động
                                                     @endif
                                                     <td>{{ $product->created_at}}</td>
@@ -452,7 +411,7 @@
                                     <tbody>
                                         @if($rejectedProducts->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
+                                                <td colspan="6" class="text-center">Không có sản phẩm nào .</td>
                                             </tr>
                                         @else
                                             @foreach($rejectedProducts as $product)
@@ -473,7 +432,7 @@
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
                                                     <td>{{$product->shop->shop_name}}</td> 
                                                     <td>
-                                                        @if($product->status == 2)
+                                                        @if($product->status == 5)
                                                         từ chối duyệt
                                                    
                                                     @endif
@@ -551,7 +510,7 @@
                                     <tbody>
                                         @if($violatingProducts->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
+                                                <td colspan="6" class="text-center">Không có sản phẩm nào </td>
                                             </tr>
                                         @else
                                             @foreach($violatingProducts as $product)
@@ -568,7 +527,7 @@
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
                                                     <td>{{$product->shop->shop_name}}</td> 
                                                     <td>
-                                                        @if($product->status == 3)
+                                                        @if($product->status == 4)
                                                         sản phẩm vi phạm
                                                    
                                                     @endif
