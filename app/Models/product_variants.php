@@ -24,6 +24,7 @@ class product_variants extends Model
         'updated_at',
         'attribute_id',
         'value_id',
+        'id_fe',
     ];
 
     protected $casts = [

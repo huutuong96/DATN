@@ -549,6 +549,8 @@ Route::get('/search', function () {
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
 
+            Route::post('generate_variants', [ProductController::class, 'generate_Variants']);
+
 
 });
 

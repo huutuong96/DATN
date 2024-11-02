@@ -108,7 +108,8 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        
+        // dd($request->images);
+        // dd($request->images[0]);
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -134,7 +135,7 @@ class ProductController extends Controller
                 'width' => $request->width,
                 'show_price' => $request->price ?? $request->sale_price,
                 'status' => 3,
-                'json_variants' => json_encode($request->all()) ?? null,
+                'json_variants' => json_encode($request->all()),
             ];
             $product = Product::create($dataInsert);
             foreach ($request->images as $image) {
@@ -144,35 +145,34 @@ class ProductController extends Controller
                     'status' => 1,
                 ]);
             }
-            if ($request->variant != null) {
-                $createdData = [];
+            // dd($request->variant['variantItems']);
+            if($request->variant != null){
                 foreach ($request->variant['variantItems'] as $attribute) {
+
                     $attributeData = [
                         'name' => $attribute['name'],
                         'display_name' => strtoupper($attribute['name']),
                     ];
                     $attributeId = Attribute::create($attributeData);
-                    $createdData['attributes'][] = $attributeId;
                     foreach ($attribute['values'] as $value) {
                         $attributeValueData = [
                             'attribute_id' => $attributeId->id,
                             'value' => $value['value'],
                         ];
                         $attributeValue = attributevalue::create($attributeValueData);
-                        $createdData['attributeValues'][] = $attributeValue;
                     }
                 }
+                // $attributeValue = attributevalue::where()
                 foreach ($request->variant['variantProducts'] as $variant) {
-                
                     $product_variantsData = [
                         'product_id' => $product->id,
+                        'id_fe' => $variant['id'] ?? null,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
                         'stock' => $variant['stock'] ?? $request->stock,
                         'price' => $variant['price'] ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
-                    $createdData['productVariants'][] = $product_variants;
                     $values = [];
                     foreach ($variant['variants'] as $item) {
                         $values[] = $item['value'];
@@ -181,26 +181,30 @@ class ProductController extends Controller
                     $product_variants->update([
                         'name' => $concatenated_values,
                     ]);
+                    $variantAttributeData = [
+                        'variant_id' => $product_variants->id,
+                        'product_id' => $product->id,
+                        'shop_id' => $product->shop_id,
+                        'attribute_id' => $attributeValue->attribute_id,
+                        'value_id' => $attributeValue->id,
+                    ];
+                    $variantattribute = variantattribute::create($variantAttributeData);
                 }
-                
+
                 $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
                 $highest_price = $product_variants_get_price->max('price');
                 $lowest_price = $product_variants_get_price->min('price');
-                if ($highest_price == $lowest_price) {
+                if($highest_price == $lowest_price){
                     $product->update([
                         'show_price' => $highest_price,
                     ]);
                 }
-                if ($highest_price != $lowest_price) {
+                if($highest_price != $lowest_price){
                     $product->update([
                         'show_price' => $lowest_price . " - " . $highest_price,
                     ]);
                 }
             }
-
-            // $product->update([
-            //     'json_variants' => json_encode($createdData),
-            // ]);
             DB::commit();
             return response()->json([
                 'status' => true,
@@ -219,7 +223,8 @@ class ProductController extends Controller
 
     // public function store(Request $request)
     // {
-        
+    //     // dd($request->images);
+    //     // dd($request->images[0]);
     //     try {
     //         $user = JWTAuth::parseToken()->authenticate();
     //         $cloudinary = new Cloudinary();
@@ -245,7 +250,6 @@ class ProductController extends Controller
     //             'width' => $request->width,
     //             'show_price' => $request->price ?? $request->sale_price,
     //             'status' => 3,
-    //             // 'json_variants' => json_encode($request->all()) ?? null,
     //         ];
     //         $product = Product::create($dataInsert);
     //         foreach ($request->images as $image) {
@@ -255,66 +259,64 @@ class ProductController extends Controller
     //                 'status' => 1,
     //             ]);
     //         }
-    //         if ($request->variant != null) {
-    //             $createdData = [];
-    //             foreach ($request->variant['variantProducts'] as $variant) {
-                
-    //                 $product_variantsData = [
-    //                     'product_id' => $product->id,
-    //                     'sku' => $variant['sku'] ?? $this->generateSKU(),
-    //                     'stock' => $variant['stock'] ?? $request->stock,
-    //                     'price' => $variant['price'] ?? $product->price,
-    //                     'images' => $variant['image'] ?? $product->image,
+    //         if($request->variant != null){
+    //             foreach ($request->variant['variantItems'] as $attribute) {
+
+    //                 $attributeData = [
+    //                     'name' => $attribute['name'],
+    //                     'display_name' => strtoupper($attribute['name']),
     //                 ];
-    //                 $product_variants = product_variants::create($product_variantsData);
-    //                 foreach ($request->variant['variantItems'] as $attribute) {
-    //                     $attributeData = [
-    //                         'name' => $attribute['name'],
-    //                         'display_name' => strtoupper($attribute['name']),
+    //                 $attributeId = Attribute::create($attributeData);
+                    
+    //                 foreach ($attribute['values'] as $value) {
+    //                     $attributeValueData = [
+    //                         'attribute_id' => $attributeId->id,
+    //                         'value' => $value['value'],
     //                     ];
-    //                     $attributeId = Attribute::create($attributeData);
-    //                     $createdData['attributes'][] = $attributeId;
-    //                     foreach ($attribute['values'] as $value) {
-    //                         $attributeValueData = [
-    //                             'attribute_id' => $attributeId->id,
-    //                             'value' => $value['value'],
+    //                     $attributeValue = attributevalue::create($attributeValueData);
+    //                     foreach ($request->variant['variantProducts'] as $variant) {
+    //                         $product_variantsData = [
+    //                             'product_id' => $product->id,
+    //                             'sku' => $variant['sku'] ?? $this->generateSKU(),
+    //                             'stock' => $variant['stock'] ?? $request->stock,
+    //                             'price' => $variant['price'] ?? $product->price,
+    //                             'images' => $variant['image'] ?? $product->image,
     //                         ];
-    //                         $attributeValue = attributevalue::create($attributeValueData);
-    //                         $createdData['attributeValues'][] = $attributeValue;
+    //                         $product_variants = product_variants::create($product_variantsData);
+    //                         $values = [];
+    //                         foreach ($variant['variants'] as $item) {
+    //                             $values[] = $item['value'];
+    //                         }
+    //                         $concatenated_values = implode(', ', $values);
+    //                         $product_variants->update([
+    //                             'name' => $concatenated_values,
+    //                         ]);
+    //                         $variantAttributeData = [
+    //                             'variant_id' => $product_variants->id,
+    //                             'product_id' => $product->id,
+    //                             'shop_id' => $product->shop_id,
+    //                             'attribute_id' => $attributeId->id,
+    //                             'value_id' => $attributeValue->id,
+    //                         ];
+    //                         $variantattribute = variantattribute::create($variantAttributeData);
     //                     }
+                        
     //                 }
-    //                 $product_variants->update([
-    //                     'attribute_id' =>  $createdData['attributes'],
-    //                     'value_id' => $createdData['attributeValues'],
-    //                 ]);
-    //                 $createdData['productVariants'][] = $product_variants;
-    //                 $values = [];
-    //                 foreach ($variant['variants'] as $item) {
-    //                     $values[] = $item['value'];
-    //                 }
-    //                 $concatenated_values = implode(', ', $values);
-    //                 $product_variants->update([
-    //                     'name' => $concatenated_values,
-    //                 ]);
     //             }
     //             $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
     //             $highest_price = $product_variants_get_price->max('price');
     //             $lowest_price = $product_variants_get_price->min('price');
-    //             if ($highest_price == $lowest_price) {
+    //             if($highest_price == $lowest_price){
     //                 $product->update([
     //                     'show_price' => $highest_price,
     //                 ]);
     //             }
-    //             if ($highest_price != $lowest_price) {
+    //             if($highest_price != $lowest_price){
     //                 $product->update([
     //                     'show_price' => $lowest_price . " - " . $highest_price,
     //                 ]);
     //             }
     //         }
-
-    //         $product->update([
-    //             'json_variants' => json_encode($createdData),
-    //         ]);
     //         DB::commit();
     //         return response()->json([
     //             'status' => true,
@@ -330,20 +332,6 @@ class ProductController extends Controller
     //         ], 500);
     //     }
     // }
-
-
-
-    // public function variantattributeCreate($product, $product_variantsArray, $attributeIdArray, $attributeValueArray){
-    //     $variantAttributeData = [
-    //         'variant_id' => json_encode($product_variantsArray),
-    //         'product_id' => $product->id,
-    //         'shop_id' => $product->shop_id,
-    //         'attribute_id' => json_encode($attributeIdArray),
-    //         'value_id' => json_encode($attributeValueArray),
-    //     ];
-    //     variantattribute::create($variantAttributeData);
-    // }
-
 
     private function storeProductAttribute($attributeData, $product)
     {
@@ -941,13 +929,65 @@ $notification = $notificationController->store(new Request($notificationData));
         }
     }
 
+    // public function variantattribute(Request $request, $shop_id, $id)
+    // {
+    //     $variantattribute = variantattribute::where('product_id', $id)->where('shop_id', $shop_id)->with("variant")->get();
+    //     foreach ($variantattribute as $value) {
+    //         $value->attribute_id = intval($value->attribute_id);
+    //         $value->value_id = intval($value->value_id);
+    //         $value->product_id = intval($value->product_id);
+    //         $value->shop_id = intval($value->shop_id);
+    //     }
+    //     $attributevalue = [];
+    //     $Attribute = [];
+    //     $addedAttributeIds = [];
+    //     $addedattributevalueIds = [];
+    //     // return $variantattribute;
+    //     foreach ($variantattribute as $vaAttribute) {
+    //         $attribute = Attribute::where('id', $vaAttribute->attribute_id)->get();
+    //         if (!in_array($vaAttribute->attribute_id, $addedAttributeIds)) {
+    //             $Attribute[] = $attribute;
+    //             $addedAttributeIds[] = $vaAttribute->attribute_id;
+    //         }
+    //         if (!in_array($vaAttribute->value_id, $addedattributevalueIds)) {
+    //             $attributevalue[] = attributevalue::where('id', $vaAttribute->value_id)->get();
+    //             $addedattributevalueIds[] = $vaAttribute->value_id;
+    //         }
+    //     }
+    //     $variant = product_variants::where('product_id', $id)->get();
+    //     foreach ($variant as $value) {
+    //         $value->product_id = intval($value->product_id);
+    //         $value->stock = intval($value->stock);
+    //         $value->price = intval($value->price);
+    //         $value->is_deleted = intval($value->is_deleted);
+    //         $value->deleted_by = intval($value->deleted_by);
+    //     }
+        
+    //     $data = [];
+    //     $data['attribute'] = $Attribute;
+    //     $data['value'] = $attributevalue;
+    //     $data['variant'] = $variant;
+    //     // $data['variantattribute'] = $variantattribute;
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => "Lấy dữ liệu thành công",
+    //         'data' => $data,
+    //     ]);
+    // }
+
+
     public function variantattribute(Request $request, $shop_id, $id)
     {
-        $product = Product::find($id);
+        $product = Product::where('status', 2)->first();
+        $product_variants = product_variants::where('product_id', $product->id)->get();
+        $data = [];
+        // $data['product'] = $product;
+        $data['product_variants'] = $product_variants;
         return response()->json([
             'status' => true,
             'message' => "Lấy dữ liệu thành công",
-            'data' => json_decode($product->json_variants),
+            'variants' => $data,
+            'json' => json_decode($product->json_variants),
         ]);
     }
 
@@ -1071,6 +1111,129 @@ public function ProductAll(Request $request)
         return view('products.report_form', compact('product', 'token', 'tab'));
     }
       
+
+
+
+
+
+
+
+
+
+
+
+
+// public function generate_Variants(Request $request)
+// {
+//     // Begin a database transaction to ensure data integrity
+//     DB::beginTransaction();
+//     $variantItems = $request->variant['variantItems'];
+//     try {
+//         // Create the main product if it doesn't exist
+//         $product = Product::create([
+//             'name' => $request['name'],
+//             'slug' => $request['slug'] ?? Str::slug($request['name']),
+//             'category_id' => $request['category_id'],
+//             'description' => $request['description'] ?? '',
+//             'shop_id' => $request['shop_id'],
+//             'weight' => $request['weight'] ?? null,
+//             'width' => $request['width'] ?? null,
+//             'length' => $request['length'] ?? null,
+//             'height' => $request['height'] ?? null,
+//             'sku' => $request['sku'] ?? $this->generateSKU(),
+//             'stock' => $request['stock'] ?? 0,
+//             'price' => $request['price'] ?? null,
+//             'images' => $request['images'] ?? [],
+//         ]);
+
+//         $productVariants = [];
+//         $variantCombinations = $this->getVariantCombinations($variantItems);
+
+//         foreach ($variantCombinations as $combination) {
+//             // Generate SKU and default values for each variant
+//             $sku = $request['sku'] ?? $this->generateSKU();
+//             $stock = $request['stock'] ?? 0;
+//             $price = $request['price'] ?? null;
+//             $image = $combination['image'] ?? $request['images'][0] ?? null;
+            
+//             // Create product variant
+//             $productVariantData = [
+//                 'product_id' => $product->id,
+//                 'sku' => $sku,
+//                 'stock' => $stock,
+//                 'price' => $price,
+//                 'images' => $image,
+//             ];
+//             $productVariant = product_variants::create($productVariantData);
+//             $variantName = implode(', ', array_column($combination, 'value'));
+//             $productVariant->update(['name' => $variantName]);
+//             $productVariants[] = $productVariant;
+
+//             // Insert attribute values for the variant
+//             foreach ($combination as $item) {
+//                 $attributeId = Attribute::firstOrCreate(['name' => $item['name']], [
+//                     'display_name' => strtoupper($item['name']),
+//                 ])->id;
+                
+//                 $attributeValue = AttributeValue::firstOrCreate([
+//                     'attribute_id' => $attributeId,
+//                     'value' => $item['value'],
+//                 ]);
+
+//                 VariantAttribute::create([
+//                     'variant_id' => $productVariant->id,
+//                     'product_id' => $product->id,
+//                     'shop_id' => $product->shop_id,
+//                     'attribute_id' => $attributeId,
+//                     'value_id' => $attributeValue->id,
+//                 ]);
+//             }
+//         }
+
+//         // Update the product's show price range
+//         $highestPrice = collect($productVariants)->max('price');
+//         $lowestPrice = collect($productVariants)->min('price');
+//         $showPrice = $highestPrice == $lowestPrice ? $highestPrice : "$lowestPrice - $highestPrice";
+//         $product->update(['show_price' => $showPrice]);
+
+//         DB::commit();
+        
+//         return response()->json([
+//             'status' => true,
+//             'message' => "Product and variants generated successfully.",
+//             'product' => $product->load('variants'),
+//         ], 200);
+//     } catch (\Throwable $th) {
+//         DB::rollBack();
+//         return response()->json([
+//             'status' => false,
+//             'message' => "Failed to generate product and variants.",
+//             'error' => $th->getMessage(),
+//         ], 500);
+//     }
+// }
+
+// // Helper function to get all possible combinations of attributes and values
+// private function getVariantCombinations($variantItems)
+// {
+//     $combinations = [[]];
+//     foreach ($variantItems as $attribute) {
+//         $temp = [];
+//         foreach ($combinations as $combination) {
+//             foreach ($attribute['values'] as $value) {
+//                 $temp[] = array_merge($combination, [
+//                     [
+//                         'name' => $attribute['name'],
+//                         'value' => $value['value'],
+//                         'image' => $value['image'] ?? null,
+//                     ]
+//                 ]);
+//             }
+//         }
+//         $combinations = $temp;
+//     }
+//     return $combinations;
+// }
 
 
 }
