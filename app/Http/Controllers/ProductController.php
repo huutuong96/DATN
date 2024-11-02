@@ -136,7 +136,7 @@ class ProductController extends Controller
                 'width' => $request->width,
                 'show_price' => $request->price ?? $request->sale_price,
                 'status' => 3,
-                'json_variants' => json_encode($request->all()),
+                'json_variants' => json_encode($request->variant) ?? null,
             ];
             $product = Product::create($dataInsert);
             foreach ($request->images as $image) {
@@ -979,7 +979,9 @@ $notification = $notificationController->store(new Request($notificationData));
 
     public function variantattribute(Request $request, $shop_id, $id)
     {
-        $product = Product::where('status', 2)->first();
+        // $product = Product::where('id', $id)->where('shop_id', $shop_id)->first();
+        $product = Product::where('id', $id)->where('shop_id', $shop_id)->first();
+        // dd($product);
         $product_variants = product_variants::where('product_id', $product->id)->get();
         $data = [];
         // $data['product'] = $product;
