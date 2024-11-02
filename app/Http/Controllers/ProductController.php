@@ -108,7 +108,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        return $request->all();
+        // return $request->all();
         // dd($request->images);
         // dd($request->images[0]);
         try {
