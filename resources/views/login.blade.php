@@ -41,7 +41,7 @@
                                     <form action="/api/admin/login" method="POST">
 
                                         <div class="mb-3">
-                                            <label for="email" class="form-label">Email sssssssssssssssssssss</label>
+                                            <label for="email" class="form-label">Email</label>
                                             <input type="text" name="email" class="form-control" id="email" placeholder="Nhập Email">
                                         </div>
 
