@@ -16,7 +16,6 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-
                                     <p class="text-muted">Cấp quyền truy cập</p>
                                     <!-- Bootstrap Custom Checkboxes color -->
                                     <div>
@@ -29,7 +28,8 @@
                                                 <div class="col-md-4">
                                                     @foreach($permissions->slice(0, $half) as $permission)
                                                         <div class="form-check form-check-success mb-3">
-                                                            <input name="permissions[]" value="{{$permission->id}}" class="form-check-input" type="checkbox" id="formCheck{{$permission->id}}">
+                                                        <input name="permissions[]" value="{{$permission->id}}" class="form-check-input" type="checkbox" id="formCheck{{$permission->id}}" 
+                                                        @if(in_array($permission->id, $role_premission->pluck('premission_id')->toArray())) checked @endif>
                                                             <label class="form-check-label" for="formCheck{{$permission->id}}">
                                                                 {{ $permission->name }}
                                                             </label>
@@ -39,8 +39,9 @@
                                                 <div class="col-md-4">
                                                     @foreach($permissions->slice($half) as $permission)
                                                         <div class="form-check form-check-success mb-3">
-                                                            <input name="permissions[]" value="{{$permission->id}}" class="form-check-input" type="checkbox" id="formCheck{{$permission->id}}">
-                                                            <label class="form-check-label" for="formCheck{{$permission->id}}">
+                                                        <input name="permissions[]" value="{{$permission->id}}" class="form-check-input" type="checkbox" id="formCheck{{$permission->id}}"
+                                                        @if(in_array($permission->id, $role_premission->pluck('premission_id')->toArray())) checked @endif>
+                                                        <label class="form-check-label" for="formCheck{{$permission->id}}">
                                                                 {{ $permission->name }}
                                                             </label>
                                                         </div>
@@ -49,6 +50,7 @@
                                             </div>
                                             <input type="hidden" name="role_id" value="{{ $role->id }}">
                                             <button type="submit" class="btn btn-primary">Cấp quyền</button>
+                                            <a type="submit" href="{{ route('delete_access', ['token' => auth()->user()->refesh_token, 'role_id' => $role->id] ) }}" class="btn btn-danger">Đặt lại</a>
                                         </form>
                                     </div>
                                 </div>

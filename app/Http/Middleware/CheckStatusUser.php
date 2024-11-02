@@ -16,7 +16,6 @@ class CheckStatusUser
     public function handle(Request $request, Closure $next): Response
     {
         $user = JWTAuth::parseToken()->authenticate();
-
         if (!$user) {
             return response()->json([
                 'status' => 'error',

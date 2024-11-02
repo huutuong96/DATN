@@ -62,27 +62,24 @@ class PremissionsController extends Controller
      */
     public function grant_access(Request $request)
     {
-        $roleExist = RolesModel::where('id', $request->role_id)->first();
-        if (!$roleExist) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Role này không tồn tại',
-            ], 404);
+        $role = RolesModel::where('id', $request->role_id)->first();
+        $has_permissions = role_premissionModel::where('role_id', $request->role_id)->get();
+        if (!$role) {
+            return redirect()->route('list_permission', ['token' => auth()->user()->refesh_token, 'has_permissions' => $has_permissions,'id' => $role->id])->with('message', 'Vai trò không tồn tại!');
+
         }
         // Kiểm tra xem quyền đã tồn tại cho role chưa
         
         $permissionExist = role_premissionModel::where([
             ['role_id', '=', $request->role_id],
             ['premission_id', '=', $request->premission_id]
-        ])->first();
-
-        if ($permissionExist) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Role này đã có quyền truy cập này rồi',
-            ], 400); // Sử dụng mã lỗi 400 (Bad Request)
-        }
+        ])->get();
+        
         foreach ($request->permissions as $permission) {
+            $role_premissionModelExist = role_premissionModel::where('premission_id', $permission)->first();
+            if ($role_premissionModelExist) {
+                continue;
+            }
             $dataInsert = [
                 "role_id"=> $request->role_id,
                 "premission_id"=> $permission,
@@ -94,8 +91,9 @@ class PremissionsController extends Controller
             'status' => true,
             'message' => "Đã cấp quyền truy cập cho Role",
         ];
-        $has_permissions = role_premissionModel::where('role_id', $request->role_id)->get();
-        return redirect()->route('roles.list_permission', compact('has_permissions'));
+        // return redirect()->route('roles.list_permission' , compact('has_permissions'));
+
+        return redirect()->route('list_permission', ['token' => auth()->user()->refesh_token, 'has_permissions' => $has_permissions,'id' => $role->id])->with('message', 'cập nhật vai trò thành công!');
     }
 
     /**
@@ -112,42 +110,24 @@ class PremissionsController extends Controller
 
     public function delete_access(Request $request)
     {
+        $has_permissions = role_premissionModel::where('role_id', $request->role_id)->get();
+        $role = RolesModel::where('id', $request->role_id)->first();
+  
+        if (!$role) {
+            return redirect()->route('list_permission', ['token' => auth()->user()->refesh_token, 'has_permissions' => $has_permissions,'id' => $role->id])->with('message', 'Vai trò không tồn tại!');
 
-            $roleExist = RolesModel::where('id', $request->role_id)->first();
-            if (!$roleExist) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Role này không tồn tại',
-                ], 404);
-            }
+        }
+        // Kiểm tra xem quyền đã tồn tại cho role chưa
+        $permissionExist = role_premissionModel::where('role_id', $request->role_id)->first();
 
-            // Kiểm tra xem quyền đã tồn tại cho role chưa
-            $permissionExist = role_premissionModel::where([
-                ['role_id', '=', $request->role_id],
-                ['premission_id', '=', $request->premission_id]
-            ])->first();
-            if (!$permissionExist) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Role này chưa được cấp quyền truy cập này',
-                ], 400); // Sử dụng mã lỗi 400 (Bad Request)
-            }
-            if ($permissionExist->premission_id != 4) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Bạn không có quyền truy cập chức năng này',
-                ], 404);
-            }
-            if ($permissionExist) {
-                $permission = role_premissionModel::where('premission_id', $request->premission_id)->delete();
-                $dataDone = [
-                    'status' => true,
-                    'message' => "Xóa quyền truy cập của Role thành công",
-                    'permissions' => role_premissionModel::all(),
-                ]  ;
-                return response()->json($dataDone, 200);
-            }
-
+        if (!$permissionExist) {
+            return redirect()->route('list_permission', ['token' => auth()->user()->refesh_token, 'has_permissions' => $has_permissions,'id' => $role->id])->with('message', 'Quyền chưa được gán cho vai trò này!');
+        }
+        $permissionExist = role_premissionModel::where('role_id', $request->role_id)->get();
+        foreach ($permissionExist as $permission) {
+            $permission->delete();
+        }
+        return redirect()->route('list_permission', ['token' => auth()->user()->refesh_token, 'has_permissions' => $has_permissions,'id' => $role->id])->with('message', 'xóa vai trò thành công!');
     }
 
 }

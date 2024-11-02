@@ -316,9 +316,9 @@ Route::get('/search', function () {
 
                 Route::resource('address', AddressController::class);
 
-                Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
+                // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckRole:OWNER');
-                Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access')->middleware('CheckRole:OWNER');
+                Route::get('permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access');
 
               
 

@@ -286,8 +286,13 @@ class VnshopController extends Controller
     public function list_permission(Request $request){
         $permissions = PremissionsModel::all();
         $role = RolesModel::where('id', $request->id)->first();
+        $role_premission = role_premissionModel::where('role_id', $request->id)->get();
+        if (!$role_premission) {
+            $role_premission = [];
+        }
+        // dd($role_premission);
         return view('roles.list_permission',compact(
-            'permissions', 'role'
+            'permissions', 'role', 'role_premission'
         ));
     }
     
