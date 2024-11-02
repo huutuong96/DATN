@@ -29,7 +29,7 @@ class CheckPremission
         ->get();
         foreach ($premissions as $key => $value) {
             if($value->permission->premissionName == $premission){
-                dd($value->permission->premissionName, $premission);
+                // dd($value->permission->premissionName, $premission);
                 return $next($request);
             }
         }

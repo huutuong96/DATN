@@ -15,28 +15,8 @@ class PremissionsController extends Controller
      */
     public function index()
     {
-        try {
-            // Xác thực người dùng bằng token JWT
-            // $user = JWTAuth::parseToken()->authenticate();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lấy dữ liệu thành công',
-                'data' => PremissionsModel::all(),
-            ], 200);
-        } catch (JWTException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Token không hợp lệ hoặc không tồn tại',
-                'error' => $e->getMessage(),
-            ], 401); // Sử dụng 401 cho lỗi xác thực
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lấy dữ liệu thất bại',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        $permissions = PremissionsModel::all();
+        return view('roles.list_permission', compact('permissions'));
     }
 
     public function store(PermissionsRequest $request)
@@ -90,7 +70,8 @@ class PremissionsController extends Controller
             ], 404);
         }
         // Kiểm tra xem quyền đã tồn tại cho role chưa
-        $permissionExist = role_permissionModel::where([
+        
+        $permissionExist = role_premissionModel::where([
             ['role_id', '=', $request->role_id],
             ['premission_id', '=', $request->premission_id]
         ])->first();
@@ -101,19 +82,20 @@ class PremissionsController extends Controller
                 'message' => 'Role này đã có quyền truy cập này rồi',
             ], 400); // Sử dụng mã lỗi 400 (Bad Request)
         }
-
-        $dataInsert = [
-            "role_id"=> $request->role_id,
-            "premission_id"=> $request->premission_id,
-            "create_at"=> now(),
-        ];
-        $permission = role_permissionModel::create($dataInsert);
+        foreach ($request->permissions as $permission) {
+            $dataInsert = [
+                "role_id"=> $request->role_id,
+                "premission_id"=> $permission,
+                "create_at"=> now(),
+            ];
+            $permission = role_premissionModel::create($dataInsert);
+        }   
         $dataDone = [
             'status' => true,
             'message' => "Đã cấp quyền truy cập cho Role",
-            'permissions' => role_permissionModel::all(),
         ];
-        return response()->json($dataDone, 200);
+        $has_permissions = role_premissionModel::where('role_id', $request->role_id)->get();
+        return redirect()->route('roles.list_permission', compact('has_permissions'));
     }
 
     /**
@@ -140,7 +122,7 @@ class PremissionsController extends Controller
             }
 
             // Kiểm tra xem quyền đã tồn tại cho role chưa
-            $permissionExist = role_permissionModel::where([
+            $permissionExist = role_premissionModel::where([
                 ['role_id', '=', $request->role_id],
                 ['premission_id', '=', $request->premission_id]
             ])->first();
@@ -157,11 +139,11 @@ class PremissionsController extends Controller
                 ], 404);
             }
             if ($permissionExist) {
-                $permission = role_permissionModel::where('premission_id', $request->premission_id)->delete();
+                $permission = role_premissionModel::where('premission_id', $request->premission_id)->delete();
                 $dataDone = [
                     'status' => true,
                     'message' => "Xóa quyền truy cập của Role thành công",
-                    'permissions' => role_permissionModel::all(),
+                    'permissions' => role_premissionModel::all(),
                 ]  ;
                 return response()->json($dataDone, 200);
             }

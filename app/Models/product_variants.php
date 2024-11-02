@@ -22,6 +22,8 @@ class product_variants extends Model
         'is_deleted',
         'created_at',
         'updated_at',
+        'attribute_id',
+        'value_id',
     ];
 
     protected $casts = [
