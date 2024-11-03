@@ -1423,7 +1423,7 @@
                                 >
                                     <i class="ri-git-repository-private-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý, Phân quyền xxx</span
+                                        >Quản lý phân quyền</span
                                     >
                                 </a>
                                 <div
@@ -1437,19 +1437,9 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Danh sách ROLE
+                                                Quản lý phân quyền
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crm.html"
-                                                class="nav-link"
-                                                data-key="t-crm"
-                                            >
-                                                Danh sách các quyền
-                                            </a>
-                                        </li>
-                                        
                                     </ul>
                                 </div>
                             </li>

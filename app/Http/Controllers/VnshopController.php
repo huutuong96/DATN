@@ -12,7 +12,8 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\order_fee_details;
 use App\Models\CategoriesModel;
-use App\Models\role_permissionModel;
+use App\Models\role_premissionModel;
+use App\Models\PremissionsModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -360,10 +361,15 @@ class VnshopController extends Controller
     }
 
     public function list_permission(Request $request){
-        $permission = role_permissionModel::where('role_id', $request->id)->where('status', 2)->first();
-        dd($permission);
+        $permissions = PremissionsModel::all();
+        $role = RolesModel::where('id', $request->id)->first();
+        $role_premission = role_premissionModel::where('role_id', $request->id)->get();
+        if (!$role_premission) {
+            $role_premission = [];
+        }
+        // dd($role_premission);
         return view('roles.list_permission',compact(
-            'permission'
+            'permissions', 'role', 'role_premission'
         ));
     }
     

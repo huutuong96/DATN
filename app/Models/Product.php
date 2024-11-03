@@ -41,6 +41,7 @@ class Product extends Model
         'status',
         'is_delete',
         'admin_note',
+        'json_variants',
     ];
 
 
