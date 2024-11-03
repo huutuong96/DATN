@@ -249,7 +249,6 @@
                             </div>
                         </div>
     
-                        <!-- Pagination Links -->
                         <div class="mt-3">
                         {{ $pendingProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
                         </div>

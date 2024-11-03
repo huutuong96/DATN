@@ -127,23 +127,51 @@
                                     class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">3<span class="visually-hidden">unread messages</span></span>
                             </button>
                             <div
-                                class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                                aria-labelledby="page-header-notifications-dropdown">
+                                class="dropdown topbar-head-dropdown ms-1 header-item"
+                                id="notificationDropdown"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
+                                    id="page-header-notifications-dropdown"
+                                    data-bs-toggle="dropdown"
+                                    data-bs-auto-close="outside"
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                >
+                                    <i class="bx bx-bell fs-22"></i>
+                                    <span
+                                        class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger"
+                                        >3<span class="visually-hidden"
+                                            >unread messages</span
+                                        ></span
+                                    >
+                                </button>
                                 <div
-                                    class="dropdown-head bg-primary bg-pattern rounded-top">
-                                    <div class="p-3">
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <h6
-                                                    class="m-0 fs-16 fw-semibold text-white">
-                                                    Thông báo
-                                                </h6>
-                                            </div>
-                                            <div
-                                                class="col-auto dropdown-tabs">
-                                                <span
-                                                    class="badge bg-light text-body fs-13">
-                                                    4 New</span>
+                                    class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                                    aria-labelledby="page-header-notifications-dropdown"
+                                >
+                                    <div
+                                        class="dropdown-head bg-primary bg-pattern rounded-top"
+                                    >
+                                        <div class="p-3">
+                                            <div class="row align-items-center">
+                                                <div class="col">
+                                                    <h6
+                                                        class="m-0 fs-16 fw-semibold text-white"
+                                                    >
+                                                        Notifications
+                                                    </h6>
+                                                </div>
+                                                <div
+                                                    class="col-auto dropdown-tabs"
+                                                >
+                                                    <span
+                                                        class="badge bg-light text-body fs-13"
+                                                    >
+                                                        4 New</span
+                                                    >
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -195,9 +223,15 @@
                                     class="tab-content position-relative"
                                     id="notificationItemsTabContent">
                                     <div
+<<<<<<< HEAD
+                                        class="tab-content position-relative"
+                                        id="notificationItemsTabContent"
+                                    >
+=======
                                         class="tab-pane fade show active py-2 ps-2"
                                         id="all-noti-tab"
                                         role="tabpanel">
+>>>>>>> ba84a8e5092a8b86517509d1d4180afdf7b109e5
                                         <div
                                             data-simplebar
                                             style="max-height: 300px"
@@ -814,6 +848,354 @@
                                             data-key="t-crm">
                                             Cửa hàng đã xóa
                                         </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                 href="{{ route('violation_stores',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Cửa hàng vi phạm
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyxetduyet"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-file-edit-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý xét duyệt</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyxetduyet"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Xét duyệt cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Xét duyệt sản phẩm (new)
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Xét duyệt sản phẩm (cập nhật)
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                ...
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlydanhmuc"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-align-justify"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý danh mục</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlydanhmuc"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('list_category', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                list danh mục
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('trash_category', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Danh mục đã xóa
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyblog"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-terminal-window-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý blog </span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyblog"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                 href="{{ route('blog', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Danh Mục blog
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('post', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                               Danh Sách bài viết
+                                            </a>
+                                        </li>
+                                       
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlynguoidung"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-dashboard-2-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý người dùng</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlynguoidung"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('costomer', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Danh sách khách hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('manager',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                               Danh sách quản lý
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('trash_user',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Các tài khoản đã bị xóa
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('pending_approval',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Các tài chưa được xác thực qua mail
+                                            </a>
+                                        </li>
+                                       
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyphanquyen"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-git-repository-private-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý phân quyền</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyphanquyen"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('list_role', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý phân quyền
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#thongtinsan"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-building-2-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý thông tin sàn x........</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="thongtinsan"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Thông tin cơ bản của sàn
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý voucher
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Quản lý banner
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                quản lý bên ship
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                quản lý thuế
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="{{ route('product_all', ['token' => auth()->user()->refesh_token]) }}"
+                                >
+                                    <i class="ri-dashboard-3-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý sản phẩm</span>
+                                </a>
+
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Sidebar -->
+                </div>
+
+                <div class="sidebar-background"></div>
+            </div>
+            <!-- Left Sidebar End -->
+            <!-- Vertical Overlay-->
+            <div class="vertical-overlay"></div>
+
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+                <div class="page-content">
+                    @yield('main')
+                </div>
+                <!-- End Page-content -->
+
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <script>
+                                    document.write(new Date().getFullYear());
+                                </script>
+                                © VNshop.
                                     </li>
                                     <li class="nav-item">
                                         <a
@@ -1128,6 +1510,5 @@
     <script src="assets/js/app.js"></script>
 </body>
 
-<!-- Mirrored from themesbrand.com/velzon/html/master/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 12 Aug 2024 07:45:33 GMT -->
-
+    <!-- Mirrored from themesbrand.com/velzon/html/master/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 12 Aug 2024 07:45:33 GMT -->
 </html>
