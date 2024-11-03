@@ -3,10 +3,6 @@
 
 @section('main')
    <div class="container-fluid">
-    @php 
-    $index=5;
-        
-    @endphp
     
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -66,12 +62,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if($mergedProducts->isEmpty())
+                                        @if($mergedProductsPaginated->isEmpty())
                                             <tr>
                                                 <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
                                             </tr>
                                         @else
-                                            @foreach($mergedProducts as $product)
+                                            @foreach($mergedProductsPaginated as $product)
                                                 <tr>
                                                     <th scope="row"><a href="#" class="fw-medium">{{ $product->id }}</a></th>
                                                     <td>
@@ -111,7 +107,7 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{-- {{ $mergedProducts->links() }} <!-- Hiển thị liên kết phân trang --> --}}
+                            {{ $mergedProductsPaginated->links() }} <!-- Hiển thị liên kết phân trang -->
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -255,7 +251,7 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{-- {{ $products->links() }} <!-- Hiển thị liên kết phân trang --> --}}
+                            {{ $pendingProducts->links() }} <!-- Hiển thị liên kết phân trang -->
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->

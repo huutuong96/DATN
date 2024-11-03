@@ -23,12 +23,11 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            // 'name' => 'required|string|max:255',
         ];
     }    public function messages(){
         return [
-            'name.required' => 'Tên là trường bắt buộc.',
-            'name.string' => 'Tên phải là một chuỗi ký tự',
+           
         ];
     }
     protected function failedValidation(Validator $validator)

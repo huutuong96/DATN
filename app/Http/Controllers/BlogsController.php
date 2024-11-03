@@ -1,75 +1,73 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Models\Blog;
-use App\Http\Requests\Blogrequest;
+use App\Http\Requests\BlogRequest;
 
 class BlogsController extends Controller
 {
-
     public function index()
     {
-        $blogs = Blog::where('is_deleted', false)->get();
+        $blogs = Blog::whereNull('deleted_at')->get();
         return response()->json($blogs);
     }
+
     public function store(BlogRequest $request)
     {  
-          
        
-        $slug = Str::slug($request->title, '-');
+        $token = $request->query('token');
+        $slug = Str::slug($request->name, '-');
         $blog = new Blog();
-        $blog->post_id = $request->post_id;
+        $blog->name = $request->name;
         $blog->title = $request->title;
-        $blog->description = $request->description;
-        $blog->content = $request->content;
         $blog->slug = $slug;
-        $blog->create_by = auth()->id(); 
+        $blog->create_by = auth()->user()->id; 
         $blog->save();
-    
-        return response()->json(['message' => 'Post created successfully!', 'blog' => $blog], 201);
+
+        return redirect()->route('blog', [
+            'token' => $token,
+        ])->with('message', 'Đã cập nhật');
     }
 
-    // Get single blog by ID
+
     public function show($id)
     {
-        $blog = Blog::where('id', $id)->where('is_deleted', false)->firstOrFail();
+        $blog = Blog::where('id', $id)->whereNull('deleted_at')->firstOrFail();
         return response()->json($blog);
     }
 
-   
     public function update(BlogRequest $request, string $id)
     {
 
-    //    ;  dd($request->all())
-
-        
-        // Tiếp tục xử lý nếu không có lỗi xác thực
-        // $validatedData = $validator->validated();
-        // dd('ok');
-        $blog = Blog::where('is_deleted', false)->findOrFail($id);
-        $blog->post_id = $request->post_id;
+        $blog = Blog::where('id', $id)->whereNull('deleted_at')->firstOrFail();
+       
+       
+        $blog->save();
+        $slug = Str::slug($request->name, '-');
+        $blog = new Blog();
+        $blog->name = $request->name;
         $blog->title = $request->title;
-        $slug = Str::slug($request->title, '-');
-        $blog->description = $request->description;
-        $blog->content = $request->content;
-        $blog->slug = $slug;
-        $blog->updated_by = auth()->id(); 
+        $blog->slug = $slug; 
+        $blog->updated_by = auth()->user()->id; 
         $blog->save();
-    
-        return response()->json(['message' => 'Blog updated successfully!', 'Blog' => $blog], 200);
+
+        return response()->json(['message' => 'Blog updated successfully!', 'blog' => $blog], 200);
     }
 
-    // Soft delete a blog
-    public function destroy($id)
+
+    public function destroy(Request $request,$id)
     {
-        $blog = Blog::where('is_deleted', false)->findOrFail($id);
-        $blog->is_deleted = true;
-        $blog->updated_by = auth()->id();
-        $blog->updated_at = now();
-        $blog->save();
-        return response()->json(['message' => 'Blog deleted successfully!'], 200);
+        $token = $request->query('token');
+        $tab = $request->query('tab');
+        $blog = Blog::where('id', $id)->whereNull('deleted_at')->firstOrFail();
+        $blog->delete();
+
+        return redirect()->route('blog',['token' => $token,'tab' => $tab])->with('success', 'Blog đã được xóa thành công!');
     }
+  
+
+  
 }

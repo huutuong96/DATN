@@ -203,60 +203,7 @@
                                             style="max-height: 300px"
                                             class="pe-2">
 
-                                            <!-- @foreach($notifyMain as $noti)
-                                            <div
-                                                class="text-reset notification-item d-block dropdown-item position-relative">
-                                                <div class="d-flex">
-                                                    <img
-                                                        src="assets/images/users/avatar-2.jpg"
-                                                        class="me-3 rounded-circle avatar-xs flex-shrink-0"
-                                                        alt="user-pic" />
-                                                    <div
-                                                        class="flex-grow-1">
-                                                        <a
-                                                            href="#!"
-                                                            class="stretched-link">
-                                                            <h6
-                                                                class="mt-0 mb-1 fs-13 fw-semibold">
-                                                                Angela
-                                                                Bernier
-                                                            </h6>
-                                                        </a>
-                                                        <div
-                                                            class="fs-13 text-muted">
-                                                            <p class="mb-1">
-                                                                Answered to
-                                                                your comment
-                                                                on the cash
-                                                                flow
-                                                                forecast's
-                                                                graph 🔔.
-                                                            </p>
-                                                        </div>
-                                                        <p
-                                                            class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i
-                                                                    class="mdi mdi-clock-outline"></i>
-                                                                48 min
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div
-                                                            class="form-check notification-check">
-                                                            <input
-                                                                class="form-check-input"
-                                                                type="checkbox"
-                                                                value=""
-                                                                id="all-notification-check02" />
-                                                            <label
-                                                                class="form-check-label"
-                                                                for="all-notification-check02"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach -->
+                                    
 
 
                                             
@@ -810,16 +757,354 @@
                                             data-key="t-crm">
                                             Cửa hàng đã xóa
                                         </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="{{ route('violation_stores',['token' => auth()->user()->refesh_token]) }}"
-                                            class="nav-link"
-                                            data-key="t-crypto">
-                                            Cửa hàng vi phạm
-                                        </a>
-                                    </li>
-                                </ul>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                 href="{{ route('violation_stores',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                Cửa hàng vi phạm
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyxetduyet"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-file-edit-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý xét duyệt</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyxetduyet"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Xét duyệt cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Xét duyệt sản phẩm (new)
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Xét duyệt sản phẩm (cập nhật)
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                ...
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlydanhmuc"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-align-justify"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý danh mục</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlydanhmuc"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('list_category', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                list danh mục
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('trash_category', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Danh mục đã xóa
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyblog"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-terminal-window-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý blog </span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyblog"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                 href="{{ route('blog', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Danh sách blog
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('post', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                               Danh sách bài viết
+                                            </a>
+                                        </li>
+                                       
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlynguoidung"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-dashboard-2-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý người dùng</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlynguoidung"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('costomer', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Danh sách khách hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('manager',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                               Danh sách quản lý
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('trash_user',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Các tài khoản đã bị xóa
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('pending_approval',['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Các tài chưa được xác thực qua mail
+                                            </a>
+                                        </li>
+                                       
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyphanquyen"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class="ri-git-repository-private-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý phân quyền</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyphanquyen"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="{{ route('list_role', ['token' => auth()->user()->refesh_token]) }}"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Quản lý phân quyền
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#thongtinsan"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-building-2-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý thông tin sàn x........</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="thongtinsan"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Thông tin cơ bản của sàn
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Quản lý voucher
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Quản lý banner
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                quản lý bên ship
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-projects.html"
+                                                class="nav-link"
+                                                data-key="t-projects"
+                                            >
+                                                quản lý thuế
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="{{ route('product_all', ['token' => auth()->user()->refesh_token]) }}"
+                                >
+                                    <i class="ri-dashboard-3-line"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý sản phẩm</span>
+                                </a>
+
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Sidebar -->
+                </div>
+
+                <div class="sidebar-background"></div>
+            </div>
+            <!-- Left Sidebar End -->
+            <!-- Vertical Overlay-->
+            <div class="vertical-overlay"></div>
+
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+                <div class="page-content">
+                    @yield('main')
+                </div>
+                <!-- End Page-content -->
+
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <script>
+                                    document.write(new Date().getFullYear());
+                                </script>
+                                © VNshop.
                             </div>
                         </li>
 

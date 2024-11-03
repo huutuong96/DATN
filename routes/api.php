@@ -296,6 +296,8 @@ Route::get('/search', function () {
     Route::get('banners/client', [BannerController::class, "index"]);
     Route::get('voucher_main/client', [VoucherToMainController::class, "index"]);
     Route::get('voucher_shop', [VoucherToMainController::class, "index"]);
+    Route::get('blogs', [BlogsController::class, "index"]);
+    Route::get('posts', [PostController::class, "index"]);
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
@@ -336,6 +338,12 @@ Route::get('/search', function () {
                     Route::resource('voucher_shop', VoucherToShopController::class)->except(['index']);
                    
                 });
+                Route::middleware('CheckPremission:handle_blog')->group(function () {
+                    Route::resource('posts', PostController::class)->except(['index']);
+                    Route::resource('blogs', BlogsController::class)->except(['index']);
+                });
+                
+               
                 
                
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
@@ -383,8 +391,6 @@ Route::get('/search', function () {
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
                 Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
 
-                Route::resource('blogs', BlogsController::class);
-                Route::resource('posts', PostController::class);
 
                 Route::resource('follows', FollowToShopController::class);
                 Route::resource('support_main', Support_mainController::class);
