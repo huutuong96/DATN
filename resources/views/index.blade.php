@@ -1337,7 +1337,7 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Danh sách blog
+                                                Danh mục Blog
                                             </a>
                                         </li>
                                         <li class="nav-item">

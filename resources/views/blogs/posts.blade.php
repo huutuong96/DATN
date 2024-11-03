@@ -34,7 +34,7 @@
                                  <div class="modal-dialog modal-dialog-centered">
                                      <div class="modal-content">
                                          <div class="modal-body text-center p-5">
-                                            <form  action="{{ route('posts.store', ['token' => auth()->user()->refresh_token]) }}" method="POST">
+                                            <form  action="{{ route('posts.store', ['token' => auth()->user()->refesh_token]) }}" method="POST">
                                                 @csrf <!-- Thêm CSRF token để bảo mật -->
                                                 <div class="row">
                                                     <div class="col-6">
@@ -70,10 +70,6 @@
                                                     </div><!--end col-->
                                                 </div><!--end row-->
                                             </form>
-
-                                             
-                                             
-                                             
                                          </div>
                                      </div>
                                  </div>
