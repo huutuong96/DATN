@@ -18,7 +18,7 @@
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
         <meta content="Themesbrand" name="author" />
         <!-- App favicon -->
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        <link rel="shortcut icon" href="{{ $config->icon }}">
 
         <!-- jsvectormap css -->
         <link href="assets/libs/jsvectormap/css/jsvectormap.min.css" rel="stylesheet" type="text/css" />
@@ -50,16 +50,16 @@
                                 <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}"  class="logo logo-dark">
                                     <span class="logo-sm">
                                         <img
-                                            src="assets/images/logo-sm.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="22"
+                                            height="50"
                                         />
                                     </span>
                                     <span class="logo-lg">
                                         <img
-                                            src="assets/images/logo-dark.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="17"
+                                            height="50"
                                         />
                                     </span>
                                 </a>
@@ -67,16 +67,16 @@
                                 <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}"class="logo logo-light">
                                     <span class="logo-sm">
                                         <img
-                                            src="assets/images/logo-sm.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="22"
+                                            height="50"
                                         />
                                     </span>
                                     <span class="logo-lg">
                                         <img
-                                            src="assets/images/logo-light.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="17"
+                                            height="50"
                                         />
                                     </span>
                                 </a>
@@ -94,7 +94,11 @@
                                 </span>
                             </button>
                         </div>
-                         <form class="col-xl-6 p-3">
+                        <form class="col-xl-6 p-3" action="{{ route('admin_search',[
+                                                                'token' => auth()->user()->refesh_token,
+                                                                ]) }}" method="POST" style="display:inline;">
+                            @csrf
+                         <!-- <form class="col-xl-6 p-3"> -->
                             <div class="form-group m-0">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
@@ -962,16 +966,16 @@
                     <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}" class="logo logo-dark">
                         <span class="logo-sm">
                             <img
-                                src="assets/images/logo-sm.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="22"
+                                height="50"
                             />
                         </span>
                         <span class="logo-lg">
                             <img
-                                src="assets/images/logo-dark.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="17"
+                                height="50"
                             />
                         </span>
                     </a>
@@ -979,16 +983,16 @@
                     <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}" class="logo logo-light">
                         <span class="logo-sm">
                             <img
-                                src="assets/images/logo-sm.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="22"
+                                height="50"
                             />
                         </span>
                         <span class="logo-lg">
                             <img
-                                src="assets/images/logo-light.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="17"
+                                height="50"
                             />
                         </span>
                     </a>

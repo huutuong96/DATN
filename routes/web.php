@@ -92,7 +92,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::put('/posts/{id}', [VnshopController::class, 'updatepost'])->name('post.update');
     Route::delete('/post/{id}', [PostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{id}/restore', [VnshopController::class, 'restorepost'])->name('post.restore');
-
+    Route::post('/search', [VnshopController::class, 'search'])->name('admin_search');
 
     
     

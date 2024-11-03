@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class configModel extends Model
+class ConfigModel extends Model
 {
     use HasFactory;
     protected $table = 'config_main';
@@ -13,8 +13,10 @@ class configModel extends Model
     protected $fillable = [
         'logo_header',
         'logo_footer',
-        'main_color',
         'icon',
         'thumbnail',
+        'main_color',
+        'is_active',
     ];
+    public $timestamps = false;
 }
