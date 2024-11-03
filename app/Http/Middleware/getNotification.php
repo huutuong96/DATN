@@ -27,6 +27,9 @@ class getNotification
             foreach ($notify as $noti) {
                 $notifyMain = Notification_to_mainModel::where('id', $noti->id_notification)->orderby('created_at', 'desc')->take(5)->get();
             }
+            if (empty($notifyMain)) {
+                $notifyMain = [];
+            }
 
             // Chia sẻ dữ liệu với tất cả các view
             view()->share('notifyMain', $notifyMain);
