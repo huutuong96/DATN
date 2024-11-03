@@ -32,9 +32,7 @@ class PostController extends Controller
         $post->blog_id = $request->blog_id; 
         $post->save();
 
-        return redirect()->route('posts', [
-            'token' => $token,
-        ])->with('message', 'thêm thành công');
+        return back()->with('message', 'thêm thành công');
     }
 
     /**

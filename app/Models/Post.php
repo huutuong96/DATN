@@ -30,7 +30,7 @@ class Post extends Model
 
     public function blog()
     {
-        return $this->hasMany(Blog::class, 'id'); 
+        return $this->belongsTo(Blog::class, 'blog_id'); 
     }
 
 
