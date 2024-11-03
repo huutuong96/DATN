@@ -183,7 +183,6 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         L5Swagger\L5SwaggerServiceProvider::class,
-        App\Providers\Notifications::class,
 
         // TranslateTool\Providers\TranslateServiceProvider::class,
         /*
