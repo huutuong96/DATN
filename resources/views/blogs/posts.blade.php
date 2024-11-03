@@ -34,7 +34,7 @@
                                  <div class="modal-dialog modal-dialog-centered">
                                      <div class="modal-content">
                                          <div class="modal-body text-center p-5">
-                                            <form  action="{{ route('posts.store', ['token' => auth()->user()->refresh_token]) }}" method="POST">
+                                            <form  action="{{ route('posts.store', ['token' => auth()->user()->refesh_token]) }}" method="POST">
                                                 @csrf <!-- Thêm CSRF token để bảo mật -->
                                                 <div class="row">
                                                     <div class="col-6">
@@ -69,11 +69,7 @@
                                                         </div><!--end text-end-->
                                                     </div><!--end col-->
                                                 </div><!--end row-->
-                                            </form>
-
-                                             
-                                             
-                                             
+                                            </form>       
                                          </div>
                                      </div>
                                  </div>
@@ -100,7 +96,7 @@
                                             @foreach($Posts as $Post)
                                             <tr>
                                                 <th scope="row"><a href="#" class="fw-medium">{{$Post->id}}</a></th>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog_id }}</td>
+                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog->name ?? "Danh mục đã bị xóa" }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->content }}</td>

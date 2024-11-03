@@ -1103,7 +1103,8 @@ public function ProductAll(Request $request)
     $activeProducts = Product::where('status', 2)->paginate(10);
     $rejectedProducts = Product::where('status', 5)->paginate(10);
     $violatingProducts = Product::where('status', 4)->paginate(10);
-
+    $allProducts = Product::paginate(10); 
+    $allUpdateProducts = update_product::paginate(10); 
 
 
     return view('products.list_product', compact(

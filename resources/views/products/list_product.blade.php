@@ -107,7 +107,7 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{ $mergedProductsPaginated->links() }} <!-- Hiển thị liên kết phân trang -->
+                        {{ $mergedProductsPaginated->appends(['token' => auth()->user()->refesh_token])->links() }}
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -251,7 +251,7 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{ $pendingProducts->links() }} <!-- Hiển thị liên kết phân trang -->
+                        {{ $pendingProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -394,7 +394,7 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{-- {{ $products->links() }} <!-- Hiển thị liên kết phân trang --> --}}
+                        {{ $allUpdateProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -507,7 +507,7 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{-- {{ $products->links() }} <!-- Hiển thị liên kết phân trang --> --}}
+                        {{ $activeProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -606,7 +606,8 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{-- {{ $products->links() }} <!-- Hiển thị liên kết phân trang --> --}}
+                            
+                        {{ $rejectedProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -701,7 +702,7 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                            {{-- {{ $products->links() }} <!-- Hiển thị liên kết phân trang --> --}}
+                        {{ $violatingProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->

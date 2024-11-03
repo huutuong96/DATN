@@ -243,7 +243,8 @@ class VnshopController extends Controller
     }
     public function post(Request $request){
         $tab = $request->input('tab', 1); 
-        $Posts = Post::whereNull('deleted_at')->get();
+        $Posts = Post::whereNull('deleted_at')->with('blog')->get();
+        // dd($Posts[0]->blog->name);
         $blogs = Blog::whereNull('deleted_at')->get();
         $deletedPost = Post::onlyTrashed()->get();
         return view('blogs.posts',compact(

@@ -283,7 +283,7 @@
                             </table>
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    {{ $categories->appends(['token' => auth()->user()->token])->links() }}
+                                    {{ $categories->appends(['token' => auth()->user()->refesh_token])->links() }}
                                 </div>
                                 <a
                                     href="{{ route('trash_category',['token' => auth()->user()->refesh_token]) }}"
