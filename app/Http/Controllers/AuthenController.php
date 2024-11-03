@@ -212,6 +212,7 @@ class AuthenController extends Controller
             "role_id" => $request->role_id ?? null,
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
+            "role_id" => 1,
         ];
 
         $user = UsersModel::create($dataInsert);

@@ -54,7 +54,7 @@ use App\Http\Controllers\configController;
 
 
 Route::get('/', [VnshopController::class, 'login'])->name('login');
-Route::group(['middleware' => ['checkToken']], function () {
+Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/blog', [VnshopController::class, 'blog'])->name('blog');
@@ -83,8 +83,5 @@ Route::group(['middleware' => ['checkToken']], function () {
     Route::get('/products/report/{id}', [ProductController::class, 'showReportForm'])->name('products.report');
     Route::post('/products/report/{id}', [ProductController::class, 'reportProduct'])->name('products.submitReport');
     Route::get('/list_permission', [VnshopController::class, 'list_permission'])->name('list_permission');
-    
-    
-    
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
 });

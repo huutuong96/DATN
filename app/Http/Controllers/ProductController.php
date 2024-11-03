@@ -805,7 +805,7 @@ class ProductController extends Controller
         if(!$product){
             return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
         }
-        $product->status = 1;
+        $product->status = 2;
         $product->save();
         return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
