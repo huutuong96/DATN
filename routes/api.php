@@ -434,6 +434,7 @@ Route::get('/search', function () {
 
                 //SHOP
                 Route::resource('carts', CartController::class);
+                Route::get('miniCart', [CartController::class, "miniCart"]);
                 Route::resource('users', AuthenController::class);
                 Route::get('user/me', [AuthenController::class, "me"]);
                 Route::post('user/change_password', [AuthenController::class, "change_password"])->name('change_password');
