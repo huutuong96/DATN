@@ -27,8 +27,47 @@
                     <div class="card">
                         <div class="card-header align-items-center d-flex">
                             <h4 class="card-title mb-0 flex-grow-1">Danh mục bài viết</h4>
-                        </div><!-- end card header -->
-                        
+                       
+                         <!-- Toggle Between Modals -->
+                                <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal">Thêm danh mục bài viết</button>
+                                <!-- First modal dialog -->
+                                <div class="modal fade" id="firstmodal" aria-hidden="true" aria-labelledby="..." tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-body text-center p-5">
+                                                <form id="addBlogForm" action="{{ route('blogs.store',[
+                                                                                                'token' => auth()->user()->refesh_token]) }}" method="POST">
+                                                    @csrf <!-- Thêm CSRF token để bảo mật -->
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="mb-3">
+                                                                <label for="name" class="form-label">Name</label>
+                                                                <input type="text" class="form-control" placeholder="Enter blog name" id="name" name="name" required>
+                                                            </div><!--end mb-3-->
+                                                        </div><!--end col-->
+                                                
+                                                        <div class="col-6">
+                                                            <div class="mb-3">
+                                                                <label for="title" class="form-label">Title</label>
+                                                                <input type="text" class="form-control" placeholder="Enter blog title" id="title" name="title" required>
+                                                            </div><!--end mb-3-->
+                                                        </div><!--end col-->
+                                                
+                                                        <div class="col-lg-12">
+                                                            <div class="text-end">
+                                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                            </div><!--end text-end-->
+                                                        </div><!--end col-->
+                                                    </div><!--end row-->
+                                                </form>
+                                                
+                                                
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- end card header -->
                         <div class="card-body">
                             <div class="live-preview">
                                 <div class="table-responsive">

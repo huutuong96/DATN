@@ -17,6 +17,8 @@ class BlogsController extends Controller
 
     public function store(BlogRequest $request)
     {  
+       
+        $token = $request->query('token');
         $slug = Str::slug($request->name, '-');
         $blog = new Blog();
         $blog->name = $request->name;
@@ -25,7 +27,9 @@ class BlogsController extends Controller
         $blog->create_by = auth()->user()->id; 
         $blog->save();
 
-        return response()->json(['message' => 'Blog created successfully!', 'blog' => $blog], 201);
+        return redirect()->route('blog', [
+            'token' => $token,
+        ])->with('message', 'Đã cập nhật');
     }
 
 

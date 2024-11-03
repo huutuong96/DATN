@@ -27,6 +27,57 @@
                     <div class="card">
                         <div class="card-header align-items-center d-flex">
                             <h4 class="card-title mb-0 flex-grow-1">Tất cả bài viết</h4>
+                             <!-- Toggle Between Modals -->
+                             <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal">Thêm bài viết</button>
+                             <!-- First modal dialog -->
+                             <div class="modal fade" id="firstmodal" aria-hidden="true" aria-labelledby="..." tabindex="-1">
+                                 <div class="modal-dialog modal-dialog-centered">
+                                     <div class="modal-content">
+                                         <div class="modal-body text-center p-5">
+                                            <form  action="{{ route('posts.store', ['token' => auth()->user()->refresh_token]) }}" method="POST">
+                                                @csrf <!-- Thêm CSRF token để bảo mật -->
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="title" class="form-label">Title</label>
+                                                            <input type="text" class="form-control" placeholder="Enter post title" id="title" name="title" required>
+                                                        </div><!--end mb-3-->
+                                                    </div><!--end col-->
+                                            
+                                                    <div class="col-6">
+                                                        <div class="mb-3">
+                                                            <label for="blog_id" class="form-label">chọn Blog</label>
+                                                            <select class="form-control" id="blog_id" name="blog_id" required>
+                                                                <option value="" disabled selected>chọn blog</option>
+                                                                @foreach($blogs as $blog)
+                                                                    <option value="{{ $blog->id }}">{{ $blog->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div><!--end mb-3-->
+                                                    </div><!--end col-->
+                                            
+                                                    <div class="col-12">
+                                                        <div class="mb-3">
+                                                            <label for="content" class="form-label">Content</label>
+                                                            <textarea class="form-control" placeholder="Enter post content" id="content" name="content" rows="4" required></textarea>
+                                                        </div><!--end mb-3-->
+                                                    </div><!--end col-->
+                                            
+                                                    <div class="col-lg-12">
+                                                        <div class="text-end">
+                                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                                        </div><!--end text-end-->
+                                                    </div><!--end col-->
+                                                </div><!--end row-->
+                                            </form>
+
+                                             
+                                             
+                                             
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
                         </div><!-- end card header -->
                         
                         <div class="card-body">

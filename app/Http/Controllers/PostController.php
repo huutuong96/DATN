@@ -22,16 +22,19 @@ class PostController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(PostRequest $request)
-    {
+    {   
+        $token = $request->query('token');
         $post = new Post();
-        $post->title = $request->name;
-        $post->slug = Str::slug($request->name, '-'); 
+        $post->title = $request->title;
+        $post->slug = Str::slug($request->title, '-'); 
         $post->create_by = auth()->user()->id; 
         $post->content = $request->content; 
         $post->blog_id = $request->blog_id; 
         $post->save();
 
-        return response()->json(['message' => 'Post created successfully!', 'post' => $post], 201);
+        return redirect()->route('posts', [
+            'token' => $token,
+        ])->with('message', 'thêm thành công');
     }
 
     /**
