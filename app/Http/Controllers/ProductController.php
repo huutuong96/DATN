@@ -23,6 +23,9 @@ use App\Jobs\UpdateStockAllVariant;
 use App\Jobs\UpdatePriceAllVariant;
 use App\Jobs\UpdateImageAllVariant;
 use App\Models\update_product;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+
 
 use Illuminate\Support\Facades\DB;
 
@@ -1086,17 +1089,27 @@ public function ProductAll(Request $request)
     $allProducts = Product::all(); 
     $allUpdateProducts = update_product::all();
     $mergedProducts = $allProducts->merge($allUpdateProducts);
-    $pendingProducts = Product::where('status', 3)->get();
-    $activeProducts = Product::where('status', 2)->get();
-    $rejectedProducts = Product::where('status', 5)->get();
-    $violatingProducts = Product::where('status', 4)->get();
+    $perPage = 10; // Số sản phẩm mỗi trang
+    $currentPage = LengthAwarePaginator::resolveCurrentPage();
+    $currentItems = $mergedProducts->slice(($currentPage - 1) * $perPage, $perPage)->values();
+    $mergedProductsPaginated = new LengthAwarePaginator(
+        $currentItems, 
+        $mergedProducts->count(), 
+        $perPage, 
+        $currentPage,
+        ['path' => $request->url()]
+    );
+    $pendingProducts = Product::where('status', 3)->paginate(10);
+    $activeProducts = Product::where('status', 2)->paginate(10);
+    $rejectedProducts = Product::where('status', 5)->paginate(10);
+    $violatingProducts = Product::where('status', 4)->paginate(10);
 
 
 
     return view('products.list_product', compact(
         'allProductsCount', 'pendingProductsCount', 'activeProductsCount', 
         'rejectedProductsCount', 'violatingProductsCount', 'mergedProducts','newProductsCount','allUpdateProductsCount','allUpdateProducts',
-        'pendingProducts', 'activeProducts', 'rejectedProducts', 
+        'pendingProducts', 'activeProducts', 'rejectedProducts', 'mergedProductsPaginated',
         'violatingProducts', 'tab'
     ));
 }
