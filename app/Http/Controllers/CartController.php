@@ -6,7 +6,7 @@ use App\Models\Cart_to_usersModel;
 use App\Models\ProducttocartModel;
 use App\Models\product_variants;
 use App\Models\Product;
-use App\Models\shop;
+use App\Models\Shop;
 use App\Models\variantattribute;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
