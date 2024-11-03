@@ -77,6 +77,12 @@ class CartController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
+        if (!$cart_to_users) {
+            $cart_to_users = Cart_to_usersModel::create([
+                'user_id' => $user->id,
+                'status' => 1,
+            ]);
+        }
         $product = Product::where('id', $request->product_id)->where('status', 2)->where('shop_id', $request->shop_id)->first();
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
