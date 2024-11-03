@@ -130,7 +130,7 @@ class VnshopController extends Controller
             return $b->doanhthu <=> $a->doanhthu;
         });
 
-        $feedBack;
+        // $feedBack;
         return view('dashboard.dashboard',compact(
             'checkProduct',
             'checkShop',
@@ -235,17 +235,18 @@ class VnshopController extends Controller
     public function blog(Request $request){
         $tab = $request->input('tab', 1); 
         
-        $blogs = Blog::whereNull('deleted_at')->get();
-        $deletedBlog = Blog::onlyTrashed()->get();
+        $blogs = Blog::whereNull('deleted_at')->paginate(10);
+        $deletedBlog = Blog::onlyTrashed()->paginate(10);
         return view('blogs.blogs',compact(
             'blogs','deletedBlog','tab'
         ));
     }
     public function post(Request $request){
         $tab = $request->input('tab', 1); 
-        $Posts = Post::whereNull('deleted_at')->get();
+        $Posts = Post::whereNull('deleted_at')->with('blog')->paginate(10);
+        // dd($Posts[0]->blog->name);
         $blogs = Blog::whereNull('deleted_at')->get();
-        $deletedPost = Post::onlyTrashed()->get();
+        $deletedPost = Post::onlyTrashed()->paginate(10);
         return view('blogs.posts',compact(
             'Posts','blogs','deletedPost','tab'
         ));

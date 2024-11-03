@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RolesModel;
 use App\Models\role_premissionModel;
 use App\Http\Requests\RoleRequest;
+use App\Models\UsersModel;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Http\Request;
 class RolesController extends Controller
@@ -32,7 +33,7 @@ class RolesController extends Controller
         $role = RolesModel::create([
             'title' => $request->title,
             'description' => $request->description,
-            'status' => $request->status ?? 1,
+            'status' => $request->status ?? 2,
             'create_by' => $user->id,
             'update_by' => $user->id,
         ]);
@@ -86,6 +87,7 @@ class RolesController extends Controller
         
         $role = RolesModel::find($id);
         $permissionsRole = role_premissionModel::where('role_id', $id)->get();
+        $users = UsersModel::where('role_id', $role->id)->get();
             if (!$role) {
                 if($request->token){
                     return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'Vai trò không tồn tại!');
@@ -94,6 +96,11 @@ class RolesController extends Controller
             foreach ($permissionsRole as $permission) {
                 $permission->delete();
             }
+            foreach ($users as $user) {
+                $user->role_id = 1;
+                $user->save();
+            }
+            
             $role->delete();
             return redirect()->route('list_role', ['token' => auth()->user()->refesh_token])->with('message', 'Xóa vai trò thành công!');
     }

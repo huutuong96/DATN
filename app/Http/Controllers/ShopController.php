@@ -34,6 +34,7 @@ use App\Models\AddressModel;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
+use App\Models\UsersModel;
 use Illuminate\Support\Facades\Http;
 
 
@@ -123,9 +124,6 @@ class ShopController extends Controller
         if ($shopExist) {
             return $this->errorResponse("Bạn đã tạo shop rồi, không thể tạo shop khác");
         }
-        // $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
-        // $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
-        // $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
         try {
             DB::beginTransaction();
             $dataInsert = [
@@ -159,8 +157,9 @@ class ShopController extends Controller
                 $dataInsert['image'] = $uploadedImage['secure_url'];
             }
             $Shop = Shop::create($dataInsert);
-            // $shop_manager = $this->shop_manager_store($Shop, $user->id, 'owner', 1);
-
+            $user = UsersModel::find($user->id);
+            $user->role_id = 2;
+            $user->save();
             DB::commit();
             return $this->successResponse("Tạo Shop thành công", [
                 'data' => [

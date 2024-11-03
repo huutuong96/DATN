@@ -808,7 +808,7 @@ class ProductController extends Controller
         if(!$product){
             return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
         }
-        $product->status = 1;
+        $product->status = 2;
         $product->save();
         return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
@@ -1103,7 +1103,8 @@ public function ProductAll(Request $request)
     $activeProducts = Product::where('status', 2)->paginate(10);
     $rejectedProducts = Product::where('status', 5)->paginate(10);
     $violatingProducts = Product::where('status', 4)->paginate(10);
-
+    $allProducts = Product::paginate(10); 
+    $allUpdateProducts = update_product::paginate(10); 
 
 
     return view('products.list_product', compact(

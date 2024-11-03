@@ -21,8 +21,6 @@ class Blog extends Model
     {
         return $this->belongsTo(User::class, 'create_by'); 
     }
-    public function posts()
-    {
-        return $this->belongsTo(Post::class, 'id');
-    }
+    
+    
 }

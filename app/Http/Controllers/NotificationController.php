@@ -13,7 +13,12 @@ class NotificationController extends Controller
     public function index()
     {
         $userId = auth()->user()->id;
-        $notifications = Notification::where('user_id', $userId)->get();
+        $notifications = Notification::where('user_id', $userId)->paginate(10);
+        return response()->json($notifications);
+    }
+    public function get_noti_admin (Request $request){
+        $user = JWTAuth::parseToken()->authenticate();
+        $notifications = Notification::where('type', 'main')->paginate(10);
         return response()->json($notifications);
     }
 

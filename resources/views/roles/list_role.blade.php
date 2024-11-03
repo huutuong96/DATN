@@ -66,7 +66,7 @@
                                     <tr>
                                         <th scope="col">ID</th>
                                         <th scope="col">Tên phân quyền</th>
-                                        <th scope="col">phân quyền con của</th>
+                                        <th scope="col">Mô tả</th>
                                         <th scope="col">Hành động</th>
                                     </tr>
                                 </thead>
@@ -76,7 +76,7 @@
                                     <tr>
                                         <th scope="row"><a href="#" class="fw-medium">{{$role->id}}</a></th>
                                         <td>{{$role->title}}</td>
-                                        <td>{{$role->parent_id ?? "Đây là phân quyền cha"}}</td>
+                                        <td>{{$role->description ?? "Không có mô tả"}}</td>
                                         <td>
                                             <ul class="list-inline">                                   
                                                 <li class="list-inline-item">

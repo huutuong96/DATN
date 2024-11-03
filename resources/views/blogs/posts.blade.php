@@ -70,6 +70,7 @@
                                                     </div><!--end col-->
                                                 </div><!--end row-->
                                             </form>
+                                            </form>       
                                          </div>
                                      </div>
                                  </div>
@@ -96,7 +97,7 @@
                                             @foreach($Posts as $Post)
                                             <tr>
                                                 <th scope="row"><a href="#" class="fw-medium">{{$Post->id}}</a></th>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog_id }}</td>
+                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog->name ?? "Danh mục đã bị xóa" }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->content }}</td>
