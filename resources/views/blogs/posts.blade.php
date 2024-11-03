@@ -179,7 +179,11 @@
         
                                 </div>
                             </div>
+                            <div class="mt-3">
+                                {{ $Posts->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                </div>
                         </div><!-- end card-body -->
+                       
                     </div><!-- end card -->
                 </div>
                 <!-- end col -->
@@ -240,6 +244,9 @@
         
                                 </div>
                             </div>
+                            <div class="mt-3">
+                                {{ $deletedPost->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                </div>
                         </div><!-- end card-body -->
                     </div><!-- end card -->
                 </div>

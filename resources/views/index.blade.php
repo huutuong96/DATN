@@ -121,7 +121,7 @@
                             <div
                                 class="dropdown topbar-head-dropdown ms-1 header-item"
                                 id="notificationDropdown"
-                                >
+                            >
                                 <button
                                     type="button"
                                     class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
@@ -152,7 +152,7 @@
                                                     <h6
                                                         class="m-0 fs-16 fw-semibold text-white"
                                                     >
-                                                        Thông báo
+                                                        Notifications
                                                     </h6>
                                                 </div>
                                                 <div
@@ -220,7 +220,7 @@
                                     <div
                                         class="tab-content position-relative"
                                         id="notificationItemsTabContent"
-                                        >
+                                    >
                                         <div
                                             class="tab-pane fade show active py-2 ps-2"
                                             id="all-noti-tab"
@@ -1214,7 +1214,64 @@
                                     </ul>
                                 </div>
                             </li>
-                       
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link menu-link"
+                                    href="#quanlyxetduyet"
+                                    data-bs-toggle="collapse"
+                                    role="button"
+                                    aria-expanded="false"
+                                    aria-controls="sidebarDashboards"
+                                >
+                                    <i class=" ri-file-edit-fill"></i>
+                                    <span data-key="t-dashboards"
+                                        >Quản lý xét duyệt</span
+                                    >
+                                </a>
+                                <div
+                                    class="collapse menu-dropdown"
+                                    id="quanlyxetduyet"
+                                >
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-analytics.html"
+                                                class="nav-link"
+                                                data-key="t-analytics"
+                                            >
+                                                Xét duyệt cửa hàng
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crm.html"
+                                                class="nav-link"
+                                                data-key="t-crm"
+                                            >
+                                                Xét duyệt sản phẩm (new)
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="index.html"
+                                                class="nav-link"
+                                                data-key="t-ecommerce"
+                                            >
+                                                Xét duyệt sản phẩm (cập nhật)
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a
+                                                href="dashboard-crypto.html"
+                                                class="nav-link"
+                                                data-key="t-crypto"
+                                            >
+                                                ...
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
                             <li class="nav-item">
                                 <a
                                     class="nav-link menu-link"
@@ -1266,7 +1323,7 @@
                                 >
                                     <i class="ri-terminal-window-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý blog xxx</span
+                                        >Quản lý blog </span
                                     >
                                 </a>
                                 <div
@@ -1280,16 +1337,16 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Danh mục Blog
+                                                Danh Mục blog
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crm.html"
+                                                href="{{ route('post', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                                Các blog đã xóa
+                                               Danh Sách bài viết
                                             </a>
                                         </li>
                                        
@@ -1460,7 +1517,7 @@
                                 >
                                     <i class="ri-dashboard-3-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Xét duyệt sản phẩm</span>
+                                        >Quản lý sản phẩm</span>
                                 </a>
 
                             </li>
@@ -1555,4 +1612,4 @@
     </body>
 
     <!-- Mirrored from themesbrand.com/velzon/html/master/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 12 Aug 2024 07:45:33 GMT -->
-</html>
+</html>z
