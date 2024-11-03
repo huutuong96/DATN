@@ -156,7 +156,7 @@
                                                     <h6
                                                         class="m-0 fs-16 fw-semibold text-white"
                                                     >
-                                                        Thông báo
+                                                        Notifications
                                                     </h6>
                                                 </div>
                                                 <div
@@ -224,7 +224,7 @@
                                     <div
                                         class="tab-content position-relative"
                                         id="notificationItemsTabContent"
-                                        >
+                                    >
                                         <div
                                             class="tab-pane fade show active py-2 ps-2"
                                             id="all-noti-tab"

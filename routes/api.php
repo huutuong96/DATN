@@ -299,7 +299,7 @@ Route::get('/search', function () {
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
 
-    Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
+    Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'getNotification']], function () {
 
 
                 Route::post('categories', [CategoriesController::class, 'store']);

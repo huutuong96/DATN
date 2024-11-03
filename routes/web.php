@@ -56,27 +56,22 @@ use App\Http\Controllers\PostController;
 
 
 Route::get('/', [VnshopController::class, 'login'])->name('login');
-Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
+Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
-
     Route::get('/blog', [VnshopController::class, 'blog'])->name('blog');
     Route::get('/posts', [VnshopController::class, 'post'])->name('post');
-
     Route::get('/costomer', [VnshopController::class, 'costomer'])->name('costomer');
     Route::get('/change-user', [VnshopController::class, 'changeUser'])->name('change_user');
     Route::get('/trash-user', [VnshopController::class, 'trashUser'])->name('trash_user');
     Route::get('/pending-approval', [VnshopController::class, 'pendingApproval'])->name('pending_approval');
     Route::get('/manager', [VnshopController::class, 'manager'])->name('manager');
-
     Route::get('/store', [VnshopController::class, 'store'])->name('store');
     Route::get('/trash-stores', [VnshopController::class, 'trash_stores'])->name('trash_stores');
     Route::get('/violation-stores', [VnshopController::class, 'violation_stores'])->name('violation_stores');
     Route::get('/pending-approval-stores', [VnshopController::class, 'pending_approval_stores'])->name('pending_approval_stores');
-
     Route::get('/list-category', [VnshopController::class, 'list_category'])->name('list_category');
     Route::get('/trash-category', [VnshopController::class, 'trash_category'])->name('trash_category');
     Route::get('/change-category', [VnshopController::class, 'changeCategory'])->name('change_category');
-
     Route::get('/change-shop', [VnshopController::class, 'changeShop'])->name('change_shop');
     Route::get('/list_role', [VnshopController::class, 'list_role'])->name('list_role');
     Route::get('/product_all', [ProductController::class, 'ProductAll'])->name('product_all');
@@ -94,8 +89,6 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::post('/post/{id}/restore', [VnshopController::class, 'restorepost'])->name('post.restore');
     Route::post('/search', [VnshopController::class, 'search'])->name('admin_search');
 
-    
-    
-    
+
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
 });
