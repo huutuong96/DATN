@@ -223,15 +223,9 @@
                                     class="tab-content position-relative"
                                     id="notificationItemsTabContent">
                                     <div
-<<<<<<< HEAD
                                         class="tab-content position-relative"
                                         id="notificationItemsTabContent"
                                     >
-=======
-                                        class="tab-pane fade show active py-2 ps-2"
-                                        id="all-noti-tab"
-                                        role="tabpanel">
->>>>>>> ba84a8e5092a8b86517509d1d4180afdf7b109e5
                                         <div
                                             data-simplebar
                                             style="max-height: 300px"
