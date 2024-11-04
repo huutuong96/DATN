@@ -91,7 +91,7 @@
                                             <script>
                                                 $(document).ready(function() {
                                                     $('#summernote').summernote({
-                                                    placeholder: 'Hello Bootstrap 5',
+                                                    placeholder: 'Nội dung bài viết',
                                                     tabsize: 2,
                                                     height: 100
                                                     });
@@ -194,7 +194,7 @@
                                                                     <script>
                                                                         $(document).ready(function() {
                                                                             $('#summernote{{ $Post->id }}').summernote({
-                                                                                placeholder: 'Hello Bootstrap 5',
+                                                                                placeholder: 'Nội dung bài viết',
                                                                                 tabsize: 2,
                                                                                 height: 100
                                                                             });
