@@ -70,7 +70,7 @@
                                                     </div><!--end col-->
                                                 </div><!--end row-->
                                             </form>
-                                            </form>       
+                                        
                                          </div>
                                      </div>
                                  </div>
@@ -87,6 +87,7 @@
                                                 <th scope="col">blog</th>
                                                 <th scope="col">slug</th>
                                                 <th scope="col">tiêu đề</th>
+                                                <th scope="col">Hình ảnh</th>
                                                 <th scope="col">nội dung</th>
                                                 <th scope="col">Người tạo</th>
                                                 <th scope="col">Hành động</th>
@@ -100,7 +101,10 @@
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog->name ?? "Danh mục đã bị xóa" }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->content }}</td>
+                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->image }}</td>
+                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                    {{ \Illuminate\Support\Str::limit($Post->content, 150, '...') }}
+                                                </td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->user->fullname }}</td>
                                                 <td>
                                                     <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $Post->id }}">

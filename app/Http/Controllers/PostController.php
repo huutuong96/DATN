@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Cloudinary\Cloudinary;
 use App\Models\Post;
 use App\Http\Requests\PostRequest;
 use Illuminate\Http\Request;
@@ -70,5 +70,11 @@ class PostController extends Controller
         $post = Post::where('deleted_at', null)->findOrFail($id);
         $post->delete(); 
         return redirect()->route('post',['token' => $token,'tab' => $tab])->with('success', 'post đã được xóa thành công!');
+    }
+    private function storeImage($image)
+    {
+        $cloudinary = new Cloudinary();
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        return $uploadedImage['secure_url'];
     }
 }
