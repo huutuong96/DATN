@@ -155,6 +155,9 @@
         
                                 </div>
                             </div>
+                            <div class="mt-3">
+                                {{ $blogs->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                </div>
                         </div><!-- end card-body -->
                     </div><!-- end card -->
                 </div>
@@ -208,13 +211,15 @@
                                         </tbody>
                                         
                                     </table>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            {{-- {{ $blogs->appends(['token' => auth()->user()->token])->links() }} --}}
+                                    
+                                           
                                         
         
                                 </div>
                             </div>
+                            <div class="mt-3">
+                                {{ $deletedBlog->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                </div>
                         </div><!-- end card-body -->
                     </div><!-- end card -->
                 </div>
