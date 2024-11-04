@@ -40,10 +40,10 @@
                              <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal">Thêm bài viết</button>
                              <!-- First modal dialog -->
                              <div class="modal fade" id="firstmodal" aria-hidden="true" aria-labelledby="..." tabindex="-1">
-                                 <div class="modal-dialog modal-dialog-centered">
+                                 <div class="modal-dialog modal-dialog-centered modal-xl">
                                      <div class="modal-content">
                                          <div class="modal-body text-center p-5">
-                                            <form  action="{{ route('posts.store', ['token' => auth()->user()->refesh_token]) }}" method="POST">
+                                            <form action="{{ route('posts.store', ['token' => auth()->user()->refesh_token]) }}" method="POST" enctype="multipart/form-data">
                                                 @csrf <!-- Thêm CSRF token để bảo mật -->
                                                 <div class="row">
                                                     <div class="col-6">
@@ -55,15 +55,22 @@
                                             
                                                     <div class="col-6">
                                                         <div class="mb-3">
-                                                            <label for="blog_id" class="form-label">chọn Blog</label>
+                                                            <label for="blog_id" class="form-label">Chọn Blog</label>
                                                             <select class="form-control" id="blog_id" name="blog_id" required>
-                                                                <option value="" disabled selected>chọn blog</option>
+                                                                <option value="" disabled selected>Chọn blog</option>
                                                                 @foreach($blogs as $blog)
                                                                     <option value="{{ $blog->id }}">{{ $blog->name }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
+                                                    <div class="col-12">
+                                                        <div class="mb-3">
+                                                            <label for="image" class="form-label">Image</label>
+                                                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                                        </div><!--end mb-3-->
+                                                    </div><!--end col-->
+                                            
                                             
                                                     <div class="col-12">
                                                         <div class="mb-3">
@@ -72,6 +79,7 @@
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
                                             
+                                                   
                                                     <div class="col-lg-12">
                                                         <div class="text-end">
                                                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -79,7 +87,7 @@
                                                     </div><!--end col-->
                                                 </div><!--end row-->
                                             </form>
-                                            </form>   
+                                             
                                             <script>
                                                 $(document).ready(function() {
                                                     $('#summernote').summernote({
@@ -105,6 +113,7 @@
                                                 <th scope="col">blog</th>
                                                 <th scope="col">slug</th>
                                                 <th scope="col">tiêu đề</th>
+                                                <th scope="col">Hình ảnh</th>
                                                 <th scope="col">nội dung</th>
                                                 <th scope="col">Người tạo</th>
                                                 <th scope="col">Hành động</th>
@@ -118,9 +127,15 @@
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog->name ?? "Danh mục đã bị xóa" }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
+                                                <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                    <img src="{{ $Post->image }}" alt="Post Image" style="max-width: 100%; height: auto;">
+                                                </td>
+                                                
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                     {{ \Illuminate\Support\Str::limit($Post->content, 150, '...') }}
                                                 </td>
+                                                
+                                                
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->user->fullname }}</td>
                                                 <td>
                                                     <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $Post->id }}">
@@ -131,50 +146,57 @@
                                                 
                                                     <!-- Modal Chỉnh sửa -->
                                                     <div class="modal fade" id="editModal-{{ $Post->id }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $Post->id }}" aria-hidden="true">
-                                                        <div class="modal-dialog">
+                                                        <div class="modal-dialog modal-xl">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                     <h5 class="modal-title" id="editModalLabel-{{ $Post->id }}">Chỉnh sửa Post</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <form action="{{ route('post.update', [
-                                                                        'id' => $Post->id,
-                                                                        'tab' => 1,
-                                                                        'token' => auth()->user()->refesh_token,
-                                                                    ]) }}" method="POST">
+                                                                    <form action="{{ route('post.update', ['id' => $Post->id, 'tab' => 1, 'token' => auth()->user()->refesh_token]) }}" method="POST" enctype="multipart/form-data">
                                                                         @csrf
                                                                         @method('PUT')
                                                                         <div class="mb-3">
                                                                             <label for="blog_id-{{ $Post->id }}" class="form-label">Chọn Blog</label>
                                                                             <select name="blog_id" id="blog_id-{{ $Post->id }}" class="form-select" required>
                                                                                 <option value="">-- Chọn Blog --</option>
-                                                                                @foreach($blogs as $blog) 
+                                                                                @foreach($blogs as $blog)
                                                                                     <option value="{{ $blog->id }}" {{ $Post->blog_id == $blog->id ? 'selected' : '' }}>
-                                                                                        {{ $blog->name }} 
+                                                                                        {{ $blog->name }}
                                                                                     </option>
                                                                                 @endforeach
                                                                             </select>
-                                                                        </div>                                                      
+                                                                        </div>
                                                                         <div class="mb-3">
                                                                             <label for="title-{{ $Post->id }}" class="form-label">Tiêu đề</label>
                                                                             <input type="text" name="title" id="title-{{ $Post->id }}" class="form-control" value="{{ $Post->title }}" required>
+                                                                        </div>                                             
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Ảnh hiện tại:</label>
+                                                                            <div>
+                                                                                <img  src="{{ $Post->image }}" alt="Ảnh hiện tại" style="max-width: 100px; height: 100px;">
+                                                                            </div>
                                                                         </div>
                                                                         <div class="mb-3">
-                                                                            <label for="content-{{ $Post->id }}" class="form-label">Nội dung:</label>
-                                                                            <textarea name="content" id="summernote{{ $Post->id }}" id="content-{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
+                                                                            <label for="image-{{ $Post->id }}" class="form-label">Cập nhật ảnh mới (tùy chọn)</label>
+                                                                            <input type="file" name="image" id="image-{{ $Post->id }}" class="form-control" accept="image/*">
                                                                         </div>
-                                                                    
-                                                                        <input type="hidden" name="update_by" value="{{ auth()->user()->id }}"> 
-                                                                    
+                                                
+                                                                        <div class="mb-3">
+                                                                            <label for="content-{{ $Post->id }}" class="form-label">Nội dung:</label>
+                                                                            <textarea name="content" id="summernote{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
+                                                                        </div>
+                                                
+                                                
+                                                                        <input type="hidden" name="update_by" value="{{ auth()->user()->id }}">
                                                                         <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                                                                     </form>
                                                                     <script>
-                                                                       $(document).ready(function() {
+                                                                        $(document).ready(function() {
                                                                             $('#summernote{{ $Post->id }}').summernote({
-                                                                            placeholder: 'Hello Bootstrap 5',
-                                                                            tabsize: 2,
-                                                                            height: 100
+                                                                                placeholder: 'Hello Bootstrap 5',
+                                                                                tabsize: 2,
+                                                                                height: 100
                                                                             });
                                                                         });
                                                                     </script>
@@ -182,11 +204,9 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <form action="{{ route('post.destroy', [
-                                                        'token' => auth()->user()->refesh_token,
-                                                        'id' => $Post->id,
-                                                        'tab' => 1,
-                                                    ]) }}" method="POST" style="display: inline;">
+                                                
+                                                    <!-- Delete form -->
+                                                    <form action="{{ route('post.destroy', ['token' => auth()->user()->refesh_token, 'id' => $Post->id, 'tab' => 1]) }}" method="POST" style="display: inline;">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" style="background: ;border-radius: 5px; border: 1px solid black; color: red; cursor: pointer; height: 37px; width: 80px;" onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
@@ -194,6 +214,7 @@
                                                         </button>
                                                     </form>
                                                 </td>
+                                                
                                                 
                                                 
                                             </tr>
