@@ -381,7 +381,9 @@ class VnshopController extends Controller
 
         $db = [
             "products" => ["name", "sku", "slug", "description"],
-            "shops" => ["shop_name", "slug", "description"]
+            "shops" => ["shop_name", "slug", "description"],
+            "users" => ["fullname", "phone", "email", "description"],
+            "posts" => ["slug", "title", "content"]
         ];
 
         $search = $rqt->input('search');
@@ -394,21 +396,28 @@ class VnshopController extends Controller
             foreach ($columns as $column) {
                 $query = DB::table($table)
                     ->where($column, 'like', "%$search%");
-                    
-                if ($table == 'products') {
-                    $results = $query->paginate($limit_product);
+                    $results = $query->paginate(6);
                     $resultsByTable[$table] = $results;
-                    break; // Dừng lại sau khi phân trang bảng 'products'
-                }
-                // Phân trang riêng cho bảng 'shops'
-                if ($table == 'shops') {
-                    $results = $query->paginate($limit_shops);
-                    $resultsByTable[$table] = $results;
-                    break; // Dừng lại sau khi phân trang bảng 'shops'
-                }
+                    break; 
+                // if ($table == 'products') {
+                //     $results = $query->paginate($limit_product);
+                //     $resultsByTable[$table] = $results;
+                //     break; // Dừng lại sau khi phân trang bảng 'products'
+                // }
+                // // Phân trang riêng cho bảng 'shops'
+                // if ($table == 'shops') {
+                //     $results = $query->paginate($limit_shops);
+                //     $resultsByTable[$table] = $results;
+                //     break; // Dừng lại sau khi phân trang bảng 'shops'
+                // }
             }
         };
+        $tab = 1;
         dd($resultsByTable);
+        return view('search.search',compact(
+            'resultsByTable',
+            'tab'
+        ));
     }
     
 }
