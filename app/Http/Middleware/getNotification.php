@@ -22,22 +22,16 @@ class getNotification
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $notify = Notification::where('user_id', $user->id)->orderby('created_at')->get();
-            // $notifyMain = [];
+            $notifyMain = [];
 
             foreach ($notify as $noti) {
-                $notifyMain = Notification_to_mainModel::where('id', $noti->id_notification)->orderby('created_at', 'desc')->take(5)->get();
-            }
-            if (empty($notifyMain)) {
-                $notifyMain = [];
+                $notifyMain[] = Notification_to_mainModel::where('id', $noti->id_notification)->orderby('created_at')->get();
             }
 
-            // Chia sẻ dữ liệu với tất cả các view
-            view()->share('notifyMain', $notifyMain);
-
-        } catch (TokenExpiredException | JWTException $e) {
-            return response()->json([
-                'status' => 'Token is Invalid'
-            ]);
+            // Gán notifyMain vào session hoặc request để sử dụng trong view
+            $request->merge(['notifyMain' => $notifyMain]);
+        } catch (\Exception $e) {
+            $request->merge(['notifyMain' => []]);
         }
 
         return $next($request);

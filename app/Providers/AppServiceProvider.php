@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
+use App\Models\ConfigModel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +30,9 @@ class AppServiceProvider extends ServiceProvider
             Log::info('Bindings: '.json_encode($query->bindings));
             Log::info('Time: '.$query->time);
         });
+        $config = ConfigModel::where('is_active', 1)->first();
+        // dd($config);
+        // $config = (new configController)->
+        View::share('config', $config);
     }
 }

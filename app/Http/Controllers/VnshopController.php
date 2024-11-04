@@ -16,6 +16,8 @@ use App\Models\role_premissionModel;
 use App\Models\PremissionsModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Str;
 use App\Http\Requests\BlogRequest;
@@ -372,6 +374,41 @@ class VnshopController extends Controller
         return view('roles.list_permission',compact(
             'permissions', 'role', 'role_premission'
         ));
+    }
+    public function search(Request $rqt)  {
+        $limit_shops = $rqt->limit_shop ?? 6;
+        $limit_product = $rqt->limit_product ?? 6;
+
+        $db = [
+            "products" => ["name", "sku", "slug", "description"],
+            "shops" => ["shop_name", "slug", "description"]
+        ];
+
+        $search = $rqt->input('search');
+        $perPage = $rqt->input('per_page', 10); // Số lượng bản ghi mỗi trang, mặc định là 10
+        $resultsByTable = [];
+
+        foreach ($db as $table => $columns) {
+            $tableResults = collect();
+
+            foreach ($columns as $column) {
+                $query = DB::table($table)
+                    ->where($column, 'like', "%$search%");
+                    
+                if ($table == 'products') {
+                    $results = $query->paginate($limit_product);
+                    $resultsByTable[$table] = $results;
+                    break; // Dừng lại sau khi phân trang bảng 'products'
+                }
+                // Phân trang riêng cho bảng 'shops'
+                if ($table == 'shops') {
+                    $results = $query->paginate($limit_shops);
+                    $resultsByTable[$table] = $results;
+                    break; // Dừng lại sau khi phân trang bảng 'shops'
+                }
+            }
+        };
+        dd($resultsByTable);
     }
     
 }
