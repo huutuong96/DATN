@@ -1,6 +1,15 @@
 @extends('index')
 @section('title', 'List Store')
 
+@section('link')
+<!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet"> -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<!-- include summernote css/js -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+@endsection
 @section('main')
    <div class="container-fluid">
     <div class="row">
@@ -15,7 +24,7 @@
             {{ session('error') }}
         </div>
     @endif
-        <nav>
+        <nav>   
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
               <button class="nav-link {{ $tab == 1 ? 'active' : '' }}" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="{{ $tab == 1 ? 'true' : 'false' }}">Tất cả</button>
               <button class="nav-link {{ $tab == 2  ? 'active' : '' }}" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="{{ $tab == 2 ? 'true' : 'false' }}">Đã xóa</button>
@@ -34,7 +43,7 @@
                                  <div class="modal-dialog modal-dialog-centered">
                                      <div class="modal-content">
                                          <div class="modal-body text-center p-5">
-                                            <form  action="{{ route('posts.store', ['token' => auth()->user()->refesh_token]) }}" method="POST">
+                                            <form action="{{ route('posts.store', ['token' => auth()->user()->refesh_token]) }}" method="POST" enctype="multipart/form-data">
                                                 @csrf <!-- Thêm CSRF token để bảo mật -->
                                                 <div class="row">
                                                     <div class="col-6">
@@ -46,23 +55,31 @@
                                             
                                                     <div class="col-6">
                                                         <div class="mb-3">
-                                                            <label for="blog_id" class="form-label">chọn Blog</label>
+                                                            <label for="blog_id" class="form-label">Chọn Blog</label>
                                                             <select class="form-control" id="blog_id" name="blog_id" required>
-                                                                <option value="" disabled selected>chọn blog</option>
+                                                                <option value="" disabled selected>Chọn blog</option>
                                                                 @foreach($blogs as $blog)
                                                                     <option value="{{ $blog->id }}">{{ $blog->name }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
+                                                    <div class="col-12">
+                                                        <div class="mb-3">
+                                                            <label for="image" class="form-label">Image</label>
+                                                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                                        </div><!--end mb-3-->
+                                                    </div><!--end col-->
+                                            
                                             
                                                     <div class="col-12">
                                                         <div class="mb-3">
                                                             <label for="content" class="form-label">Content</label>
-                                                            <textarea class="form-control" placeholder="Enter post content" id="content" name="content" rows="4" required></textarea>
+                                                            <textarea class="form-control" placeholder="Enter post content" id="summernote" name="content" rows="4" required></textarea>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
                                             
+                                                   
                                                     <div class="col-lg-12">
                                                         <div class="text-end">
                                                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -70,7 +87,21 @@
                                                     </div><!--end col-->
                                                 </div><!--end row-->
                                             </form>
-                                        
+                                             
+                                            <script>
+                                                $(document).ready(function() {
+                                                    $('#summernote').summernote({
+                                                    placeholder: 'Hello Bootstrap 5',
+                                                    tabsize: 2,
+                                                    height: 100
+                                                    });
+                                                    $('#summernote2').summernote({
+                                                    placeholder: 'Hello Bootstrap 5',
+                                                    tabsize: 2,
+                                                    height: 100
+                                                    });
+                                                });
+                                            </script>
                                          </div>
                                      </div>
                                  </div>
@@ -101,10 +132,15 @@
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog->name ?? "Danh mục đã bị xóa" }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->image }}</td>
+                                                <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                    <img src="{{ $Post->image }}" alt="Post Image" style="max-width: 100%; height: auto;">
+                                                </td>
+                                                
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                     {{ \Illuminate\Support\Str::limit($Post->content, 150, '...') }}
                                                 </td>
+                                                
+                                                
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->user->fullname }}</td>
                                                 <td>
                                                     <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $Post->id }}">
@@ -112,7 +148,7 @@
                                                             Chỉnh sửa
                                                         </button>
                                                     </a>
-                                                
+                                
                                                     <!-- Modal Chỉnh sửa -->
                                                     <div class="modal fade" id="editModal-{{ $Post->id }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $Post->id }}" aria-hidden="true">
                                                         <div class="modal-dialog">
@@ -146,7 +182,7 @@
                                                                         </div>
                                                                         <div class="mb-3">
                                                                             <label for="content-{{ $Post->id }}" class="form-label">Nội dung:</label>
-                                                                            <textarea name="content" id="content-{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
+                                                                            <textarea name="content" id="summernote2" id="content-{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
                                                                         </div>
                                                                     
                                                                         <input type="hidden" name="update_by" value="{{ auth()->user()->id }}"> 

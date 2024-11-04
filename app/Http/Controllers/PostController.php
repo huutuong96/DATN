@@ -26,6 +26,7 @@ class PostController extends Controller
         $token = $request->query('token');
         $post = new Post();
         $post->title = $request->title;
+        $post->image =  $this->storeImage($request->image);
         $post->slug = Str::slug($request->title, '-'); 
         $post->create_by = auth()->user()->id; 
         $post->content = $request->content; 
