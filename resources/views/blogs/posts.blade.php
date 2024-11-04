@@ -1,6 +1,15 @@
 @extends('index')
 @section('title', 'List Store')
 
+@section('link')
+<!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet"> -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<!-- include summernote css/js -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+@endsection
 @section('main')
    <div class="container-fluid">
     <div class="row">
@@ -15,7 +24,7 @@
             {{ session('error') }}
         </div>
     @endif
-        <nav>
+        <nav>   
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
               <button class="nav-link {{ $tab == 1 ? 'active' : '' }}" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="{{ $tab == 1 ? 'true' : 'false' }}">Tất cả</button>
               <button class="nav-link {{ $tab == 2  ? 'active' : '' }}" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="{{ $tab == 2 ? 'true' : 'false' }}">Đã xóa</button>
@@ -59,7 +68,7 @@
                                                     <div class="col-12">
                                                         <div class="mb-3">
                                                             <label for="content" class="form-label">Content</label>
-                                                            <textarea class="form-control" placeholder="Enter post content" id="content" name="content" rows="4" required></textarea>
+                                                            <textarea class="form-control" placeholder="Enter post content" id="summernote" name="content" rows="4" required></textarea>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
                                             
@@ -70,7 +79,21 @@
                                                     </div><!--end col-->
                                                 </div><!--end row-->
                                             </form>
-                                            </form>       
+                                            </form>   
+                                            <script>
+                                                $(document).ready(function() {
+                                                    $('#summernote').summernote({
+                                                    placeholder: 'Hello Bootstrap 5',
+                                                    tabsize: 2,
+                                                    height: 100
+                                                    });
+                                                    $('#summernote2').summernote({
+                                                    placeholder: 'Hello Bootstrap 5',
+                                                    tabsize: 2,
+                                                    height: 100
+                                                    });
+                                                });
+                                            </script>
                                          </div>
                                      </div>
                                  </div>
@@ -100,7 +123,9 @@
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog->name ?? "Danh mục đã bị xóa" }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->content }}</td>
+                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                    {{ \Illuminate\Support\Str::limit($Post->content, 150, '...') }}
+                                                </td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->user->fullname }}</td>
                                                 <td>
                                                     <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $Post->id }}">
@@ -142,7 +167,7 @@
                                                                         </div>
                                                                         <div class="mb-3">
                                                                             <label for="content-{{ $Post->id }}" class="form-label">Nội dung:</label>
-                                                                            <textarea name="content" id="content-{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
+                                                                            <textarea name="content" id="summernote2" id="content-{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
                                                                         </div>
                                                                     
                                                                         <input type="hidden" name="update_by" value="{{ auth()->user()->id }}"> 

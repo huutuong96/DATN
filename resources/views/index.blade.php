@@ -36,6 +36,8 @@
         <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
         <!-- custom Css-->
         <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+
+        @yield('link')
     </head>
 
     <body>
