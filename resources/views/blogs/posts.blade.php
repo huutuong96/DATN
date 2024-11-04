@@ -4,7 +4,7 @@
 @section('link')
 <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet"> -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
 
 <!-- include summernote css/js -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
@@ -87,11 +87,6 @@
                                                     tabsize: 2,
                                                     height: 100
                                                     });
-                                                    $('#summernote2').summernote({
-                                                    placeholder: 'Hello Bootstrap 5',
-                                                    tabsize: 2,
-                                                    height: 100
-                                                    });
                                                 });
                                             </script>
                                          </div>
@@ -167,16 +162,22 @@
                                                                         </div>
                                                                         <div class="mb-3">
                                                                             <label for="content-{{ $Post->id }}" class="form-label">Nội dung:</label>
-                                                                            <textarea name="content" id="summernote2" id="content-{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
+                                                                            <textarea name="content" id="summernote{{ $Post->id }}" id="content-{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
                                                                         </div>
                                                                     
                                                                         <input type="hidden" name="update_by" value="{{ auth()->user()->id }}"> 
                                                                     
                                                                         <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                                                                     </form>
-                                                                    
-
-                                                                    
+                                                                    <script>
+                                                                       $(document).ready(function() {
+                                                                            $('#summernote{{ $Post->id }}').summernote({
+                                                                            placeholder: 'Hello Bootstrap 5',
+                                                                            tabsize: 2,
+                                                                            height: 100
+                                                                            });
+                                                                        });
+                                                                    </script>
                                                                 </div>
                                                             </div>
                                                         </div>

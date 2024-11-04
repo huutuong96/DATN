@@ -78,7 +78,7 @@
                                                     </td>
                                                     <td>{{ $user->created_at}}</td>
                                                     <td>
-                                                        {{$user->rank->title}}: {{$user->point}} điểm tích lũy
+                                                        {{$user->rank->title ?? "Vô danh"}}: {{$user->point}} điểm tích lũy
                                                     <td>
                                                     <ul class="list-inline">
                                                         @if ($user->status == 1)
