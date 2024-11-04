@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Cloudinary\Cloudinary;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\Tax;
@@ -243,17 +243,20 @@ class VnshopController extends Controller
             'blogs','deletedBlog','tab'
         ));
     }
-    public function post(Request $request){
+    public function post(Request $request)
+    {
         $tab = $request->input('tab', 1); 
-        $Posts = Post::whereNull('deleted_at')->with('blog')->paginate(10);
-        // dd($Posts[0]->blog->name);
+        $Posts = Post::whereNull('deleted_at')
+                    ->with('blog')
+                    ->orderBy('created_at', 'desc') 
+                    ->paginate(10);
+    
         $blogs = Blog::whereNull('deleted_at')->get();
         $deletedPost = Post::onlyTrashed()->paginate(10);
-        return view('blogs.posts',compact(
-            'Posts','blogs','deletedPost','tab'
-        ));
-
+    
+        return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
     }
+    
     public function restorepost(Request $request, $id)
     {
 
@@ -271,18 +274,22 @@ class VnshopController extends Controller
                 $token = $request->query('token');
                 $tab = $request->query('tab');
                 $post = Post::where('deleted_at', null)->findOrFail($id);
-                $post->title = $request->title; 
-                $post->slug = Str::slug($request->title, '-'); 
+            
+                $post->title = $request->title;
+                $post->slug = Str::slug($request->title, '-');
                 $post->updated_by = auth()->user()->id;
                 $post->updated_at = now();
                 $post->content = $request->content;
-                $post->blog_id = $request->blog_id; 
+                $post->blog_id = $request->blog_id;
+            
+                if ($request->hasFile('image')) {
+                    $imagePath =  $this->storeImage($request->image);
+                    $post->image = $imagePath;
+                }
+            
                 $post->save();
 
-                return redirect()->route('post', [
-                    'token' => $token,
-                    'tab' => $tab
-                ])->with('message', 'Đã cập nhật');
+                return  back()->with('message', 'Đã cập nhật');
             }
         public function updateBlog(BlogRequest $request, string $id)
         {
@@ -419,5 +426,10 @@ class VnshopController extends Controller
             'tab'
         ));
     }
-    
+    private function storeImage($image)
+    {
+        $cloudinary = new Cloudinary();
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        return $uploadedImage['secure_url'];
+    }
 }
