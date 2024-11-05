@@ -65,14 +65,9 @@ class configController extends Controller
     // }
     public function update(request $request, string $id)
     {
-        // Lấy cấu hình hiện tại theo ID
         $config = ConfigModel::findOrFail($id);
-    
-        // Cập nhật các trường từ yêu cầu
         $config->main_color = $request->main_color ?? $config->main_color;
-        $config->is_active = $request->has('is_active') ? 1 : 0; // Kiểm tra xem checkbox có được chọn không
-    
-        // Cập nhật hình ảnh nếu có
+        $config->is_active = $request->has('is_active') ? 1 : 0;
         if ($request->hasFile('logo_header')) {
             $config->logo_header = $this->storeImage($request->logo_header);
         }
@@ -82,9 +77,7 @@ class configController extends Controller
         if ($request->hasFile('icon')) {
             $config->icon = $this->storeImage($request->icon);
         }
-        if ($request->hasFile('thumbnail')) {
-            $config->thumbnail = $this->storeImage($request->thumbnail);
-        }
+        $config->thumbnail = $request->thumbnail ?? $config->thumbnail;
         $config->save();
     
         return back()->with('message', 'Đã cập nhật thành công');
