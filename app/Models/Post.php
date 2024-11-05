@@ -16,6 +16,7 @@ class Post extends Model
         'slug',
         'title',
         'content',
+        'image',
         'updated_by',
         'create_by', 
     ];
