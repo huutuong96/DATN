@@ -88,6 +88,8 @@ Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], f
     Route::delete('/post/{id}', [PostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{id}/restore', [VnshopController::class, 'restorepost'])->name('post.restore');
     Route::post('/search', [VnshopController::class, 'search'])->name('admin_search');
+    Route::get('/config_list', [configController::class, 'index'])->name('config');
+    Route::put('/config_update/{id}', [configController::class, 'update'])->name('config.update');
 
 
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
