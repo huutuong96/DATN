@@ -501,26 +501,28 @@ class VnshopController extends Controller
                         ->where($column, 'like', "%$search%")
                         ->get();
                     $resultsByTable[$table] = $results;
-                    break; 
-                // if ($table == 'products') {
-                //     $results = $query->paginate($limit_product);
-                //     $resultsByTable[$table] = $results;
-                //     break; // Dừng lại sau khi phân trang bảng 'products'
-                // }
-                // // Phân trang riêng cho bảng 'shops'
-                // if ($table == 'shops') {
-                //     $results = $query->paginate($limit_shops);
-                //     $resultsByTable[$table] = $results;
-                //     break; // Dừng lại sau khi phân trang bảng 'shops'
-                // }
+                    break; // Stop once shops are paginated
+                }   else {
+                    // No pagination for other tables
+                    $results = $query->get();
+                    $tableResults = $tableResults->merge($results);
+                }
             }
-        };
-        $tab = 1;
-        dd($resultsByTable);
-        return view('search.search',compact(
-            'resultsByTable',
-            'tab'
-        ));
-    }
     
+            if (!isset($resultsByTable[$table])) {
+                $resultsByTable[$table] = $tableResults;
+            }
+        }
+    
+        session()->put('tab', $rqt->tab ?? 'products');
+        // dd("têst".session('tab'));
+        return view('search.search', compact('resultsByTable', 'search'));
+    }
+
+    private function storeImage($image)
+    {
+        $cloudinary = new Cloudinary();
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        return $uploadedImage['secure_url'];
+    }
 }
