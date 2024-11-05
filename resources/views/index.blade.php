@@ -1413,7 +1413,7 @@
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-analytics.html"
+                                                href="{{ route('config', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
