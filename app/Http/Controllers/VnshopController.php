@@ -18,7 +18,8 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\voucherToMain;
+use App\Http\Requests\VoucherRequest;
 use Illuminate\Support\Str;
 use App\Http\Requests\BlogRequest;
 use App\Http\Requests\PostRequest;
@@ -321,6 +322,8 @@ class VnshopController extends Controller
 
                 return  back()->with('message', 'Đã cập nhật');
             }
+
+                
         public function updateBlog(BlogRequest $request, string $id)
         {
             $token = $request->query('token');
@@ -338,6 +341,38 @@ class VnshopController extends Controller
                 'tab' => $tab
             ])->with('message', 'Đã cập nhật');
         }
+
+        public function updatevoucher(VoucherRequest $request, $id)
+        {
+            $token = $request->token;
+            $tab = $request->tab;
+        
+            // Lấy bản ghi voucher hiện tại
+            $voucherMain = voucherToMain::where('id', $id)->firstOrFail();
+        
+            // Chỉ cập nhật các trường nếu có giá trị mới được nhập
+            $voucherMain->title = $request->title ?? $voucherMain->title; // Giữ lại giá trị cũ nếu không có giá trị mới
+            $voucherMain->description = $request->description ?? $voucherMain->description;
+            $voucherMain->quantity = $request->quantity ?? $voucherMain->quantity;
+            $voucherMain->limitValue = $request->limitValue ?? $voucherMain->limitValue;
+            $voucherMain->ratio = $request->ratio ?? $voucherMain->ratio;
+            $voucherMain->code = $request->code ?? $voucherMain->code;
+            $voucherMain->status = $request->status ?? $voucherMain->status;
+            $voucherMain->update_by = auth()->user()->id;
+        
+            // Lưu bản ghi
+            $voucherMain->save();
+        
+            // Chuyển hướng và hiển thị thông báo
+            return redirect()->route('voucherall', [
+                'token' => $token,
+                'tab'=>$tab,
+            ])->with('message', 'Cập nhật voucher main thành công!');
+        }
+        
+      
+        
+
         public function restoreBlog(Request $request, $id)
         {
             $tab = $request->query('tab');

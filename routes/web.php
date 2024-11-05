@@ -93,6 +93,9 @@ Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], f
     Route::get('/search', [VnshopController::class, 'search'])->name('admin_search_get');
     Route::get('/config_list', [configController::class, 'index'])->name('config');
     Route::put('/config_update/{id}', [configController::class, 'update'])->name('config.update');
+    Route::get('/voucherall', [VoucherToMainController::class, 'voucherall'])->name('voucherall');
+    Route::put('/update_voucher/{id}', [VnshopController::class, 'updatevoucher'])->name('voucher_main.update');
+   
 
 
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');

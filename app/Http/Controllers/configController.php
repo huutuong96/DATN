@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use App\Models\ConfigModel;
+use App\Models\voucherToMain;
+use App\Http\Requests\VoucherRequest;
 // use App\Jobs\changeConfig;
 class configController extends Controller
 {
@@ -83,7 +85,7 @@ class configController extends Controller
         return back()->with('message', 'Đã cập nhật thành công');
     }
     
-    
+ 
 
 
     // public function destroy(Request $request)

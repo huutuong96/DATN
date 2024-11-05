@@ -1422,7 +1422,7 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crm.html"
+                                                href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
