@@ -8,10 +8,12 @@ use App\Models\ConfigModel;
 class configController extends Controller
 {
     public function index()
-    {
-        $config = ConfigModel::all();
-        return response()->json($config, 200);
-    }
+{
+
+    $configs = ConfigModel::all();
+    return view('config.config_list', compact('configs'));
+}
+
     public function is_active()
     {
         $active = ConfigModel::where('is_active', 1)->first();
@@ -61,6 +63,35 @@ class configController extends Controller
     //     $config->save();
     //     return response()->json($config, 200);
     // }
+    public function update(request $request, string $id)
+    {
+        // Lấy cấu hình hiện tại theo ID
+        $config = ConfigModel::findOrFail($id);
+    
+        // Cập nhật các trường từ yêu cầu
+        $config->main_color = $request->main_color ?? $config->main_color;
+        $config->is_active = $request->has('is_active') ? 1 : 0; // Kiểm tra xem checkbox có được chọn không
+    
+        // Cập nhật hình ảnh nếu có
+        if ($request->hasFile('logo_header')) {
+            $config->logo_header = $this->storeImage($request->logo_header);
+        }
+        if ($request->hasFile('logo_footer')) {
+            $config->logo_footer = $this->storeImage($request->logo_footer);
+        }
+        if ($request->hasFile('icon')) {
+            $config->icon = $this->storeImage($request->icon);
+        }
+        if ($request->hasFile('thumbnail')) {
+            $config->thumbnail = $this->storeImage($request->thumbnail);
+        }
+        $config->save();
+    
+        return back()->with('message', 'Đã cập nhật thành công');
+    }
+    
+    
+
 
     // public function destroy(Request $request)
     // {
