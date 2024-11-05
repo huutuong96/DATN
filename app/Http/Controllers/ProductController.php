@@ -1121,7 +1121,6 @@ public function ProductAll(Request $request)
         'violatingProducts', 'tab'
     ));
 }
-
     public function showReportForm(Request $request, $id)
     {
         $token = $request->query('token'); // Lấy token từ URL

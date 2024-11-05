@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Http\Request;
 use App\Models\voucherToMain;
 use App\Http\Requests\VoucherRequest;
 
@@ -20,29 +20,48 @@ class VoucherToMainController extends Controller
 
         return $this->successResponse('Lấy dữ liệu thành công', $voucherMains);
     }
+    public function voucherall(Request $request)
+    {
+        $tab = $request->input('tab', 1); 
+        $voucherMains = voucherToMain::where('status',2)->get();
+        $inactiveVoucher = voucherToMain::where('status',0)->get();
+    
+       
+    
+        return view('voucher.voucher_list', compact('voucherMains','inactiveVoucher', 'tab'));
+    }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(VoucherRequest $request)
     {
-        $dataInsert = [
-            'title' => $request->title,
-            'description' => $request->description,
-            'image' => $request->image,
-            'quantity' => $request->quantity,
-            'limitValue' => $request->limitValue,
-            'ratio' => $request->ratio,
-            'code' => $request->code,
-            'status' => $request->status,
-        ];
+        $token = $request->query('token');
+        
+        $voucherMain = new voucherToMain();
+        $voucherMain->title = $request->title;
+        $voucherMain->description = $request->description;
+        $voucherMain->quantity = $request->quantity;
+        $voucherMain->limitValue = $request->limitValue;
+        $voucherMain->ratio = $request->ratio;
+        $voucherMain->code = $request->code;
+        $voucherMain->status = $request->status;
+        $voucherMain->create_by = auth()->user()->id;
+        $voucherMain->save();
         try {
-            $voucherMain = voucherToMain::create($dataInsert);
-            return $this->successResponse("Thêm voucher main thành công", $voucherMain);
+            $voucherMain->save();
+            return redirect()->route('voucherall', [
+                'token' => $token,
+            ])->with('message', 'Thêm voucher main thành công');
         } catch (\Throwable $th) {
-            return $this->errorResponse('Thêm voucher main không thành công', $th->getMessage());
+            return redirect()->route('voucherall', [
+                'token' => $token,
+            ])->with('error', 'Thêm voucher main không thành công: ' . $th->getMessage());
         }
     }
+    
+    
 
     /**
      * Display the specified resource.
@@ -58,24 +77,14 @@ class VoucherToMainController extends Controller
         return $this->successResponse("Lấy dữ liệu thành công", $voucherMain);
     }
 
+
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(VoucherRequest $request, string $id)
-    {
-        $voucherMain = voucherToMain::find($id);
-
-        if (!$voucherMain) {
-            return $this->errorResponse("Voucher main không tồn tại", null, 404);
-        }
-
-        try {
-            $voucherMain->update($request->validated());
-            return $this->successResponse("Cập nhật voucher main thành công", $voucherMain);
-        } catch (\Throwable $th) {
-            return $this->errorResponse("Cập nhật voucher main không thành công", $th->getMessage());
-        }
-    }
+   
+    
+    
 
     /**
      * Remove the specified resource from storage.

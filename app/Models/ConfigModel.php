@@ -17,6 +17,9 @@ class ConfigModel extends Model
         'thumbnail',
         'main_color',
         'is_active',
+        'create_by'
     ];
     public $timestamps = false;
+   
+    
 }
