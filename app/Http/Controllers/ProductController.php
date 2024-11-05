@@ -1021,10 +1021,13 @@ $notification = $notificationController->store(new Request($notificationData));
         $tab = $request->tab;
         $tabchill = $request->tabchill;
         // dd($tabchill);
-        $product = Product::find($id);
+        $product = Product::find($id ?? $request->id);
         if ($product) {
-            $product->status = 1;
+            $product->status = 2;
             $product->save();
+            if($request->search){
+                return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
+            }
             return redirect()->route('product_all', [
                 'token' => auth()->user()->refesh_token,
                 'tab' => $tab,
@@ -1039,9 +1042,11 @@ $notification = $notificationController->store(new Request($notificationData));
         $tab = $request->tab;
         $product = Product::find($id);
         if ($product) {
-            $product->status = 2;
+            $product->status = 0;
             $product->save();
-    
+            if($request->search){
+                return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
+            }
             return redirect()->route('product_all', [
                 'token' => auth()->user()->refesh_token,
                 'tab' => $tab
@@ -1058,10 +1063,12 @@ $notification = $notificationController->store(new Request($notificationData));
     $product = Product::find($id);
 
     if ($product) {
-        $product->status = 3;
+        $product->status = 4;
         $product->admin_note = $reason;
         $product->save();
-
+        if($request->search){
+            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
+        }
         return redirect()->route('product_all', [
             'token' => $token,
             'tab' => $tab

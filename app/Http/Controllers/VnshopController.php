@@ -231,7 +231,37 @@ class VnshopController extends Controller
         if ($shop) {
             $shop->status =$rqt->status; 
             $shop->save(); 
-            return Back();
+            return back();
+        }
+    }
+    public function changeShopSearch(Request $rqt){
+       
+        $shop = Shop::find($rqt->id);
+        if ($shop) {
+            $shop->status =$rqt->status; 
+            $shop->save(); 
+            // dd($rqt->tab);
+            // dd(session('tab'));
+            session()->forget('tab');
+            // dd(session('tab'));
+            session()->put('tab', $rqt->tab);
+            // dd(session('tab'));
+            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
+        }
+    }
+    public function changeUserSearch(Request $rqt){
+       
+        $user = UsersModel::find($rqt->id);
+        if ($user) {
+            $user->status =$rqt->status; 
+            $user->save();  
+            // dd($rqt->tab);
+            // dd(session('tab'));
+            session()->forget('tab');
+            // dd(session('tab'));
+            session()->put('tab', $rqt->tab);
+            // dd(session('tab'));
+            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
         }
     }
     public function blog(Request $request){
@@ -382,28 +412,94 @@ class VnshopController extends Controller
             'permissions', 'role', 'role_premission'
         ));
     }
-    public function search(Request $rqt)  {
-        $limit_shops = $rqt->limit_shop ?? 6;
-        $limit_product = $rqt->limit_product ?? 6;
+    // public function search(Request $rqt)  {
+    //     $limit_shops = $rqt->limit_shop ?? 6;
+    //     $limit_product = $rqt->limit_product ?? 6;
 
+    //     $db = [
+    //         "products" => ["name", "sku", "slug", "description"],
+    //         "shops" => ["shop_name", "slug", "description"],
+    //         "users" => ["fullname", "phone", "email", "description"],
+    //         "posts" => ["slug", "title", "content"]
+    //     ];
+
+    //     $search = $rqt->input('search');
+    //     $perPage = $rqt->input('per_page', 10); // Số lượng bản ghi mỗi trang, mặc định là 10
+    //     $resultsByTable = [];
+
+    //     foreach ($db as $table => $columns) {
+    //         $tableResults = collect();
+
+    //         foreach ($columns as $column) {
+    //             $query = DB::table($table)
+    //                 ->where($column, 'like', "%$search%");
+                     
+    //             // if ($table == 'products') {
+    //             //     $results = $query->paginate($limit_product);
+    //             //     $resultsByTable[$table] = $results;
+    //             //     break; // Dừng lại sau khi phân trang bảng 'products'
+    //             // }
+    //             // // Phân trang riêng cho bảng 'shops'
+    //             if ($table == 'shops') {
+    //                 $results = $query->with('user')->get();
+    //                 $resultsByTable[$table] = $results;
+    //                 break; // Dừng lại sau khi phân trang bảng 'shops'
+    //             }
+    //             $results = $query->get();
+    //                 $resultsByTable[$table] = $results;
+    //                 break;
+    //         }
+    //     };
+    //     $tab = 1;
+    //     // dd($resultsByTable);
+    //     return view('search.search',compact(
+    //         'resultsByTable',
+    //         'tab'
+    //     ));
+    // }
+    public function search(Request $rqt)  {
+    
         $db = [
             "products" => ["name", "sku", "slug", "description"],
             "shops" => ["shop_name", "slug", "description"],
             "users" => ["fullname", "phone", "email", "description"],
             "posts" => ["slug", "title", "content"]
         ];
-
-        $search = $rqt->input('search');
-        $perPage = $rqt->input('per_page', 10); // Số lượng bản ghi mỗi trang, mặc định là 10
+    
+        $search = $rqt->search;
+        $perPage = $rqt->input('per_page', 10); // Default records per page
         $resultsByTable = [];
-
+    
         foreach ($db as $table => $columns) {
             $tableResults = collect();
-
+    
             foreach ($columns as $column) {
-                $query = DB::table($table)
-                    ->where($column, 'like', "%$search%");
-                    $results = $query->paginate(6);
+                $query = DB::table($table)->where($column, 'like', "%$search%");
+    
+                if ($table == 'products') {
+                    // Pagination for products
+                    $results = $query->get();
+                    $resultsByTable[$table] = $results;
+                    break; // Stop once products are paginated
+                } elseif ($table == 'shops') {
+                    // Separate handling for shops with eager loading using Eloquent
+                    $results = \App\Models\Shop::with('user')
+                        ->where($column, 'like', "%$search%")
+                        ->get();
+                    $resultsByTable[$table] = $results;
+                    break; // Stop once shops are paginated
+                } elseif ($table == 'users') {
+                    // Separate handling for shops with eager loading using Eloquent
+                    $results = \App\Models\UsersModel::with('address')
+                        ->where($column, 'like', "%$search%")
+                        ->get();
+                    $resultsByTable[$table] = $results;
+                    break; // Stop once shops are paginated
+                } elseif ($table == 'posts') {
+                    // Separate handling for shops with eager loading using Eloquent
+                    $results = \App\Models\Post::with('user')
+                        ->where($column, 'like', "%$search%")
+                        ->get();
                     $resultsByTable[$table] = $results;
                     break; 
                 // if ($table == 'products') {
@@ -426,10 +522,5 @@ class VnshopController extends Controller
             'tab'
         ));
     }
-    private function storeImage($image)
-    {
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        return $uploadedImage['secure_url'];
-    }
+    
 }

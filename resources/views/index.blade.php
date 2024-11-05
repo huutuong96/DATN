@@ -103,7 +103,7 @@
                          <!-- <form class="col-xl-6 p-3"> -->
                             <div class="form-group m-0">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                    <input name='search' type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
                                     <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
                                 </div>
                             </div>

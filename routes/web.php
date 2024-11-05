@@ -62,6 +62,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], f
     Route::get('/posts', [VnshopController::class, 'post'])->name('post');
     Route::get('/costomer', [VnshopController::class, 'costomer'])->name('costomer');
     Route::get('/change-user', [VnshopController::class, 'changeUser'])->name('change_user');
+    Route::get('/change-user-search', [VnshopController::class, 'changeUserSearch'])->name('changeUserSearch');
     Route::get('/trash-user', [VnshopController::class, 'trashUser'])->name('trash_user');
     Route::get('/pending-approval', [VnshopController::class, 'pendingApproval'])->name('pending_approval');
     Route::get('/manager', [VnshopController::class, 'manager'])->name('manager');
@@ -73,6 +74,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], f
     Route::get('/trash-category', [VnshopController::class, 'trash_category'])->name('trash_category');
     Route::get('/change-category', [VnshopController::class, 'changeCategory'])->name('change_category');
     Route::get('/change-shop', [VnshopController::class, 'changeShop'])->name('change_shop');
+    Route::get('/change-shop-search', [VnshopController::class, 'changeShopSearch'])->name('changeShopSearch');
     Route::get('/list_role', [VnshopController::class, 'list_role'])->name('list_role');
     Route::get('/product_all', [ProductController::class, 'ProductAll'])->name('product_all');
     Route::get('/product-waiting-approval', [ProductController::class, 'productWaitingApproval'])->name('product-waiting-approval');
@@ -88,6 +90,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], f
     Route::delete('/post/{id}', [PostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{id}/restore', [VnshopController::class, 'restorepost'])->name('post.restore');
     Route::post('/search', [VnshopController::class, 'search'])->name('admin_search');
+    Route::get('/search', [VnshopController::class, 'search'])->name('admin_search_get');
     Route::get('/config_list', [configController::class, 'index'])->name('config');
     Route::put('/config_update/{id}', [configController::class, 'update'])->name('config.update');
 
