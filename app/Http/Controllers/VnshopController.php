@@ -25,6 +25,8 @@ use App\Http\Requests\BlogRequest;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Http\Requests\TaxRequest;
+use App\Http\Requests\BannerRequest;
+use App\Models\Banner;
 
 
 class VnshopController extends Controller
@@ -209,7 +211,7 @@ class VnshopController extends Controller
     }
     public function violation_stores($limit = 5){
         $shops = Shop::orderBy('updated_at', 'desc')->where('status', "=", 4 )->paginate($limit);
-        return view('stores.violation',compact(
+        return view('stores.Violation',compact(
             'shops'
         ));
     }
@@ -261,19 +263,19 @@ class VnshopController extends Controller
             'blogs','deletedBlog','tab'
         ));
     }
-    public function post(Request $request)
-    {
-        $tab = $request->input('tab', 1); 
-        $Posts = Post::whereNull('deleted_at')
-                    ->with('blog')
-                    ->orderBy('created_at', 'desc') 
-                    ->paginate(10);
-    
-        $blogs = Blog::whereNull('deleted_at')->get();
-        $deletedPost = Post::onlyTrashed()->paginate(10);
-    
-        return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
-    }
+        public function post(Request $request)
+        {
+            $tab = $request->input('tab', 1); 
+            $Posts = Post::whereNull('deleted_at')
+                        ->with('blog')
+                        ->orderBy('created_at', 'desc') 
+                        ->paginate(10);
+        
+            $blogs = Blog::whereNull('deleted_at')->get();
+            $deletedPost = Post::onlyTrashed()->paginate(10);
+        
+            return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
+        }
     
     public function restorepost(Request $request, $id)
     {
@@ -547,7 +549,7 @@ class VnshopController extends Controller
 {    $tab = $request->query('tab',1);
     // dd($tab);
     $taxes = Tax::where('status',2)->get();
-    $taxeOFF = Tax::where('status',0)->get();
+    $taxeOFF = Tax::where('status',3)->get();
 
     if ($taxes->isEmpty()) {
         return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
@@ -593,6 +595,73 @@ public function update_tax(TaxRequest $request, $id)
         'tab' => $tab,
     ])->with('message', 'Cập nhật thuế thành công!');
 }
+public function bannerall(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $banners = Banner::where('status',2)->paginate(10);
+    $banners0ff = Banner::where('status',3)->paginate(10);
+
+   
+
+    return view('banner.banner', compact('banners', 'banners0ff', 'tab'));
+}
+public function storebanner(BannerRequest $request)
+{
+    $image = $request->file('image');
+    $cloudinary = new Cloudinary();
+    $token = $request->query('token');
+
+    try {
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $dataInsert = [
+            'title' => $request->title,
+            'content' => $request->content,
+            'URL' => $uploadedImage['secure_url'],
+            'status' => $request->status,
+            'index' => $request->index,
+            'create_by' =>  auth()->user()->id,
+        ];
+        $banner = Banner::create($dataInsert);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            
+        ])->with('success', 'banner thuế thành công');
+    } catch (\Throwable $th) {
+        // Return view with error message
+        return view('bannerall')->with([
+            'status' => false,
+            'message' => "Thêm Banner không thành công",
+            'error' => $th->getMessage()
+        ]);
+    }
+}
+public function updatebanner(BannerRequest $request, $id)
+{
+
+    $token = $request->token; 
+    $tab = $request->tab;
+    $banner = Banner::findOrFail($id);
+    $dataUpdate = [
+        'title' => $request->title,
+        'content' => $request->content,
+        'status' => $request->status,
+        'index' => $request->index,
+        'update_by' =>  auth()->user()->id,
+    ];
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $cloudinary = new Cloudinary();
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $dataUpdate['URL'] = $uploadedImage['secure_url'];
+    }
+    $banner->update($dataUpdate);
+    return redirect()->route('bannerall', [
+        'token' => $token,
+        'tab' => $tab,
+    ])->with('message', 'Cập nhật banner thành công!');
+}
+
+
 
 
 
