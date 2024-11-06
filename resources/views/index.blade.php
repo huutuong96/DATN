@@ -1431,7 +1431,7 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="index.html"
+                                                href="{{ route('bannerall', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-ecommerce"
                                             >
