@@ -24,6 +24,8 @@ use Illuminate\Support\Str;
 use App\Http\Requests\BlogRequest;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
+use App\Http\Requests\TaxRequest;
+
 
 class VnshopController extends Controller
 {
@@ -235,21 +237,6 @@ class VnshopController extends Controller
             return back();
         }
     }
-    public function changeShopSearch(Request $rqt){
-       
-        $shop = Shop::find($rqt->id);
-        if ($shop) {
-            $shop->status =$rqt->status; 
-            $shop->save(); 
-            // dd($rqt->tab);
-            // dd(session('tab'));
-            session()->forget('tab');
-            // dd(session('tab'));
-            session()->put('tab', $rqt->tab);
-            // dd(session('tab'));
-            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
-        }
-    }
     public function changeUserSearch(Request $rqt){
        
         $user = UsersModel::find($rqt->id);
@@ -347,11 +334,10 @@ class VnshopController extends Controller
             $token = $request->token;
             $tab = $request->tab;
         
-            // Lấy bản ghi voucher hiện tại
             $voucherMain = voucherToMain::where('id', $id)->firstOrFail();
         
-            // Chỉ cập nhật các trường nếu có giá trị mới được nhập
-            $voucherMain->title = $request->title ?? $voucherMain->title; // Giữ lại giá trị cũ nếu không có giá trị mới
+            
+            $voucherMain->title = $request->title ?? $voucherMain->title; 
             $voucherMain->description = $request->description ?? $voucherMain->description;
             $voucherMain->quantity = $request->quantity ?? $voucherMain->quantity;
             $voucherMain->limitValue = $request->limitValue ?? $voucherMain->limitValue;
@@ -359,11 +345,7 @@ class VnshopController extends Controller
             $voucherMain->code = $request->code ?? $voucherMain->code;
             $voucherMain->status = $request->status ?? $voucherMain->status;
             $voucherMain->update_by = auth()->user()->id;
-        
-            // Lưu bản ghi
             $voucherMain->save();
-        
-            // Chuyển hướng và hiển thị thông báo
             return redirect()->route('voucherall', [
                 'token' => $token,
                 'tab'=>$tab,
@@ -560,4 +542,58 @@ class VnshopController extends Controller
         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
         return $uploadedImage['secure_url'];
     }
+
+    public function taxall(request $request)
+{    $tab = $request->query('tab',1);
+    // dd($tab);
+    $taxes = Tax::where('status',2)->get();
+    $taxeOFF = Tax::where('status',0)->get();
+
+    if ($taxes->isEmpty()) {
+        return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
+    }
+
+    return view('tax.tax', compact('taxes' ,'taxeOFF', 'tab'));
+}
+public function storetax(TaxRequest $request)
+{
+    $token = $request->query('token');
+    $tab = $request->query('tab');
+   
+    $tax = new Tax();
+    $tax->title = $request->title;
+    $tax->type = $request->type;
+    $tax->tax_number = $request->tax_number;
+    $tax->rate = $request->rate;
+    $tax->status = $request->status;
+    $tax->create_by = auth()->user()->id; 
+    $tax->save();
+    return redirect()->route('taxall', [
+        'token' => $token,
+        
+    ])->with('success', 'Thêm thuế thành công');
+    
+}
+
+
+public function update_tax(TaxRequest $request, $id)
+{
+    $token = $request->token; 
+    $tab = $request->tab; 
+    $tax = Tax::findOrFail($id);
+    $tax->title = $request->title ?? $tax->title; 
+    $tax->type = $request->type ?? $tax->type;
+    $tax->tax_number = $request->tax_number ?? $tax->tax_number;
+    $tax->rate = $request->rate ?? $tax->rate;
+    $tax->status = $request->status ?? $tax->status;
+    $tax->update_by = auth()->user()->id;
+    $tax->save();
+    return redirect()->route('taxall', [
+        'token' => $token,
+        'tab' => $tab,
+    ])->with('message', 'Cập nhật thuế thành công!');
+}
+
+
+
 }

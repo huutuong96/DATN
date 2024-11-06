@@ -95,6 +95,9 @@ Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], f
     Route::put('/config_update/{id}', [configController::class, 'update'])->name('config.update');
     Route::get('/voucherall', [VoucherToMainController::class, 'voucherall'])->name('voucherall');
     Route::put('/update_voucher/{id}', [VnshopController::class, 'updatevoucher'])->name('voucher_main.update');
+    Route::get('/taxall', [VnshopController::class, 'taxall'])->name('taxall');
+    Route::put('/update_tax/{id}', [VnshopController::class, 'update_tax'])->name('tax.update');
+    Route::post('/storetax', [VnshopController::class, 'storetax'])->name('tax.store');
    
 
 

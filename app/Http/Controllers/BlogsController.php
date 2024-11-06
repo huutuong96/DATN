@@ -29,7 +29,7 @@ class BlogsController extends Controller
 
         return redirect()->route('blog', [
             'token' => $token,
-        ])->with('message', 'Đã cập nhật');
+        ])->with('message', 'Đã thêm ');
     }
 
 
