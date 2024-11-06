@@ -29,7 +29,7 @@ class BlogsController extends Controller
 
         return redirect()->route('blog', [
             'token' => $token,
-        ])->with('message', 'Đã cập nhật');
+        ])->with('message', 'Đã thêm ');
     }
 
 
@@ -43,9 +43,6 @@ class BlogsController extends Controller
     {
 
         $blog = Blog::where('id', $id)->whereNull('deleted_at')->firstOrFail();
-       
-       
-        $blog->save();
         $slug = Str::slug($request->name, '-');
         $blog = new Blog();
         $blog->name = $request->name;

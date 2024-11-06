@@ -89,4 +89,5 @@ class UsersModel extends Authenticatable implements JWTSubject {
     {
         return $this->belongsTo(RolesModel::class, 'role_id');
     }
+    
 }
