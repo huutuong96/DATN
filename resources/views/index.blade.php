@@ -41,6 +41,7 @@
     </head>
 
     <body>
+      
         <!-- Begin page -->
         <div id="layout-wrapper">
             <header id="page-topbar">
@@ -1486,6 +1487,17 @@
             <!-- ============================================================== -->
             <div class="main-content">
                 <div class="page-content">
+                    @if (session('message'))
+                    <div class="alert alert-success">
+                        {{ session('message') }}
+                    </div>
+                @endif
+            
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
                     @yield('main')
                 </div>
                 <!-- End Page-content -->

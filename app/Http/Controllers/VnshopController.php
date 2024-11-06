@@ -227,7 +227,7 @@ class VnshopController extends Controller
         if ($category) {
             $category->status =$rqt->status; 
             $category->save(); 
-            return Back();
+            return Back()->with('message', 'Cập nhật thành công!');
         }
     }
     public function changeShop(Request $rqt){
@@ -236,7 +236,7 @@ class VnshopController extends Controller
         if ($shop) {
             $shop->status =$rqt->status; 
             $shop->save(); 
-            return back();
+            return back()->with('message', 'Cập nhật thành công!');
         }
     }
     public function changeUserSearch(Request $rqt){
@@ -251,7 +251,7 @@ class VnshopController extends Controller
             // dd(session('tab'));
             session()->put('tab', $rqt->tab);
             // dd(session('tab'));
-            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
+            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search])->with('message', 'Cập nhật thành công!');
         }
     }
     public function blog(Request $request){
