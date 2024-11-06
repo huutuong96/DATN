@@ -185,7 +185,7 @@
                                                                     href="{{ route('change_user', [
                                                                                                         'token' => auth()->user()->refesh_token,
                                                                                                         'id' => $user->id,
-                                                                                                        'status' => 2,
+                                                                                                        'status' => 4,
                                                                                                         ]) }}"
                                                                 >
                                                                     <button type="button" class="btn rounded-pill btn-warning waves-effect waves-light">Khóa</button>
@@ -197,7 +197,7 @@
                                                                 href="{{ route('change_user', [
                                                                                                     'token' => auth()->user()->refesh_token,
                                                                                                     'id' => $user->id,
-                                                                                                    'status' => 1,
+                                                                                                    'status' => 2,
                                                                                                     ]) }}"
                                                             >
                                                                 <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">mở</button>
