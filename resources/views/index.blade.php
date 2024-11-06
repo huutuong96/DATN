@@ -1449,7 +1449,7 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-projects.html"
+                                                href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-projects"
                                             >

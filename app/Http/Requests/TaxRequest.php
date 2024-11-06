@@ -26,6 +26,7 @@ class TaxRequest extends FormRequest
         return [
             'title' => 'required|string',
             'type' => 'required|string',
+            'rate' => 'required|numeric|min:0|max:1', 
             'tax_number' => 'required|string',
             'status' => 'numeric'
         ];

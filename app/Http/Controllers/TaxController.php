@@ -32,12 +32,17 @@ class TaxController extends Controller
     public function store(TaxRequest $request)
     {
         try {
+            // Tạo mới một bản ghi thuế từ dữ liệu hợp lệ
             $tax = Tax::create($request->validated());
-            return $this->successResponse("Thêm thuế thành công", $tax);
+    
+            // Chuyển hướng về trang danh sách thuế kèm thông báo thành công
+            return redirect()->route('tax.index')->with('success', 'Thêm thuế thành công');
         } catch (\Throwable $th) {
-            return $this->errorResponse("Thêm thuế không thành công", $th->getMessage());
+            // Nếu có lỗi, chuyển hướng lại form thêm với thông báo lỗi
+            return redirect()->back()->withInput()->with('error', 'Thêm thuế không thành công: ' . $th->getMessage());
         }
     }
+    
 
     /**
      * Display the specified resource.
