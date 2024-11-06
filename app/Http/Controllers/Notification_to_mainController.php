@@ -15,6 +15,7 @@ class Notification_to_mainController extends Controller
      */
     public function index()
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $notification_to_main = Notification_to_mainModel::all();
 
         if ($notification_to_main->isEmpty()) {

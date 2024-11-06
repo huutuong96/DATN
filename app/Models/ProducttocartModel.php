@@ -12,14 +12,21 @@ class ProducttocartModel extends Model
 
     // Các trường có thể được gán hàng loạt
     protected $fillable = [
-        'quantity',
         'status',
+        'created_at',
+        'updated_at',
         'cart_id',
-        'product_id',
-        'create_by',
-        'update_by',
-        'variant_id',
         'shop_id',
+        'shop_name',
+        'shop_slug',
+        'product_id',
+        'product_name',
+        'product_slug',
+        'product_price',
+        'variant_id',
+        'variant_name',
+        'variant_price',
+        'quantity',
         'ship_code',
     ];
     public function product()

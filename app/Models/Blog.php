@@ -9,19 +9,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Blog extends Model
 {
     use HasFactory;
-
+    use SoftDeletes;
     protected $fillable = [
-        'post_id',
-        'title',
-        'description',
-        'content',
+        'name',
         'slug',
+        'title',
         'create_by',
         'updated_by',
-        'is_deleted',
     ];
-    public function postCategory()
+    public function user()
     {
-        return $this->belongsTo(Post::class, 'post_id', 'id'); // Chỉnh sửa theo cần thiết
+        return $this->belongsTo(User::class, 'create_by'); 
     }
+    
+    
 }

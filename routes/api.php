@@ -296,8 +296,10 @@ Route::get('/search', function () {
     Route::get('banners/client', [BannerController::class, "index"]);
     Route::get('voucher_main/client', [VoucherToMainController::class, "index"]);
     Route::get('voucher_shop', [VoucherToMainController::class, "index"]);
+    Route::get('blogs', [BlogsController::class, "index"]);
+    Route::get('posts', [PostController::class, "index"]);
 
-    Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
+    Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'getNotification']], function () {
 
 
                 Route::post('categories', [CategoriesController::class, 'store']);
@@ -316,9 +318,9 @@ Route::get('/search', function () {
 
                 Route::resource('address', AddressController::class);
 
-                Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
+                // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckRole:OWNER');
-                Route::post('permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access')->middleware('CheckRole:OWNER');
+                Route::get('permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access');
 
               
 
@@ -336,6 +338,12 @@ Route::get('/search', function () {
                     Route::resource('voucher_shop', VoucherToShopController::class)->except(['index']);
                    
                 });
+                Route::middleware('CheckPremission:handle_blog')->group(function () {
+                    Route::resource('posts', PostController::class)->except(['index']);
+                    Route::resource('blogs', BlogsController::class)->except(['index']);
+                });
+                
+               
                 
                
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
@@ -383,8 +391,6 @@ Route::get('/search', function () {
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
                 Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
 
-                Route::resource('blogs', BlogsController::class);
-                Route::resource('posts', PostController::class);
 
                 Route::resource('follows', FollowToShopController::class);
                 Route::resource('support_main', Support_mainController::class);
@@ -434,6 +440,7 @@ Route::get('/search', function () {
 
                 //SHOP
                 Route::resource('carts', CartController::class);
+                Route::get('miniCart', [CartController::class, "miniCart"]);
                 Route::resource('users', AuthenController::class);
                 Route::get('user/me', [AuthenController::class, "me"]);
                 Route::post('user/change_password', [AuthenController::class, "change_password"])->name('change_password');
@@ -548,6 +555,8 @@ Route::get('/search', function () {
             Route::delete('main/config/{id}', [configController::class, 'destroy']);
             Route::get('main/config/restore{id}', [configController::class, 'restore']);
             Route::get('main/config/active{id}', [configController::class, 'active']);
+
+            Route::post('generate_variants', [ProductController::class, 'generate_Variants']);
 
 
 });

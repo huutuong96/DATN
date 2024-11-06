@@ -24,12 +24,15 @@ class CheckPremission
                 'message' => 'Tài khoản không tồn tại',
             ], 401);
         };
+        if($user->role_id == 2){
+            return $next($request);
+        }
         $premissions = role_premissionModel::with('permission')
         ->where('role_id', $user->role_id)
         ->get();
         foreach ($premissions as $key => $value) {
             if($value->permission->premissionName == $premission){
-                dd($value->permission->premissionName, $premission);
+                // dd($value->permission->premissionName, $premission);
                 return $next($request);
             }
         }

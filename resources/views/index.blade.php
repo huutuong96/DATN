@@ -18,7 +18,7 @@
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
         <meta content="Themesbrand" name="author" />
         <!-- App favicon -->
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        <link rel="shortcut icon" href="{{ $config->icon }}">
 
         <!-- jsvectormap css -->
         <link href="assets/libs/jsvectormap/css/jsvectormap.min.css" rel="stylesheet" type="text/css" />
@@ -36,6 +36,8 @@
         <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
         <!-- custom Css-->
         <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+
+        @yield('link')
     </head>
 
     <body>
@@ -50,16 +52,16 @@
                                 <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}"  class="logo logo-dark">
                                     <span class="logo-sm">
                                         <img
-                                            src="assets/images/logo-sm.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="22"
+                                            height="50"
                                         />
                                     </span>
                                     <span class="logo-lg">
                                         <img
-                                            src="assets/images/logo-dark.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="17"
+                                            height="50"
                                         />
                                     </span>
                                 </a>
@@ -67,16 +69,16 @@
                                 <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}"class="logo logo-light">
                                     <span class="logo-sm">
                                         <img
-                                            src="assets/images/logo-sm.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="22"
+                                            height="50"
                                         />
                                     </span>
                                     <span class="logo-lg">
                                         <img
-                                            src="assets/images/logo-light.png"
+                                            src="{{ $config->logo_admin }}"
                                             alt=""
-                                            height="17"
+                                            height="50"
                                         />
                                     </span>
                                 </a>
@@ -94,10 +96,14 @@
                                 </span>
                             </button>
                         </div>
-                         <form class="col-xl-6 p-3">
+                        <form class="col-xl-6 p-3" action="{{ route('admin_search',[
+                                                                'token' => auth()->user()->refesh_token,
+                                                                ]) }}" method="POST" style="display:inline;">
+                            @csrf
+                         <!-- <form class="col-xl-6 p-3"> -->
                             <div class="form-group m-0">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                    <input name='search' type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
                                     <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
                                 </div>
                             </div>
@@ -121,7 +127,7 @@
                             <div
                                 class="dropdown topbar-head-dropdown ms-1 header-item"
                                 id="notificationDropdown"
-                            >
+                                >
                                 <button
                                     type="button"
                                     class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
@@ -962,16 +968,16 @@
                     <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}" class="logo logo-dark">
                         <span class="logo-sm">
                             <img
-                                src="assets/images/logo-sm.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="22"
+                                height="50"
                             />
                         </span>
                         <span class="logo-lg">
                             <img
-                                src="assets/images/logo-dark.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="17"
+                                height="50"
                             />
                         </span>
                     </a>
@@ -979,16 +985,16 @@
                     <a href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}" class="logo logo-light">
                         <span class="logo-sm">
                             <img
-                                src="assets/images/logo-sm.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="22"
+                                height="50"
                             />
                         </span>
                         <span class="logo-lg">
                             <img
-                                src="assets/images/logo-light.png"
+                                src="{{ $config->logo_admin }}"
                                 alt=""
-                                height="17"
+                                height="50"
                             />
                         </span>
                     </a>
@@ -1214,64 +1220,7 @@
                                     </ul>
                                 </div>
                             </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link menu-link"
-                                    href="#quanlyxetduyet"
-                                    data-bs-toggle="collapse"
-                                    role="button"
-                                    aria-expanded="false"
-                                    aria-controls="sidebarDashboards"
-                                >
-                                    <i class=" ri-file-edit-fill"></i>
-                                    <span data-key="t-dashboards"
-                                        >Quản lý xét duyệt</span
-                                    >
-                                </a>
-                                <div
-                                    class="collapse menu-dropdown"
-                                    id="quanlyxetduyet"
-                                >
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-analytics.html"
-                                                class="nav-link"
-                                                data-key="t-analytics"
-                                            >
-                                                Xét duyệt cửa hàng
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crm.html"
-                                                class="nav-link"
-                                                data-key="t-crm"
-                                            >
-                                                Xét duyệt sản phẩm (new)
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="index.html"
-                                                class="nav-link"
-                                                data-key="t-ecommerce"
-                                            >
-                                                Xét duyệt sản phẩm (cập nhật)
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crypto.html"
-                                                class="nav-link"
-                                                data-key="t-crypto"
-                                            >
-                                                ...
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
+                       
                             <li class="nav-item">
                                 <a
                                     class="nav-link menu-link"
@@ -1323,7 +1272,7 @@
                                 >
                                     <i class="ri-terminal-window-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý blog xxx</span
+                                        >Quản lý Doanh mục Blog</span
                                     >
                                 </a>
                                 <div
@@ -1337,16 +1286,16 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Danh sách blog
+                                                Danh sách Danh mục bài viết
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crm.html"
+                                                 href="{{ route('post', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
-                                                data-key="t-crm"
+                                                data-key="t-analytics"
                                             >
-                                                Các blog đã xóa
+                                                Danh sách  bài viết
                                             </a>
                                         </li>
                                        
@@ -1423,7 +1372,7 @@
                                 >
                                     <i class="ri-git-repository-private-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý, Phân quyền xxx</span
+                                        >Quản lý phân quyền</span
                                     >
                                 </a>
                                 <div
@@ -1437,19 +1386,9 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                Danh sách ROLE
+                                                Quản lý phân quyền
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a
-                                                href="dashboard-crm.html"
-                                                class="nav-link"
-                                                data-key="t-crm"
-                                            >
-                                                Danh sách các quyền
-                                            </a>
-                                        </li>
-                                        
                                     </ul>
                                 </div>
                             </li>
@@ -1474,7 +1413,7 @@
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-analytics.html"
+                                                href="{{ route('config', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
@@ -1483,7 +1422,7 @@
                                         </li>
                                         <li class="nav-item">
                                             <a
-                                                href="dashboard-crm.html"
+                                                href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
@@ -1527,7 +1466,7 @@
                                 >
                                     <i class="ri-dashboard-3-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý sản phẩm</span>
+                                        >Xét duyệt sản phẩm</span>
                                 </a>
 
                             </li>

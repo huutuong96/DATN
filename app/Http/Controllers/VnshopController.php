@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Cloudinary\Cloudinary;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\Tax;
@@ -12,9 +12,18 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\order_fee_details;
 use App\Models\CategoriesModel;
-use App\Models\role_permissionModel;
+use App\Models\role_premissionModel;
+use App\Models\PremissionsModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\DB;
+use App\Models\voucherToMain;
+use App\Http\Requests\VoucherRequest;
+use Illuminate\Support\Str;
+use App\Http\Requests\BlogRequest;
+use App\Http\Requests\PostRequest;
+use App\Models\Post;
 
 class VnshopController extends Controller
 {
@@ -124,7 +133,7 @@ class VnshopController extends Controller
             return $b->doanhthu <=> $a->doanhthu;
         });
 
-        $feedBack;
+        // $feedBack;
         return view('dashboard.dashboard',compact(
             'checkProduct',
             'checkShop',
@@ -223,15 +232,159 @@ class VnshopController extends Controller
         if ($shop) {
             $shop->status =$rqt->status; 
             $shop->save(); 
-            return Back();
+            return back();
         }
     }
-    public function blog($limit = 5){
-        $blogs = Blogs::orderBy('created_at', 'desc')->where('is_delete', "!=", 0)->where('is_delete', "!=", 5)->paginate($limit);
+    public function changeShopSearch(Request $rqt){
+       
+        $shop = Shop::find($rqt->id);
+        if ($shop) {
+            $shop->status =$rqt->status; 
+            $shop->save(); 
+            // dd($rqt->tab);
+            // dd(session('tab'));
+            session()->forget('tab');
+            // dd(session('tab'));
+            session()->put('tab', $rqt->tab);
+            // dd(session('tab'));
+            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
+        }
+    }
+    public function changeUserSearch(Request $rqt){
+       
+        $user = UsersModel::find($rqt->id);
+        if ($user) {
+            $user->status =$rqt->status; 
+            $user->save();  
+            // dd($rqt->tab);
+            // dd(session('tab'));
+            session()->forget('tab');
+            // dd(session('tab'));
+            session()->put('tab', $rqt->tab);
+            // dd(session('tab'));
+            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
+        }
+    }
+    public function blog(Request $request){
+        $tab = $request->input('tab', 1); 
+        
+        $blogs = Blog::whereNull('deleted_at')->paginate(10);
+        $deletedBlog = Blog::onlyTrashed()->paginate(10);
         return view('blogs.blogs',compact(
-            'blogs'
+            'blogs','deletedBlog','tab'
         ));
     }
+    public function post(Request $request)
+    {
+        $tab = $request->input('tab', 1); 
+        $Posts = Post::whereNull('deleted_at')
+                    ->with('blog')
+                    ->orderBy('created_at', 'desc') 
+                    ->paginate(10);
+    
+        $blogs = Blog::whereNull('deleted_at')->get();
+        $deletedPost = Post::onlyTrashed()->paginate(10);
+    
+        return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
+    }
+    
+    public function restorepost(Request $request, $id)
+    {
+
+       
+        $tab = $request->query('tab');
+        $token = $request->query('token');
+        $post = Post::onlyTrashed()->findOrFail($id);
+        $post->restore(); 
+        // return $tab;
+        return redirect()->route('post',['token' => $token, 'tab' => $tab])->with('message', 'post đã được khôi phục.');
+}
+
+    public function updatepost(PostRequest $request, string $id)
+            {
+                $token = $request->query('token');
+                $tab = $request->query('tab');
+                $post = Post::where('deleted_at', null)->findOrFail($id);
+            
+                $post->title = $request->title;
+                $post->slug = Str::slug($request->title, '-');
+                $post->updated_by = auth()->user()->id;
+                $post->updated_at = now();
+                $post->content = $request->content;
+                $post->blog_id = $request->blog_id;
+            
+                if ($request->hasFile('image')) {
+                    $imagePath =  $this->storeImage($request->image);
+                    $post->image = $imagePath;
+                }
+            
+                $post->save();
+
+                return  back()->with('message', 'Đã cập nhật');
+            }
+
+                
+        public function updateBlog(BlogRequest $request, string $id)
+        {
+            $token = $request->query('token');
+            $tab = $request->query('tab');
+            $blog = Blog::where('id', $id)->whereNull('deleted_at')->firstOrFail();
+            $slug = Str::slug($request->name, '-');
+            $blog->name = $request->name;
+            $blog->title = $request->title;
+            $blog->slug = $slug; 
+            $blog->updated_by = auth()->user()->id; 
+            $blog->save();
+
+            return redirect()->route('blog', [
+                'token' => $token,
+                'tab' => $tab
+            ])->with('message', 'Đã cập nhật');
+        }
+
+        public function updatevoucher(VoucherRequest $request, $id)
+        {
+            $token = $request->token;
+            $tab = $request->tab;
+        
+            // Lấy bản ghi voucher hiện tại
+            $voucherMain = voucherToMain::where('id', $id)->firstOrFail();
+        
+            // Chỉ cập nhật các trường nếu có giá trị mới được nhập
+            $voucherMain->title = $request->title ?? $voucherMain->title; // Giữ lại giá trị cũ nếu không có giá trị mới
+            $voucherMain->description = $request->description ?? $voucherMain->description;
+            $voucherMain->quantity = $request->quantity ?? $voucherMain->quantity;
+            $voucherMain->limitValue = $request->limitValue ?? $voucherMain->limitValue;
+            $voucherMain->ratio = $request->ratio ?? $voucherMain->ratio;
+            $voucherMain->code = $request->code ?? $voucherMain->code;
+            $voucherMain->status = $request->status ?? $voucherMain->status;
+            $voucherMain->update_by = auth()->user()->id;
+        
+            // Lưu bản ghi
+            $voucherMain->save();
+        
+            // Chuyển hướng và hiển thị thông báo
+            return redirect()->route('voucherall', [
+                'token' => $token,
+                'tab'=>$tab,
+            ])->with('message', 'Cập nhật voucher main thành công!');
+        }
+        
+      
+        
+
+        public function restoreBlog(Request $request, $id)
+        {
+            $tab = $request->query('tab');
+            $token = $request->query('token');
+            $blog = Blog::onlyTrashed()->findOrFail($id);
+            $blog->restore(); 
+
+            return redirect()->route('blog',['token' => $token, 'tab' => $tab])->with('message', 'Blog đã được khôi phục.');
+}
+            
+
+ 
     public function costomer($limit = 5){
         $customer_id = RolesModel::where('title', 'CUSTOMER')->first('id');
         // dd($customer_id->id);
@@ -283,11 +436,128 @@ class VnshopController extends Controller
     }
 
     public function list_permission(Request $request){
-        $permission = role_permissionModel::where('role_id', $request->id)->where('status', 2)->first();
-        dd($permission);
+        $permissions = PremissionsModel::all();
+        $role = RolesModel::where('id', $request->id)->first();
+        $role_premission = role_premissionModel::where('role_id', $request->id)->get();
+        if (!$role_premission) {
+            $role_premission = [];
+        }
+        // dd($role_premission);
         return view('roles.list_permission',compact(
-            'permission'
+            'permissions', 'role', 'role_premission'
         ));
     }
+    // public function search(Request $rqt)  {
+    //     $limit_shops = $rqt->limit_shop ?? 6;
+    //     $limit_product = $rqt->limit_product ?? 6;
+
+    //     $db = [
+    //         "products" => ["name", "sku", "slug", "description"],
+    //         "shops" => ["shop_name", "slug", "description"],
+    //         "users" => ["fullname", "phone", "email", "description"],
+    //         "posts" => ["slug", "title", "content"]
+    //     ];
+
+    //     $search = $rqt->input('search');
+    //     $perPage = $rqt->input('per_page', 10); // Số lượng bản ghi mỗi trang, mặc định là 10
+    //     $resultsByTable = [];
+
+    //     foreach ($db as $table => $columns) {
+    //         $tableResults = collect();
+
+    //         foreach ($columns as $column) {
+    //             $query = DB::table($table)
+    //                 ->where($column, 'like', "%$search%");
+                     
+    //             // if ($table == 'products') {
+    //             //     $results = $query->paginate($limit_product);
+    //             //     $resultsByTable[$table] = $results;
+    //             //     break; // Dừng lại sau khi phân trang bảng 'products'
+    //             // }
+    //             // // Phân trang riêng cho bảng 'shops'
+    //             if ($table == 'shops') {
+    //                 $results = $query->with('user')->get();
+    //                 $resultsByTable[$table] = $results;
+    //                 break; // Dừng lại sau khi phân trang bảng 'shops'
+    //             }
+    //             $results = $query->get();
+    //                 $resultsByTable[$table] = $results;
+    //                 break;
+    //         }
+    //     };
+    //     $tab = 1;
+    //     // dd($resultsByTable);
+    //     return view('search.search',compact(
+    //         'resultsByTable',
+    //         'tab'
+    //     ));
+    // }
+    public function search(Request $rqt)  {
     
+        $db = [
+            "products" => ["name", "sku", "slug", "description"],
+            "shops" => ["shop_name", "slug", "description"],
+            "users" => ["fullname", "phone", "email", "description"],
+            "posts" => ["slug", "title", "content"]
+        ];
+    
+        $search = $rqt->search;
+        $perPage = $rqt->input('per_page', 10); // Default records per page
+        $resultsByTable = [];
+    
+        foreach ($db as $table => $columns) {
+            $tableResults = collect();
+    
+            foreach ($columns as $column) {
+                $query = DB::table($table)->where($column, 'like', "%$search%");
+    
+                if ($table == 'products') {
+                    // Pagination for products
+                    $results = $query->get();
+                    $resultsByTable[$table] = $results;
+                    break; // Stop once products are paginated
+                } elseif ($table == 'shops') {
+                    // Separate handling for shops with eager loading using Eloquent
+                    $results = \App\Models\Shop::with('user')
+                        ->where($column, 'like', "%$search%")
+                        ->get();
+                    $resultsByTable[$table] = $results;
+                    break; // Stop once shops are paginated
+                } elseif ($table == 'users') {
+                    // Separate handling for shops with eager loading using Eloquent
+                    $results = \App\Models\UsersModel::with('address')
+                        ->where($column, 'like', "%$search%")
+                        ->get();
+                    $resultsByTable[$table] = $results;
+                    break; // Stop once shops are paginated
+                } elseif ($table == 'posts') {
+                    // Separate handling for shops with eager loading using Eloquent
+                    $results = \App\Models\Post::with('user')
+                        ->where($column, 'like', "%$search%")
+                        ->get();
+                    $resultsByTable[$table] = $results;
+                    break; // Stop once shops are paginated
+                }   else {
+                    // No pagination for other tables
+                    $results = $query->get();
+                    $tableResults = $tableResults->merge($results);
+                }
+            }
+    
+            if (!isset($resultsByTable[$table])) {
+                $resultsByTable[$table] = $tableResults;
+            }
+        }
+    
+        session()->put('tab', $rqt->tab ?? 'products');
+        // dd("têst".session('tab'));
+        return view('search.search', compact('resultsByTable', 'search'));
+    }
+
+    private function storeImage($image)
+    {
+        $cloudinary = new Cloudinary();
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        return $uploadedImage['secure_url'];
+    }
 }
