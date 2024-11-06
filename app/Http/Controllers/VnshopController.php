@@ -431,51 +431,7 @@ class VnshopController extends Controller
             'permissions', 'role', 'role_premission'
         ));
     }
-    // public function search(Request $rqt)  {
-    //     $limit_shops = $rqt->limit_shop ?? 6;
-    //     $limit_product = $rqt->limit_product ?? 6;
-
-    //     $db = [
-    //         "products" => ["name", "sku", "slug", "description"],
-    //         "shops" => ["shop_name", "slug", "description"],
-    //         "users" => ["fullname", "phone", "email", "description"],
-    //         "posts" => ["slug", "title", "content"]
-    //     ];
-
-    //     $search = $rqt->input('search');
-    //     $perPage = $rqt->input('per_page', 10); // Số lượng bản ghi mỗi trang, mặc định là 10
-    //     $resultsByTable = [];
-
-    //     foreach ($db as $table => $columns) {
-    //         $tableResults = collect();
-
-    //         foreach ($columns as $column) {
-    //             $query = DB::table($table)
-    //                 ->where($column, 'like', "%$search%");
-                     
-    //             // if ($table == 'products') {
-    //             //     $results = $query->paginate($limit_product);
-    //             //     $resultsByTable[$table] = $results;
-    //             //     break; // Dừng lại sau khi phân trang bảng 'products'
-    //             // }
-    //             // // Phân trang riêng cho bảng 'shops'
-    //             if ($table == 'shops') {
-    //                 $results = $query->with('user')->get();
-    //                 $resultsByTable[$table] = $results;
-    //                 break; // Dừng lại sau khi phân trang bảng 'shops'
-    //             }
-    //             $results = $query->get();
-    //                 $resultsByTable[$table] = $results;
-    //                 break;
-    //         }
-    //     };
-    //     $tab = 1;
-    //     // dd($resultsByTable);
-    //     return view('search.search',compact(
-    //         'resultsByTable',
-    //         'tab'
-    //     ));
-    // }
+    
     public function search(Request $rqt)  {
     
         $db = [

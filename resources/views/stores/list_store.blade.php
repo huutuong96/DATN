@@ -7,7 +7,7 @@
         <div class="col-xl-12">
         <div class="card">
                     <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm đang hoạt động</h4>
+                        <h4 class="card-title mb-0 flex-grow-1">Danh sách cửa hàng đang hoạt động</h4>
                     </div><!-- end card header -->
     
                     <div class="card-body">
@@ -21,14 +21,14 @@
                                             <th scope="col">Thông tin chủ shop</th>
                                             <th scope="col">Địa chỉ</th>
                                             <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Doanh thuTtrong tháng</th>
+                                            <th scope="col">Doanh thu trong tháng</th>
                                             <th scope="col">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @if($shops->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
+                                                <td colspan="6" class="text-center">Không có cửa hàng nào chờ duyệt.</td>
                                             </tr>
                                         @else
                                             @foreach($shops as $shop)

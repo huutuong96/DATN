@@ -1122,7 +1122,7 @@
                                 >
                                     <i class=" ri-currency-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý doanh thu xxx</span
+                                        >Quản lý doanh thu</span
                                     >
                                 </a>
                                 <div
@@ -1246,7 +1246,7 @@
                                                 class="nav-link"
                                                 data-key="t-analytics"
                                             >
-                                                list danh mục
+                                                Danh sách danh mục
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1272,7 +1272,7 @@
                                 >
                                     <i class="ri-terminal-window-fill"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý Doanh mục Blog</span
+                                        >Quản lý bài viết</span
                                     >
                                 </a>
                                 <div
@@ -1336,7 +1336,7 @@
                                                 class="nav-link"
                                                 data-key="t-crm"
                                             >
-                                               Danh sách quản lý
+                                               Danh sách Quản lý
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1403,7 +1403,7 @@
                                 >
                                     <i class=" ri-building-2-line"></i>
                                     <span data-key="t-dashboards"
-                                        >Quản lý thông tin sàn x........</span
+                                        >Quản lý thông tin sàn</span
                                     >
                                 </a>
                                 <div
@@ -1444,7 +1444,7 @@
                                                 class="nav-link"
                                                 data-key="t-crypto"
                                             >
-                                                quản lý bên ship
+                                                Quản lý bên ship
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1453,7 +1453,7 @@
                                                 class="nav-link"
                                                 data-key="t-projects"
                                             >
-                                                quản lý thuế
+                                                Quản lý thuế
                                             </a>
                                         </li>
                                     </ul>
