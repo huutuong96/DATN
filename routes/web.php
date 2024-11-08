@@ -56,7 +56,7 @@ use App\Http\Controllers\PostController;
 
 
 Route::get('/', [VnshopController::class, 'login'])->name('login');
-Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], function () {
+Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
     Route::get('/blog', [VnshopController::class, 'blog'])->name('blog');
     Route::get('/posts', [VnshopController::class, 'post'])->name('post');
