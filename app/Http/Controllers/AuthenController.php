@@ -30,6 +30,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\View;
 
 /**
  * Paginate a collection.
@@ -418,6 +419,12 @@ class AuthenController extends Controller
         $user->load('role', 'address');
         $user = auth::user();
         // dd(auth()->user()->refesh_token);
+        $notification = Notification::where('user_id', $user->id)->get();
+        $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
+        $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
+        // dd($notifyMain);
+        session(['notifyMain' => $notifyMain]);
+        // dd(session('notifyMain'));
         return redirect()->route('dashboard', ['token' => auth()->user()->refesh_token]);
     }
 
@@ -1110,4 +1117,6 @@ class AuthenController extends Controller
         return view('profile.profile', ['user' => $user]);
 
     }
+
+    
 }

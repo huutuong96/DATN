@@ -1,7 +1,9 @@
 <?php
 
 namespace Illuminate\Notifications;
-
+use Illuminate\Support\Facades\View;
+use App\Models\notification;
+use App\Models\Notification_to_mainModel;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Support\ServiceProvider;
@@ -15,13 +17,16 @@ class NotificationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'notifications');
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/notifications'),
-            ], 'laravel-notifications');
-        }
+        
+        View::composer('*', function ($view) {
+            $user = auth()->user();
+            if ($user) {
+            $notification = Notification::where('user_id', $user->id)->get();
+            $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
+            $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->orderBy('created_at', 'desc')->take(5)->get();
+            $view->with('notifyMain', $notifyMain);
+            }
+        });
     }
 
     /**

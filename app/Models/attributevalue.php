@@ -14,6 +14,7 @@ class attributevalue extends Model
     protected $fillable = [
         'value',
         'attribute_id',
+        'image',
     ];
 
     protected $hidden = [
