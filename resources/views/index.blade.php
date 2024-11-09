@@ -131,7 +131,7 @@
                                 aria-expanded="false">
                                 <i class="bx bx-bell fs-22"></i>
                                 <span
-                                    class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">3<span class="visually-hidden">unread messages</span></span>
+                                    class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">{{ count($notifyMain) }}<span class="visually-hidden">unread messages</span></span>
                             </button>
                             <div
                                 class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
@@ -150,7 +150,7 @@
                                                 class="col-auto dropdown-tabs">
                                                 <span
                                                     class="badge bg-light text-body fs-13">
-                                                    4 New</span>
+                                                    {{ count($notifyMain) }} New</span>
                                             </div>
                                         </div>
                                     </div>
@@ -169,7 +169,7 @@
                                                     href="#all-noti-tab"
                                                     role="tab"
                                                     aria-selected="true">
-                                                    All (4)
+                                                    All ({{ count($notifyMain) }})
                                                 </a>
                                             </li>
                                             <li
@@ -270,23 +270,17 @@
                                                         </div>
                                                     </div>
                                                 @endforeach
-                                            @endif
-                                                
-
-                                         
-
-
-
-                                            <div
+                                                <div
                                                 class="my-3 text-center view-all">
                                                 <button
                                                     type="button"
                                                     class="btn btn-soft-success waves-effect waves-light">
-                                                    View All Notifications
+                                                    Xem tất cả thông báo
                                                     <i
                                                         class="ri-arrow-right-line align-middle"></i>
                                                 </button>
                                             </div>
+                                            @endif
                                         </div>
                                     </div>
 

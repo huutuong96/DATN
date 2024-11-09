@@ -2,7 +2,7 @@
 
 namespace Illuminate\Notifications;
 use Illuminate\Support\Facades\View;
-use App\Models\notification;
+use App\Models\Notification;
 use App\Models\Notification_to_mainModel;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
