@@ -28,17 +28,6 @@
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade {{ $tab == 1 ? 'show active' : '' }}" id="all-products" role="tabpanel" aria-labelledby="home-tab">
             <div class="col-xl-12">
-                @if(session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Tất cả sản phẩm</h4>
@@ -117,17 +106,6 @@
        
         <div class="tab-pane fade {{ $tab == 2 ? 'show active' : '' }}" id="pending-products" role="tabpanel" aria-labelledby="pending-tab">
             <div class="col-xl-12">
-                @if(session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm chờ duyệt</h4>
@@ -259,17 +237,6 @@
         </div>
         <div class="tab-pane fade {{ $tab == 6 ? 'show active' : '' }}" id="pending-update-products" role="tabpanel" aria-labelledby="pending-update-tab">
             <div class="col-xl-12">
-                @if(session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm chờ duyệt</h4>
@@ -403,17 +370,6 @@
       
         <div class="tab-pane fade {{ $tab == 3 ? 'show active' : '' }}" id="active-products" role="tabpanel" aria-labelledby="active-tab">
             <div class="col-xl-12">
-                @if(session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm đang hoạt động</h4>
@@ -516,17 +472,6 @@
         
         <div class="tab-pane fade {{ $tab == 4 ? 'show active' : '' }}" id="rejected-products" role="tabpanel" aria-labelledby="rejected-tab">
             <div class="col-xl-12">
-                @if(session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm từ chối</h4>
@@ -616,17 +561,7 @@
        
         <div class="tab-pane fade {{ $tab == 5 ? 'show active' : '' }}" id="violating-products" role="tabpanel" aria-labelledby="violating-tab">
             <div class="col-xl-12">
-                @if(session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
+               
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm vi phạm</h4>

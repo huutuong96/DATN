@@ -1043,14 +1043,7 @@
                                             Quản lý banner
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="dashboard-crypto.html"
-                                            class="nav-link"
-                                            data-key="t-crypto">
-                                            Quản lý bên ship
-                                        </a>
-                                    </li>
+            
                                     <li class="nav-item">
                                         <a
                                             href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
