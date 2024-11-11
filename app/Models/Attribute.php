@@ -17,6 +17,7 @@ class Attribute extends Model
         'deleted_at',
         'deleted_by',
         'is_deleted',
+        'image',
     ];
 
     protected $hidden = [

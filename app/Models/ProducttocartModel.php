@@ -23,9 +23,11 @@ class ProducttocartModel extends Model
         'product_name',
         'product_slug',
         'product_price',
+        'product_image',
         'variant_id',
         'variant_name',
         'variant_price',
+        'variant_image',
         'quantity',
         'ship_code',
     ];
