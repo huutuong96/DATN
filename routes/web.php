@@ -52,11 +52,8 @@ use App\Http\Controllers\configController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\PostController;
 
-
-
-
 Route::get('/', [VnshopController::class, 'login'])->name('login');
-Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], function () {
+Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/dashboard', [VnshopController::class, 'dashboard'])->name('dashboard');
     Route::get('/blog', [VnshopController::class, 'blog'])->name('blog');
     Route::get('/posts', [VnshopController::class, 'post'])->name('post');
@@ -95,6 +92,12 @@ Route::group(['middleware' => ['checkToken', 'CheckRole', 'getNotification']], f
     Route::put('/config_update/{id}', [configController::class, 'update'])->name('config.update');
     Route::get('/voucherall', [VoucherToMainController::class, 'voucherall'])->name('voucherall');
     Route::put('/update_voucher/{id}', [VnshopController::class, 'updatevoucher'])->name('voucher_main.update');
+    Route::get('/taxall', [VnshopController::class, 'taxall'])->name('taxall');
+    Route::put('/update_tax/{id}', [VnshopController::class, 'update_tax'])->name('tax.update');
+    Route::post('/storetax', [VnshopController::class, 'storetax'])->name('tax.store');
+    Route::get('/bannerall', [VnshopController::class, 'bannerall'])->name('bannerall');
+    Route::post('/storebanner', [VnshopController::class, 'storebanner'])->name('banner.store');
+    Route::put('/bannerupdate{id}', [VnshopController::class, 'updatebanner'])->name('banner.update');
    
 
 

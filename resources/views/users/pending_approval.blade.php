@@ -86,7 +86,7 @@
                                                                 href="{{ route('change_user', [
                                                                                                     'token' => auth()->user()->refesh_token,
                                                                                                     'id' => $user->id,
-                                                                                                    'status' => 1,
+                                                                                                    'status' => 2,
                                                                                                     ]) }}"
                                                             >
                                                                 <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">Đồng ý</button>

@@ -21,9 +21,13 @@ use Illuminate\Support\Facades\DB;
 use App\Models\voucherToMain;
 use App\Http\Requests\VoucherRequest;
 use Illuminate\Support\Str;
-use App\Http\Requests\BlogRequest;
+use App\Http\Requests\Blogrequest;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
+use App\Http\Requests\TaxRequest;
+use App\Http\Requests\BannerRequest;
+use App\Models\Banner;
+
 
 class VnshopController extends Controller
 {
@@ -207,7 +211,7 @@ class VnshopController extends Controller
     }
     public function violation_stores($limit = 5){
         $shops = Shop::orderBy('updated_at', 'desc')->where('status', "=", 4 )->paginate($limit);
-        return view('stores.violation',compact(
+        return view('stores.Violation',compact(
             'shops'
         ));
     }
@@ -223,7 +227,7 @@ class VnshopController extends Controller
         if ($category) {
             $category->status =$rqt->status; 
             $category->save(); 
-            return Back();
+            return Back()->with('message', 'Cập nhật thành công!');
         }
     }
     public function changeShop(Request $rqt){
@@ -232,22 +236,7 @@ class VnshopController extends Controller
         if ($shop) {
             $shop->status =$rqt->status; 
             $shop->save(); 
-            return back();
-        }
-    }
-    public function changeShopSearch(Request $rqt){
-       
-        $shop = Shop::find($rqt->id);
-        if ($shop) {
-            $shop->status =$rqt->status; 
-            $shop->save(); 
-            // dd($rqt->tab);
-            // dd(session('tab'));
-            session()->forget('tab');
-            // dd(session('tab'));
-            session()->put('tab', $rqt->tab);
-            // dd(session('tab'));
-            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
+            return back()->with('message', 'Cập nhật thành công!');
         }
     }
     public function changeUserSearch(Request $rqt){
@@ -262,7 +251,7 @@ class VnshopController extends Controller
             // dd(session('tab'));
             session()->put('tab', $rqt->tab);
             // dd(session('tab'));
-            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search]);
+            return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $rqt->tab,'search'=>$rqt->search])->with('message', 'Cập nhật thành công!');
         }
     }
     public function blog(Request $request){
@@ -274,19 +263,19 @@ class VnshopController extends Controller
             'blogs','deletedBlog','tab'
         ));
     }
-    public function post(Request $request)
-    {
-        $tab = $request->input('tab', 1); 
-        $Posts = Post::whereNull('deleted_at')
-                    ->with('blog')
-                    ->orderBy('created_at', 'desc') 
-                    ->paginate(10);
-    
-        $blogs = Blog::whereNull('deleted_at')->get();
-        $deletedPost = Post::onlyTrashed()->paginate(10);
-    
-        return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
-    }
+        public function post(Request $request)
+        {
+            $tab = $request->input('tab', 1); 
+            $Posts = Post::whereNull('deleted_at')
+                        ->with('blog')
+                        ->orderBy('created_at', 'desc') 
+                        ->paginate(10);
+        
+            $blogs = Blog::whereNull('deleted_at')->get();
+            $deletedPost = Post::onlyTrashed()->paginate(10);
+        
+            return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
+        }
     
     public function restorepost(Request $request, $id)
     {
@@ -324,7 +313,7 @@ class VnshopController extends Controller
             }
 
                 
-        public function updateBlog(BlogRequest $request, string $id)
+        public function updateBlog(Blogrequest $request, string $id)
         {
             $token = $request->query('token');
             $tab = $request->query('tab');
@@ -347,11 +336,10 @@ class VnshopController extends Controller
             $token = $request->token;
             $tab = $request->tab;
         
-            // Lấy bản ghi voucher hiện tại
             $voucherMain = voucherToMain::where('id', $id)->firstOrFail();
         
-            // Chỉ cập nhật các trường nếu có giá trị mới được nhập
-            $voucherMain->title = $request->title ?? $voucherMain->title; // Giữ lại giá trị cũ nếu không có giá trị mới
+            
+            $voucherMain->title = $request->title ?? $voucherMain->title; 
             $voucherMain->description = $request->description ?? $voucherMain->description;
             $voucherMain->quantity = $request->quantity ?? $voucherMain->quantity;
             $voucherMain->limitValue = $request->limitValue ?? $voucherMain->limitValue;
@@ -359,11 +347,7 @@ class VnshopController extends Controller
             $voucherMain->code = $request->code ?? $voucherMain->code;
             $voucherMain->status = $request->status ?? $voucherMain->status;
             $voucherMain->update_by = auth()->user()->id;
-        
-            // Lưu bản ghi
             $voucherMain->save();
-        
-            // Chuyển hướng và hiển thị thông báo
             return redirect()->route('voucherall', [
                 'token' => $token,
                 'tab'=>$tab,
@@ -447,51 +431,7 @@ class VnshopController extends Controller
             'permissions', 'role', 'role_premission'
         ));
     }
-    // public function search(Request $rqt)  {
-    //     $limit_shops = $rqt->limit_shop ?? 6;
-    //     $limit_product = $rqt->limit_product ?? 6;
-
-    //     $db = [
-    //         "products" => ["name", "sku", "slug", "description"],
-    //         "shops" => ["shop_name", "slug", "description"],
-    //         "users" => ["fullname", "phone", "email", "description"],
-    //         "posts" => ["slug", "title", "content"]
-    //     ];
-
-    //     $search = $rqt->input('search');
-    //     $perPage = $rqt->input('per_page', 10); // Số lượng bản ghi mỗi trang, mặc định là 10
-    //     $resultsByTable = [];
-
-    //     foreach ($db as $table => $columns) {
-    //         $tableResults = collect();
-
-    //         foreach ($columns as $column) {
-    //             $query = DB::table($table)
-    //                 ->where($column, 'like', "%$search%");
-                     
-    //             // if ($table == 'products') {
-    //             //     $results = $query->paginate($limit_product);
-    //             //     $resultsByTable[$table] = $results;
-    //             //     break; // Dừng lại sau khi phân trang bảng 'products'
-    //             // }
-    //             // // Phân trang riêng cho bảng 'shops'
-    //             if ($table == 'shops') {
-    //                 $results = $query->with('user')->get();
-    //                 $resultsByTable[$table] = $results;
-    //                 break; // Dừng lại sau khi phân trang bảng 'shops'
-    //             }
-    //             $results = $query->get();
-    //                 $resultsByTable[$table] = $results;
-    //                 break;
-    //         }
-    //     };
-    //     $tab = 1;
-    //     // dd($resultsByTable);
-    //     return view('search.search',compact(
-    //         'resultsByTable',
-    //         'tab'
-    //     ));
-    // }
+    
     public function search(Request $rqt)  {
     
         $db = [
@@ -560,4 +500,125 @@ class VnshopController extends Controller
         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
         return $uploadedImage['secure_url'];
     }
+
+    public function taxall(request $request)
+{    $tab = $request->query('tab',1);
+    // dd($tab);
+    $taxes = Tax::where('status',2)->get();
+    $taxeOFF = Tax::where('status',3)->get();
+
+    if ($taxes->isEmpty()) {
+        return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
+    }
+
+    return view('tax.tax', compact('taxes' ,'taxeOFF', 'tab'));
+}
+public function storetax(TaxRequest $request)
+{
+    $token = $request->query('token');
+    $tab = $request->query('tab');
+   
+    $tax = new Tax();
+    $tax->title = $request->title;
+    $tax->type = $request->type;
+    $tax->tax_number = $request->tax_number;
+    $tax->rate = $request->rate;
+    $tax->status = $request->status;
+    $tax->create_by = auth()->user()->id; 
+    $tax->save();
+    return redirect()->route('taxall', [
+        'token' => $token,
+        
+    ])->with('success', 'Thêm thuế thành công');
+    
+}
+
+
+public function update_tax(TaxRequest $request, $id)
+{
+    $token = $request->token; 
+    $tab = $request->tab; 
+    $tax = Tax::findOrFail($id);
+    $tax->title = $request->title ?? $tax->title; 
+    $tax->type = $request->type ?? $tax->type;
+    $tax->tax_number = $request->tax_number ?? $tax->tax_number;
+    $tax->rate = $request->rate ?? $tax->rate;
+    $tax->status = $request->status ?? $tax->status;
+    $tax->update_by = auth()->user()->id;
+    $tax->save();
+    return redirect()->route('taxall', [
+        'token' => $token,
+        'tab' => $tab,
+    ])->with('message', 'Cập nhật thuế thành công!');
+}
+public function bannerall(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $banners = Banner::where('status',2)->paginate(10);
+    $banners0ff = Banner::where('status',3)->paginate(10);
+
+   
+
+    return view('banner.banner', compact('banners', 'banners0ff', 'tab'));
+}
+public function storebanner(BannerRequest $request)
+{
+    $image = $request->file('image');
+    $cloudinary = new Cloudinary();
+    $token = $request->query('token');
+
+    try {
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $dataInsert = [
+            'title' => $request->title,
+            'content' => $request->content,
+            'URL' => $uploadedImage['secure_url'],
+            'status' => $request->status,
+            'index' => $request->index,
+            'create_by' =>  auth()->user()->id,
+        ];
+        $banner = Banner::create($dataInsert);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            
+        ])->with('success', 'banner thuế thành công');
+    } catch (\Throwable $th) {
+        // Return view with error message
+        return view('bannerall')->with([
+            'status' => false,
+            'message' => "Thêm Banner không thành công",
+            'error' => $th->getMessage()
+        ]);
+    }
+}
+public function updatebanner(BannerRequest $request, $id)
+{
+
+    $token = $request->token; 
+    $tab = $request->tab;
+    $banner = Banner::findOrFail($id);
+    $dataUpdate = [
+        'title' => $request->title,
+        'content' => $request->content,
+        'status' => $request->status,
+        'index' => $request->index,
+        'update_by' =>  auth()->user()->id,
+    ];
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $cloudinary = new Cloudinary();
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $dataUpdate['URL'] = $uploadedImage['secure_url'];
+    }
+    $banner->update($dataUpdate);
+    return redirect()->route('bannerall', [
+        'token' => $token,
+        'tab' => $tab,
+    ])->with('message', 'Cập nhật banner thành công!');
+}
+
+
+
+
+
 }

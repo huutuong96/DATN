@@ -22,4 +22,8 @@ class Tax extends Model
         'create_at',
         'update_at',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'create_by'); 
+    }
 }

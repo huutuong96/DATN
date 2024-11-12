@@ -299,7 +299,7 @@ Route::get('/search', function () {
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
 
-    Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'getNotification']], function () {
+    Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
 
                 Route::post('categories', [CategoriesController::class, 'store']);
@@ -574,7 +574,7 @@ Route::get('/search', function () {
             Route::get('confirm_restore_account/{token}/{email}', [AuthenController::class, "confirm_restore_account"])->name('confirm_restore_account');
             Route::post('users/register', [AuthenController::class, "register"]);
 
-
+            Route::get('delete_notify', [NotificationController::class, "delete_notify"])->name('delete_notify');
 
 
 Route::get('/', function () {

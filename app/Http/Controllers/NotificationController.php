@@ -94,4 +94,23 @@ class NotificationController extends Controller
             'message' => 'xóa thành công'
         ], 200);
     }
+
+    public function delete_notify(Request $request){
+        $user = JWTAuth::parseToken()->authenticate();
+        $notificationIds = explode(',', $request->ids);
+    
+        foreach ($notificationIds as $id) {
+            Notification::where('id_notification', $id)->delete();
+            Notification_to_mainModel::where('id', $id)->delete();
+        }
+    
+        if ($request->token) {
+            return redirect()->back()->with('success', 'Xóa thông báo thành công');
+        }
+    
+        return response()->json([
+            'status' => 'success',
+            'message' => 'xóa thành công'
+        ], 200);
+    }
 }

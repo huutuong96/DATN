@@ -7,7 +7,7 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Danh sách danh mục</h4>
+                    <h4 class="card-title mb-0 flex-grow-1">Danh sách Config</h4>
                 </div><!-- end card header -->
                 
                 <div class="card-body">

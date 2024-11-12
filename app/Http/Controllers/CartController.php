@@ -173,7 +173,6 @@ class CartController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->variant_id);
         $user = JWTAuth::parseToken()->authenticate();
         $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
         if (!$cart_to_users) {
@@ -189,6 +188,7 @@ class CartController extends Controller
         }
         if ($request->variant_id) {
             $productVariant = product_variants::where('id', $request->variant_id)->first();
+            // dd($productVariant->images);
             if (!$productVariant) {
                 return response()->json(['error' => 'Sản phẩm không có biến thể này'], 404);
             }if ($productVariant->stock < $request->quantity) {
@@ -210,13 +210,16 @@ class CartController extends Controller
                    ], 200);
                }
             }else {
-                
+                // dd($productVariant->images);
                 $product_to_cart = ProducttocartModel::create([
                      'cart_id' => $cart_to_users->id,
                      'quantity' => $request->quantity ?? 1,
                      'variant_id' => $productVariant->id ?? null,
                      'variant_name' => $productVariant->name,
                      'variant_price' => $productVariant->price,
+                     'variant_image' => $productVariant->images,
+                     'product_name' => $product->name,
+                     'product_slug' => $product->slug,
                      'shop_id' => $request->shop_id,
                      'shop_name' => $shop->shop_name,
                      'shop_slug' => $shop->slug,
@@ -256,6 +259,7 @@ class CartController extends Controller
                 'product_name' => $product->name,
                 'product_slug' => $product->slug,
                 'product_price' => $product->price,
+                'product_image' => $product->image ?? null,
                 'quantity' => $request->quantity ?? 1,
                 'shop_id' => $request->shop_id,
                 'shop_name' => $shop->shop_name,
