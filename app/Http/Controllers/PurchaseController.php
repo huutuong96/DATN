@@ -149,7 +149,6 @@ class PurchaseController extends Controller
                     $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
                     $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                 }
-
                 $order->height = $height;
                 $order->length = $length;
                 $order->weight = $weight;
