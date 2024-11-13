@@ -341,16 +341,9 @@ class CartController extends Controller
     public function calculateShipFees_giao_hang_nhanh(Request $request)
     {
         $data = [];
-        // $shipFee = [];
         $user = JWTAuth::parseToken()->authenticate();
         $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $inputArray = $request->all();
-        // if ($order->weight >= 2000) {
-        //     $service_id = 100039;
-        // } else {
-        //     $service_id = 53320;
-        // }
-
         foreach ($inputArray as $input) {
             $shopData = Shop::where('id', $input['shop_id'])->first();
             $addressUser = AddressModel::where('user_id', $user->id)->first();
