@@ -618,7 +618,16 @@ public function updatebanner(BannerRequest $request, $id)
 }
 
 
+    public function revenue_general(Request $request){
+        $token = $request->token; 
+        $totalRevenue = order_fee_details::sum('amount');
+        // return redirect()->route('revenue_general', [
+        //     'token' => $token,
+        //     'totalRevenue' => $totalRevenue,
+        // ]);
 
+        return view('revenue.revenue_general', compact('totalRevenue'));
+    }
 
 
 }

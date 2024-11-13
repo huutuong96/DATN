@@ -8,8 +8,10 @@ use App\Models\product_variants;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\variantattribute;
+use App\Models\AddressModel;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Http;
 
 class CartController extends Controller
 {
@@ -218,6 +220,7 @@ class CartController extends Controller
                      'variant_name' => $productVariant->name,
                      'variant_price' => $productVariant->price,
                      'variant_image' => $productVariant->images,
+                        'product_id' => $productVariant->product_id,
                      'product_name' => $product->name,
                      'product_slug' => $product->slug,
                      'shop_id' => $request->shop_id,
@@ -334,4 +337,83 @@ class CartController extends Controller
             }
         }
     }
+
+    public function calculateShipFees_giao_hang_nhanh(Request $request)
+    {
+        $data = [];
+        // $shipFee = [];
+        $user = JWTAuth::parseToken()->authenticate();
+        $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
+        $inputArray = $request->all();
+        // if ($order->weight >= 2000) {
+        //     $service_id = 100039;
+        // } else {
+        //     $service_id = 53320;
+        // }
+
+        foreach ($inputArray as $input) {
+            $shopData = Shop::where('id', $input['shop_id'])->first();
+            $addressUser = AddressModel::where('user_id', $user->id)->first();
+            $response = Http::withHeaders([
+                'token' => $token, // Gắn token vào header
+            ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services', [
+                    "shop_id"=>$shopData->shopid_GHN,
+                    "from_district" => $shopData->district_id,
+                    "to_district"=>$addressUser->district_id,
+            ]);
+            $service = $response->json();
+            if ($service['data'] != null) {
+                foreach ($input['items'] as $item) {
+                    $result = ProducttocartModel::where('id', $item)->first();
+                    $response = Http::withHeaders([
+                        'token' => $token, // Gắn token vào header
+                    ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', [
+                            "from_district_id" => $shopData->district_id,
+                            "from_ward_code"=>$shopData->ward_id,
+                            // "service_id"=>$service_id,
+                            "service_id"=> 53320,
+                            "service_type_id"=>null,
+                            "to_district_id"=>$addressUser->district_id,
+                            "to_ward_code"=>$addressUser->ward_id,
+                            "height"=>100,
+                            "length"=>100,
+                            "weight"=>100,
+                            "width"=>100,
+                            "insurance_value"=>0,
+                            "cod_failed_amount"=>2000,
+                            "coupon"=> null,
+                            "items"=> [
+                                    [
+                                    "name" =>$result->name,
+                                    "quantity" => $result->quantity,
+                                    "height" => 200,
+                                    "weight" => 1000,
+                                    "length" => 200,
+                                    "width" => 200
+                                    ]
+                            ]
+                            
+                        ]);;
+                        $OrderFee = $response->json();
+                        if ($OrderFee['data']['total'] > 50000) {
+                            $OrderFee['data']['total'] = rand(25000, 40000);
+                        }
+                        // return $OrderFee['data']['total'];
+                }
+            }
+            $shipFee = $OrderFee['data']['total'] ?? rand(25000, 40000);
+            while (in_array($shipFee, array_column($data, 'ship_fee'))) {
+                $shipFee = rand(25000, 40000);
+            }
+            $data[] = [
+                'shop_id' => $input['shop_id'],
+                'ship_fee' => $shipFee,
+            ];
+        }
+        return response()->json($data, 200);
+    }
+
+
+
+
 }
