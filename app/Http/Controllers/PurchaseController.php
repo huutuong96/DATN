@@ -51,7 +51,6 @@ class PurchaseController extends Controller
                 'message' => 'Vui lòng nhập số điện thoại',
             ], 400);
         }
-
         $voucherToMainCode = null;
         $voucherToShopCode = null;
 
@@ -209,6 +208,7 @@ class PurchaseController extends Controller
             }
             $order->order_infomation = $orderInfomation;
             $order->save();
+            // dd($total_amount);
             SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
             return response()->json([
@@ -303,18 +303,15 @@ class PurchaseController extends Controller
     }
     private function getValidVoucherCode($code, $type)
     {
-
         if ($type === 'main') {
             $voucher = voucherToMain::where('code', $code)
                 ->where('quantity', '>=', 1)
-                ->where('status', 1)
                 ->first();
             return $voucher ? $voucher->code : null;
         }
         if ($type === 'shop') {
             $voucher = VoucherToShop::whereIn('code', $code)
                 ->where('quantity', '>=', 1)
-                ->where('status', 1)
                 ->pluck('code');
             // dd($voucher);
             return $voucher;
