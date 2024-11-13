@@ -115,7 +115,6 @@ class PurchaseController extends Controller
             // Process each shop's order
 
             $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
-
             foreach ($ordersByShop as $shopId => &$shopOrder) {
                 $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
                 $order = $this->createOrder($request, $ship_id, $groupOrderIds, $payment);
@@ -178,6 +177,7 @@ class PurchaseController extends Controller
             if ($voucherToMainCode) {
                 $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
             }
+
             AddPointUser::dispatch(auth()->id());
             $checkRank = $this->check_point_to_user();
             $total_amount = $this->discountsByRank($checkRank, $total_amount);
@@ -203,9 +203,9 @@ class PurchaseController extends Controller
                 $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
             }
             if($payment->name == 'COD'){
-        
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
             }
+
             $order->order_infomation = $orderInfomation;
             $order->save();
             // dd($total_amount);
@@ -607,6 +607,7 @@ class PurchaseController extends Controller
 
     public function calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $quantity)
     {
+
         if ($order->weight >= 2000) {
             $service_id = 100039;
         } else {
@@ -615,54 +616,46 @@ class PurchaseController extends Controller
         $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
             'token' => $token, // Gắn token vào header
-        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', [
-            
-                "from_district_id" => $shopData->district_id,
-                "from_ward_code"=>$shopData->ward_id,
-                "service_id"=>$service_id,
-                "service_type_id"=>null,
-                "to_district_id"=>$addressUser->district_id,
-                "to_ward_code"=>$addressUser->ward_id,
-                "height"=>100,
-                "length"=>100,
-                "weight"=>100,
-                "width"=>100,
-                "insurance_value"=>0,
-                "cod_failed_amount"=>2000,
-                "coupon"=> null,
-                "items"=> [
-                        [
-                        "name" =>$result->name,
-                        "quantity" => $quantity,
-                        "height" => 200,
-                        "weight" => 1000,
-                        "length" => 200,
-                        "width" => 200
-                        ]
-                  ]
+        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services', [
+                "shop_id"=>$shopData->shopid_GHN,
+                "from_district" => $shopData->district_id,
+                "to_district"=>$addressUser->district_id,
+        ]);
+        $service = $response->json();
+        if ($service['data'] != null) {
+            $response = Http::withHeaders([
+                'token' => $token, // Gắn token vào header
+            ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', [
                 
-            ]);
-
-            // "from_district_id"=>$shopData->district_id,
-            // "from_ward_code"=>$shopData->ward_id,
-            // "service_id" =>$service_id,
-            // "service_type_id"=>null,
-            // "to_district_id"=>$addressUser->district_id,
-            // "to_ward_code"=>$addressUser->ward_id,
-            // "height" => $order->height,
-            // "length" => $order->length,
-            // "weight" => $order->weight,
-            // "width" => $order->width,
-            // "insurance_value"=>$shopTotalPrice,
-            // "cod_failed_amount"=>2000,
-            // "coupon"=> null
-
-        $OrderFee = $response->json();
-
-        if ($OrderFee['data']['total'] > 50000) {
-            $OrderFee['data']['total'] = 48000;
+                    "from_district_id" => $shopData->district_id,
+                    "from_ward_code"=>$shopData->ward_id,
+                    "service_id"=>53320,
+                    "service_type_id"=>null,
+                    "to_district_id"=>$addressUser->district_id,
+                    "to_ward_code"=>$addressUser->ward_id,
+                    "height"=>10,
+                    "length"=>10,
+                    "weight"=>10,
+                    "width"=>10,
+                    "insurance_value"=>0,
+                    "cod_failed_amount"=>2000,
+                    "coupon"=> null,
+                    "items"=> [
+                            [
+                            "name" =>$result->name,
+                            "quantity" => $quantity,
+                            "height" => 10,
+                            "weight" => 10,
+                            "length" => 10,
+                            "width" => 10
+                            ]
+                      ]
+                    
+                ]);
+                $OrderFee = $response->json();
         }
-        return $OrderFee['data']['total'];
+        $ShipFree = $OrderFee['data']['total'] ?? 25700;
+        return $ShipFree;
     }
 
 
@@ -735,6 +728,11 @@ class PurchaseController extends Controller
         // lưu đơn hàng lên db
         
         $orderShipGHN = $response->json();
+        if ($orderShipGHN['data'] == null) {
+            $orderShipGHN['data']['order_code'] = null;
+            $orderShipGHN = "GIAO HÀNG NHANH";
+        }
+
         // Cập nhật đơn hàng chỉ một lần
         $order->update([
             "payment_type_id" => 2,
@@ -744,7 +742,7 @@ class PurchaseController extends Controller
             "return_address" => $shopData->pick_up_address,
             "return_district_id" => $shopData->district_id,
             "return_ward_code" => $shopData->ward_id,
-            "client_order_code" => $orderShipGHN['data']['order_code'],
+            "client_order_code" => $orderShipGHN['data']['order_code'] ?? null,
             "from_name" => $shopData->shop_name,
             "from_phone" => $shopData->contact_number,
             "from_address" => $shopData->pick_up_address . ", " . $shopData->ward . ", " . $shopData->district . ", " . $shopData->province . ", Vietnam",
