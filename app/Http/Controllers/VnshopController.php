@@ -617,8 +617,17 @@ public function updatebanner(BannerRequest $request, $id)
     ])->with('message', 'Cập nhật banner thành công!');
 }
 
-
-
-
+public function statistByQuantity(Request $request)
+{
+    return view('statist.quantity_sold');
+}
+public function statistByRevenue(Request $request)
+{
+    return view('statist.revenue');
+}
+public function statistBySales(Request $request)
+{
+ return view('statist.sales');
+}
 
 }
