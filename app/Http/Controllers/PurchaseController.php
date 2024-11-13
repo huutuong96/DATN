@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Http;
 use App\Jobs\SendMail;
 use App\Jobs\SendNotification;
 use App\Jobs\AddPointUser;
+use App\Models\product_variants;
 use App\Models\vnpay_transaction;
 use Illuminate\Support\Facades\Cache;
 
@@ -318,20 +319,44 @@ class PurchaseController extends Controller
         }
     }
 
+    // private function getProduct($productId, $variantId, $quantity)
+    // {
+    //     $result = Product::with(['variants' => function ($query) use ($variantId) {
+    //         $query->where('id', $variantId);
+    //     }])
+    //         ->where('id', $productId)
+    //         ->first();
+        
+    //     $result->increment('sold_count', $quantity);
+    //     $variant = $result->variants->first();
+
+    //     return $variant;
+
+    // }
     private function getProduct($productId, $variantId, $quantity)
     {
-        $result = Product::with(['variants' => function ($query) use ($variantId) {
-            $query->where('id', $variantId);
-        }])
-            ->where('id', $productId)
-            ->first();
-        $result->increment('sold_count', $quantity);
-        $variant = $result->variants->first();
-
-        return $variant;
-
+        // Nếu có `productId` và không có `variantId`, lấy sản phẩm không biến thể
+        if ($productId && !$variantId) {
+            $result = Product::where('id', $productId)->first();
+            
+            if ($result) {
+                $result->increment('sold_count', $quantity); // Tăng số lượng bán
+                return $result; // Trả về sản phẩm gốc
+            }
+        }
+    
+        // Nếu có `variantId` và không có `productId`, lấy sản phẩm có biến thể
+        if ($variantId && !$productId) {
+            $variant = product_variants::where('id', $variantId)->with('product')->first();
+    
+            if ($variant) {
+                $variant->product->increment('sold_count', $quantity); // Tăng số lượng bán
+                return $variant; // Trả về biến thể
+            }
+        }
+    
+        return null; // Nếu không tìm thấy sản phẩm hoặc biến thể
     }
-
     private function getProductForShip($productId)
     {
         $result = Product::whereIn('id', $productId)->get();
@@ -342,7 +367,7 @@ class PurchaseController extends Controller
     private function checkProductAvailability($variant, $quantity)
     {
         // dd($product);
-        if ($variant->stock < $quantity) {
+        if ($variant->quantity < $quantity) {
             throw new \Exception('Không đủ hàng');
         }
     }
@@ -461,16 +486,15 @@ class PurchaseController extends Controller
         $product = Product::find($product_id);
         return OrderDetailsModel::create([
             'order_id' => $order->id,
-            'category_id'=>$product->category_id,
-            'product_id' => $variant->product_id,
-            'variant_id' => $variant->id,
+            'product_id' => $product->id ?? $variant->product->id,
+            'variant_id' => $variant->id ?? null,
             'quantity' => $quantity,
             'subtotal' => $totalPrice,
             'status' => 1,
-            'height' => $product->height,
-            'length' => $product->length,
-            'weight' => $product->weight,
-            'width' => $product->width,
+            'height' => $product->height ?? $variant->product->height,
+            'length' => $product->length ?? $variant->product->length,
+            'weight' => $product->weight ?? $variant->product->weight,
+            'width' => $product->width ?? $variant->product->width,
         ]);
     }
 
@@ -577,6 +601,7 @@ class PurchaseController extends Controller
             "to_district"=> $addressUser->district_id
         ]);
         $service = $response->json();
+        dd($service);
         return $service['data'];
     }
 
