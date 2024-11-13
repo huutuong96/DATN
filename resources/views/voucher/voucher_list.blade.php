@@ -169,7 +169,7 @@
                                                             <td>
                                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $voucherMain->id }}">
                                                                     <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                                        Chỉnh sửa
+                                                                            <i class="ri-edit-line align-middle"></i>
                                                                     </button>
                                                                 </a>
                                                             
@@ -261,14 +261,7 @@
                                                                     </div>
                                                                 </div>
                                                             
-                                                                <!-- Delete form -->
-                                                                {{-- <form action="{{ route('post.destroy', ['token' => auth()->user()->refesh_token, 'id' => $Post->id, 'tab' => 1]) }}" method="POST" style="display: inline;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" style="background: ;border-radius: 5px; border: 1px solid black; color: red; cursor: pointer; height: 37px; width: 80px;" onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
-                                                                        🗑️ Xóa
-                                                                    </button>
-                                                                </form> --}}
+                                                               
                                                             </td>
                                                             
 
@@ -296,7 +289,7 @@
                     <div class="col-xl-12">
                         <div class="card">
                             <div class="card-header align-items-center d-flex">
-                                <h4 class="card-title mb-0 flex-grow-1"> Voucher Hoạt động</h4>
+                                <h4 class="card-title mb-0 flex-grow-1"> Voucher không hoạt động</h4>
                             </div><!-- end card header -->
 
                             <div class="card-body">
@@ -345,110 +338,111 @@
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             {{ $voucherMain->user->fullname }}</td>
-                                                            <td>
-                                                                <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $voucherMain->id }}">
-                                                                    <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                                        Chỉnh sửa
-                                                                    </button>
-                                                                </a>
-                                                            
-                                                                <!-- Modal Chỉnh sửa -->
-                                                                <div class="modal fade" id="editModal-{{ $voucherMain->id }}" tabindex="-1"
-                                                                    aria-labelledby="editModalLabel-{{ $voucherMain->id }}" aria-hidden="true">
-                                                                    <div class="modal-dialog modal-xl">
-                                                                        <div class="modal-content">
-                                                                            <div class="modal-header">
-                                                                                <h5 class="modal-title" id="editModalLabel-{{ $voucherMain->id }}">
-                                                                                    Chỉnh sửa Voucher</h5>
-                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                                    aria-label="Close"></button>
-                                                                            </div>
-                                                                            <div class="modal-body">
-                                                                                <form action="{{ route('voucher_main.update', ['id' => $voucherMain->id,  'token' => auth()->user()->refesh_token, 'tab'=>2]) }}" method="POST" enctype="multipart/form-data">
-                                                                                    @csrf
-                                                                                    @method('PUT')
-                                                                                    <div class="row">
-                                                                                        <div class="col-6">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="title-{{ $voucherMain->id }}" class="form-label">Tiêu đề</label>
-                                                                                                <input type="text" class="form-control"
-                                                                                                    placeholder="Tiêu đề" id="title-{{ $voucherMain->id }}" name="title"
-                                                                                                    value="{{ $voucherMain->title }}" required>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-6">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="description-{{ $voucherMain->id }}" class="form-label">Nội dung</label>
-                                                                                                <textarea class="form-control" placeholder="Nội dung" id="description-{{ $voucherMain->id }}" name="description" rows="2" required>{{ $voucherMain->description }}</textarea>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-4">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="quantity-{{ $voucherMain->id }}" class="form-label">Số lượng</label>
-                                                                                                <input type="number" class="form-control" id="quantity-{{ $voucherMain->id }}"
-                                                                                                    name="quantity" placeholder="Số lượng" value="{{ $voucherMain->quantity }}" required>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-4">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="limitValue-{{ $voucherMain->id }}" class="form-label">Tổng tiền sản phẩm</label>
-                                                                                                <input type="number" class="form-control" id="limitValue-{{ $voucherMain->id }}"
-                                                                                                    name="limitValue" placeholder="Tổng tiền sản phẩm"
-                                                                                                    value="{{ $voucherMain->limitValue }}" required>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-4">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="ratio-{{ $voucherMain->id }}" class="form-label">Phần trăm giảm giá</label>
-                                                                                                <input type="number" class="form-control" id="ratio-{{ $voucherMain->id }}"
-                                                                                                    name="ratio" placeholder="Phần trăm giảm giá" value="{{ $voucherMain->ratio }}" required>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-6">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="code-{{ $voucherMain->id }}" class="form-label">Mã giảm giá</label>
-                                                                                                <input type="text" class="form-control" id="code-{{ $voucherMain->id }}"
-                                                                                                    name="code" placeholder="Enter code" value="{{ $voucherMain->code }}" required>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-6">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="status-{{ $voucherMain->id }}" class="form-label">Trạng thái</label>
-                                                                                                <select style="width: 130px" class="form-control" id="status-{{ $voucherMain->id }}"
-                                                                                                    name="status" required>
-                                                                                                    <option value="" disabled>Chọn trạng thái</option>
-                                                                                                    <option value="2" {{ $voucherMain->status == 2 ? 'selected' : '' }}>Active</option>
-                                                                                                    <option value="0" {{ $voucherMain->status == 0 ? 'selected' : '' }}>Inactive</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-lg-12">
-                                                                                            <div class="text-end">
-                                                                                                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                                                                                            </div>
+                                                        <td>
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $voucherMain->id }}">
+                                                                <button type="button" class="btn btn-primary" title="Chỉnh sửa">
+                                                                    <i class="ri-edit-line align-middle"></i>
+                                                                </button>
+                                                                
+                                                            </a>
+                                                        
+                                                            <!-- Modal Chỉnh sửa -->
+                                                            <div class="modal fade" id="editModal-{{ $voucherMain->id }}" tabindex="-1"
+                                                                aria-labelledby="editModalLabel-{{ $voucherMain->id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-xl">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="editModalLabel-{{ $voucherMain->id }}">
+                                                                                Chỉnh sửa Voucher</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                                aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <form action="{{ route('voucher_main.update', ['id' => $voucherMain->id,  'token' => auth()->user()->refesh_token, 'tab'=>2]) }}" method="POST" enctype="multipart/form-data">
+                                                                                @csrf
+                                                                                @method('PUT')
+                                                                                <div class="row">
+                                                                                    <div class="col-6">
+                                                                                        <div class="mb-3">
+                                                                                            <label for="title-{{ $voucherMain->id }}" class="form-label">Tiêu đề</label>
+                                                                                            <input type="text" class="form-control"
+                                                                                                placeholder="Tiêu đề" id="title-{{ $voucherMain->id }}" name="title"
+                                                                                                value="{{ $voucherMain->title }}" required>
                                                                                         </div>
                                                                                     </div>
-                                                                                </form>
-                                                                            </div>
+                                                        
+                                                                                    <div class="col-6">
+                                                                                        <div class="mb-3">
+                                                                                            <label for="description-{{ $voucherMain->id }}" class="form-label">Nội dung</label>
+                                                                                            <textarea class="form-control" placeholder="Nội dung" id="description-{{ $voucherMain->id }}" name="description" rows="2" required>{{ $voucherMain->description }}</textarea>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-4">
+                                                                                        <div class="mb-3">
+                                                                                            <label for="quantity-{{ $voucherMain->id }}" class="form-label">Số lượng</label>
+                                                                                            <input type="number" class="form-control" id="quantity-{{ $voucherMain->id }}"
+                                                                                                name="quantity" placeholder="Số lượng" value="{{ $voucherMain->quantity }}" required>
+                                                                                        </div>
+                                                                                    </div>
+                                                        
+                                                                                    <div class="col-4">
+                                                                                        <div class="mb-3">
+                                                                                            <label for="limitValue-{{ $voucherMain->id }}" class="form-label">Tổng tiền sản phẩm</label>
+                                                                                            <input type="number" class="form-control" id="limitValue-{{ $voucherMain->id }}"
+                                                                                                name="limitValue" placeholder="Tổng tiền sản phẩm"
+                                                                                                value="{{ $voucherMain->limitValue }}" required>
+                                                                                        </div>
+                                                                                    </div>
+                                                        
+                                                                                    <div class="col-4">
+                                                                                        <div class="mb-3">
+                                                                                            <label for="ratio-{{ $voucherMain->id }}" class="form-label">Phần trăm giảm giá</label>
+                                                                                            <input type="number" class="form-control" id="ratio-{{ $voucherMain->id }}"
+                                                                                                name="ratio" placeholder="Phần trăm giảm giá" value="{{ $voucherMain->ratio }}" required>
+                                                                                        </div>
+                                                                                    </div>
+                                                        
+                                                                                    <div class="col-6">
+                                                                                        <div class="mb-3">
+                                                                                            <label for="code-{{ $voucherMain->id }}" class="form-label">Mã giảm giá</label>
+                                                                                            <input type="text" class="form-control" id="code-{{ $voucherMain->id }}"
+                                                                                                name="code" placeholder="Enter code" value="{{ $voucherMain->code }}" required>
+                                                                                        </div>
+                                                                                    </div>
+                                                        
+                                                                                    <div class="col-6">
+                                                                                        <div class="mb-3">
+                                                                                            <label for="status-{{ $voucherMain->id }}" class="form-label">Trạng thái</label>
+                                                                                            <select style="width: 130px" class="form-control" id="status-{{ $voucherMain->id }}"
+                                                                                                name="status" required>
+                                                                                                <option value="" disabled>Chọn trạng thái</option>
+                                                                                                <option value="2" {{ $voucherMain->status == 2 ? 'selected' : '' }}>Active</option>
+                                                                                                <option value="0" {{ $voucherMain->status == 0 ? 'selected' : '' }}>Inactive</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                        
+                                                                                    <div class="col-lg-12">
+                                                                                        <div class="text-end">
+                                                                                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </form>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            
-                                                                {{-- <!-- Delete form -->
-                                                                <form action="{{ route('voucher_main.update', ['id' => $voucherMain->id,  'token' => auth()->user()->refesh_token , 'tab'=>2, 'status'=>2]) }}" method="POST" style="display: inline;">
-                                                                    @csrf
-                                                                    @method('PUT')
-                                                                    <button type="submit" style="background: none; border: none; color: green; cursor: pointer;" onclick="return confirm('Bạn có chắc chắn muốn bật lại kh?');">
-                                                                        🔄 Khôi Phục
-                                                                    </button>
-                                                                </form> --}}
-                                                            </td>
+                                                            </div>
+                                                            <form
+                                                                {{-- action="{{ route('', ['token' => auth()->user()->refesh_token, 'id' => $Post->id, 'tab' => 1]) }}" method="POST" style="display: inline;" --}}
+                                                                >
+                                                                @csrf
+                                                                @method('DELETE')                                                       
+                                                                    <button type="submit" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
+                                                                        <i class="ri-delete-bin-line align-middle"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
                                                             
 
 

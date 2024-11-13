@@ -456,7 +456,7 @@ Route::get('/search', function () {
                 
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
             Route::get('shop_get_message/{shop_id}', [MessageController::class, "shop_get_message"]);
-            Route::get('user_get_message', [MessageController::class, "user_get_message"]);
+            Route::get('user_get_message', action: [MessageController::class, "user_get_message"]);
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
