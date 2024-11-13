@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Product;
 
 
 class OrdersController extends Controller
@@ -36,10 +37,31 @@ class OrdersController extends Controller
     }
     public function indexOrderToUser()
     {
-        $orders = OrdersModel::with('orderDetails')
+        $orders = OrdersModel::with(['orderDetails.variant.product']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', auth()->id())
             ->get();
-    
+           
+            foreach ($orders as $order) {
+                foreach ($order->orderDetails as $orderDetail) {
+                    if($orderDetail->variant!=null){
+                        $variant = $orderDetail->variant;  
+                    }else{
+                        $product = $orderDetail->product;  
+                    }
+                  
+                }
+            }
+            foreach ($orders as $key => $order) {
+                foreach ($order->orderDetails as $orderDetail  ) {
+                    if( $orderDetail->variant){
+                       $orderDetail['product']  = $orderDetail->variant->product;
+                       unset($orderDetail->variant['product']);
+
+                    }
+                   
+                }
+            }
+
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
         }
