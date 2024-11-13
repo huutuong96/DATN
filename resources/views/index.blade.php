@@ -784,7 +784,15 @@
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a
-                                             href="{{ route('statist_revenue', ['token' => auth()->user()->refesh_token]) }}"
+                                            href="{{ route('statist_revenue', ['token' => auth()->user()->refesh_token]) }}"
+                                            class="nav-link"
+                                            data-key="t-analytics">
+                                            Quản lý doanh thu
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a
+                                            href="dashboard-crm.html"
                                             class="nav-link"
                                             data-key="t-crm">
                                             Quản lý tổng quát theo doanh thu
