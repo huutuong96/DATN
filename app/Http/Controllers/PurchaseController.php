@@ -139,11 +139,12 @@ class PurchaseController extends Controller
                     $weight += $orderDetail->weight;
                     $width += $orderDetail->width;
                     $shopOrder['orderDetails'][] = $orderDetail;
-                    if ($cart->variant_id != null) {
-                        $result->decrement('stock', $cart->quantity);
-                    }else {
-                        $result->decrement('quantity', $cart->quantity);
-                    }
+                    // if ($cart->variant_id != null) {
+                    //     $result->decrement('stock', $cart->quantity);
+                    // }else {
+                    //     $result->decrement('quantity', $cart->quantity);
+                    // }
+                    // dd($result);
                     $shopTotalPrice += $totalPrice;
                     $totalQuantity += $cart->quantity;
                     $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
@@ -208,7 +209,7 @@ class PurchaseController extends Controller
 
             $order->order_infomation = $orderInfomation;
             $order->save();
-            // dd($total_amount);
+            // dd($carts);
             SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
             ProducttocartModel::whereIn('id', $request->carts)->delete();
@@ -321,15 +322,19 @@ class PurchaseController extends Controller
 
     private function getProduct($productId, $variantId, $quantity)
     {
+        $product = Product::where('id', $productId)->first();
+        $product->increment('sold_count', $quantity);
+        
         if ($variantId == null) {
             $result = Product::where('id', $productId)->first();
-            $result->increment('sold_count', $quantity);
+            $product->decrement('quantity', $quantity);
             return $result;
         }else{
             $result = product_variants::where('id', $variantId)->first();
-            $result->increment('stock', $quantity);
+            $result->decrement('stock', $quantity);
             return $result;
         }
+        // return $result;
     }
 
     private function getProductForShip($productId)
