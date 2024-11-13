@@ -13,17 +13,6 @@
 @section('main')
     <div class="container-fluid">
         <div class="row">
-            @if (session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link {{ $tab == 1 ? 'active' : '' }}" id="nav-home-tab" data-bs-toggle="tab"
@@ -163,8 +152,8 @@
                                                             {{ $banner->user->fullname }}</td>
                                                             <td>
                                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $banner->id }}">
-                                                                    <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                                        Chỉnh sửa
+                                                                    <button type="button" class="btn btn-primary" title="Chỉnh sửa">                      
+                                                                            <i class="ri-edit-line align-middle"></i>
                                                                     </button>
                                                                 </a>
                                                             
@@ -326,7 +315,7 @@
                                                             <td>
                                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $banner->id }}">
                                                                     <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                                        Chỉnh sửa
+                                                                        <i class="ri-edit-line align-middle"></i>
                                                                     </button>
                                                                 </a>
                                                             
