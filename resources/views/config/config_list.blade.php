@@ -51,8 +51,9 @@
                                         <td>              
                                             <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $config->id}}">
                                                 <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                    Chỉnh sửa
+                                                    <i class="ri-edit-line align-middle"></i>
                                                 </button>
+                                                
                                             </a>
                                         
                                             <!-- Modal Chỉnh sửa -->

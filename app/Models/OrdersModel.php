@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\product_variants;
 class OrdersModel extends Model
 {
     use HasFactory;
@@ -87,7 +87,7 @@ class OrdersModel extends Model
     public const STATUS_REFUND_CONFIRM = 7;
     public const STATUS_REFUNDING = 8;
     public const STATUS_REFUNDED = 9;
-
+    public const STATUS_PAID_PENDING_PICKUP = 10;
     public static function getStatusOptions()
     {
         return [
@@ -100,6 +100,7 @@ class OrdersModel extends Model
             self::STATUS_REFUND_CONFIRM => 'Chờ hoàn tiền',
             self::STATUS_REFUNDING => 'Đang hoàn tiền',
             self::STATUS_REFUNDED => 'Đã hoàn tiền',
+            self::STATUS_PAID_PENDING_PICKUP => 'Đã thanh toán chờ lấy hàng',
         ];
     }
 
@@ -112,4 +113,13 @@ class OrdersModel extends Model
     {
         return $query->where('status', $status);
     }
+    public function productVariant()
+{
+    return $this->belongsTo(product_variants::class, 'variant_id');
+}
+
+public function product()
+{
+    return $this->belongsTo(Product::class, 'product_id');
+}
 }

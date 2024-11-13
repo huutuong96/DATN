@@ -147,7 +147,9 @@
                                                                                                 'status' => 2,
                                                                                                 ]) }}"
                                                         >
-                                                            <button type="button" class="btn btn-warning waves-effect waves-light">Tắt</button>
+                                                            <button type="button" class="btn btn-warning waves-effect waves-light" title="Khóa">
+                                                                <i class="ri-lock-line align-middle"></i>
+                                                            </button>
                                                         </a>
                                                     </li>
                                                 @elseif ($category->status == 2)
@@ -166,7 +168,7 @@
                                                 @endif
                                                 <li class="list-inline-item">
                                                    <!-- Toggle Between Modals -->
-                                                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal{{ $category->id }}">Chỉnh sửa</button>
+                                                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal{{ $category->id }}" title="Chỉnh sửa"><i class="ri-edit-line align-middle"></i></button>
                                                     <!-- First modal dialog -->
                                                     <div class="modal fade" id="firstmodal{{ $category->id }}" aria-hidden="true" aria-labelledby="..." tabindex="-1">
                                                         <div class="modal-dialog modal-dialog-centered">
@@ -271,7 +273,7 @@
                                                                                             'status' => 0,
                                                                                             ]) }}"
                                                 >
-                                                    <button type="button" class="btn btn-danger waves-effect waves-light">Xóa</button>
+                                                    <button type="button" class="btn btn-danger waves-effect waves-light" title="xóa"><i class="ri-delete-bin-line align-middle"></i></button>
                                                 </a>
                                                 </li>
                                             </ul>
