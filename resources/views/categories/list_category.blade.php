@@ -268,7 +268,7 @@
                                                         href="{{ route('change_category', [
                                                                                             'token' => auth()->user()->refesh_token,
                                                                                             'id' => $category->id,
-                                                                                            'status' => 0,
+                                                                                            'status' => 5,
                                                                                             ]) }}"
                                                 >
                                                     <button type="button" class="btn btn-danger waves-effect waves-light">Xóa</button>
