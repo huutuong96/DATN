@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use App\Mail\ConfirmOder;
 use App\Mail\ConfirmOderToCart;
 use App\Models\Cart_to_usersModel;
+use App\Models\product_variants;
 use App\Models\ShipsModel;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
@@ -143,7 +144,7 @@ class PurchaseController extends Controller
                     $weight += $orderDetail->weight;
                     $width += $orderDetail->width;
                     $shopOrder['orderDetails'][] = $orderDetail;
-                    $variant->decrement('stock', $cart->quantity);
+                    $variant->decrement('quantity', $cart->quantity);
                     $shopTotalPrice += $totalPrice;
                     $totalQuantity += $cart->quantity;
                     $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
@@ -158,9 +159,9 @@ class PurchaseController extends Controller
                 $shopData = Shop::find($shopId);
                 $service = $this->get_infomaiton_services($shopData, $addressUser);
                 $productForShip = $this->getProductForShip($productIds);
-                
+               
                 $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice);
-                
+                dd('ok');
                 // $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], 99999);
                 // $order->order_infomation = $orderInfomation;
                 $grandTotalPrice += $shipFee;
@@ -319,16 +320,23 @@ class PurchaseController extends Controller
 
     private function getProduct($productId, $variantId, $quantity)
     {
-        $result = Product::with(['variants' => function ($query) use ($variantId) {
-            $query->where('id', $variantId);
-        }])
-            ->where('id', $productId)
-            ->first();
-        $result->increment('sold_count', $quantity);
-        $variant = $result->variants->first();
-
-        return $variant;
-
+        if ($productId && !$variantId) {
+            $result = Product::where('id', $productId)->first();
+           
+            if ($result) {
+                $result->increment('sold_count', $quantity); 
+                return $result; 
+            }        
+        }
+        if ($variantId && !$productId) {
+            $variant = product_variants::where('id', $variantId)->with('product')->first();
+            if ($variant) {
+                $variant->product->increment('sold_count', $quantity); // Tăng số lượng bán
+                return $variant; // Trả về biến thể
+            }
+           
+        }
+        return null; 
     }
 
     private function getProductForShip($productId)
@@ -341,7 +349,7 @@ class PurchaseController extends Controller
     private function checkProductAvailability($variant, $quantity)
     {
         // dd($product);
-        if ($variant->stock < $quantity) {
+        if ($variant->quantity < $quantity) {
             throw new \Exception('Không đủ hàng');
         }
     }
@@ -462,7 +470,7 @@ class PurchaseController extends Controller
             'order_id' => $order->id,
             'category_id'=>$product->category_id,
             'product_id' => $variant->product_id,
-            'variant_id' => $variant->id,
+            'variant_id' => $variant->variant_id,
             'quantity' => $quantity,
             'subtotal' => $totalPrice,
             'status' => 1,
@@ -581,7 +589,7 @@ class PurchaseController extends Controller
 
     public function calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice)
     {
-
+//  dd($service);
         if ($order->weight >= 2000) {
             $service_id = 100039;
         } else {
@@ -601,22 +609,13 @@ class PurchaseController extends Controller
             "weight" => $order->weight,
             "width" => $order->width,
             "service_type_id "=> null,
-
-            "from_district_id"=>$shopData->district_id,
             "from_ward_code"=>$shopData->ward_id,
-            "service_id"=>$service_id,
             "service_type_id"=>null,
-            "to_district_id"=>$addressUser->district_id,
-            "to_ward_code"=>$addressUser->ward_id,
-            "height" => $order->height,
-            "length" => $order->length,
-            "weight" => $order->weight,
-            "width" => $order->width,
-            "insurance_value"=>$shopTotalPrice,
             "cod_failed_amount"=>2000,
             "coupon"=> null
         ]);
         $OrderFee = $response->json();
+        dd( $OrderFee);
         return $OrderFee['data']['total'];
     }
 
