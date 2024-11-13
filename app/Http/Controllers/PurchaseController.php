@@ -83,7 +83,7 @@ class PurchaseController extends Controller
             if (!$payment) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Phương thức thanh toán không hợp lệ',
+                    'message' => 'Phương thức thanh toán không hợp lệ.',
                 ], 400);
             }
             $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
