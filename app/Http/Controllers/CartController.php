@@ -218,6 +218,7 @@ class CartController extends Controller
                      'variant_name' => $productVariant->name,
                      'variant_price' => $productVariant->price,
                      'variant_image' => $productVariant->images,
+                        'product_id' => $productVariant->product_id,
                      'product_name' => $product->name,
                      'product_slug' => $product->slug,
                      'shop_id' => $request->shop_id,

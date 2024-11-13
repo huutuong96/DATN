@@ -291,7 +291,7 @@
                                                                                                         'status' => 5,
                                                                                                         ]) }}"
                                                                 >
-                                                                    <button type="button" class="btn rounded-pill btn-danger waves-effect waves-light">xóa .</button>
+                                                                    <button type="button" class="btn rounded-pill btn-danger waves-effect waves-light">xóa</button>
                                                                 </a>
                                                             </li>
                                                             @endif
