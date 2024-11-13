@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\voucherToMain;
 use App\Http\Requests\VoucherRequest;
 use Illuminate\Support\Str;
-use App\Http\Requests\BlogRequest;
+use App\Http\Requests\Blogrequest;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Http\Requests\TaxRequest;
@@ -313,7 +313,7 @@ class VnshopController extends Controller
             }
 
                 
-        public function updateBlog(BlogRequest $request, string $id)
+        public function updateBlog(Blogrequest $request, string $id)
         {
             $token = $request->query('token');
             $tab = $request->query('tab');
