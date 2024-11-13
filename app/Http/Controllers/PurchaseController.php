@@ -44,6 +44,7 @@ class PurchaseController extends Controller
     }
     public function purchaseToCart(Request $request)
     {
+        dd($request);
         $user = JWTAuth::parseToken()->authenticate();
         if (!$user->phone) {
             return response()->json([
@@ -80,7 +81,6 @@ class PurchaseController extends Controller
         try {
             DB::beginTransaction();
             $payment = PaymentsModel::where('id', $request->payment)->first();
-            dd($request->all());
             if (!$payment) {
                 return response()->json([
                     'status' => false,
