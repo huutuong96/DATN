@@ -211,6 +211,7 @@ class PurchaseController extends Controller
             // dd($total_amount);
             SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email);
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
+            ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
