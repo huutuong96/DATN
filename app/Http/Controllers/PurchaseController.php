@@ -44,7 +44,6 @@ class PurchaseController extends Controller
     }
     public function purchaseToCart(Request $request)
     {
-        dd($request);
         $user = JWTAuth::parseToken()->authenticate();
         if (!$user->phone) {
             return response()->json([
