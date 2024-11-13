@@ -80,7 +80,7 @@ class PurchaseController extends Controller
         try {
             DB::beginTransaction();
             $payment = PaymentsModel::where('id', $request->payment)->first();
-            dd($request->payment);
+            dd($request->all());
             if (!$payment) {
                 return response()->json([
                     'status' => false,
