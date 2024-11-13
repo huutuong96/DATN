@@ -51,7 +51,6 @@ class PurchaseController extends Controller
                 'message' => 'Vui lòng nhập số điện thoại',
             ], 400);
         }
-
         $voucherToMainCode = null;
         $voucherToShopCode = null;
 
@@ -78,11 +77,8 @@ class PurchaseController extends Controller
         if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
             return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
         }
-
         try {
             DB::beginTransaction();
-
-
             $payment = PaymentsModel::where('name', $request->payment)->first();
             if (!$payment) {
                 return response()->json([
@@ -135,16 +131,20 @@ class PurchaseController extends Controller
                 $productIds = [];
                 foreach ($shopOrder['items'] as $cart) {
                     $productIds[] = $cart->product_id;
-                    $variant = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
-                    $this->checkProductAvailability($variant, $cart->quantity);
-                    $totalPrice = $this->calculateTotalPrice($variant, $cart->quantity);
-                    $orderDetail = $this->createOrderDetail($order, $variant, $cart->quantity, $totalPrice, $cart->product_id);
+                    $result = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
+                    $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
+                    $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
+                    $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id);
                     $height += $orderDetail->height;
                     $length += $orderDetail->length;
                     $weight += $orderDetail->weight;
                     $width += $orderDetail->width;
                     $shopOrder['orderDetails'][] = $orderDetail;
-                    $variant->decrement('stock', $cart->quantity);
+                    if ($cart->variant_id != null) {
+                        $result->decrement('stock', $cart->quantity);
+                    }else {
+                        $result->decrement('quantity', $cart->quantity);
+                    }
                     $shopTotalPrice += $totalPrice;
                     $totalQuantity += $cart->quantity;
                     $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
@@ -160,9 +160,7 @@ class PurchaseController extends Controller
                 $shopData = Shop::find($shopId);
                 $service = $this->get_infomaiton_services($shopData, $addressUser);
                 $productForShip = $this->getProductForShip($productIds);
-                
-                $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice);
-                
+                $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
                 // $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], 99999);
                 // $order->order_infomation = $orderInfomation;
                 $grandTotalPrice += $shipFee;
@@ -175,7 +173,7 @@ class PurchaseController extends Controller
                 $order->total_amount = $totalPrice;
                 $total_amount += $order->total_amount;
                 $this->addOrderFeesToTotal($order, $shopTotalPrice);
-                // $order->save();
+                $order->save();
             }
             if ($voucherToMainCode) {
                 $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
@@ -301,18 +299,15 @@ class PurchaseController extends Controller
     }
     private function getValidVoucherCode($code, $type)
     {
-
         if ($type === 'main') {
             $voucher = voucherToMain::where('code', $code)
                 ->where('quantity', '>=', 1)
-                ->where('status', 1)
                 ->first();
             return $voucher ? $voucher->code : null;
         }
         if ($type === 'shop') {
             $voucher = VoucherToShop::whereIn('code', $code)
                 ->where('quantity', '>=', 1)
-                ->where('status', 1)
                 ->pluck('code');
             // dd($voucher);
             return $voucher;
@@ -364,21 +359,30 @@ class PurchaseController extends Controller
     }
 
 
-    private function checkProductAvailability($variant, $quantity)
+    private function checkProductAvailability($result, $quantity, $variant_id)
     {
         // dd($product);
-        if ($variant->quantity < $quantity) {
-            throw new \Exception('Không đủ hàng');
+        if ($variant_id != null) {
+            if ($result->stock < $quantity) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Sản phẩm ' . $result->name . ' không đủ hàng',
+                ], 400);
+            }
+        }else {
+            if ($result->quantity < $quantity) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Sản phẩm ' . $result->name . ' không đủ hàng',
+                ], 400);
+            }
         }
+        
     }
 
-    private function calculateTotalPrice($variant, $quantity)
-
+    private function calculateTotalPrice($result, $quantity)
     {
-        $price = $variant->sale_price && $variant->sale_price < $variant->price
-            ? $variant->sale_price
-            : $variant->price;
-        return $price * $quantity;
+        return $result->price * $quantity;
     }
 
     private function applyVouchers($voucherToMainCode, $voucherToShopCode, &$totalPrice)
@@ -480,22 +484,40 @@ class PurchaseController extends Controller
     }
 
 
-    private function createOrderDetail($order, $variant, $quantity, $totalPrice, $product_id)
-
+    private function createOrderDetail($order, $result, $quantity, $totalPrice, $product_id, $variant_id)
     {
-        $product = Product::find($product_id);
-        return OrderDetailsModel::create([
-            'order_id' => $order->id,
-            'product_id' => $product->id ?? $variant->product->id,
-            'variant_id' => $variant->id ?? null,
-            'quantity' => $quantity,
-            'subtotal' => $totalPrice,
-            'status' => 1,
-            'height' => $product->height ?? $variant->product->height,
-            'length' => $product->length ?? $variant->product->length,
-            'weight' => $product->weight ?? $variant->product->weight,
-            'width' => $product->width ?? $variant->product->width,
-        ]);
+        if ($variant_id == null) {
+            $product = Product::find($result->id);
+            return OrderDetailsModel::create([
+                'order_id' => $order->id,
+                'category_id'=> $product->category_id,
+                'product_id' => $product_id,
+                'variant_id' => $variant_id,
+                'quantity' => $quantity,
+                'subtotal' => $totalPrice,
+                'status' => 1,
+                'height' => $product->height,
+                'length' => $product->length,
+                'weight' => $product->weight,
+                'width' => $product->width,
+            ]);
+        }else {
+            $variant = product_variants::find($result->id);
+            return OrderDetailsModel::create([
+                'order_id' => $order->id,
+                'category_id'=> $variant->category_id,
+                'product_id' => $product_id,
+                'variant_id' => $variant_id,
+                'quantity' => $quantity,
+                'subtotal' => $totalPrice,
+                'status' => 1,
+                'height' => $variant->height,
+                'length' => $variant->length,
+                'weight' => $variant->weight,
+                'width' => $variant->width,
+            ]);
+        }
+        
     }
 
     private function calculateStateTax($totalPriceOfShop, $product_id)
@@ -605,9 +627,8 @@ class PurchaseController extends Controller
         return $service['data'];
     }
 
-    public function calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice)
+    public function calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $quantity)
     {
-
         if ($order->weight >= 2000) {
             $service_id = 100039;
         } else {
@@ -617,32 +638,52 @@ class PurchaseController extends Controller
         $response = Http::withHeaders([
             'token' => $token, // Gắn token vào header
         ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', [
-            "service_id" => $service_id,
-            "insurance_value" => $shopTotalPrice,
-            "from_district_id" => $shopData->district_id,
-            "to_district_id" => $addressUser->district_id,
-            "to_ward_code" => $addressUser->ward_id,
-            "height" => $order->height,
-            "length" => $order->length,
-            "weight" => $order->weight,
-            "width" => $order->width,
-            "service_type_id "=> null,
+            
+                "from_district_id" => $shopData->district_id,
+                "from_ward_code"=>$shopData->ward_id,
+                "service_id"=>$service_id,
+                "service_type_id"=>null,
+                "to_district_id"=>$addressUser->district_id,
+                "to_ward_code"=>$addressUser->ward_id,
+                "height"=>100,
+                "length"=>100,
+                "weight"=>100,
+                "width"=>100,
+                "insurance_value"=>0,
+                "cod_failed_amount"=>2000,
+                "coupon"=> null,
+                "items"=> [
+                        [
+                        "name" =>$result->name,
+                        "quantity" => $quantity,
+                        "height" => 200,
+                        "weight" => 1000,
+                        "length" => 200,
+                        "width" => 200
+                        ]
+                  ]
+                
+            ]);
 
-            "from_district_id"=>$shopData->district_id,
-            "from_ward_code"=>$shopData->ward_id,
-            "service_id"=>$service_id,
-            "service_type_id"=>null,
-            "to_district_id"=>$addressUser->district_id,
-            "to_ward_code"=>$addressUser->ward_id,
-            "height" => $order->height,
-            "length" => $order->length,
-            "weight" => $order->weight,
-            "width" => $order->width,
-            "insurance_value"=>$shopTotalPrice,
-            "cod_failed_amount"=>2000,
-            "coupon"=> null
-        ]);
+            // "from_district_id"=>$shopData->district_id,
+            // "from_ward_code"=>$shopData->ward_id,
+            // "service_id" =>$service_id,
+            // "service_type_id"=>null,
+            // "to_district_id"=>$addressUser->district_id,
+            // "to_ward_code"=>$addressUser->ward_id,
+            // "height" => $order->height,
+            // "length" => $order->length,
+            // "weight" => $order->weight,
+            // "width" => $order->width,
+            // "insurance_value"=>$shopTotalPrice,
+            // "cod_failed_amount"=>2000,
+            // "coupon"=> null
+
         $OrderFee = $response->json();
+
+        if ($OrderFee['data']['total'] > 50000) {
+            $OrderFee['data']['total'] = 48000;
+        }
         return $OrderFee['data']['total'];
     }
 
@@ -698,10 +739,10 @@ class PurchaseController extends Controller
             "to_province_name" => $address->province,
             "cod_amount" => $cod_amount,
             "content" => $request->content ?? "",
-            "weight" => $order->weight ?? 1000,
-            "length" => $order->length ?? 20,
-            "width" => $order->width ?? 20,
-            "height" => $order->height,
+            "weight" => 1000,
+            "length" =>  20,
+            "width" =>  20,
+            "height" => 30,
             "cod_failed_amount" => 6000,
             "pick_station_id" => 1444,
             "deliver_station_id" => null,
@@ -716,8 +757,6 @@ class PurchaseController extends Controller
         // lưu đơn hàng lên db
         
         $orderShipGHN = $response->json();
-   
-
         // Cập nhật đơn hàng chỉ một lần
         $order->update([
             "payment_type_id" => 2,

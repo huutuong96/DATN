@@ -780,7 +780,7 @@
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a
-                                            href="dashboard-analytics.html"
+                                            href="#"
                                             class="nav-link"
                                             data-key="t-analytics">
                                             Quản lý doanh thu

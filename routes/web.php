@@ -98,8 +98,10 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/bannerall', [VnshopController::class, 'bannerall'])->name('bannerall');
     Route::post('/storebanner', [VnshopController::class, 'storebanner'])->name('banner.store');
     Route::put('/bannerupdate{id}', [VnshopController::class, 'updatebanner'])->name('banner.update');
-   
-
+    Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
 
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
 });
+
+
+
