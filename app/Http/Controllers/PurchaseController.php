@@ -79,7 +79,7 @@ class PurchaseController extends Controller
         }
         try {
             DB::beginTransaction();
-            $payment = PaymentsModel::where('name', $request->payment)->first();
+            $payment = PaymentsModel::where('id', $request->payment)->first();
             if (!$payment) {
                 return response()->json([
                     'status' => false,
