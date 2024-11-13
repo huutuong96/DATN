@@ -780,7 +780,7 @@
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a
-                                            href="{{route('revenue_general', ['token' => auth()->user()->refesh_token])}}"
+                                            href="#"
                                             class="nav-link"
                                             data-key="t-analytics">
                                             Quản lý doanh thu

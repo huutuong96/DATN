@@ -365,6 +365,7 @@ class CartController extends Controller
             if ($service['data'] != null) {
                 foreach ($input['items'] as $item) {
                     $result = ProducttocartModel::where('id', $item)->first();
+                    $product = Product::where('id', $result->product_id)->first();
                     $response = Http::withHeaders([
                         'token' => $token, // Gắn token vào header
                     ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', [
@@ -375,10 +376,10 @@ class CartController extends Controller
                             "service_type_id"=>null,
                             "to_district_id"=>$addressUser->district_id,
                             "to_ward_code"=>$addressUser->ward_id,
-                            "height"=>100,
-                            "length"=>100,
-                            "weight"=>100,
-                            "width"=>100,
+                            "height"=>$product->height ?? 10,
+                            "length"=>$product->length ?? 10,
+                            "weight"=>$product->weight ?? 10,
+                            "width"=>$product->width ?? 10,
                             "insurance_value"=>0,
                             "cod_failed_amount"=>2000,
                             "coupon"=> null,
@@ -386,25 +387,23 @@ class CartController extends Controller
                                     [
                                     "name" =>$result->name,
                                     "quantity" => $result->quantity,
-                                    "height" => 200,
-                                    "weight" => 1000,
-                                    "length" => 200,
-                                    "width" => 200
+                                    "height"=>$product->height ?? 10,
+                                    "length"=>$product->length ?? 10,
+                                    "weight"=>$product->weight ?? 10,
+                                    "width"=>$product->width ?? 10,
                                     ]
                             ]
                             
                         ]);;
                         $OrderFee = $response->json();
-                        if ($OrderFee['data']['total'] > 50000) {
-                            $OrderFee['data']['total'] = rand(25000, 40000);
-                        }
+                        // return $OrderFee['data']['total'];
+                        // if ($OrderFee['data']['total'] > 50000) {
+                        //     $OrderFee['data']['total'] = 25700;
+                        // }
                         // return $OrderFee['data']['total'];
                 }
             }
-            $shipFee = $OrderFee['data']['total'] ?? rand(25000, 40000);
-            while (in_array($shipFee, array_column($data, 'ship_fee'))) {
-                $shipFee = rand(25000, 40000);
-            }
+            $shipFee = $OrderFee['data']['total'] ?? 25700;
             $data[] = [
                 'shop_id' => $input['shop_id'],
                 'ship_fee' => $shipFee,
