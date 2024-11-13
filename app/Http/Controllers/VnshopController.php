@@ -263,19 +263,19 @@ class VnshopController extends Controller
             'blogs','deletedBlog','tab'
         ));
     }
-        public function post(Request $request)
-        {
-            $tab = $request->input('tab', 1); 
-            $Posts = Post::whereNull('deleted_at')
-                        ->with('blog')
-                        ->orderBy('created_at', 'desc') 
-                        ->paginate(10);
-        
-            $blogs = Blog::whereNull('deleted_at')->get();
-            $deletedPost = Post::onlyTrashed()->paginate(10);
-        
-            return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
-        }
+    public function post(Request $request)
+    {
+        $tab = $request->input('tab', 1); 
+        $Posts = Post::whereNull('deleted_at')
+                    ->with('blog')
+                    ->orderBy('created_at', 'desc') 
+                    ->paginate(10);
+    
+        $blogs = Blog::whereNull('deleted_at')->get();
+        $deletedPost = Post::onlyTrashed()->paginate(10);
+    
+        return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
+    }
     
     public function restorepost(Request $request, $id)
     {
@@ -628,6 +628,7 @@ public function updatebanner(BannerRequest $request, $id)
 
         return view('revenue.revenue_general', compact('totalRevenue'));
     }
+   
 
 
 }

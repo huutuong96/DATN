@@ -149,7 +149,7 @@
                                                                 data-bs-target="#editModal-{{ $tax->id }}">
                                                                 <button type="button" class="btn btn-primary"
                                                                     title="Chỉnh sửa">
-                                                                    Chỉnh sửa
+                                                                        <i class="ri-edit-line align-middle"></i>
                                                                 </button>
                                                             </a>
 
@@ -311,7 +311,7 @@
                                                                 data-bs-target="#editModal-{{ $tax->id }}">
                                                                 <button type="button" class="btn btn-primary"
                                                                     title="Chỉnh sửa">
-                                                                    Chỉnh sửa
+                                                                    <i class="ri-edit-line align-middle"></i>
                                                                 </button>
                                                             </a>
 

@@ -89,7 +89,8 @@
                                                                                                     'status' => 2,
                                                                                                     ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">Đồng ý</button>
+                                                            <button type="button" class="btn btn-success" title="Đồng ý"> <i class="ri-check-line align-middle"></i></button>
+
                                                         </li>
                                                         <li class="list-inline-item">
                                                             <a 
@@ -99,7 +100,9 @@
                                                                                                         'status' => 0,
                                                                                                         ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-danger waves-effect waves-light">Xóa</button>
+                                                            <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
+                                                                <i class="ri-delete-bin-line align-middle"></i>
+                                                        </button>
                                                             </a>
                                                         </li>
                                                     </ul>

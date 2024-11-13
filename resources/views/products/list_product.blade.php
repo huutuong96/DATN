@@ -140,10 +140,6 @@
                                                     <td>
                                                         <img src="{{ $product->image }}" alt="{{ $product->name }}" style="width: 50px; height: 50px;">
                                                         
-                                                        {{-- 
-                                                        @foreach ($product->images as $image)
-                                                            <img src="{{ $image->url }}" alt="{{ $product->id }}" style="width: 30px; height: 30px; margin-top: 5px; margin-right: 5px;">
-                                                        @endforeach --}}
                                                     </td>
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         {{ $product->name }}
@@ -167,17 +163,13 @@
                                                             <button type="submit" class="btn btn-success" title="Duyệt">
                                                                 <i class="ri-check-line align-middle"></i>
                                                             </button>
-                                                        </form>
-                                                     
-                                                        <!-- Báo cáo vi phạm -->
-                                                        
+                                                        </form>                                        
+                                                        <!-- Báo cáo vi phạm -->                                  
                                                             <a href="#" data-bs-toggle="modal" data-bs-target="#reportModal">
                                                                 <button type="submit" class="btn btn-danger" title="Báo cáo vi phạm">
                                                                     <i class="ri-error-warning-line align-middle"></i> 
                                                                 </button>
                                                             </a>
-                                                        
-                        
                                                         <!-- Modal Báo cáo vi phạm -->
                                                         <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog">
@@ -203,8 +195,6 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                        
-                                                    
                                                         <!-- Không duyệt -->
                                                         <form action="{{ route('products.reject',[
                                                                                                 'token' => auth()->user()->refesh_token,
