@@ -161,8 +161,9 @@
                                                                                             'status' => 1,
                                                                                             ]) }}"
                                                     >
-                                                        <button type="button" class="btn btn-success waves-effect waves-light">Bật</button>
-                                                    
+                                                    <button type="button" class="btn btn-success" title="Bật">
+                                                        <i class="ri-check-line align-middle"></i>
+                                                    </button>
                                                        
                                                     </li>
                                                 @endif

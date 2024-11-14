@@ -295,7 +295,7 @@ Route::get('/search', function () {
     // Route không áp dụng middleware
     Route::get('banners/client', [BannerController::class, "index"]);
     Route::get('voucher_main/client', [VoucherToMainController::class, "index"]);
-    Route::get('voucher_shop', [VoucherToMainController::class, "index"]);
+    Route::get('voucher_shop', [VoucherToShopController::class, "index"]);
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
 
@@ -391,6 +391,8 @@ Route::get('/search', function () {
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
                 Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
 
+                Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
+                Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
 
                 Route::resource('follows', FollowToShopController::class);
                 Route::resource('support_main', Support_mainController::class);
@@ -456,7 +458,7 @@ Route::get('/search', function () {
                 
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
             Route::get('shop_get_message/{shop_id}', [MessageController::class, "shop_get_message"]);
-            Route::get('user_get_message', [MessageController::class, "user_get_message"]);
+            Route::get('user_get_message', action: [MessageController::class, "user_get_message"]);
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');

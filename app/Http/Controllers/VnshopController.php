@@ -353,6 +353,18 @@ class VnshopController extends Controller
                 'tab'=>$tab,
             ])->with('message', 'Cập nhật voucher main thành công!');
         }
+        public function delete_voucher(request $request, $id)
+        {
+            $token = $request->token;
+            $tab = $request->tab;
+            $voucherMain = voucherToMain::where('id', $id)->firstOrFail();
+            $voucherMain->delete();
+            return redirect()->route('voucherall', [
+                'token' => $token,
+                'tab' => $tab,
+            ])->with('message', 'Xóa voucher main thành công!');
+        }
+        
         
       
         

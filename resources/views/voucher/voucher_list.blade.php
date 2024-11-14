@@ -434,11 +434,11 @@
                                                                 </div>
                                                             </div>
                                                             <form
-                                                                {{-- action="{{ route('', ['token' => auth()->user()->refesh_token, 'id' => $Post->id, 'tab' => 1]) }}" method="POST" style="display: inline;" --}}
+                                                                action="{{ route('voucher.delete', ['token' => auth()->user()->refesh_token, 'id' => $voucherMain->id, 'tab' => 2]) }}" method="POST" style="display: inline;"
                                                                 >
                                                                 @csrf
                                                                 @method('DELETE')                                                       
-                                                                <button type="submit" class="btn btn-danger ms-2" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
+                                                                    <button type="submit" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa voucher này?');">
                                                                         <i class="ri-delete-bin-line align-middle"></i>
                                                                 </button>
                                                             </form>

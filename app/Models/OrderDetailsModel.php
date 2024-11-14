@@ -29,6 +29,8 @@ class OrderDetailsModel extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+    // Trong model OrderDetail
+
     public function variant()
     {
         return $this->belongsTo(product_variants::class, 'variant_id');
