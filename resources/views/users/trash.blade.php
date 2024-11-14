@@ -91,7 +91,7 @@
                                                             >
                                                             <button type="button" class="btn btn-info"
                                                             title="Khôi phục"
-                                                            onclick="return confirm('Bạn có chắc chắn muốn khôi phục blog này?');">
+                                                            onclick="return confirm('Bạn có chắc chắn muốn khôi phục user này?');">
                                                             <i class="ri-refresh-line align-middle"></i>
                                                         </button>
                                                         </li>
