@@ -71,7 +71,11 @@
                                                                                                     'status' => 2,
                                                                                                     ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">Khôi phục</button>
+                                                            <button type="button" class="btn btn-info"
+                                                            title="Khôi phục"
+                                                            onclick="return confirm('Bạn có chắc chắn muốn khôi phục user này?');">
+                                                            <i class="ri-refresh-line align-middle"></i>
+                                                        </button>
                                                         </li>
                                                     </ul>
                                                        

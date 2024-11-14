@@ -64,7 +64,9 @@
                                                                                                         'status' => 1,
                                                                                                         ]) }}"
                                                                 >
-                                                                    <button type="button" class="btn rounded-pill btn-warning waves-effect waves-light">Khóa shop</button>
+                                                                <button type="button" class="btn btn-warning" title="Khóa">
+                                                                    <i class="ri-lock-line align-middle"></i>
+                                                                </button>
                                                                 </a>
                                                             </li>
                                                         @elseif ($shop->status == 1)
@@ -76,7 +78,8 @@
                                                                                                     'status' => 2,
                                                                                                     ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">Khôi phục</button>
+                                                            <button type="button" class="btn btn-success" title="mở"> <i class="ri-check-line align-middle"></i></button>
+
                                                             </li>
                                                         @endif
                                                         <li class="list-inline-item">
@@ -87,7 +90,9 @@
                                                                                                         'status' => 5,
                                                                                                         ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-danger waves-effect waves-light">Xóa</button>
+                                                            <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
+                                                                <i class="ri-delete-bin-line align-middle"></i>
+                                                        </button>
                                                             </a>
                                                         </li>
                                                     </ul>

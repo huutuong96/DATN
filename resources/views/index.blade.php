@@ -1027,14 +1027,7 @@
                                             Thông tin cơ bản của sàn
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
-                                            class="nav-link"
-                                            data-key="t-crm">
-                                            Quản lý voucher
-                                        </a>
-                                    </li>
+                                    
                                     <li class="nav-item">
                                         <a
                                             href="{{ route('bannerall', ['token' => auth()->user()->refesh_token]) }}"
@@ -1044,14 +1037,7 @@
                                         </a>
                                     </li>
             
-                                    <li class="nav-item">
-                                        <a
-                                            href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
-                                            class="nav-link"
-                                            data-key="t-projects">
-                                            Quản lý thuế
-                                        </a>
-                                    </li>
+                                    
                                 </ul>
                             </div>
                         </li>
@@ -1063,6 +1049,28 @@
                                 <span data-key="t-dashboards">Xét duyệt sản phẩm</span>
                             </a>
 
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-crm">
+                                <i class="ri-dashboard-3-line"></i>
+
+                                Quản lý voucher
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-projects">
+                                <i class="ri-dashboard-3-line"></i>
+
+                                Quản lý thuế
+                            </a>
                         </li>
                     </ul>
                 </div>

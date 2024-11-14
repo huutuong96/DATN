@@ -71,7 +71,9 @@
                                                                                                     'status' => 2,
                                                                                                     ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">chấp nhận</button>
+                                                            <button type="button" class="btn btn-success" title="Duyệt">
+                                                                <i class="ri-check-line align-middle"></i>
+                                                            </button>
                                                         </li>
                                                         <li class="list-inline-item">
                                                             <a 
@@ -81,7 +83,9 @@
                                                                                                     'status' => 0,
                                                                                                     ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-danger waves-effect waves-light">Không đồng ý</button>
+                                                            <button type="button" class="btn btn-warning" title="Không duyệt">
+                                                                <i class="ri-close-circle-line align-middle"></i> 
+                                                            </button>
                                                         </li>
                                                     </ul>
                                                        
