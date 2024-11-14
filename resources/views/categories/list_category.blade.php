@@ -161,8 +161,9 @@
                                                                                             'status' => 1,
                                                                                             ]) }}"
                                                     >
-                                                        <button type="button" class="btn btn-success waves-effect waves-light">Bật</button>
-                                                    
+                                                    <button type="button" class="btn btn-success" title="Bật">
+                                                        <i class="ri-check-line align-middle"></i>
+                                                    </button>
                                                        
                                                     </li>
                                                 @endif
@@ -270,7 +271,7 @@
                                                         href="{{ route('change_category', [
                                                                                             'token' => auth()->user()->refesh_token,
                                                                                             'id' => $category->id,
-                                                                                            'status' => 0,
+                                                                                            'status' => 5,
                                                                                             ]) }}"
                                                 >
                                                     <button type="button" class="btn btn-danger waves-effect waves-light" title="xóa"><i class="ri-delete-bin-line align-middle"></i></button>

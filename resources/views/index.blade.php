@@ -760,8 +760,12 @@
                 <div class="container-fluid">
                     <div id="two-column-menu"></div>
                     <ul class="navbar-nav" id="navbar-nav">
-                        <li class="menu-title">
-                            <span data-key="t-menu">Menu</span>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}">
+                                <span data-key="t-dashboards"><b>DASH BOARD</b></span>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a
@@ -772,7 +776,7 @@
                                 aria-expanded="false"
                                 aria-controls="sidebarDashboards">
                                 <i class=" ri-currency-line"></i>
-                                <span data-key="t-dashboards">Quản lý doanh thu</span>
+                                <span data-key="t-dashboards">Trang quản lý</span>
                             </a>
                             <div
                                 class="collapse menu-dropdown"
@@ -780,26 +784,26 @@
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a
-                                            href="#"
+                                            href="{{ route('statist_revenue', ['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-analytics">
-                                            Quản lý doanh thu
+                                            Quản lý tổng quát và doanh thu
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a
-                                            href="dashboard-crm.html"
-                                            class="nav-link"
-                                            data-key="t-crm">
-                                            Quản lý doanh thu tổng quát
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="index.html"
+                                             href="{{ route('statist.quantity_sold', ['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-ecommerce">
-                                            Quản lý doanh thu theo shop
+                                            Quản lý tổng quát theo số lượng sản phẩm bán ra
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a
+                                             href="{{ route('statist.sales', ['token' => auth()->user()->refesh_token]) }}"
+                                            class="nav-link"
+                                            data-key="t-ecommerce">
+                                            Quản lý tổng quát đơn hàng
                                         </a>
                                     </li>
 
@@ -1027,14 +1031,7 @@
                                             Thông tin cơ bản của sàn
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
-                                            class="nav-link"
-                                            data-key="t-crm">
-                                            Quản lý voucher
-                                        </a>
-                                    </li>
+                                    
                                     <li class="nav-item">
                                         <a
                                             href="{{ route('bannerall', ['token' => auth()->user()->refesh_token]) }}"
@@ -1044,14 +1041,7 @@
                                         </a>
                                     </li>
             
-                                    <li class="nav-item">
-                                        <a
-                                            href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
-                                            class="nav-link"
-                                            data-key="t-projects">
-                                            Quản lý thuế
-                                        </a>
-                                    </li>
+                                    
                                 </ul>
                             </div>
                         </li>
@@ -1063,6 +1053,28 @@
                                 <span data-key="t-dashboards">Xét duyệt sản phẩm</span>
                             </a>
 
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-crm">
+                                <i class="ri-dashboard-3-line"></i>
+
+                                Quản lý voucher
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-projects">
+                                <i class="ri-dashboard-3-line"></i>
+
+                                Quản lý thuế
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -1127,7 +1139,7 @@
     <!--end back-to-top-->
 
     <!--preloader-->
-    <div id="preloader">
+    <!-- <div id="preloader">
         <div id="status">
             <div
                 class="spinner-border text-primary avatar-sm"
@@ -1135,7 +1147,7 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- JAVASCRIPT -->
     <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/libs/simplebar/simplebar.min.js"></script>
@@ -1157,9 +1169,6 @@
     <!-- Dashboard init -->
     <script src="assets/js/pages/dashboard-ecommerce.init.js"></script>
 
-    <!-- linecharts init -->
-    <!-- <script src="assets/js/pages/apexcharts-line.init.js"></script> -->
-    <!-- App js -->
     <script src="assets/js/app.js"></script>
 </body>
 

@@ -353,6 +353,18 @@ class VnshopController extends Controller
                 'tab'=>$tab,
             ])->with('message', 'Cập nhật voucher main thành công!');
         }
+        public function delete_voucher(request $request, $id)
+        {
+            $token = $request->token;
+            $tab = $request->tab;
+            $voucherMain = voucherToMain::where('id', $id)->firstOrFail();
+            $voucherMain->delete();
+            return redirect()->route('voucherall', [
+                'token' => $token,
+                'tab' => $tab,
+            ])->with('message', 'Xóa voucher main thành công!');
+        }
+        
         
       
         
@@ -617,6 +629,18 @@ public function updatebanner(BannerRequest $request, $id)
     ])->with('message', 'Cập nhật banner thành công!');
 }
 
+public function statistByQuantity(Request $request)
+{
+    return view('statist.quantity_sold');
+}
+public function statistByRevenue(Request $request)
+{
+    return view('statist.revenue');
+}
+public function statistBySales(Request $request)
+{
+ return view('statist.sales');
+}
 
     public function revenue_general(Request $request){
         $token = $request->token; 

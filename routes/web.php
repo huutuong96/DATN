@@ -92,14 +92,21 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::put('/config_update/{id}', [configController::class, 'update'])->name('config.update');
     Route::get('/voucherall', [VoucherToMainController::class, 'voucherall'])->name('voucherall');
     Route::put('/update_voucher/{id}', [VnshopController::class, 'updatevoucher'])->name('voucher_main.update');
+    Route::delete('/delete_voucher/{id}', [VnshopController::class, 'delete_voucher'])->name('voucher.delete');
     Route::get('/taxall', [VnshopController::class, 'taxall'])->name('taxall');
     Route::put('/update_tax/{id}', [VnshopController::class, 'update_tax'])->name('tax.update');
     Route::post('/storetax', [VnshopController::class, 'storetax'])->name('tax.store');
     Route::get('/bannerall', [VnshopController::class, 'bannerall'])->name('bannerall');
     Route::post('/storebanner', [VnshopController::class, 'storebanner'])->name('banner.store');
     Route::put('/bannerupdate{id}', [VnshopController::class, 'updatebanner'])->name('banner.update');
-    Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
+    Route::get('/statist-quantity-sold', [VnshopController::class, 'statistByQuantity'])->name('statist.quantity_sold');
+    Route::get('/statist-revenue', [VnshopController::class, 'statistByRevenue'])->name('statist_revenue');
+    Route::get('/statist-sales', [VnshopController::class, 'statistBySales'])->name('statist.sales');
+   
 
+    Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
+    Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
+    Route::get('/products/{id}', [ProductController::class, 'showproduct'])->name('products.show');
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
 });
 
