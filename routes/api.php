@@ -295,7 +295,7 @@ Route::get('/search', function () {
     // Route không áp dụng middleware
     Route::get('banners/client', [BannerController::class, "index"]);
     Route::get('voucher_main/client', [VoucherToMainController::class, "index"]);
-    Route::get('voucher_shop', [VoucherToMainController::class, "index"]);
+    Route::get('voucher_shop', [VoucherToShopController::class, "index"]);
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
 
