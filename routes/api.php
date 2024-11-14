@@ -391,6 +391,8 @@ Route::get('/search', function () {
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
                 Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
 
+                Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
+                Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
 
                 Route::resource('follows', FollowToShopController::class);
                 Route::resource('support_main', Support_mainController::class);
