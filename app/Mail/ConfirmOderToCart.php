@@ -16,14 +16,14 @@ class ConfirmOderToCart extends Mailable
     public $totalQuantity;
     public $shipFee;
     public $typeCheckout;
-    public function __construct($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, $typeCheckout)
+    public function __construct($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee,)
     {
         $this->ordersByShop = $ordersByShop;
         $this->total_amount = $total_amount;
         $this->carts = $carts;
         $this->totalQuantity = $totalQuantity;
         $this->shipFee = $shipFee;
-        $this->typeCheckout = $typeCheckout;
+        // $this->typeCheckout = $typeCheckout;
     }
 
     public function build()
