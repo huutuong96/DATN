@@ -338,7 +338,7 @@
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             {{ $voucherMain->user->fullname }}</td>
-                                                        <td>
+                                                        <td style="display: flex;">
                                                             <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $voucherMain->id }}">
                                                                 <button type="button" class="btn btn-primary" title="Chỉnh sửa">
                                                                     <i class="ri-edit-line align-middle"></i>
@@ -438,7 +438,7 @@
                                                                 >
                                                                 @csrf
                                                                 @method('DELETE')                                                       
-                                                                    <button type="submit" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
+                                                                <button type="submit" class="btn btn-danger ms-2" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
                                                                         <i class="ri-delete-bin-line align-middle"></i>
                                                                 </button>
                                                             </form>

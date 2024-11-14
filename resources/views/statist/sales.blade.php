@@ -6,7 +6,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <h5>Thống kê sản phẩm và lượt bán</h5>
+        <h5>Thống kê lượt bán ra và lượt trả hàng trong Tháng {{ \Carbon\Carbon::now()->format('m') }}</h5>
         <div class="col">
             <div class="h-100">
                 <div class="row">
@@ -23,7 +23,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            Cửa hàng cần duyệt
+                                            Số lượt bán ra trong tháng
                                         </p>
                                     </div>
                                     <!-- <div
@@ -89,7 +89,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            Sản phẩm cần duyệt
+                                            Số lượt đơn hàng được giao
                                         </p>
                                     </div>
                                     <!-- <div
@@ -155,7 +155,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                        Lợi nhận của sàn trong tháng
+                                        Số lượng đơn hàng đổi trả
                                         </p>
                                     </div>
                                     <!-- <div
@@ -219,7 +219,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            Tổng số cửa hàng đang hoạt động
+                                        Số lượng đơn hàng bị hủy
                                         </p>
                                     </div>
                                     <!-- <div
@@ -242,26 +242,24 @@
                                         <h4
                                             class="fs-22 fw-semibold ff-secondary mb-4"
                                         >
-                                            <span
-                                                class="counter-value"
-                                                data-target="{{$shopAC ?? 0}}"
-                                                >0</span
-                                            >
+                                        <span >
+                                        {{ number_format($monthlyRevenue ?? 0)}} vnđ
+                                        </span>
                                         </h4>
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >feedback</a
+                                            >Doanh thu theo tháng</a
                                         >
                                     </div>
                                     <div
                                         class="avatar-sm flex-shrink-0"
                                     >
                                         <span
-                                            class="avatar-title bg-danger-subtle rounded fs-3"
+                                            class="avatar-title bg-secondary-subtle rounded fs-3"
                                         >
                                             <i
-                                                class=" ri-close-line"
+                                                class="ri-refund-2-fill"
                                             ></i>
                                         </span>
                                     </div>
@@ -274,20 +272,17 @@
                     <!-- end col -->
                 </div>
                 <!-- end row-->
+                 
             </div>
             <!-- end .h-100-->
         </div>
         <!-- end col -->
     </div>
-    <div class="row">
-        <div class="col-xl-6">
+    <div class="row">  
+        <div class="col-xl-9">
             <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Thống kê tổng quát</h4>
-                </div><!-- end card header -->
-
                 <div class="card-body">
-                    <canvas id="myChart"></canvas>
+                    <canvas id="myChart"   style="height: 100px !important";></canvas>
                 </div><!-- end card-body -->
                 <div class="card-footer">
                     <ul style="display: flex; list-style-type: none; padding: 0; margin: 0;">
@@ -308,198 +303,63 @@
 
             </div><!-- end card -->
         </div>
-        <!-- end col -->
-        <div class="col-xl-6 ">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Thống kê doanh thu</h4>
-                </div><!-- end card header -->
-                
-                <div class="card-body">
-                <canvas id="chart"></canvas>
-                </div><!-- end card-body -->
-                <br>
-                <div class="div float-center" style="display: flex; justify-content: center; align-items: center">
-                    <b>theo danh mục</b>
-                </div>
-                <br>
-            </div><!-- end card -->
+        <div class="col-xl-3">
+            
+            <table class="table table-striped table-hover">
+                <thead class="table-success">
+                    <tr>
+                        <th>Cửa hàng</th>
+                        <th>số lượng đơn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>100.200.000.000 đ</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>Bets shop Bets shop</td>
+                        <td>Thy shop</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>12.000.000 vnd</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>Bets shop</td>
+                        <td>T shop</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>12.000.000 vnd</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>Bets shop</td>
+                        <td>Thy shop</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>12.000.000 vnd</td>
+                       
+                    </tr>
+                    <tr>
+                        <td>Bets shop</td>
+                        <td>1.000.000 vnd</td>
+                       
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <!-- end col -->
     </div>
     <!-- end row -->
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Hot shop</h4>
-                    <div class="flex-shrink-0">
-                        <div class="dropdown card-header-dropdown">
-                            <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted">Tháng {{ \Carbon\Carbon::now()->format('m') }}<i class="mdi mdi-chevron-down ms-1"></i></span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#">Today</a>
-                                <a class="dropdown-item" href="#">Last Week</a>
-                                <a class="dropdown-item" href="#">Last Month</a>
-                                <a class="dropdown-item" href="#">Current Year</a>
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- end card header -->
 
-                <div class="card-body">
-                    <div class="table-responsive table-card">
-                        <table class="table table-borderless table-hover table-nowrap align-middle mb-0">
-                            <thead class="table-light">
-                                <tr class="text-muted">
-                                    <th scope="col">Tên shop</th>
-                                    <th scope="col" style="width: 20%;">Địa chỉ</th>
-                                    <th scope="col">Chủ cửa hàng</th>
-                                    <th scope="col" style="width: 16%;">Status</th>
-                                    <th scope="col" style="width: 12%;">Doanh thu</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @if(isset($listShop))
-                                    @foreach($listShop as $shop)
-                                    <tr>
-                                        <td>{{$shop->shop_name}}</td>
-                                        <td>{{$shop->pick_up_address}} <br> {{$shop->ward}} <br> {{$shop->district}} <br> {{$shop->province}}</td>
-                                        <td><img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                            <a href="#javascript: void(0);" class="text-body fw-medium">{{$shop->user[0]->fullname ?? null}}</a>
-                                        </td>
-                                        <td><span class="badge bg-success-subtle text-success p-2">Cửa hàng nổi bật</span></td>
-                                        <td>
-                                            <div class="text-nowrap">{{number_format($shop->doanhthu)}}vnđ</div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                @endif 
-                            </tbody><!-- end tbody -->
-                        </table><!-- end table -->
-                    </div><!-- end table responsive -->
-                </div><!-- end card body -->
-            </div><!-- end card -->
-        </div><!-- end col -->
-
-        <!-- <div class="col-xl-5">
-            <div class="card card-height-100">
-                <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">My Tasks</h4>
-                    <div class="flex-shrink-0">
-                        <div class="dropdown card-header-dropdown">
-                            <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted"><i class="ri-settings-4-line align-bottom me-1 fs-15"></i>Settings</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#">Edit</a>
-                                <a class="dropdown-item" href="#">Remove</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-body p-0">
-
-                    <div class="align-items-center p-3 justify-content-between d-flex">
-                        <div class="flex-shrink-0">
-                            <div class="text-muted"><span class="fw-semibold">4</span> of <span class="fw-semibold">10</span> remaining</div>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-success"><i class="ri-add-line align-middle me-1"></i> Add Task</button>
-                    </div>
-
-                    <div data-simplebar style="max-height: 219px;">
-                        <ul class="list-group list-group-flush border-dashed px-3">
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_one">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_one">Check yêu cầu từ new shop</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">15 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_two">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_two">Check yêu cầu thêm sản phẩm từ shop</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">20 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check flex-sharink-0 ps-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_three">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_three">Check yêu cầu cập nhật sản phẩm từ shop</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">24 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_four">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_four">Xem xét các feeback gửi về và giải quyết vấn đề</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">27 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_five">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_five">Xem qua thống kê rồi báo cho quản lý để bàn về hướng phát triển</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">27 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_six">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_six">Nhắn tin kêu thy và hoàng đi nhậu</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">27 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="p-3 pt-2">
-                        <a href="javascript:void(0);" class="text-muted text-decoration-underline">Show more...</a>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!-- end col -->
-    </div><!-- end row -->
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 

@@ -787,15 +787,7 @@
                                             href="{{ route('statist_revenue', ['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-analytics">
-                                            Quản lý doanh thu
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="dashboard-crm.html"
-                                            class="nav-link"
-                                            data-key="t-crm">
-                                            Quản lý tổng quát theo doanh thu
+                                            Quản lý tổng quát và doanh thu
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -811,7 +803,7 @@
                                              href="{{ route('statist.sales', ['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-ecommerce">
-                                            Quản lý tổng quát theo lượt bán
+                                            Quản lý tổng quát đơn hàng
                                         </a>
                                     </li>
 
