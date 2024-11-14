@@ -153,6 +153,7 @@
                                                     @endif
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
+                                                        <div>
                                                         <!-- Duyệt -->
                                                         <form action="{{ route( 'products.approve' ,[
                                                                                                 'token' => auth()->user()->refesh_token,
@@ -195,6 +196,8 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                    </div>
+                                                    <div class="mt-2">
                                                         <!-- Không duyệt -->
                                                         <form action="{{ route('products.reject',[
                                                                                                 'token' => auth()->user()->refesh_token,
@@ -206,6 +209,75 @@
                                                                 <i class="ri-close-circle-line align-middle"></i> 
                                                             </button>
                                                         </form>
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
+                                                            <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                <i class="ri-eye-line align-middle"></i>
+                                                            </button>
+                                                        </a>
+                                                        
+                                                        <!-- Modal to Show Product Details -->
+                                                        <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
+                                                            <div class="modal-dialog modal-xl">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Chi tiết Sản phẩm</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <!-- Product Name -->
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Tên sản phẩm</label>
+                                                                            <p>{{ $product->name }}</p>
+                                                                        </div>
+                                                        
+                                                                        <!-- Price and Sale Price -->
+                                                                        <div class="row mb-3">
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Giá</label>
+                                                                                <p>{{ number_format($product->price, 0, ',', '.') }} VND</p>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Giá khuyến mãi</label>
+                                                                                <p>{{ number_format($product->sale_price, 0, ',', '.') }} VND</p>
+                                                                            </div>
+                                                                        </div>
+                                                        
+                                                                        <!-- Product Image -->
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Ảnh hiện tại:</label>
+                                                                            <div>
+                                                                                <img src="{{ $product->image }}" alt="Ảnh sản phẩm" style="max-width: 100px; height: 100px;">
+                                                                            </div>
+                                                                        </div>
+                                                        
+                                                                        <!-- Description -->
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Mô tả sản phẩm</label>
+                                                                            <p>{{ $product->description }}</p>
+                                                                        </div>
+                                                        
+                                                                        <!-- Quantity and SKU -->
+                                                                        <div class="row mb-3">
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">Số lượng</label>
+                                                                                <p>{{ $product->quantity }}</p>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label class="form-label">SKU</label>
+                                                                                <p>{{ $product->sku }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                        
+                                                                        <!-- Close Button -->
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        
+                                                        
+                                                    </div>
                                                     </td>
                                                     
                                                     

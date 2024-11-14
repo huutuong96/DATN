@@ -1121,6 +1121,14 @@ public function ProductAll(Request $request)
         'violatingProducts', 'tab'
     ));
 }
+
+    public function showproduct($id)
+    {
+        $product = Product::findOrFail($id);
+        return view('products.show', compact('product'));
+    }
+
+
     public function showReportForm(Request $request, $id)
     {
         $token = $request->query('token'); // Lấy token từ URL
