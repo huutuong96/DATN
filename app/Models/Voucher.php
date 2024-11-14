@@ -18,5 +18,6 @@ class Voucher extends Model
         'updated_at',
         'user_id',
         'code',
+        'user_id',
     ];
 }
