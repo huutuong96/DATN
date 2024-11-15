@@ -631,27 +631,141 @@ public function updatebanner(BannerRequest $request, $id)
 
 public function statistByQuantity(Request $request)
 {
-    return view('statist.quantity_sold');
+    $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->get();
+        
+        $soluong = array_fill(1, Carbon::now()->day, 0);
+        foreach ($monthlyRevenueOrder as $order) {
+            $day = $order->created_at->day; 
+            if ($day <= Carbon::now()->day) { 
+
+                $soluong[$day] += OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
+            }else{
+                break;
+            }
+        }
+        $soluongJson = array_values($soluong);
+
+        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+        $listShop = [];
+
+        foreach ($listShopId as $idKey => $shopId) {
+            $shop = Shop::where("id", $shopId)->with('user')->first();
+            $soluong = OrderDetailsModel::where("shop_id", $shopId)->whereMonth('created_at', Carbon::now()->month)->get()->sum("quantity"); 
+
+            $shop["soluong"] = $soluong ;
+            $listShop[] = $shop;
+        }
+        // dd($listShop);
+        usort($listShop, function($a, $b) {
+            return $b->soluong <=> $a->soluong; 
+
+        });
+        return view('statist.quantity_sold',compact('soluongJson',
+                                                'listShop'
+                                             )
+                    );
+    // return view('statist.quantity_sold'); 
 }
 public function statistByRevenue(Request $request)
-{
-    return view('statist.revenue');
-}
+{   
+    $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->get();
+        
+        $doanhthu = array_fill(1, Carbon::now()->day, 0);
+        foreach ($monthlyRevenueOrder as $order) {
+            $day = $order->created_at->day; 
+            if ($day <= Carbon::now()->day) { 
+
+                $doanhthu[$day] += ($order->total_amount  );     
+            }else{
+                break;
+            }
+        }
+        $doanhthuJson = array_values($doanhthu);
+        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+        $listShop = [];
+        foreach ($listShopId as $idKey => $shopId) {
+            $doanhthu = 0;
+            $shop = Shop::where("id", $shopId)->with('user')->first();
+            foreach ($monthlyRevenueOrder as $orderKey => $order) {
+                if($order->status == 2){
+                    if($order->shop_id == $shopId){
+                        $doanhthu += $order->net_amount;
+                    }
+                }
+                
+            }
+            $shop["doanhthu"] = $doanhthu ;
+            $listShop[] = $shop;
+        }
+        // dd($listShop);
+        usort($listShop, function($a, $b) {
+            return $b->doanhthu <=> $a->doanhthu;
+        });
+
+        // $feedBack;
+        return view('statist.revenue',compact('doanhthuJson',
+                                                'listShop'
+                                             )
+                    );
+    }
 public function statistBySales(Request $request)
 {
- return view('statist.sales');
-}
+    $TongSoLuongBanRa = OrdersModel::count();
+    $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->count();
+    $DoiTra = OrdersModel::whereIn("order_status", [9])->count();
+    $Huy = OrdersModel::whereIn("order_status", [10])->count();
+    $HoanThanh = OrdersModel::whereIn("order_status", [7,8])->count();
+    $ThatBai = OrdersModel::whereIn("order_status", [6])->count();
+    $ChoDuyet = OrdersModel::whereIn("order_status", [0,1,2,3])->count();
+    $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->count();
 
-    public function revenue_general(Request $request){
-        $token = $request->token; 
-        $totalRevenue = order_fee_details::sum('amount');
-        // return redirect()->route('revenue_general', [
-        //     'token' => $token,
-        //     'totalRevenue' => $totalRevenue,
-        // ]);
-
-        return view('revenue.revenue_general', compact('totalRevenue'));
+    $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+    ->get();
+    $luongtrahang = array_fill(1, Carbon::now()->day, 0);
+    $luotmua = array_fill(1, Carbon::now()->day, 0);
+    foreach ($monthlyRevenueOrder as $order) {
+        $day = $order->created_at->day; 
+        if ($day <= Carbon::now()->day) { 
+            
+            $luotmua[$day] += 1;
+                
+        }else{
+            break;
+        }
     }
+    $luongtrahangJson = array_values($luongtrahang);
+    $luotmuaJson = array_values($luotmua);
+    
+    $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+    $listShop = [];
+    foreach ($listShopId as $idKey => $shopId) {
+        $shop = Shop::where("id", $shopId)->with('user')->first();
+        $shop["luotban"] = OrdersModel::where("shop_id", $shopId)->count();
+        $listShop[] = $shop;
+    }
+    // dd($listShop);
+    usort($listShop, function($a, $b) {
+        return $b->doanhthu <=> $a->doanhthu;
+    });
+    return view('statist.sales',compact(
+        'luongtrahangJson',
+        'luotmuaJson',
+        'TongSoLuongBanRa',
+        'listShop'
+    ));
+}
+public function revenue_general(Request $request){
+    $token = $request->token; 
+    $totalRevenue = order_fee_details::sum('amount');
+    // return redirect()->route('revenue_general', [
+    //     'token' => $token,
+    //     'totalRevenue' => $totalRevenue,
+    // ]);
+
+    return view('revenue.revenue_general', compact('totalRevenue'));
+}
    
 
 

@@ -1,6 +1,11 @@
 @extends('index')
 @section('title', 'Tổng quan')
-
+@section('link')
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+  
+  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+@endsection
 @section('main')
 
 
@@ -23,21 +28,9 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            Số lượt bán ra trong tháng
+                                            Số đơn hàng bán ra trong tháng
                                         </p>
                                     </div>
-                                    <!-- <div
-                                        class="flex-shrink-0"
-                                    >
-                                        <h5
-                                            class="text-success fs-14 mb-0"
-                                        >
-                                            <i
-                                                class="ri-arrow-right-up-line fs-13 align-middle"
-                                            ></i>
-                                            20
-                                        </h5>
-                                    </div> -->
                                 </div>
                                 <div
                                     class="d-flex align-items-end justify-content-between mt-4"
@@ -48,14 +41,14 @@
                                         >
                                             <span
                                                 class="counter-value"
-                                                data-target="{{$checkShop ?? 0}}"
+                                                data-target="{{$TongSoLuongBanRa ?? 0}}"
                                                 >0</span
                                             >
                                         </h4>
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >Cửa hàng cần duyệt</a
+                                            >Số đơn hàng bán ra</a
                                         >
                                     </div>
                                     <div
@@ -89,21 +82,9 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            Số lượt đơn hàng được giao
+                                            Số đơn hàng đang được giao
                                         </p>
                                     </div>
-                                    <!-- <div
-                                        class="flex-shrink-0"
-                                    >
-                                        <h5
-                                            class="text-success fs-14 mb-0"
-                                        >
-                                            <i
-                                                class="ri-arrow-right-up-line fs-13 align-middle"
-                                            ></i>
-                                            20
-                                        </h5>
-                                    </div> -->
                                 </div>
                                 <div
                                     class="d-flex align-items-end justify-content-between mt-4"
@@ -121,7 +102,7 @@
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >Sản phẩm cần duyệt</a
+                                            >Số đơn hàng đang được giao</a
                                         >
                                     </div>
                                     <div
@@ -155,21 +136,9 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                        Số lượng đơn hàng đổi trả
+                                        Số đơn hàng đổi trả
                                         </p>
                                     </div>
-                                    <!-- <div
-                                        class="flex-shrink-0"
-                                    >
-                                        <h5
-                                            class="text-success fs-14 mb-0"
-                                        >
-                                            <i
-                                                class="ri-arrow-right-up-line fs-13 align-middle"
-                                            ></i>
-                                            20
-                                        </h5>
-                                    </div> -->
                                 </div>
                                 <div
                                     class="d-flex align-items-end justify-content-between mt-4"
@@ -185,7 +154,7 @@
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >Doanh thu theo tháng</a
+                                            >Số đơn hàng đổi trả</a
                                         >
                                     </div>
                                     <div
@@ -219,21 +188,9 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                        Số lượng đơn hàng bị hủy
+                                        Số đơn hàng bị hủy
                                         </p>
-                                    </div>
-                                    <!-- <div
-                                        class="flex-shrink-0"
-                                    >
-                                        <h5
-                                            class="text-success fs-14 mb-0"
-                                        >
-                                            <i
-                                                class="ri-arrow-right-up-line fs-13 align-middle"
-                                            ></i>
-                                            20
-                                        </h5>
-                                    </div> -->
+                                    </div> 
                                 </div>
                                 <div
                                     class="d-flex align-items-end justify-content-between mt-4"
@@ -249,7 +206,7 @@
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >Doanh thu theo tháng</a
+                                            >Số đơn hàng bị hủy</a
                                         >
                                     </div>
                                     <div
@@ -272,7 +229,221 @@
                     <!-- end col -->
                 </div>
                 <!-- end row-->
-                 
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <!-- card -->
+                        <div class="card card-animate">
+                            <div class="card-body">
+                                <div
+                                    class="d-flex align-items-center"
+                                >
+                                    <div
+                                        class="flex-grow-1 overflow-hidden"
+                                    >
+                                        <p
+                                            class="text-uppercase fw-medium text-muted text-truncate mb-0"
+                                        >
+                                            Số đơn hàng đã giao hoàn thành
+                                        </p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="d-flex align-items-end justify-content-between mt-4"
+                                >
+                                    <div>
+                                        <h4
+                                            class="fs-22 fw-semibold ff-secondary mb-4"
+                                        >
+                                            <span
+                                                class="counter-value"
+                                                data-target="{{$TongSoLuongBanRa ?? 0}}"
+                                                >0</span
+                                            >
+                                        </h4>
+                                        <a
+                                            href="#"
+                                            class="text-decoration-underline"
+                                            >Đơn hàng đã giao hoàn thành</a
+                                        >
+                                    </div>
+                                    <div
+                                        class="avatar-sm flex-shrink-0"
+                                    >
+                                        <span
+                                            class="avatar-title bg-success-subtle rounded fs-3"
+                                        >
+                                            <i
+                                                class="ri-store-2-line"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        <!-- end card -->
+                    </div>
+                    <!-- end col -->
+                    <div class="col-xl-3 col-md-6">
+                        <!-- card -->
+                        <div class="card card-animate">
+                            <div class="card-body">
+                                <div
+                                    class="d-flex align-items-center"
+                                >
+                                    <div
+                                        class="flex-grow-1 overflow-hidden"
+                                    >
+                                        <p
+                                            class="text-uppercase fw-medium text-muted text-truncate mb-0"
+                                        >
+                                            Số đơn giao thất bại
+                                        </p>
+                                    </div> 
+                                </div>
+                                <div
+                                    class="d-flex align-items-end justify-content-between mt-4"
+                                >
+                                    <div>
+                                        <h4
+                                            class="fs-22 fw-semibold ff-secondary mb-4"
+                                        >
+                                            <span
+                                                class="counter-value"
+                                                data-target="{{$checkProduct ?? 0}}"
+                                                >0</span
+                                            >
+                                        </h4>
+                                        <a
+                                            href="#"
+                                            class="text-decoration-underline"
+                                            >Số đơn giao thất bại</a
+                                        >
+                                    </div>
+                                    <div
+                                        class="avatar-sm flex-shrink-0"
+                                    >
+                                        <span
+                                            class="avatar-title bg-info-subtle rounded fs-3"
+                                        >
+                                            <i
+                                                class="ri-archive-fill"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        <!-- end card -->
+                    </div>
+                    <!-- end col -->
+                    <div class="col-xl-3 col-md-6">
+                        <!-- card -->
+                        <div class="card card-animate">
+                            <div class="card-body">
+                                <div
+                                    class="d-flex align-items-center"
+                                >
+                                    <div
+                                        class="flex-grow-1 overflow-hidden"
+                                    >
+                                        <p
+                                            class="text-uppercase fw-medium text-muted text-truncate mb-0"
+                                        >
+                                        Số đơn hàng đang chờ duyệt
+                                        </p>
+                                    </div> 
+                                </div>
+                                <div
+                                    class="d-flex align-items-end justify-content-between mt-4"
+                                >
+                                    <div>
+                                        <h4
+                                            class="fs-22 fw-semibold ff-secondary mb-4"
+                                        >
+                                        <span >
+                                        {{ number_format($monthlyRevenue ?? 0)}} vnđ
+                                        </span>
+                                        </h4>
+                                        <a
+                                            href="#"
+                                            class="text-decoration-underline"
+                                            >Số đơn hàng đang chờ duyệt</a
+                                        >
+                                    </div>
+                                    <div
+                                        class="avatar-sm flex-shrink-0"
+                                    >
+                                        <span
+                                            class="avatar-title bg-secondary-subtle rounded fs-3"
+                                        >
+                                            <i
+                                                class="ri-refund-2-fill"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        <!-- end card -->
+                    </div>
+                    <!-- end col -->
+                    <div class="col-xl-3 col-md-6">
+                        <!-- card -->
+                        <div class="card card-animate">
+                            <div class="card-body">
+                                <div
+                                    class="d-flex align-items-center"
+                                >
+                                    <div
+                                        class="flex-grow-1 overflow-hidden"
+                                    >
+                                        <p
+                                            class="text-uppercase fw-medium text-muted text-truncate mb-0"
+                                        >
+                                        Số đơn hàng chưa thanh toán
+                                        </p>
+                                    </div> 
+                                </div>
+                                <div
+                                    class="d-flex align-items-end justify-content-between mt-4"
+                                >
+                                    <div>
+                                        <h4
+                                            class="fs-22 fw-semibold ff-secondary mb-4"
+                                        >
+                                        <span >
+                                        {{ number_format($monthlyRevenue ?? 0)}} vnđ
+                                        </span>
+                                        </h4>
+                                        <a
+                                            href="#"
+                                            class="text-decoration-underline"
+                                            >Số đơn hàng chưa thanh toán</a
+                                        >
+                                    </div>
+                                    <div
+                                        class="avatar-sm flex-shrink-0"
+                                    >
+                                        <span
+                                            class="avatar-title bg-secondary-subtle rounded fs-3"
+                                        >
+                                            <i
+                                                class="ri-refund-2-fill"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        <!-- end card -->
+                    </div>
+                    <!-- end col -->
+                </div>
+                <!-- end row-->
             </div>
             <!-- end .h-100-->
         </div>
@@ -281,84 +452,110 @@
     <div class="row">  
         <div class="col-xl-9">
             <div class="card">
+            <h5 class="m-3">Thống kê lượt bán trong tháng</h5>
                 <div class="card-body">
                     <canvas id="myChart"   style="height: 100px !important";></canvas>
                 </div><!-- end card-body -->
                 <div class="card-footer">
                     <ul style="display: flex; list-style-type: none; padding: 0; margin: 0;">
-                        <li style="margin-right: 10px;">
-                            <span style="display: inline-block; background-color: red; height: 10px; width: 10px;"></span>
-                            lượt trả hàng
-                        </li>
+      
                         <li style="margin-right: 10px;">
                             <span style="display: inline-block; background-color: green; height: 10px; width: 10px;"></span>
                             Lượt mua sản phẩm
                         </li>
-                        <li>
+                        <!-- <li>
                             <span style="display: inline-block; background-color: blue; height: 10px; width: 10px;"></span>
                             Doanh thu * 1.000.000 vnd
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
 
             </div><!-- end card -->
         </div>
         <div class="col-xl-3">
-            
-            <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover">
                 <thead class="table-success">
                     <tr>
                         <th>Cửa hàng</th>
-                        <th>số lượng đơn</th>
+                        <th>Số lượn đơn</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>100.200.000.000 đ</td>
-                       
-                    </tr>
-                    <tr>
-                        <td>Bets shop Bets shop</td>
-                        <td>Thy shop</td>
-                       
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>12.000.000 vnd</td>
-                       
-                    </tr>
-                    <tr>
-                        <td>Bets shop</td>
-                        <td>T shop</td>
-                       
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>12.000.000 vnd</td>
-                       
-                    </tr>
-                    <tr>
-                        <td>Bets shop</td>
-                        <td>Thy shop</td>
-                       
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>12.000.000 vnd</td>
-                       
-                    </tr>
-                    <tr>
-                        <td>Bets shop</td>
-                        <td>1.000.000 vnd</td>
-                       
-                    </tr>
+                    
+                    @if(isset($listShop))
+                        @foreach($listShop as $shop)
+                            <tr>
+                                <td>{{$shop->shop_name}}</td>
+                                <td>{{number_format($shop->luotban)}} đơn</td> 
+                            </tr>
+                        @endforeach
+                    @endif 
                 </tbody>
+            </table>
             </table>
         </div>
         <!-- end col -->
     </div>
     <!-- end row -->
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Thống kê đơn hàng theo cửa hàng (all)</h4>
+                    <div class="flex-shrink-0">
+                        <div class="dropdown card-header-dropdown">
+                            <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="text-muted">Tháng {{ \Carbon\Carbon::now()->format('m') }}<i class="mdi mdi-chevron-down ms-1"></i></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="#">Today</a>
+                                <a class="dropdown-item" href="#">Last Week</a>
+                                <a class="dropdown-item" href="#">Last Month</a>
+                                <a class="dropdown-item" href="#">Current Year</a>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    <div class="table-responsive table-card">
+                    <table id="shop" class="display" style="width:100%">
+                    <thead class="table-light">
+                                <tr class="text-muted">
+                                    <th scope="col">Tên shop</th>
+                                    <th scope="col" style="width: 20%;">Địa chỉ</th>
+                                    <th scope="col">Chủ cửa hàng</th>
+                                    <th scope="col" style="width: 16%;">Status</th>
+                                    <th scope="col" style="width: 12%;">Doanh thu</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach($listShop as $shop)
+                                <tr>
+                                    <td>{{$shop->shop_name}}</td>
+                                    <td>{{$shop->pick_up_address}} <br> {{$shop->ward}} <br> {{$shop->district}} <br> {{$shop->province}}</td>
+                                    <td><img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
+                                        <a href="#javascript: void(0);" class="text-body fw-medium">{{$shop->user[0]->fullname ?? null}}</a>
+                                    </td>
+                                    <td><span class="badge bg-success-subtle text-success p-2">Cửa hàng nổi bật</span></td>
+                                    <td>
+                                        <div class="text-nowrap">{{number_format($shop->luotban)}} đơn</div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                                
+                            </tbody><!-- end tbody -->
+                    </table>
+                    <script>
+                        new DataTable('#shop');
+                    </script>
+                    </div><!-- end table responsive -->
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col -->
+
+    </div><!-- end row -->
 
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
@@ -367,9 +564,9 @@
 const xValues1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 
 // Lấy dữ liệu từ PHP cho biểu đồ màu xanh
-var red_data = @json($luongtrahangJson ?? []);
+var red_data = @json($luongtrahangJsonx ?? []);
 var green_data = @json($luotmuaJson ?? []);
-var blue_data = @json($doanhthuJson ?? []);
+var blue_data = @json($doanhthuJsonx ?? []);
 
 new Chart("myChart", {
   type: "line",
