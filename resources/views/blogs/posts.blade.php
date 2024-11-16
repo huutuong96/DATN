@@ -102,7 +102,6 @@
                                                 <th scope="col">blog</th>
                                                 <th scope="col">tiêu đề</th>
                                                 <th scope="col">Hình ảnh</th>
-                                                <th scope="col">nội dung</th>
                                                 <th scope="col">Người tạo</th>
                                                 <th scope="col">Hành động</th>
                                             </tr>
@@ -118,9 +117,7 @@
                                                     <img src="{{ $Post->image }}" alt="Post Image" style="max-width: 70%; height: auto;">
                                                 </td>
                                                 
-                                                <td style="max-width: 200px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                    {{ \Illuminate\Support\Str::limit($Post->content, 150, '...') }}
-                                                </td>
+
                                                 
                                                 
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->user->fullname }}</td>
