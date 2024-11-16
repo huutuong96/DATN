@@ -64,7 +64,7 @@
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         <img src="{{$user->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="avatar-xs rounded-circle me-3 material-shadow" style="width: 60px; height: 60px;">
                                                     </td>
-                                                    <td style="display: flex; align-items: center;">
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$user->fullname ?? 'No Name'}}</span>
                                                             <span style="color: gray;">{{$user->email ?? 'No Email'}}</span>
@@ -94,6 +94,33 @@
                                                             onclick="return confirm('Bạn có chắc chắn muốn khôi phục user này?');">
                                                             <i class="ri-refresh-line align-middle"></i>
                                                         </button>
+                                                        </li>
+                                                        <li class="mt-2 mb-2">
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $user->id }}">
+                                                                <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                    <i class="ri-eye-line align-middle"></i>
+                                                                </button>
+                                                            </a>
+                                                        
+                                                            <!-- Modal Chi tiết sản phẩm -->
+                                                            <div class="modal fade" id="detailsModal-{{ $user->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $user->id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="detailsModalLabel-{{ $user->id }}">Chi tiết Sản phẩm</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <table class="table table-bordered">
+                                                                                
+                                                                            </table>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </li>
                                                     </ul>
                                                        
