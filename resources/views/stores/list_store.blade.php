@@ -37,7 +37,7 @@
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         {{ $shop->shop_name ?? "Chưa đặt tên"}}
                                                     </td>
-                                                    <td style="display: flex; align-items: center;">
+                                                    <td style="word-wrap: break-word; white-space: normal;">
                                                         <img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="avatar-xs rounded-circle me-3 material-shadow" style="width: 60px; height: 60px;">
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$shop->user[0]->fullname ?? 'No Name'}}</span>
@@ -82,6 +82,33 @@
 
                                                             </li>
                                                         @endif
+                                                        <li class="mt-2 mb-2">
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $shop->id }}">
+                                                                <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                    <i class="ri-eye-line align-middle"></i>
+                                                                </button>
+                                                            </a>
+                                                        
+                                                            <!-- Modal Chi tiết sản phẩm -->
+                                                            <div class="modal fade" id="detailsModal-{{ $shop->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $shop->id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="detailsModalLabel-{{ $shop->id }}">Chi tiết Sản phẩm</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <table class="table table-bordered">
+                                                                                
+                                                                            </table>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
                                                         <li class="list-inline-item">
                                                             <a 
                                                                     href="{{ route('change_shop', [
@@ -92,7 +119,7 @@
                                                             >
                                                             <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
                                                                 <i class="ri-delete-bin-line align-middle"></i>
-                                                        </button>
+                                                            </button>
                                                             </a>
                                                         </li>
                                                     </ul>
