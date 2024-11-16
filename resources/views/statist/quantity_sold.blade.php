@@ -55,7 +55,7 @@
                         @foreach($listShop as $shop)
                             <tr>
                                 <td>{{$shop->shop_name}}</td>
-                                <td>{{number_format($shop->soluong)}} sp</td> 
+                                <td>{{number_format($shop->soluong)}} sản phẩm</td> 
                             </tr>
                         @endforeach
                     @endif 
@@ -69,7 +69,7 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Thống kê doanh thu theo cửa hàng (all)</h4>
+                    <h4 class="card-title mb-0 flex-grow-1">Thống kê doanh thu theo cửa hàng (Tất cả)</h4>
                     <div class="flex-shrink-0">
                         <div class="dropdown card-header-dropdown">
                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -90,10 +90,10 @@
                     <table id="shop" class="display" style="width:100%">
                     <thead class="table-light">
                                 <tr class="text-muted">
-                                    <th scope="col">Tên shop</th>
+                                    <th scope="col">Tên cửa hàng</th>
                                     <th scope="col" style="width: 20%;">Địa chỉ</th>
                                     <th scope="col">Chủ cửa hàng</th>
-                                    <th scope="col" style="width: 16%;">Status</th>
+                                    <th scope="col" style="width: 16%;">Trạng thái</th>
                                     <th scope="col" style="width: 12%;">So luong</th>
                                 </tr>
                             </thead>
@@ -108,7 +108,7 @@
                                     </td>
                                     <td><span class="badge bg-success-subtle text-success p-2">Cửa hàng nổi bật</span></td>
                                     <td>
-                                        <div class="text-nowrap">{{number_format($shop->soluong)}} sp</div>
+                                        <div class="text-nowrap">{{number_format($shop->soluong)}} sản phẩm</div>
                                     </td>
                                 </tr>
                                 @endforeach

@@ -184,7 +184,7 @@
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >Doanh thu theo tháng</a
+                                            >Lợi nhận của sàn trong tháng</a
                                         >
                                     </div>
                                     <div
@@ -250,7 +250,7 @@
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >feedback</a
+                                            >Tổng số cửa hàng đang hoạt động</a
                                         >
                                     </div>
                                     <div
