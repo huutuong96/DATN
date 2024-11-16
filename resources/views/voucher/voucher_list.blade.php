@@ -85,6 +85,14 @@
                                                             </div>
                                                         </div>
 
+                                                        <div class="col-4">
+                                                            <div class="mb-3">
+                                                                <label for="ratio" class="form-label">Đơn hàng tối thiểu được áp dụng</label>
+                                                                <input type="number" class="form-control" id="ratio"
+                                                                    name="min_order" placeholder="Đơn hàng tối thiểu được áp dụng" required>
+                                                            </div>
+                                                        </div>
+
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="code" class="form-label">Mã giảm giá</label>

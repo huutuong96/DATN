@@ -109,7 +109,7 @@
                                                                                 </td>
                                                                                 <td style="padding: 8px; font-size: 13px;">
                                                                                         <?php 
-                                                                                            $subTotal = $cart->quantity;
+                                                                                            $subTotal = 0;
                                                                                         ?>
                                                                                     @if($cart->variant_id != null)
                                                                                         <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($cartQuantity * $cart->variant_price)}}</p>

@@ -20,6 +20,7 @@ class Voucher extends Model
         'code',
         'shop_id',
         'max',
+        'min',
         'ratio',
         'title',
         'description',
