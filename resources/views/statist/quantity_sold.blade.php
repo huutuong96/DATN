@@ -26,14 +26,14 @@
                         <!-- <li style="margin-right: 10px;">
                             <span style="display: inline-block; background-color: red; height: 10px; width: 10px;"></span>
                             lượt trả hàng
-                        </li>
+                        </li> -->
                         <li style="margin-right: 10px;">
                             <span style="display: inline-block; background-color: green; height: 10px; width: 10px;"></span>
-                            Lượt mua sản phẩm
-                        </li> -->
+                            Tổng: {{$tong}} sản phẩm
+                        </li>
                         <!-- <li>
                             <span style="display: inline-block; background-color: blue; height: 10px; width: 10px;"></span>
-                            Số lượng
+                           Tổng: {{$tong}} sản phẩm
                         </li> -->
                     </ul>
                 </div>

@@ -55,7 +55,9 @@ class AddressController extends Controller
             "type"=> $request->type ?? null,
             "default"=> $request->default ?? 0,
             "status"=> $request->status ?? 1,
-            "user_id" => $user->id
+            "user_id" => $user->id,
+            "name"=> $request->status ?? null,
+            "phone" => $request->status ?? null,
         ];
         AddressModel::create($Address);
         $dataDone = [
@@ -114,7 +116,9 @@ class AddressController extends Controller
             "type"=> $request->type ?? $Address->type,
             "default"=> $request->default ?? 0,
             "status"=> $request->status ?? 1,
-            "user_id" => $user->id
+            "user_id" => $user->id,
+            "name"=> $request->status ?? null,
+            "phone" => $request->status ?? null,
         ]);
 
         $dataDone = [

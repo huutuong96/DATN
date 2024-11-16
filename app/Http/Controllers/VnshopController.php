@@ -639,7 +639,7 @@ public function statistByQuantity(Request $request)
             $day = $order->created_at->day; 
             if ($day <= Carbon::now()->day) { 
 
-                $soluong[$day] += OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
+                $soluong[$day] = OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
             }else{
                 break;
             }
@@ -661,8 +661,10 @@ public function statistByQuantity(Request $request)
             return $b->soluong <=> $a->soluong; 
 
         });
+        $tong = OrderDetailsModel::whereMonth('created_at', Carbon::now()->month)->get()->sum("quantity"); 
         return view('statist.quantity_sold',compact('soluongJson',
-                                                'listShop'
+                                                'listShop',
+                                                'tong'
                                              )
                     );
     // return view('statist.quantity_sold'); 
