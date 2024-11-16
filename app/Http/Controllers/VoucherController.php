@@ -124,6 +124,7 @@ class VoucherController extends Controller
             'update_by' => $user->id,
             'code' => $request->code,
             'user_id' => $user->id,
+            'shop_id' => $voucherShop->shop_id ?? null
         ]);
         return $this->successResponse("Lấy dữ liệu thành công", $voucherMain ? $voucherMain : $voucherShop);
     }

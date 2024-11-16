@@ -16,23 +16,30 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class SendMail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $ordersByShop;
+    
+    protected $orders;
     protected $total_amount;
     protected $carts;
-    protected $totalQuantity;
+    protected $orderDetails;
     protected $shipFee;
+    protected $products;
+    protected $variants;
     protected $email;
-    protected $typeCheckout;
+    protected $paymentMethod;
+    protected $user;
 
-    public function __construct($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, $email)
+    public function __construct($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, $email, $paymentMethod, $user)
     {
-        $this->ordersByShop = $ordersByShop;
+        $this->orders = $orders;
         $this->total_amount = $total_amount;
         $this->carts = $carts;
-        $this->totalQuantity = $totalQuantity;
+        $this->orderDetails = $orderDetails;
         $this->shipFee = $shipFee;
+        $this->products = $products;
+        $this->variants = $variants;
         $this->email = $email;
-        // $this->typeCheckout = $typeCheckout;
+        $this->paymentMethod = $paymentMethod;
+        $this->user = $user;
         $this->handle();
     }
 
@@ -41,6 +48,6 @@ class SendMail implements ShouldQueue
      */
     public function handle(): void
     {
-            Mail::to($this->email)->send(new ConfirmOderToCart($this->ordersByShop, $this->total_amount, $this->carts, $this->totalQuantity, $this->shipFee));
+            Mail::to($this->email)->send(new ConfirmOderToCart($this->orders, $this->total_amount, $this->carts, $this->orderDetails, $this->shipFee, $this->products, $this->variants, $this->email, $this->paymentMethod, $this->user));
     }
 }

@@ -111,4 +111,5 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
 });
 
 
+Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mail');
 

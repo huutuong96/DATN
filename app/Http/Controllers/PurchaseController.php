@@ -209,8 +209,15 @@ class PurchaseController extends Controller
 
             $order->order_infomation = $orderInfomation;
             $order->save();
-            // dd($carts);
-            // SendMail::dispatch($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee, auth()->user()->email, $payment->name);
+            $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
+            $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
+            $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
+            $variants = "Không có biến thể";
+            if ($orderDetails->first()->variant_id != null) {
+                $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
+            }
+            $user = jwtAuth::parseToken()->authenticate();
+            // SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
             ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
