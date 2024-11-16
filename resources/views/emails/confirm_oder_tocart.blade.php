@@ -36,7 +36,7 @@
 
             <div class="page-content">
                 <div class="container-fluid">
-
+                    @foreach($orders as $order)
                     <div class="row">
                         <!--end col-->
                         <div class="col-12">
@@ -67,16 +67,16 @@
                                                                         <tbody>
                                                                             <tr style="text-align: left;">
                                                                                 <th style="padding: 5px;">
-                                                                                    <p style="color: #878a99; font-size: 13px; margin-bottom: 2px; font-weight: 400;">Order Number</p>
-                                                                                    <span>VZ14524742541</span>
+                                                                                    <p style="color: #878a99; font-size: 13px; margin-bottom: 2px; font-weight: 400;">Mã đơn hàng</p>
+                                                                                    <span>{{$order->group_order_id}}</span>
                                                                                 </th>
                                                                                 <th style="padding: 5px;">
-                                                                                    <p style="color: #878a99; font-size: 13px; margin-bottom: 2px; font-weight: 400;">Order Date</p>
-                                                                                    <span>05 April, 2022</span>
+                                                                                    <p style="color: #878a99; font-size: 13px; margin-bottom: 2px; font-weight: 400;">Ngày đặt đơn</p>
+                                                                                    <span>{{$order->created_at}}</span>
                                                                                 </th>
                                                                                 <th style="padding: 5px;">
-                                                                                    <p style="color: #878a99; font-size: 13px; margin-bottom: 2px; font-weight: 400;">Payment Method</p>
-                                                                                    <span>Viss - 4622</span>
+                                                                                    <p style="color: #878a99; font-size: 13px; margin-bottom: 2px; font-weight: 400;">Phương thức thanh toán</p>
+                                                                                    <span>{{$paymentMethod}}</span>
                                                                                 </th>
                                                                             </tr>
                                                                         </tbody>
@@ -85,41 +85,43 @@
                                                             </tr>
                                                             <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                                                 <td class="content-block" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 15px; vertical-align: top; margin: 0; padding: 0 0 12px;" valign="top">
-                                                                    <h6 style="font-family: 'Roboto', sans-serif; font-size: 15px; text-decoration-line: underline;margin-bottom: 15px;">Her'e what you ordered:</h6>
+                                                                    <h6 style="font-family: 'Roboto', sans-serif; font-size: 15px; text-decoration-line: underline;margin-bottom: 15px;">Chi tiết đơn hàng:</h6>
                                                                     <table style="width:100%;" cellspacing="0" cellpadding="0">
                                                                         <thead style="text-align: left;">
-                                                                            <th style="padding: 8px;border-bottom: 1px solid #e9ebec;">Product Details</th>
-                                                                            <th style="padding: 8px;border-bottom: 1px solid #e9ebec;">Quantity</th>
-                                                                            <th style="padding: 8px;border-bottom: 1px solid #e9ebec;">Amount</th>
+                                                                            <th style="padding: 8px;border-bottom: 1px solid #e9ebec;">Tên sản phẩm</th>
+                                                                            <th style="padding: 8px;border-bottom: 1px solid #e9ebec;">Số lượng</th>
+                                                                            <th style="padding: 8px;border-bottom: 1px solid #e9ebec;">Đơn giá</th>
                                                                         </thead>
                                                                         <tbody>
+                                                                            @foreach($carts as $cart)
                                                                             <tr>
                                                                                 <td style="padding: 8px; font-size: 13px;">
-                                                                                    <h6 style="margin-bottom: 2px; font-size: 14px;">Sweatshirt for Men (Pink)</h6>
-                                                                                    <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">Graphic Print Men & Women Sweatshirt</p>
+                                                                                    <h6 style="margin-bottom: 2px; font-size: 14px;">{{$cart->product_name  ?? null}}</h6>
+                                                                                    @if($cart->variant_id != null)
+                                                                                        <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{$cart->variant_name ?? null}}</p>
+                                                                                    @endif
                                                                                 </td>
                                                                                 <td style="padding: 8px; font-size: 13px;">
-                                                                                    02
+                                                                                        <?php 
+                                                                                            $cartQuantity = $cart->quantity;
+                                                                                        ?>
+                                                                                            {{$cart->quantity ?? 1}}
                                                                                 </td>
                                                                                 <td style="padding: 8px; font-size: 13px;">
-                                                                                    $239.98
+                                                                                        <?php 
+                                                                                            $subTotal = 0;
+                                                                                        ?>
+                                                                                    @if($cart->variant_id != null)
+                                                                                        <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($cartQuantity * $cart->variant_price)}}</p>
+                                                                                    @else
+                                                                                        <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($cartQuantity * $cart->product_price)}}</p>
+                                                                                    @endif
                                                                                 </td>
                                                                             </tr>
-                                                                            <tr>
-                                                                                <td style="padding: 8px; font-size: 13px;">
-                                                                                    <h6 style="margin-bottom: 2px; font-size: 14px;">Noise NoiseFit Endure Smart Watch</h6>
-                                                                                    <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">32.5mm (1.28 Inch) TFT Color Touch Display</p>
-                                                                                </td>
-                                                                                <td style="padding: 8px; font-size: 13px;">
-                                                                                    01
-                                                                                </td>
-                                                                                <td style="padding: 8px; font-size: 13px;">
-                                                                                    $94.99
-                                                                                </td>
-                                                                            </tr>
+                                                                            @endforeach
                                                                             <tr>
                                                                                 <td colspan="2" style="padding: 8px; font-size: 13px; text-align: end;border-top: 1px solid #e9ebec;">
-                                                                                    Subtotal
+                                                                                    Tổng đơn giá
                                                                                 </td>
                                                                                 <th style="padding: 8px; font-size: 13px;border-top: 1px solid #e9ebec;">
                                                                                     $334.97
@@ -161,6 +163,7 @@
                                                                     </table>
                                                                 </td>
                                                             </tr>
+                                 
                                                             <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                                                 <td class="content-block" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 15px; vertical-align: top; margin: 0; padding: 0 0 0px;" valign="top">
                                                                     <p style="font-family: 'Roboto', sans-serif; margin-bottom: 8px; color: #878a99;">Wl'll send you shipping confirmation when your item(s) are on the way! We appreciate your business, and hope you enjoy your purchase.</p>
@@ -187,7 +190,7 @@
                         </div>
                         <!--end col-->
                     </div><!-- end row -->
-
+                    @endforeach
                 </div>
                 <!-- container-fluid -->
             </div>

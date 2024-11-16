@@ -47,6 +47,7 @@ class VoucherToMainController extends Controller
         $voucherMain->ratio = $request->ratio;
         $voucherMain->code = $request->code;
         $voucherMain->status = $request->status;
+        $voucherMain->min = $request->min_order;
         $voucherMain->create_by = auth()->user()->id;
         $voucherMain->save();
         try {

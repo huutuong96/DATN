@@ -117,6 +117,7 @@ class VoucherController extends Controller
         if (!$voucherMain && !$voucherShop) {
             return $this->errorResponse("Mã voucher không tồn tại hoặc đã hết hạn");
         }
+        // dd($voucherMain);
         Voucher::create([
             'type' => $voucherMain ? 'main' : 'shop',
             'status' => 2,
@@ -124,7 +125,12 @@ class VoucherController extends Controller
             'update_by' => $user->id,
             'code' => $request->code,
             'user_id' => $user->id,
-            'shop_id' => $voucherShop->shop_id ?? null
+            'shop_id' => $voucherShop->shop_id ?? null,
+            'max' => $voucherMain->limitValue ?? $voucherShop->limitValue,
+            'min' => $voucherMain->min ?? $voucherShop->min,
+            'ratio' => $voucherMain->ratio ?? $voucherShop->ratio,
+            'title' => $voucherMain->title ?? $voucherShop->title,
+            'description' => $voucherMain->description ?? $voucherShop->description,
         ]);
         return $this->successResponse("Lấy dữ liệu thành công", $voucherMain ? $voucherMain : $voucherShop);
     }
