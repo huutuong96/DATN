@@ -218,7 +218,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            Tổng số cửa hàng đang hoạt động
+                                            Số cửa hàng đang hoạt động
                                         </p>
                                     </div>
                                     <!-- <div
@@ -250,7 +250,7 @@
                                         <a
                                             href="#"
                                             class="text-decoration-underline"
-                                            >Tổng số cửa hàng đang hoạt động</a
+                                            >Số cửa hàng đang hoạt động</a
                                         >
                                     </div>
                                     <div
@@ -300,7 +300,7 @@
                         </li>
                         <li>
                             <span style="display: inline-block; background-color: blue; height: 10px; width: 10px;"></span>
-                            Doanh thu * 1.000.000 vnd
+                            Doanh thu * 1.000.000 vnd 
                         </li>
                     </ul>
                 </div>
@@ -327,177 +327,7 @@
         <!-- end col -->
     </div>
     <!-- end row -->
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Hot shop</h4>
-                    <div class="flex-shrink-0">
-                        <div class="dropdown card-header-dropdown">
-                            <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted">Tháng {{ \Carbon\Carbon::now()->format('m') }}<i class="mdi mdi-chevron-down ms-1"></i></span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#">Today</a>
-                                <a class="dropdown-item" href="#">Last Week</a>
-                                <a class="dropdown-item" href="#">Last Month</a>
-                                <a class="dropdown-item" href="#">Current Year</a>
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- end card header -->
-
-                <div class="card-body">
-                    <div class="table-responsive table-card">
-                        <table class="table table-borderless table-hover table-nowrap align-middle mb-0">
-                            <thead class="table-light">
-                                <tr class="text-muted">
-                                    <th scope="col">Tên shop</th>
-                                    <th scope="col" style="width: 20%;">Địa chỉ</th>
-                                    <th scope="col">Chủ cửa hàng</th>
-                                    <th scope="col" style="width: 16%;">Status</th>
-                                    <th scope="col" style="width: 12%;">Doanh thu</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @foreach($listShop as $shop)
-                                <tr>
-                                    <td>{{$shop->shop_name}}</td>
-                                    <td>{{$shop->pick_up_address}} <br> {{$shop->ward}} <br> {{$shop->district}} <br> {{$shop->province}}</td>
-                                    <td><img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow">
-                                        <a href="#javascript: void(0);" class="text-body fw-medium">{{$shop->user[0]->fullname ?? null}}</a>
-                                    </td>
-                                    <td><span class="badge bg-success-subtle text-success p-2">Cửa hàng nổi bật</span></td>
-                                    <td>
-                                        <div class="text-nowrap">{{number_format($shop->doanhthu)}}vnđ</div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                                
-                            </tbody><!-- end tbody -->
-                        </table><!-- end table -->
-                    </div><!-- end table responsive -->
-                </div><!-- end card body -->
-            </div><!-- end card -->
-        </div><!-- end col -->
-
-        <!-- <div class="col-xl-5">
-            <div class="card card-height-100">
-                <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">My Tasks</h4>
-                    <div class="flex-shrink-0">
-                        <div class="dropdown card-header-dropdown">
-                            <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted"><i class="ri-settings-4-line align-bottom me-1 fs-15"></i>Settings</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#">Edit</a>
-                                <a class="dropdown-item" href="#">Remove</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-body p-0">
-
-                    <div class="align-items-center p-3 justify-content-between d-flex">
-                        <div class="flex-shrink-0">
-                            <div class="text-muted"><span class="fw-semibold">4</span> of <span class="fw-semibold">10</span> remaining</div>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-success"><i class="ri-add-line align-middle me-1"></i> Add Task</button>
-                    </div>
-
-                    <div data-simplebar style="max-height: 219px;">
-                        <ul class="list-group list-group-flush border-dashed px-3">
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_one">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_one">Check yêu cầu từ new shop</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">15 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_two">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_two">Check yêu cầu thêm sản phẩm từ shop</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">20 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check flex-sharink-0 ps-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_three">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_three">Check yêu cầu cập nhật sản phẩm từ shop</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">24 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_four">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_four">Xem xét các feeback gửi về và giải quyết vấn đề</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">27 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_five">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_five">Xem qua thống kê rồi báo cho quản lý để bàn về hướng phát triển</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">27 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item ps-0">
-                                <div class="d-flex align-items-start">
-                                    <div class="form-check ps-0 flex-sharink-0">
-                                        <input type="checkbox" class="form-check-input ms-0" id="task_six">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label class="form-check-label mb-0 ps-2" for="task_six">Nhắn tin kêu thy và hoàng đi nhậu</label>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-2">
-                                        <p class="text-muted fs-12 mb-0">27 Sep, 2021</p>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="p-3 pt-2">
-                        <a href="javascript:void(0);" class="text-muted text-decoration-underline">Show more...</a>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!-- end col -->
-    </div><!-- end row -->
+   
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 

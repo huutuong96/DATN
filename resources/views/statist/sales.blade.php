@@ -243,7 +243,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                            Số đơn hàng đã giao hoàn thành
+                                            Số đơn hàng đã hoàn thành
                                         </p>
                                     </div>
                                 </div>
@@ -461,12 +461,20 @@
       
                         <li style="margin-right: 10px;">
                             <span style="display: inline-block; background-color: green; height: 10px; width: 10px;"></span>
-                            Lượt mua sản phẩm
+                            Lượt mua
                         </li>
-                        <!-- <li>
+                        <li style="margin-right: 10px;">
                             <span style="display: inline-block; background-color: blue; height: 10px; width: 10px;"></span>
-                            Doanh thu * 1.000.000 vnd
-                        </li> -->
+                            Lượt trả hàng
+                        </li>
+                        <li style="margin-right: 10px;">
+                            <span style="display: inline-block; background-color: red; height: 10px; width: 10px;"></span>
+                            Đơn bị hủy
+                        </li>
+                        <li style="margin-right: 10px;">
+                            <span style="display: inline-block; background-color: yellow; height: 10px; width: 10px;"></span>
+                            Đơn bị lỗi khi gửi
+                        </li>
                     </ul>
                 </div>
 
@@ -564,9 +572,10 @@
 const xValues1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 
 // Lấy dữ liệu từ PHP cho biểu đồ màu xanh
-var red_data = @json($luongtrahangJsonx ?? []);
-var green_data = @json($luotmuaJson ?? []);
-var blue_data = @json($doanhthuJsonx ?? []);
+var red_data = @json($luongtrahangJson);
+var green_data = @json($luotmuaJson);
+var blue_data = @json($bihuyJson);
+var yellow_data = @json($loiJson);
 
 new Chart("myChart", {
   type: "line",
@@ -586,6 +595,11 @@ new Chart("myChart", {
       { 
         data: blue_data,
         borderColor: "blue",
+        fill: false
+      },
+      { 
+        data: yellow_data,
+        borderColor: "yellow",
         fill: false
       }
     ]
