@@ -24,6 +24,7 @@ class voucherToMain extends Model
         'update_by',
         'created_at',
         'updated_at',
+        'min',
     ];
     public function user()
 {

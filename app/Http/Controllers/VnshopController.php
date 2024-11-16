@@ -624,15 +624,19 @@ public function statistByQuantity(Request $request)
         //     }
         // }
         $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
-
+        $tong = 0;
         foreach ($monthlyRevenueOrder as $order) {
             $day = $order->created_at->day; // Lấy ngày của order
             if ($day <= Carbon::now()->day) { 
                 // Tổng số lượng của các sản phẩm trong đơn hàng cho ngày tương ứng
                 if($order->status == 2){
                     
-                    $soluong[$day] = OrderDetailsModel::whereDay('created_at', $day)
+                    $soluong[$day] = OrderDetailsModel::where('order_id', $order->id)->whereDay('created_at', $day)
                         ->sum('quantity'); 
+                    $tong += OrderDetailsModel::where('order_id', $order->id)
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->sum('quantity');
                 }
             } else {
                 break;
@@ -655,7 +659,7 @@ public function statistByQuantity(Request $request)
             return $b->soluong <=> $a->soluong; 
 
         });
-        $tong = OrderDetailsModel::whereMonth('created_at', Carbon::now()->month)->get()->sum("quantity"); 
+         
         return view('statist.quantity_sold',compact('soluongJson',
                                                 'listShop',
                                                 'tong'
