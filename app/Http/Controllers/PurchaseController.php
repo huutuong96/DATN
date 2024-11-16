@@ -212,7 +212,7 @@ class PurchaseController extends Controller
             $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
             $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
             $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
-            $variants = "Không có biến thể";
+            $variants = null;
             if ($orderDetails->first()->variant_id != null) {
                 $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
             }

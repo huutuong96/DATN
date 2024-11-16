@@ -124,7 +124,11 @@ class VoucherController extends Controller
             'update_by' => $user->id,
             'code' => $request->code,
             'user_id' => $user->id,
-            'shop_id' => $voucherShop->shop_id ?? null
+            'shop_id' => $voucherShop->shop_id ?? null,
+            'max' => $voucherMain->limitValue ?? $voucherShop->limitValue,
+            'ratio' => $voucherMain->ratio ?? $voucherShop->ratio,
+            'title' => $voucherMain->title ?? $voucherShop->title,
+            'description' => $voucherMain->description ?? $voucherShop->description,
         ]);
         return $this->successResponse("Lấy dữ liệu thành công", $voucherMain ? $voucherMain : $voucherShop);
     }
