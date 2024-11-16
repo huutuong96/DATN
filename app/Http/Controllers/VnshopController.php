@@ -653,6 +653,6 @@ public function statistBySales(Request $request)
         return view('revenue.revenue_general', compact('totalRevenue'));
     }
    
-
+    public function 
 
 }

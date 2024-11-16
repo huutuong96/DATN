@@ -10,19 +10,32 @@ class ConfirmOderToCart extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $ordersByShop;
+    
+    public $orders;
     public $total_amount;
     public $carts;
     public $totalQuantity;
     public $shipFee;
-    public $typeCheckout;
-    public function __construct($ordersByShop, $total_amount, $carts, $totalQuantity, $shipFee,)
+    public $orderDetails;
+    public $products;
+    public $variants;
+    public $email;
+    public $paymentMethod;
+    public $user;
+    // public $typeCheckout;
+
+    public function __construct($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, $email, $paymentMethod, $user)
     {
-        $this->ordersByShop = $ordersByShop;
+        $this->orders = $orders;
         $this->total_amount = $total_amount;
         $this->carts = $carts;
-        $this->totalQuantity = $totalQuantity;
+        $this->orderDetails = $orderDetails;
         $this->shipFee = $shipFee;
+        $this->products = $products;
+        $this->variants = $variants;
+        $this->email = $email;
+        $this->paymentMethod = $paymentMethod;
+        $this->user = $user;
         // $this->typeCheckout = $typeCheckout;
     }
 
