@@ -634,13 +634,25 @@ public function statistByQuantity(Request $request)
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
         ->get();
         
-        $soluong = array_fill(1, Carbon::now()->day, 0);
-        foreach ($monthlyRevenueOrder as $order) {
-            $day = $order->created_at->day; 
-            if ($day <= Carbon::now()->day) { 
+        // $soluong = array_fill(1, Carbon::now()->day, 0);
+        // foreach ($monthlyRevenueOrder as $order) {
+        //     $day = $order->created_at->day; 
+        //     if ($day <= Carbon::now()->day) { 
 
-                $soluong[$day] = OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
-            }else{
+        //         $soluong[$day] += OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
+        //     }else{
+        //         break;
+        //     }
+        // }
+        $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
+
+        foreach ($monthlyRevenueOrder as $order) {
+            $day = $order->created_at->day; // Lấy ngày của order
+            if ($day <= Carbon::now()->day) { 
+                // Tổng số lượng của các sản phẩm trong đơn hàng cho ngày tương ứng
+                $soluong[$day] = OrderDetailsModel::whereDay('created_at', $day)
+                    ->sum('quantity'); 
+            } else {
                 break;
             }
         }
