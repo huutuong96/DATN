@@ -48,7 +48,6 @@
                                             <th scope="col">Thông tin tài khoản</th>
                                             <th scope="col">Địa chỉ</th>
                                             <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Mức rank và tích điểm</th>
                                             <th scope="col">Hành động</th>
                                         </tr>
                                     </thead>
@@ -77,8 +76,6 @@
                                                         @endforeach
                                                     </td>
                                                     <td>{{ $user->created_at}}</td>
-                                                    <td>
-                                                        {{$user->rank->title ?? "Vô danh"}} : {{$user->point}} điểm tích lũy
                                                     <td>
                                                     <ul class="list-inline">
                                                         <li class="list-inline-item">
@@ -111,85 +108,90 @@
                                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                         </div>
                                                                         <div class="modal-body">
-                                                                                                                                                   <!-- Card Thông tin chi tiết -->
-                                                                                                                                                   <div class="card">
-                                                                                    <div class="card-header bg-info text-white d-flex align-items-center">
-                                                                                        <img src="https://via.placeholder.com/50" alt="Avatar" class="rounded-circle me-3">
-                                                                                        <h5 class="mb-0">Thông Tin Người Dùng</h5>
-                                                                                    </div>
-                                                                                    <div class="card-body">
-                                                                                        <!-- Tên -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Tên:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">Nguyễn Văn A</p>
+                                                                            <div class="card shadow-sm">
+                                                                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                    <h5 class="mb-0 text-white">Thông Tin Tài Khoản</h5>
+                                                                                    <span class="badge bg-success">Hoạt Động</span>
+                                                                                </div>
+                                                                                <div class="card-body">
+                                                                                    <div class="row">
+                                                                                        <div class="">
+                                                                                            <img src="{{$user->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="rounded-circle me-3 mb-3" style="width: 100px; height: 100px;">
+                                                                                        </div>
+                                                                                        <!-- Cột trái -->
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="mb-3 d-flex ">
+                                                                                                <strong>ID:</strong> <span class="text-muted me-5">{{ $user->id }}</span>
+                                                                                                <strong>CHỨC VỤ: </strong> <span class="text-muted">{{ $user->role->title}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Tên Tài Khoản:</strong> <span class="text-muted">{{ $user->fullname }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Số Điện Thoại:</strong> <span class="text-muted">{{ $user->phone }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Email:</strong> <span class="text-muted">{{ $user->email }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Giới Tính:</strong> <span class="text-muted">{{ $user->genre }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Sinh Nhật:</strong> <span class="text-muted">{{ $user->datebirth }}</span>
                                                                                             </div>
                                                                                         </div>
-                                                                                        <!-- Số điện thoại -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Số Điện Thoại:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">0987 654 321</p>
+                                                                                        <!-- Cột phải -->
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Mô Tả:</strong> <span class="text-muted">{{ $user->description }}</span>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        <!-- Email -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Email:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">nguyenvana@example.com</p>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Thành Viên Hạng:</strong> <span class="text-muted">{{ $user->rank->title ?? "Không hạng" }}</span>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        <!-- Mô tả -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Mô Tả:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">Thành viên VIP của hệ thống.</p>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Điểm Tích Lũy:</strong> <span class="text-muted">{{ $user->point }}</span>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        <!-- Điểm -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Điểm:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">1500</p>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Tạo:</strong> <span class="text-muted">{{ $user->created_at }}</span>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        <!-- Giới tính -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Giới Tính:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">Nam</p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <!-- Ngày sinh -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Ngày Sinh:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">01/01/1990</p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <!-- Hạng -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Hạng:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">Gold</p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <!-- Vai trò -->
-                                                                                        <div class="row mb-3">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Vai Trò:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext">Quản Trị Viên</p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <!-- Trạng thái -->
-                                                                                        <div class="row">
-                                                                                            <label class="col-sm-4 col-form-label fw-bold">Trạng Thái:</label>
-                                                                                            <div class="col-sm-8">
-                                                                                                <p class="form-control-plaintext text-success">Hoạt Động</p>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Cập Nhật:</strong> <span class="text-muted">{{ $user->updated_at }}</span>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
+                                                                            </div>
+
+                                                                            <!-- Danh Sách Địa Chỉ -->
+                                                                            <div class="mt-5">
+                                                                                <h4 class="mb-3">Danh Sách Địa Chỉ</h4>
+                                                                                <table class="table table-bordered table-hover shadow-sm">
+                                                                                    <thead class="table-light">
+                                                                                        <tr>
+                                                                                            <th>#</th>
+                                                                                            <th>Phân Loại</th>
+                                                                                            <th>Tỉnh/Thành</th>
+                                                                                            <th>Quận/Huyện</th>
+                                                                                            <th>Xã/Phường</th>
+                                                                                            <th>Người Nhận</th>
+                                                                                            <th>Số Điện Thoại</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        @foreach($user->address as $data)
+                                                                                        <tr>
+                                                                                            <td>{{$data->id}}</td>
+                                                                                            <td>{{$data->type}}</td>
+                                                                                            <td>{{$data->province}}</td>
+                                                                                            <td>{{$data->district}}</td>
+                                                                                            <td>{{$data->ward}}</td>
+                                                                                            <td>{{$data->name}}</td>
+                                                                                            <td>{{$data->phone}}</td>
+                                                                                        </tr>
+                                                                                        @endforeach
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
                                                                             </div>
                                                                         </div>
                                                                         <div class="modal-footer">
