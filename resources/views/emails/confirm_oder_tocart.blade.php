@@ -112,9 +112,9 @@
                                                                                             $subTotal = 0;
                                                                                         ?>
                                                                                     @if($cart->variant_id != null)
-                                                                                        <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($cartQuantity * $cart->variant_price)}}</p>
+                                                                                        <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($subTotal += $cartQuantity * $cart->variant_price)}}đ</p>
                                                                                     @else
-                                                                                        <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($cartQuantity * $cart->product_price)}}</p>
+                                                                                        <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($subTotal += $cartQuantity * $cart->product_price)}}đ</p>
                                                                                     @endif
                                                                                 </td>
                                                                             </tr>
@@ -124,15 +124,15 @@
                                                                                     Tổng đơn giá
                                                                                 </td>
                                                                                 <th style="padding: 8px; font-size: 13px;border-top: 1px solid #e9ebec;">
-                                                                                    $334.97
+                                                                                    {{number_format($subTotal ?? $order->total_amount)}}đ
                                                                                 </th>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td colspan="2" style="padding: 8px; font-size: 13px; text-align: end;">
-                                                                                    Shipping Charge
+                                                                                    Phí ship
                                                                                 </td>
                                                                                 <th style="padding: 8px; font-size: 13px;">
-                                                                                    $9.50
+                                                                                    {{$shipFee ?? 0}}đ
                                                                                 </th>
                                                                             </tr>
                                                                             <tr>

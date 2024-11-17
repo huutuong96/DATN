@@ -27,6 +27,7 @@ use App\Models\Post;
 use App\Http\Requests\TaxRequest;
 use App\Http\Requests\BannerRequest;
 use App\Models\Banner;
+use App\Models\tax_category;
 
 
 class VnshopController extends Controller
@@ -193,8 +194,10 @@ class VnshopController extends Controller
     }
     public function list_category($limit = 5){
         $categories = CategoriesModel::orderBy('created_at', 'desc')->whereIn("status", [1, 2])->paginate($limit);
+        $taxes = Tax::where('status',2)->get();
+        $tax_category = tax_category::all();
         return view('categories.list_category',compact(
-            'categories'
+            'categories', 'taxes', 'tax_category'
         ));
     }
     public function trash_category($limit = 5){

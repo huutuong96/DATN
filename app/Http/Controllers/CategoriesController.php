@@ -9,6 +9,7 @@ use App\Models\CategoriesModel;
 use App\Models\categoryattribute;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\CategoriesRequest;
+use App\Models\tax_category;
 
 class CategoriesController extends Controller
 {
@@ -188,9 +189,11 @@ class CategoriesController extends Controller
                 'update_by' => $user->id,
                 'updated_at' => now(),
             ];
-
             $categories->update($dataUpdate);
-
+            $tax_category = tax_category::create([
+                'category_id' => $categories->id,
+                'tax_id' => $request->tax_id,
+            ]);
             return response()->json([
                 'status' => true,
                 'message' => "Cập nhật danh mục thành công",
