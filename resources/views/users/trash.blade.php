@@ -97,7 +97,7 @@
                                                         </li>
                                                         <li class="mt-2 mb-2">
                                                             <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $user->id }}">
-                                                                <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                <button type="button" class="btn btn-primary" title="Thông tin tài khoản">
                                                                     <i class="ri-eye-line align-middle"></i>
                                                                 </button>
                                                             </a>
@@ -107,13 +107,90 @@
                                                                 <div class="modal-dialog modal-lg">
                                                                     <div class="modal-content">
                                                                         <div class="modal-header">
-                                                                            <h5 class="modal-title" id="detailsModalLabel-{{ $user->id }}">Chi tiết Sản phẩm</h5>
+                                                                            <h5 class="modal-title" id="detailsModalLabel-{{ $user->id }}">Thông tin tài khoản</h5>
                                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                         </div>
                                                                         <div class="modal-body">
-                                                                            <table class="table table-bordered">
-                                                                                
-                                                                            </table>
+                                                                                                                                                   <!-- Card Thông tin chi tiết -->
+                                                                                                                                                   <div class="card">
+                                                                                    <div class="card-header bg-info text-white d-flex align-items-center">
+                                                                                        <img src="https://via.placeholder.com/50" alt="Avatar" class="rounded-circle me-3">
+                                                                                        <h5 class="mb-0">Thông Tin Người Dùng</h5>
+                                                                                    </div>
+                                                                                    <div class="card-body">
+                                                                                        <!-- Tên -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Tên:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">Nguyễn Văn A</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Số điện thoại -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Số Điện Thoại:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">0987 654 321</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Email -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Email:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">nguyenvana@example.com</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Mô tả -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Mô Tả:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">Thành viên VIP của hệ thống.</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Điểm -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Điểm:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">1500</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Giới tính -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Giới Tính:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">Nam</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Ngày sinh -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Ngày Sinh:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">01/01/1990</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Hạng -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Hạng:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">Gold</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Vai trò -->
+                                                                                        <div class="row mb-3">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Vai Trò:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext">Quản Trị Viên</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Trạng thái -->
+                                                                                        <div class="row">
+                                                                                            <label class="col-sm-4 col-form-label fw-bold">Trạng Thái:</label>
+                                                                                            <div class="col-sm-8">
+                                                                                                <p class="form-control-plaintext text-success">Hoạt Động</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>

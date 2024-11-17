@@ -69,12 +69,14 @@ class VnshopController extends Controller
         foreach ($monthlyRevenueOrder as $order) {
             $day = $order->created_at->day; 
             if ($day <= Carbon::now()->day) { 
-
-                $doanhthu[$day] += ($order->total_amount / 100000 );
-                if($order->status == 5){
-                    $luongtrahang[$day] += 1;
+                if($order->status == 2){
+                    $doanhthu[$day] += ($order->total_amount / 1000000 );
+                    if($order->status == 5){
+                        $luongtrahang[$day] += 1;
+                    }
+                    $luotmua[$day] += 1;
+                    
                 }
-                $luotmua[$day] += 1;
                  
             }else{
                 break;
@@ -117,28 +119,6 @@ class VnshopController extends Controller
             'violet'
         ];
         $listCategoryColors= array_slice($colors, 0, count($listCategoryJson));
-        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
-        $listShop = [];
-        foreach ($listShopId as $idKey => $shopId) {
-            $doanhthu = 0;
-            $shop = Shop::where("id", $shopId)->with('user')->first();
-            foreach ($monthlyRevenueOrder as $orderKey => $order) {
-                if($order->status == 2){
-                    if($order->shop_id == $shopId){
-                        $doanhthu += $order->net_amount;
-                    }
-                }
-                
-            }
-            $shop["doanhthu"] = $doanhthu ;
-            $listShop[] = $shop;
-        }
-        // dd($listShop);
-        usort($listShop, function($a, $b) {
-            return $b->doanhthu <=> $a->doanhthu;
-        });
-
-        // $feedBack;
         return view('dashboard.dashboard',compact(
             'checkProduct',
             'checkShop',
@@ -149,7 +129,6 @@ class VnshopController extends Controller
             'listCategoryJson',
             'listCategorydoanhthu',
             'listCategoryColors',
-            'listShop',
             'shopAC'
 
         ));
@@ -648,13 +627,20 @@ public function statistByQuantity(Request $request)
         //     }
         // }
         $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
-
+        $tong = 0;
         foreach ($monthlyRevenueOrder as $order) {
             $day = $order->created_at->day; // Lấy ngày của order
             if ($day <= Carbon::now()->day) { 
                 // Tổng số lượng của các sản phẩm trong đơn hàng cho ngày tương ứng
-                $soluong[$day] = OrderDetailsModel::whereDay('created_at', $day)
-                    ->sum('quantity'); 
+                if($order->status == 2){
+                    
+                    $soluong[$day] = OrderDetailsModel::where('order_id', $order->id)->whereDay('created_at', $day)
+                        ->sum('quantity'); 
+                    $tong += OrderDetailsModel::where('order_id', $order->id)
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->sum('quantity');
+                }
             } else {
                 break;
             }
@@ -676,7 +662,7 @@ public function statistByQuantity(Request $request)
             return $b->soluong <=> $a->soluong; 
 
         });
-        $tong = OrderDetailsModel::whereMonth('created_at', Carbon::now()->month)->get()->sum("quantity"); 
+         
         return view('statist.quantity_sold',compact('soluongJson',
                                                 'listShop',
                                                 'tong'
@@ -693,8 +679,9 @@ public function statistByRevenue(Request $request)
         foreach ($monthlyRevenueOrder as $order) {
             $day = $order->created_at->day; 
             if ($day <= Carbon::now()->day) { 
-
-                $doanhthu[$day] += ($order->total_amount  );     
+                if($order->status == 2){
+                    $doanhthu[$day] += ($order->total_amount  );     
+                }
             }else{
                 break;
             }
@@ -742,11 +729,24 @@ public function statistBySales(Request $request)
     ->get();
     $luongtrahang = array_fill(1, Carbon::now()->day, 0);
     $luotmua = array_fill(1, Carbon::now()->day, 0);
+    $bihuy = array_fill(1, Carbon::now()->day, 0);
+    $loi = array_fill(1, Carbon::now()->day, 0);
+
     foreach ($monthlyRevenueOrder as $order) {
         $day = $order->created_at->day; 
         if ($day <= Carbon::now()->day) { 
-            
-            $luotmua[$day] += 1;
+            if($order->status == 2){
+                if($order->status == 5){
+                    $luongtrahang[$day] += 1;
+                }
+                if($order->status == 5){
+                    $bihuy[$day] += 1;
+                }
+                if($order->status == 5){
+                    $loi[$day] += 1;
+                }
+                $luotmua[$day] += 1;
+            }
                 
         }else{
             break;
@@ -754,7 +754,9 @@ public function statistBySales(Request $request)
     }
     $luongtrahangJson = array_values($luongtrahang);
     $luotmuaJson = array_values($luotmua);
-    
+    $bihuyJson = array_values($bihuy);
+    $loiJson = array_values($loi);
+
     $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
     $listShop = [];
     foreach ($listShopId as $idKey => $shopId) {
@@ -769,6 +771,8 @@ public function statistBySales(Request $request)
     return view('statist.sales',compact(
         'luongtrahangJson',
         'luotmuaJson',
+        'bihuyJson',
+        'loiJson',
         'TongSoLuongBanRa',
         'listShop'
     ));
