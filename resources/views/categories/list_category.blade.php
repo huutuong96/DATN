@@ -76,6 +76,7 @@
                                     const image = document.getElementById('image').files; // Nếu bạn có URL của ảnh
                                     const status = document.getElementById('status').value;
                                     const parentId = document.getElementById('parentId').value;
+                                    const tax = document.getElementById('tax').value;
                                     console.log(image);
                                     
                                     const data = {
@@ -126,6 +127,7 @@
                                         <th scope="col">Hình ảnh</th>
                                         <th scope="col">Danh mục con của</th>
                                         <th scope="col">Hành động</th>
+                                        <th scope="col">Thuế</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -198,6 +200,25 @@
                                                                                 <input type="number" name="parent_id" class="form-control" value="{{$category->parent_id }}" id="parentIdInput">
                                                                             </div>
                                                                         </div><!--end col-->
+                                                                        <div class="col-lg-12 mb-3">
+                                                                            <label for="tax_id" class="form-label">Chọn thuế danh mục</label>
+                                                                            <select id="tax_id" name="tax_id" class="form-control js-example-templating">
+                                                                                <option>Chọn Thuế Danh Mục</option>
+                                                                                @foreach($taxes as $tax)
+                                                                                    @php
+                                                                                        $selected = false;
+                                                                                    @endphp
+                                                                                    @foreach($tax_category as $tc)
+                                                                                        @if($tc->category_id == $category->id && $tc->tax_id == $tax->id)
+                                                                                            @php
+                                                                                                $selected = true;
+                                                                                            @endphp
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                    <option value="{{$tax->id}}" {{ $selected ? 'selected' : '' }}>{{$tax->title}} | {{$tax->rate}}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
                                                                         <div class="col-lg-12">
                                                                             <div class="text-end">
                                                                                 <button type="submit" onclick="updateCategory({{ $category->id }})" class="btn btn-primary">Submit</button>
@@ -233,6 +254,7 @@
                                                                                 image: document.getElementById('imageInput').value,
                                                                                 status: document.getElementById('statusInput').value,
                                                                                 parent_id: document.getElementById('parentIdInput').value,
+                                                                                tax_id: document.getElementById('tax_id').value,
                                                                                 update_by: {{ auth()->user()->id }} // ID người cập nhật
                                                                             };
                                                                             console.log(formData);
@@ -278,6 +300,26 @@
                                                 </a>
                                                 </li>
                                             </ul>
+                                        </td>
+                                        <td>
+                                        <div class="col-lg-8">
+                                            <select name="tax_id" class="form-control js-example-templating">
+                                                <option>Danh Mục Chưa Có Thuế</option>
+                                                @foreach($taxes as $tax)
+                                                    @php
+                                                        $selected = false;
+                                                    @endphp
+                                                    @foreach($tax_category as $tc)
+                                                        @if($tc->category_id == $category->id && $tc->tax_id == $tax->id)
+                                                            @php
+                                                                $selected = true;
+                                                            @endphp
+                                                        @endif
+                                                    @endforeach
+                                                    <option value="{{$tax->id}}" {{ $selected ? 'selected' : '' }}>{{$tax->title}} | {{$tax->rate}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         </td>
                                     </tr>
                                     @endforeach

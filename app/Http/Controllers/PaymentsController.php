@@ -291,8 +291,8 @@ class PaymentsController extends Controller
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
 
-        dd($vnp_Url);
-        // header("Location: $vnp_Url");
+        // dd($vnp_Url);
+        header("Location: $vnp_Url");
 
     }
 

@@ -8,7 +8,7 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\Voucher;
 use App\Models\VoucherToShop;
-use App\Models\VoucherToMain;
+use App\Models\voucherToMain;
 use App\Models\UsersModel;
 use App\Models\RanksModel;
 use App\Models\Tax;
@@ -148,6 +148,12 @@ class PurchaseController extends Controller
                     $shopTotalPrice += $totalPrice;
                     $totalQuantity += $cart->quantity;
                     $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+                    if (!$tax) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
+                        ], 400);
+                    }
                     $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                 }
 
@@ -217,7 +223,7 @@ class PurchaseController extends Controller
                 $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
             }
             $user = jwtAuth::parseToken()->authenticate();
-            // SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
+            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
             ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
@@ -270,7 +276,7 @@ class PurchaseController extends Controller
             $order->save();
             $data = DB::table("data_mail")->where("groupOrderIds", $groupOrderIds)->first();
             $user = UsersModel::where("email", $data->email)->first();
-            SendMail::dispatch(json_decode($data->ordersByShop, true) ?? null, $data->total_amount ?? null, json_decode($data->carts, true), $data->totalQuantity ?? null, $data->shipFee ?? null, $data->email);
+            // SendMail::dispatch(json_decode($data->ordersByShop, true) ?? null, $data->total_amount ?? null, json_decode($data->carts, true), $data->totalQuantity ?? null, $data->shipFee ?? null, $data->email);
             DB::table('data_mail')->where("groupOrderIds", $groupOrderIds)->delete();
             // dd(response()->json([
             //     'status' => true,
@@ -428,16 +434,14 @@ class PurchaseController extends Controller
     }
     private function applyVouchersToMain($voucherToMainCode, &$totalPrice)
     {
-        // dd($voucherToShopCode);
 
         if ($voucherToMainCode) {
             $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
                 $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
-                $this->updateVoucherQuantity($voucherToMain);
+                // $this->updateVoucherQuantity($voucherToMain);
             }
         }
-        // dd($totalPrice);
         return $totalPrice;
     }
 
@@ -457,9 +461,9 @@ class PurchaseController extends Controller
     {
 
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
-        $status = 1;
+        $status = 0;
         if ($payment->name == 'VNPAY') {
-            $status = 2;
+            $status = 12;
         }
 
         $order = OrdersModel::create([
@@ -517,7 +521,6 @@ class PurchaseController extends Controller
         $product = Product::find($product_id);
         $tax_category = tax_category::where('category_id', $product->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
-
         $totalTaxAmount = 0;
             $taxAmount = $totalPriceOfShop * $taxes->rate;
             $totalTaxAmount += $taxAmount;
@@ -693,7 +696,6 @@ class PurchaseController extends Controller
                 ]
             ];
         }, $orderDetails);
-        
         $service_id = $order->weight >= 2000 ? 100039 : 53320;
         $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $response = Http::withHeaders([
@@ -704,7 +706,7 @@ class PurchaseController extends Controller
             "payment_type_id" => 2,
             "note" => $request->note ?? "",
             "required_note" => $request->required_note ?? "KHONGCHOXEMHANG",
-            "return_phone" => $shopData->contact_number,
+            "return_phone" => intval($shopData->contact_number),
             "return_address" => $shopData->pick_up_address,
             "return_district_id" => $shopData->district_id,
             "return_ward_code" => $shopData->ward_id,
