@@ -8,7 +8,7 @@ use App\Models\OrdersModel;
 use App\Models\OrderDetailsModel;
 use App\Models\Voucher;
 use App\Models\VoucherToShop;
-use App\Models\VoucherToMain;
+use App\Models\voucherToMain;
 use App\Models\UsersModel;
 use App\Models\RanksModel;
 use App\Models\Tax;
