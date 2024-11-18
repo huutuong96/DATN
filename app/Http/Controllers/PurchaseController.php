@@ -168,6 +168,12 @@ class PurchaseController extends Controller
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
                 if ($voucherToShopCode) {
                     $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                    if (!$totalAdded) {
+                       return response()->json([
+                           'status' => false,
+                           'message' => 'Mã giảm giá cửa hàng không hợp lệ',
+                       ], 400);
+                    }
                     $totalPrice -= $totalAdded;
                 }
                 $order->total_amount = $totalPrice;
@@ -218,7 +224,7 @@ class PurchaseController extends Controller
             }
             $user = jwtAuth::parseToken()->authenticate();
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
-            SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
+            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id());
             ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
                 'status' => true,
@@ -404,6 +410,7 @@ class PurchaseController extends Controller
     }
     private function applyVouchersToShop($voucherToShopCode, &$totalPrice, $shopId)
     {
+        $discountAmount = null;
         if ($voucherToShopCode) {
             // $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where('status', 1)->first();
 
@@ -423,7 +430,6 @@ class PurchaseController extends Controller
                 $this->updateVoucherQuantity($voucherToShop);
             }
         }
-
         return $discountAmount;
     }
     private function applyVouchersToMain($voucherToMainCode, &$totalPrice)
