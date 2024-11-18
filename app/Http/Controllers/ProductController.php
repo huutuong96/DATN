@@ -1042,7 +1042,7 @@ $notification = $notificationController->store(new Request($notificationData));
         $tab = $request->tab;
         $product = Product::find($id);
         if ($product) {
-            $product->status = 0;
+            $product->status = 5;
             $product->save();
             if($request->search){
                 return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
