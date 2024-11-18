@@ -93,9 +93,58 @@
                                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                         </div>
                                                                         <div class="modal-body">
-                                                                            <table class="table table-bordered">
-                                                                                
-                                                                            </table>
+                                                                        <div class="card shadow-sm">
+                                                                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                    <h5 class="mb-0 text-white">Thông Tin Shop</h5>
+                                                                                    <span class="badge bg-success">Khóa vi phạm </span>
+                                                                                </div>
+                                                                                <div class="card-body">
+                                                                                    <div class="">
+                                                                                        <img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="rounded-circle me-3 mb-3" style="width: 100px; height: 100px;">
+                                                                                    </div>
+                                                                                    <div class="row">
+                                                                                        <!-- Cột trái -->
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="mb-3">
+                                                                                                <strong>ID:</strong> <span class="text-muted">{{$shop->id}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Tên Shop:</strong> <span class="text-muted">{{$shop->shop_name}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Mô Tả:</strong> <span class="text-muted">{{$shop->description}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Mã Shop:</strong> <span class="text-muted">{{$shop->slug}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Số Điện Thoại:</strong> <span class="text-muted">{{$shop->contact_number ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Người Tạo:</strong> <span class="text-muted">{{$shop->user[0]->fullname ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Cột phải -->
+                                                                                        <div class="col-lg-6 mb-3">
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Tỉnh/Thành:</strong> <span class="text-muted">{{$shop->province ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Quận/Huyện:</strong> <span class="text-muted">{{$shop->district ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Xã/Phường:</strong> <span class="text-muted">{{$shop->ward ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Tạo:</strong> <span class="text-muted">{{$shop->created_at}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Cập Nhật:</strong> <span class="text-muted">{{$shop->updated_at}}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>

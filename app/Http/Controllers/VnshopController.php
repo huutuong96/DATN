@@ -366,14 +366,15 @@ class VnshopController extends Controller
     public function costomer($limit = 5){
         $customer_id = RolesModel::where('title', 'CUSTOMER')->first('id');
         // dd($customer_id->id);
-        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->where('role_id', $customer_id->id)->paginate($limit);
+        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('role')->with('rank')->whereIn("status", [1, 2])->where('role_id', $customer_id->id)->paginate($limit);
         // dd($users);
         return view('users.list_customer',compact(
             'users'
         ));
     }
     public function manager($limit = 5){
-        $customer_id = RolesModel::where('title', '!=', 'CUSTOMER')->where('title', '!=', 'OWNER')->pluck('id');
+        $customer_id = RolesModel::where('title', '!=', 'CUSTOMER')->pluck('id');
+        // ->where('title', '!=', 'OWNER')
         // dd($customer_id);
         $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->whereIn('role_id', $customer_id)->paginate($limit);
         $roles = RolesModel::all();
