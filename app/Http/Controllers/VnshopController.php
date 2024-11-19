@@ -546,6 +546,48 @@ public function update_tax(TaxRequest $request, $id)
         'tab' => $tab,
     ])->with('message', 'Cập nhật thuế thành công!');
 }
+public function destroytax(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $tax = Tax::findOrFail($id);
+        $tax->delete();
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa thuế thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa thuế không thành công!');
+    }
+}
+public function changeStatusTax(Request $request, $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+    
+        $tax = Tax::findOrFail($id);
+
+       
+        $tax->status = $request->status; 
+        $tax->save();
+
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Thay đổi trạng thái thuế thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('taxall', [
+            'token' => $request->token,
+            'tab' => $request->tab,
+        ])->with('message', 'Thay đổi trạng thái thuế không thành công!');
+    }
+}
+
 public function bannerall(Request $request)
 {
     $tab = $request->input('tab', 1); 

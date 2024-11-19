@@ -220,14 +220,20 @@
                                                                     </div>
                                                                 </div>
 
-                                                            <!-- Delete form -->
-                                                            {{-- <form action="{{ route('post.destroy', ['token' => auth()->user()->refesh_token, 'id' => $Post->id, 'tab' => 1]) }}" method="POST" style="display: inline;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" style="background: ;border-radius: 5px; border: 1px solid black; color: red; cursor: pointer; height: 37px; width: 80px;" onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
-                                                                        🗑️ Xóa
-                                                                    </button>
-                                                                </form> --}}
+                                                                <li class="list-inline-item">
+                                                                    <a 
+                                                                        href="{{ route('changeStatusTax', [
+                                                                                                            'token' => auth()->user()->refesh_token,
+                                                                                                            'id' => $tax->id,
+                                                                                                            'status' => 3,
+                                                                                                            'tab'=>1
+                                                                                                            ]) }}"
+                                                                    >
+                                                                        <button type="button" class="btn btn-warning waves-effect waves-light" title="tắt">
+                                                                            <i class="ri-lock-line align-middle"></i>
+                                                                        </button>
+                                                                    </a>
+                                                                </li>
                                                         </td>
 
 
@@ -381,15 +387,29 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-
-                                                            <!-- Delete form -->
-                                                            {{-- <form action="{{ route('post.destroy', ['token' => auth()->user()->refesh_token, 'id' => $Post->id, 'tab' => 1]) }}" method="POST" style="display: inline;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" style="background: ;border-radius: 5px; border: 1px solid black; color: red; cursor: pointer; height: 37px; width: 80px;" onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
-                                                                        🗑️ Xóa
+                                                               
+                                                                    <a 
+                                                                        href="{{ route('changeStatusTax', [
+                                                                                                            'token' => auth()->user()->refesh_token,
+                                                                                                            'id' => $tax->id,
+                                                                                                            'status' => 2,
+                                                                                                            'tab'=>2
+                                                                                                            ]) }}"
+                                                                    >
+                                                                    <button type="button" class="btn btn-success" title="Bật">
+                                                                        <i class="ri-check-line align-middle"></i>
                                                                     </button>
-                                                                </form> --}}
+                                                                    </a>
+                                                               
+                                                                <form
+                                                                action="{{ route('tax.delete', ['token' => auth()->user()->refesh_token, 'id' => $tax->id, 'tab' => 2]) }}" method="POST" style="display: inline;"
+                                                                >
+                                                                @csrf
+                                                                @method('DELETE')                                                       
+                                                                    <button type="submit" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa thuế này?');">
+                                                                        <i class="ri-delete-bin-line align-middle"></i>
+                                                                </button>
+                                                            </form>
                                                         </td>
 
 

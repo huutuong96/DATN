@@ -96,6 +96,8 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/taxall', [VnshopController::class, 'taxall'])->name('taxall');
     Route::put('/update_tax/{id}', [VnshopController::class, 'update_tax'])->name('tax.update');
     Route::post('/storetax', [VnshopController::class, 'storetax'])->name('tax.store');
+    Route::delete('/destroytax/{id}', [VnshopController::class, 'destroytax'])->name('tax.delete');
+    Route::get('/changeStatusTax/{id}', [VnshopController::class, 'changeStatusTax'])->name('changeStatusTax');
     Route::get('/bannerall', [VnshopController::class, 'bannerall'])->name('bannerall');
     Route::post('/storebanner', [VnshopController::class, 'storebanner'])->name('banner.store');
     Route::put('/bannerupdate{id}', [VnshopController::class, 'updatebanner'])->name('banner.update');
