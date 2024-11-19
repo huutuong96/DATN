@@ -32,6 +32,7 @@ use App\Http\Requests\CategoriesRequest;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\categoryattribute;
 
+
 class VnshopController extends Controller
 {
     public function __construct() {
@@ -666,6 +667,54 @@ public function update_tax(TaxRequest $request, $id)
         'tab' => $tab,
     ])->with('message', 'Cập nhật thuế thành công!');
 }
+public function destroytax(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $tax = Tax::findOrFail($id);
+        $tax->delete();
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa thuế thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa thuế không thành công!');
+    }
+}
+public function changeStatusTax(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $tax = Tax::findOrFail($id);
+        if (\DB::table('tax_category')->where('tax_id', $tax->id)->exists()) {
+            return redirect()->route('taxall', [
+                'token' => $token,
+                'tab' => $tab,
+            ])->with('message', 'Không thể thay đổi trạng thái vì thuế đang được áp dụng cho danh mục!');
+        }
+
+        // Thay đổi trạng thái thuế
+        $tax->status = $request->status;
+        $tax->save();
+
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Thay đổi trạng thái thuế thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('taxall', [
+            'token' => $request->token,
+            'tab' => $request->tab,
+        ])->with('message', 'Thay đổi trạng thái thuế không thành công!');
+    }
+}
+
+
 public function bannerall(Request $request)
 {
     $tab = $request->input('tab', 1); 

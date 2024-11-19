@@ -17,9 +17,8 @@ class PaymentsController extends Controller
      */
     public function index()
     {
-
         $payments = PaymentsModel::all();
-
+       
         if ($payments->isEmpty()) {
             return response()->json(
                 [
@@ -237,7 +236,9 @@ class PaymentsController extends Controller
             ]);
         }
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://127.0.0.1:8000/api/checkoutdone";
+        // $vnp_Returnurl = "http://127.0.0.1:8000/api/checkoutdone";
+        $vnp_Returnurl = "localhost:3000/checkout/success?id=$groupOrderIds";
+
         $vnp_TmnCode = "TIGDFWL4"; //Mã website tại VNPAY
         $vnp_HashSecret = "W09DJQ9Y0K214BWC48SNRZR7UWVE8OPT"; //Chuỗi bí mật
 
@@ -292,7 +293,7 @@ class PaymentsController extends Controller
         }
 
         // dd($vnp_Url);
-        header("Location: $vnp_Url");
+       return $vnp_Url;
 
     }
 
