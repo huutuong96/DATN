@@ -126,8 +126,8 @@
                                         <th scope="col">Tên danh mục</th>
                                         <th scope="col">Hình ảnh</th>
                                         <th scope="col">Danh mục con của</th>
-                                        <th scope="col">Hành động</th>
                                         <th scope="col">Thuế</th>
+                                        <th scope="col">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -138,6 +138,26 @@
                                         <td>{{$category->title}}</td>
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
                                         <td>{{$category->parent_id ?? "Đây là danh mục cha"}}</td>
+                                        <td>
+                                        <div class="col-lg-8">
+                                            <select name="tax_id" class="form-control js-example-templating">
+                                                <option>Danh Mục Chưa Có Thuế</option>
+                                                @foreach($taxes as $tax)
+                                                    @php
+                                                        $selected = false;
+                                                    @endphp
+                                                    @foreach($tax_category as $tc)
+                                                        @if($tc->category_id == $category->id && $tc->tax_id == $tax->id)
+                                                            @php
+                                                                $selected = true;
+                                                            @endphp
+                                                        @endif
+                                                    @endforeach
+                                                    <option value="{{$tax->id}}" {{ $selected ? 'selected' : '' }}>{{$tax->title}} | {{$tax->rate}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        </td>
                                         <td>
                                             <ul class="list-inline">
                                                 @if ($category->status == 1)
@@ -301,26 +321,7 @@
                                                 </li>
                                             </ul>
                                         </td>
-                                        <td>
-                                        <div class="col-lg-8">
-                                            <select name="tax_id" class="form-control js-example-templating">
-                                                <option>Danh Mục Chưa Có Thuế</option>
-                                                @foreach($taxes as $tax)
-                                                    @php
-                                                        $selected = false;
-                                                    @endphp
-                                                    @foreach($tax_category as $tc)
-                                                        @if($tc->category_id == $category->id && $tc->tax_id == $tax->id)
-                                                            @php
-                                                                $selected = true;
-                                                            @endphp
-                                                        @endif
-                                                    @endforeach
-                                                    <option value="{{$tax->id}}" {{ $selected ? 'selected' : '' }}>{{$tax->title}} | {{$tax->rate}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        </td>
+                                        
                                     </tr>
                                     @endforeach
                                 </tbody>
