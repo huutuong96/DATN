@@ -799,27 +799,27 @@ class PurchaseController extends Controller
         $PaymentsController = new PaymentsController();
         $data = ($PaymentsController->vnpay_return($request));
         // dd($data);
-        $insertData = [
-            'vnp_Amount' => $data["vnp_Amount"] ?? 0, // Giá trị mặc định nếu không có
-            'vnp_BankCode' => "".$data['vnp_BankCode']."",
-            'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
-            'vnp_CardType' => $data["vnp_CardType"] ?? '',
-            // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
-            'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
-            'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
-            'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
-            'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
-            'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
-            'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
-            'vnp_SecureHash' => "".$data['vnp_SecureHash']."",
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-        // dd($insertData);
+        // $insertData = [
+        //     'vnp_Amount' => $data["vnp_Amount"] ?? 0, // Giá trị mặc định nếu không có
+        //     'vnp_BankCode' => "".$data['vnp_BankCode']."",
+        //     'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
+        //     'vnp_CardType' => $data["vnp_CardType"] ?? '',
+        //     // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
+        //     'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
+        //     'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
+        //     'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
+        //     'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
+        //     'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
+        //     'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
+        //     'vnp_SecureHash' => "".$data['vnp_SecureHash']."",
+        //     'created_at' => now(),
+        //     'updated_at' => now(),
+        // ];
+        // // dd($insertData);
 
-        // Chèn dữ liệu vào bảng
-        vnpay_transaction::create($insertData);
-        $this->handlePaymenAndSendEmail($data["vnp_TxnRef"]);
+        // // Chèn dữ liệu vào bảng
+        // vnpay_transaction::create($insertData);
+        // $this->handlePaymenAndSendEmail($data["vnp_TxnRef"]);
         
     }
 }
