@@ -28,7 +28,9 @@ use App\Http\Requests\TaxRequest;
 use App\Http\Requests\BannerRequest;
 use App\Models\Banner;
 use App\Models\tax_category;
-
+use App\Http\Requests\CategoriesRequest;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\categoryattribute;
 
 
 class VnshopController extends Controller
@@ -186,6 +188,79 @@ class VnshopController extends Controller
             'categories'
         ));
     }
+    
+    public function storeCategory(CategoriesRequest $request, $limit = 5){
+        $dataInsert = [];
+
+        // Kiểm tra và upload ảnh
+        if ($request->file('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $dataInsert['image'] = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        try {
+            $dataInsert = [
+                'title' => $request->title,
+                'slug' => $request->slug ?? Str::slug($request->title, '-'),
+                'index' => $request->index ?? 1,
+                'status' => $request->status ?? 1,
+                'parent_id' => $request->parent_id ?? null,
+                'create_by' => $user->id,
+                'image' => $dataInsert['image'] ?? null,
+                'tax_id' => $request->tax_id
+            ];
+
+            $category = CategoriesModel::create($dataInsert);
+            $tax_category = tax_category::create([
+                'category_id' => $category->id,
+                'tax_id' => $request->tax_id,
+            ]);
+            $parentId = $category->parent_id;
+            while ($parentId) {
+                $parentAttributes = CategoryAttribute::where('category_id', $parentId)->get();
+
+                foreach ($parentAttributes as $parentAttribute) {
+                    $parentAttribute->status = 0;
+                    $parentAttribute->save();
+                }
+
+                $parentCategory = CategoriesModel::find($parentId);
+                $parentId = $parentCategory ? $parentCategory->parent_id : null;
+            }
+            $subCategories = CategoriesModel::where('parent_id', $category->id)->get();
+            if ($subCategories->isEmpty()) {
+                $attributeIds = $request->attribute_ids;
+                if (is_array($attributeIds) && count($attributeIds) > 0) {
+                    foreach ($attributeIds as $attributeId) {
+                        categoryattribute::insert([
+                            'category_id' => $category->id,
+                            'attribute_id' => $attributeId,
+                        ]);
+                    }
+                }
+            }
+            if($request->back == 1){
+                // session()->put('message', 'Tạo thành công!');
+                return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Tạo thành công!');
+                // return back()->with('message', 'Tạo thành công!');
+            }
+            return response()->json([
+                'status' => true,
+                'message' => "Thêm danh mục thành công",
+                'data' => $category,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm danh mục không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+    
     public function trash_stores($limit = 5){
         $shops = Shop::orderBy('updated_at', 'desc')->where('status', "=", 5 )->paginate($limit);
         return view('stores.trash',compact(
@@ -212,6 +287,51 @@ class VnshopController extends Controller
             $category->save(); 
             return Back()->with('message', 'Cập nhật thành công!');
         }
+    }
+    
+    public function updateCategory(Request $request){
+        $user = JWTAuth::parseToken()->authenticate();
+        try {
+            $categories = CategoriesModel::find($request->id);
+
+            if (!$categories) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Danh mục không tồn tại",
+                ], 404);
+            }
+            if ($request->file('image')) {
+                $image = $request->file('image');
+                $cloudinary = new Cloudinary();
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $imageUrl = $uploadedImage['secure_url'];
+            }
+
+            $dataUpdate = [
+                'title' => $request->title ?? $categories->title,
+                'slug' => Str::slug($request->title),
+                'index' => $request->index ?? $categories->index,
+                'image' => $imageUrl ?? $categories->image,
+                'status' => $request->status ?? $categories->status,
+                'tax_id' => $request->tax_id,
+                'parent_id' => $request->parent_id ?? $categories->parent_id,
+                'update_by' => $user->id,
+                'updated_at' => now(),
+            ];
+            $categories->update($dataUpdate);
+            $tax_category = tax_category::create([
+                'category_id' => $categories->id,
+                'tax_id' => $request->tax_id,
+            ]);
+            return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Tạo thành công!');
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật danh mục không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+        
     }
     public function changeShop(Request $rqt){
        
