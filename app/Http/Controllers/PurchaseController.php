@@ -206,7 +206,7 @@ class PurchaseController extends Controller
                     'email' => auth()->user()->email,
                 ]);
 
-
+                dd($total_amount);
                 $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
                 return response()->json([
                     'status' => true,
