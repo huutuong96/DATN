@@ -84,27 +84,39 @@
                                                                     href="{{ route('change_user', [
                                                                                                         'token' => auth()->user()->refesh_token,
                                                                                                         'id' => $user->id,
-                                                                                                        'status' => 4,
+                                                                                                        'status' => 2,
                                                                                                         ]) }}"
                                                                 >
-                                                                <button type="button" class="btn btn-warning" title="Khóa">
+                                                                <button type="button" class="btn btn-secondary" title="Khóa">
                                                                     <i class="ri-lock-line align-middle"></i>
                                                                 </button>                                                                </a>
                                                             </li>
                                                         @elseif ($user->status == 2)
                                                             <li class="list-inline-item">
+                                                                <a 
+                                                                    href="{{ route('change_user', [
+                                                                                                        'token' => auth()->user()->refesh_token,
+                                                                                                        'id' => $user->id,
+                                                                                                        'status' => 1,
+                                                                                                        ]) }}"
+                                                                >
+                                                                <button type="button" class="btn btn-success" title="mở"> <i class="ri-check-line align-middle"></i></button>
+                                                            </li>
+                                                        @endif
+                                                        <li class="list-inline-item">
                                                             <a 
                                                                 href="{{ route('change_user', [
                                                                                                     'token' => auth()->user()->refesh_token,
                                                                                                     'id' => $user->id,
-                                                                                                    'status' => 2,
+                                                                                                    'status' => 4,
                                                                                                     ]) }}"
                                                             >
-                                                            <button type="button" class="btn btn-success" title="mở"> <i class="ri-check-line align-middle"></i></button>
-                                                            </li>
-                                                        @endif
-                                                            
-                                                        <li class="list-inline-item">
+                                                            <button type="button" class="btn btn-warning" title="vi pham"> <i class=" ri-close-line align-middle"></i></button>
+                                                            </li>   
+                                                        
+                                                    </ul>
+                                                    <ul class="list-inline d-flex">
+                                                        <li class="list-inline-item me-2">
                                                             <a 
                                                                     href="{{ route('change_user', [
                                                                                                         'token' => auth()->user()->refesh_token,
@@ -112,12 +124,12 @@
                                                                                                         'status' => 5,
                                                                                                         ]) }}"
                                                             >
-                                                            <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
-                                                                <i class="ri-delete-bin-line align-middle"></i>
-                                                        </button>
+                                                                <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
+                                                                    <i class="ri-delete-bin-line align-middle"></i>
+                                                                </button>
                                                             </a>
                                                         </li>
-                                                        <li class="mt-2 mb-2">
+                                                        <li class="ms-1">
                                                             <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $user->id }}">
                                                                 <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
                                                                     <i class="ri-eye-line align-middle"></i>
@@ -227,7 +239,6 @@
                                                             </div>
                                                         </li>
                                                     </ul>
-                                                       
                                                     </td>
                                                     
                                                     

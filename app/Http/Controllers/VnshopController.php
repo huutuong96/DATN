@@ -788,6 +788,8 @@ public function revenue_general(Request $request){
 
     return view('revenue.revenue_general', compact('totalRevenue'));
 }
-   
+public function logout(){
+    return redirect()->route('login');
+}
  
 }
