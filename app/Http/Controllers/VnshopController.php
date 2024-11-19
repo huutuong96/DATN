@@ -30,6 +30,7 @@ use App\Models\Banner;
 use App\Models\tax_category;
 
 
+
 class VnshopController extends Controller
 {
     public function __construct() {
@@ -564,16 +565,21 @@ public function destroytax(Request $request, string $id)
         ])->with('message', 'Xóa thuế không thành công!');
     }
 }
-public function changeStatusTax(Request $request, $id)
+public function changeStatusTax(Request $request, string $id)
 {
     try {
-        $token = $request->token; 
-        $tab = $request->tab; 
-    
+        $token = $request->token;
+        $tab = $request->tab;
         $tax = Tax::findOrFail($id);
+        if (\DB::table('tax_category')->where('tax_id', $tax->id)->exists()) {
+            return redirect()->route('taxall', [
+                'token' => $token,
+                'tab' => $tab,
+            ])->with('message', 'Không thể thay đổi trạng thái vì thuế đang được áp dụng cho danh mục!');
+        }
 
-       
-        $tax->status = $request->status; 
+        // Thay đổi trạng thái thuế
+        $tax->status = $request->status;
         $tax->save();
 
         return redirect()->route('taxall', [
@@ -587,6 +593,7 @@ public function changeStatusTax(Request $request, $id)
         ])->with('message', 'Thay đổi trạng thái thuế không thành công!');
     }
 }
+
 
 public function bannerall(Request $request)
 {
