@@ -102,7 +102,8 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/statist-quantity-sold', [VnshopController::class, 'statistByQuantity'])->name('statist.quantity_sold');
     Route::get('/statist-revenue', [VnshopController::class, 'statistByRevenue'])->name('statist_revenue');
     Route::get('/statist-sales', [VnshopController::class, 'statistBySales'])->name('statist.sales');
-   
+    Route::post('categories', [VnshopController::class, 'storeCategory'])->name('create_category');
+    Route::put('categories', [VnshopController::class, 'updateCategory'])->name('update_category');
 
     Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
     Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');

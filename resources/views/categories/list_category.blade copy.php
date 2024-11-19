@@ -15,56 +15,43 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-body text-center p-5">
-                                <form id="addBlogForm"
-                                                    action="{{ route('create_category', [
-                                                        'token' => auth()->user()->refesh_token,
-                                                    ]) }}"
-                                                    method="POST" 
-                                                    enctype="multipart/form-data">
-                                    @csrf
+                                <form id="addCategoryForm">
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="mb-3">
                                                 <label for="title" class="form-label">Title</label>
-                                                <input type="text" class="form-control" placeholder="Enter category title" name="title" required>
+                                                <input type="text" class="form-control" placeholder="Enter category title" id="title" required>
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
-                                        <input type="hidden"  name="back" value="1">
+
                                         <div class="col-6">
                                             <div class="mb-3">
                                                 <label for="index" class="form-label">Index</label>
-                                                <input type="number" class="form-control" value="1" name="index" required>
+                                                <input type="number" class="form-control" value="1" id="index" required>
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="image" class="form-label">Image URL</label>
-                                                <input type="file" class="form-control" placeholder="Enter image URL" name="image">
+                                                <input type="file" class="form-control" placeholder="Enter image URL" id="image">
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-6">
                                             <div class="mb-3">
                                                 <label for="status" class="form-label">Status</label>
-                                                <input type="number" class="form-control" value="1" name="status" required>
+                                                <input type="number" class="form-control" value="1" id="status" required>
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-6">
                                             <div class="mb-3">
-                                                <label for="parent_id" class="form-label">Parent ID</label>
-                                                <input type="number" class="form-control" placeholder="Enter parent ID" name="parent_id">
+                                                <label for="parentId" class="form-label">Parent ID</label>
+                                                <input type="number" class="form-control" placeholder="Enter parent ID" id="parentId">
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
-                                        <div class="col-lg-12 mb-3">
-                                            <label for="tax_id" class="form-label">Chọn thuế danh mục</label>
-                                            <select name="tax_id" name="tax_id" class="form-control js-example-templating">
-                                                @foreach($taxes as $tax)
-                                                    <option value="{{$tax->id}}">{{$tax->title}} | {{$tax->rate}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+
                                         <div class="col-lg-12">
                                             <div class="text-end">
                                                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -72,6 +59,57 @@
                                         </div><!--end col-->
                                     </div><!--end row-->
                                 </form>
+
+                                <script>
+                                document.getElementById('addCategoryForm').addEventListener('submit', async function (event) {
+                                    event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+                                    await addCategory();
+                                });
+
+                                async function addCategory() {
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    const token = urlParams.get('token');
+                                    console.log(token);
+                                    
+                                    const title = document.getElementById('title').value;
+                                    const index = document.getElementById('index').value;
+                                    const image = document.getElementById('image').files; // Nếu bạn có URL của ảnh
+                                    const status = document.getElementById('status').value;
+                                    const parentId = document.getElementById('parentId').value;
+                                    const tax = document.getElementById('tax').value;
+                                    console.log(image);
+                                    
+                                    const data = {
+                                        title: title,
+                                        index: index,
+                                        image: image,
+                                        status: status,
+                                        parent_id: parentId,
+                                        update_by: {{ auth()->user()->id }}
+                                    };
+
+                                    try {
+                                        const res = await fetch(`https://vnshop.top/api/categories`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'Authorization': `Bearer ${token}` // Gắn Bearer Token vào header
+                                            },
+                                            body: JSON.stringify(data)});
+                                        const payload = await res.json();
+                                        if(!res.ok) {
+                                            throw new Error('Network response was not ok');
+                                        }
+                                        alert('Thêm danh mục thành công!');
+                                        window.location.reload();
+                                        } catch (error) {
+                                        console.error('Error:', error);
+                                        alert('Đã xảy ra lỗi: ' + error.message);
+                                        }
+                                }
+                                </script>
+
+
                                 </div>
                             </div>
                         </div>
@@ -159,14 +197,7 @@
                                                         <div class="modal-dialog modal-dialog-centered">
                                                             <div class="modal-content">
                                                                 <div class="modal-body text-center p-5">
-                                                                <form id="addBlogForm"
-                                                                                    action="{{ route('update_category', [
-                                                                                        'token' => auth()->user()->refesh_token,
-                                                                                    ]) }}"
-                                                                                    method="POST" 
-                                                                                    enctype="multipart/form-data">
-                                                                    @csrf
-                                                                    <input type="hidden" name="_method" value="PUT">
+                                                                <form id="updateCategoryForm" action="" method="">
                                                                     <input type="hidden" name="id" value="{{$category->id}}"> <!-- Thêm trường để gửi ID của danh mục -->
                                                                     <div class="row">
                                                                         <div class="col-12">
@@ -210,11 +241,68 @@
                                                                         </div>
                                                                         <div class="col-lg-12">
                                                                             <div class="text-end">
-                                                                                <button type="submit"  class="btn btn-primary">Submit</button>
+                                                                                <button type="submit" onclick="updateCategory({{ $category->id }})" class="btn btn-primary">Submit</button>
                                                                             </div>
                                                                         </div><!--end col-->
                                                                     </div><!--end row-->
                                                                 </form>
+
+                                                                <script>
+                                                                        document.getElementById('updateCategoryForm').addEventListener('submit', function (event) {
+                                                                            event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+
+                                                                            // Lấy ID danh mục từ một input hidden
+                                                                            const categoryId = document.getElementById('categoryIdInput').value; // Giả sử có input hidden với ID này
+
+                                                                            // Cập nhật danh mục
+                                                                            updateCategory(categoryId); // Gọi hàm cập nhật danh mục
+                                                                        });
+
+                                                                        // Hàm lấy token từ URL
+                                                                        function getTokenFromURL() {
+                                                                            const urlParams = new URLSearchParams(window.location.search);
+                                                                            return urlParams.get('token'); // Giả sử token nằm trong query string dưới dạng 'token=YOUR_TOKEN'
+                                                                        }
+
+                                                                        // Hàm cập nhật danh mục
+                                                                       async function updateCategory(categoryId) {
+                                                                            const token = getTokenFromURL();
+                                                                            
+                                                                            const formData = {
+                                                                                title: document.getElementById('titleInput').value,
+                                                                                index: document.getElementById('indexInput').value,
+                                                                                image: document.getElementById('imageInput').files[0],
+                                                                                status: document.getElementById('statusInput').value,
+                                                                                parent_id: document.getElementById('parentIdInput').value,
+                                                                                tax_id: document.getElementById('tax_id').value,
+                                                                                update_by: {{ auth()->user()->id }} // ID người cập nhật
+                                                                            };
+                                                                            console.log(formData);
+                                                                            try {
+                                                                                const res = await fetch(`https://vnshop.top/api/categories/${categoryId}`, {
+                                                                                    method: 'PUT',
+                                                                                    headers: {
+                                                                                        'Content-Type': 'application/json',
+                                                                                        'Authorization': `Bearer ${token}` // Gắn Bearer Token vào header
+                                                                                    },
+                                                                                    body: JSON.stringify(formData)});
+                                                                                const payload = await res.json();
+                                                                                if(!res.ok) {
+                                                                                    throw new Error('Network response was not ok');
+                                                                                }
+                                                                                alert('Cập nhật thành công!');
+                                                                                window.location.reload();
+                                                                                } catch (error) {
+                                                                                console.error('Error:', error);
+                                                                                alert('Đã xảy ra lỗi: ' + error.message);
+                                                                                }
+                            
+                                                                        }
+                                                                    </script>
+
+
+
+                                                                   
                                                                 </div>
                                                             </div>
                                                         </div>
