@@ -236,7 +236,7 @@ class PaymentsController extends Controller
             ]);
         }
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "https://vnshop.top/api/checkoutdone?group_id=$groupOrderIds";
+        $vnp_Returnurl = "https://vnshop.top/api/checkoutdone";
         // $vnp_Returnurl = "localhost:3000/checkout/success?id=$groupOrderIds";
 
         $vnp_TmnCode = "TIGDFWL4"; //Mã website tại VNPAY
@@ -331,7 +331,7 @@ class PaymentsController extends Controller
             // Kiểm tra mã thanh toán thành công (code = 00)
             if ($vnp_ResponseCode == '00') {
                 // return $request->all();
-                header('Location: http://localhost:3000/checkout/success?id='.$request->group_id);
+                header('Location: http://localhost:3000/checkout/success?id='.$vnp_TxnRef);
             } else {
                 // Trường hợp mã thanh toán không thành công
                 return response()->json([
