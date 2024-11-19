@@ -17,9 +17,8 @@ class PaymentsController extends Controller
      */
     public function index()
     {
-
         $payments = PaymentsModel::all();
-
+       
         if ($payments->isEmpty()) {
             return response()->json(
                 [
@@ -292,7 +291,11 @@ class PaymentsController extends Controller
         }
 
         // dd($vnp_Url);
-        header("Location: $vnp_Url");
+       return response()->json([
+            'status' => 'true',
+            'message' => 'Thành công',
+            'data' => $vnp_Url
+        ]);
 
     }
 
