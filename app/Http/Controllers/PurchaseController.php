@@ -139,12 +139,6 @@ class PurchaseController extends Controller
                     $weight += $orderDetail->weight;
                     $width += $orderDetail->width;
                     $shopOrder['orderDetails'][] = $orderDetail;
-                    // if ($cart->variant_id != null) {
-                    //     $result->decrement('stock', $cart->quantity);
-                    // }else {
-                    //     $result->decrement('quantity', $cart->quantity);
-                    // }
-                    // dd($result);
                     $shopTotalPrice += $totalPrice;
                     $totalQuantity += $cart->quantity;
                     $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
@@ -174,6 +168,12 @@ class PurchaseController extends Controller
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
                 if ($voucherToShopCode) {
                     $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                    if (!$totalAdded) {
+                       return response()->json([
+                           'status' => false,
+                           'message' => 'Mã giảm giá cửa hàng không hợp lệ',
+                       ], 400);
+                    }
                     $totalPrice -= $totalAdded;
                 }
                 $order->total_amount = $totalPrice;
@@ -190,7 +190,7 @@ class PurchaseController extends Controller
             $total_amount = $this->discountsByRank($checkRank, $total_amount);
 
             DB::commit();
-            if ($payment->name == 'VNPAY') {
+            if ($payment->code == 'VNPAY') {
                 $PaymentsController = new PaymentsController();
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                 $order->order_infomation = $orderInfomation;
@@ -209,10 +209,10 @@ class PurchaseController extends Controller
 
                 $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
             }
-            if($payment->name == 'COD'){
+            
+            if($payment->code == 'COD'){
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
             }
-
             $order->order_infomation = $orderInfomation;
             $order->save();
             $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
@@ -224,7 +224,7 @@ class PurchaseController extends Controller
             }
             $user = jwtAuth::parseToken()->authenticate();
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
-            SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', auth()->id());
+            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id());
             ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
                 'status' => true,
@@ -410,11 +410,12 @@ class PurchaseController extends Controller
     }
     private function applyVouchersToShop($voucherToShopCode, &$totalPrice, $shopId)
     {
+        $discountAmount = null;
         if ($voucherToShopCode) {
             // $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where('status', 1)->first();
 
             $voucherToShop = VoucherToShop::whereIn('code', $voucherToShopCode)
-                                  ->where('status', 1)
+                                  ->where('status', 2)
                                   ->where('shop_id', $shopId)
                                   ->first();
             if ($voucherToShop) {
@@ -429,7 +430,6 @@ class PurchaseController extends Controller
                 $this->updateVoucherQuantity($voucherToShop);
             }
         }
-
         return $discountAmount;
     }
     private function applyVouchersToMain($voucherToMainCode, &$totalPrice)
@@ -741,8 +741,8 @@ class PurchaseController extends Controller
             "items" => $items,
         ]);
         // lưu đơn hàng lên db
-        
         $orderShipGHN = $response->json();
+
         if ($orderShipGHN['data'] == null) {
             $orderShipGHN['data']['order_code'] = null;
             $orderShipGHN = "GIAO HÀNG NHANH";
