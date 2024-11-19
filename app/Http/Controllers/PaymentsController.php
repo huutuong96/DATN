@@ -236,7 +236,7 @@ class PaymentsController extends Controller
             ]);
         }
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "https://vnshop.top/api/checkoutdone";
+        $vnp_Returnurl = "https://vnshop.top/api/checkoutdone?group_id=$groupOrderIds";
         // $vnp_Returnurl = "localhost:3000/checkout/success?id=$groupOrderIds";
 
         $vnp_TmnCode = "TIGDFWL4"; //Mã website tại VNPAY
