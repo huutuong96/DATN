@@ -25,7 +25,7 @@ class AddPointUser implements ShouldQueue
     {
         $user =  UsersModel::find($this->userId);
         $user->update([
-            'point' => $user->point + 100,
+            'point' => $user->point + 10,
         ]);
     }
 }

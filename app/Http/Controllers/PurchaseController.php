@@ -93,7 +93,6 @@ class PurchaseController extends Controller
             $totalQuantity = 0;
             $total_amount = 0;
             $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
-
             if (!$addressUser) {
                 return response()->json([
                     'status' => 400,
@@ -113,7 +112,6 @@ class PurchaseController extends Controller
                 $ordersByShop[$shopId]['items'][] = $cart;
             }
             // Process each shop's order
-
             $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
             foreach ($ordersByShop as $shopId => &$shopOrder) {
                 $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
@@ -317,7 +315,6 @@ class PurchaseController extends Controller
         $discountAmount = $totalPrice * $discountPercentage;
         $discountAmount = min($discountAmount, $maxDiscount); // Đảm bảo giảm giá không vượt quá giới hạn
         $discountedPrice = $totalPrice - $discountAmount;
-
         return $discountedPrice;
     }
     private function getValidVoucherCode($code, $type)
@@ -438,12 +435,15 @@ class PurchaseController extends Controller
     }
     private function applyVouchersToMain($voucherToMainCode, &$totalPrice)
     {
-
         if ($voucherToMainCode) {
             $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
-                $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
-                // $this->updateVoucherQuantity($voucherToMain);
+                $priceDiscount = $totalPrice * $voucherToMain->ratio / 100;
+                if ($priceDiscount > $voucherToMain->limitValue) {
+                    $totalPrice -= $voucherToMain->limitValue;
+                }else {
+                    $totalPrice -= $priceDiscount;
+                }
             }
         }
         return $totalPrice;
@@ -469,7 +469,6 @@ class PurchaseController extends Controller
         if ($payment->name == 'VNPAY') {
             $status = 12;
         }
-
         $order = OrdersModel::create([
             'payment_id' => $payment->id,
             'group_order_id' => $groupOrderIds,
