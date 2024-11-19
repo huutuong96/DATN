@@ -208,6 +208,11 @@ class PurchaseController extends Controller
 
 
                 $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Vui lòng thanh toán',
+                    'url' => $url,
+                ], 200);
             }
             
             if($payment->code == 'COD'){

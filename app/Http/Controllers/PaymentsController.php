@@ -291,11 +291,7 @@ class PaymentsController extends Controller
         }
 
         // dd($vnp_Url);
-       return response()->json([
-            'status' => 'true',
-            'message' => 'Thành công',
-            'data' => $vnp_Url
-        ]);
+       return $vnp_Url;
 
     }
 
