@@ -164,9 +164,9 @@ class PurchaseController extends Controller
                 // $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], 99999);
                 // $order->order_infomation = $orderInfomation;
                 $grandTotalPrice += $shipFee;
-                $order->total_amount = $shopTotalPrice;
+                $order->total_amount = $grandTotalPrice;
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
-                if ($voucherToShopCode) {
+                if ($voucherToShopCode != null) {
                     $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
                     if (!$totalAdded) {
                        return response()->json([
@@ -174,10 +174,11 @@ class PurchaseController extends Controller
                            'message' => 'Mã giảm giá cửa hàng không hợp lệ',
                        ], 400);
                     }
-                    $totalPrice -= $totalAdded;
+                    $grandTotalPrice -= $totalAdded;
                 }
-                $order->total_amount = $totalPrice;
-                $total_amount += $order->total_amount;
+                $order->total_amount = $grandTotalPrice;
+                $total_amount = $grandTotalPrice;
+                // $total_amount += $order->total_amount;
                 $this->addOrderFeesToTotal($order, $shopTotalPrice);
                 $order->save();
             }
@@ -188,8 +189,24 @@ class PurchaseController extends Controller
             AddPointUser::dispatch(auth()->id());
             $checkRank = $this->check_point_to_user();
             $total_amount = $this->discountsByRank($checkRank, $total_amount);
-
             DB::commit();
+
+            if($payment->code == 'COD'){
+                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
+            }
+            $order->order_infomation = $orderInfomation;
+            $order->save();
+            $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
+            $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
+            $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
+            $variants = null;
+            if ($orderDetails->first()->variant_id != null) {
+                $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
+            }
+            $user = jwtAuth::parseToken()->authenticate();
+            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
+            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id());
+            ProducttocartModel::whereIn('id', $request->carts)->delete();
             if ($payment->code == 'VNPAY') {
                 $PaymentsController = new PaymentsController();
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
@@ -213,23 +230,6 @@ class PurchaseController extends Controller
                     'url' => $url,
                 ], 200);
             }
-            
-            if($payment->code == 'COD'){
-                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
-            }
-            $order->order_infomation = $orderInfomation;
-            $order->save();
-            $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
-            $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
-            $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
-            $variants = null;
-            if ($orderDetails->first()->variant_id != null) {
-                $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
-            }
-            $user = jwtAuth::parseToken()->authenticate();
-            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
-            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id());
-            ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
