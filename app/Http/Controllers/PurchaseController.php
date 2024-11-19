@@ -193,9 +193,9 @@ class PurchaseController extends Controller
 
             if($payment->code == 'COD'){
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
+                $order->order_infomation = $orderInfomation;
+                $order->save();
             }
-            $order->order_infomation = $orderInfomation;
-            $order->save();
             $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
             $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
             $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
