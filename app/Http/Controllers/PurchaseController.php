@@ -188,6 +188,7 @@ class PurchaseController extends Controller
             }
             if ($voucherToMainCode) {
                 $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
+                $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
             }
 
             AddPointUser::dispatch(auth()->id());
@@ -208,7 +209,7 @@ class PurchaseController extends Controller
                 $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
             }
             $user = jwtAuth::parseToken()->authenticate();
-            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
+            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
             SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds);
             ProducttocartModel::whereIn('id', $request->carts)->delete();
             if ($payment->code == 'VNPAY') {
@@ -449,6 +450,22 @@ class PurchaseController extends Controller
                     $totalPrice -= $voucherToMain->limitValue;
                 }else {
                     $totalPrice -= $priceDiscount;
+                }
+            }
+        }
+        return $totalPrice;
+    }
+
+    private function get_price_discount($voucherToMainCode, &$totalPrice)
+    {
+        if ($voucherToMainCode) {
+            $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
+            if ($voucherToMain) {
+                $priceDiscount = $totalPrice * $voucherToMain->ratio / 100;
+                if ($priceDiscount > $voucherToMain->limitValue) {
+                    $totalPrice = $voucherToMain->limitValue;
+                }else {
+                    $totalPrice = $priceDiscount;
                 }
             }
         }

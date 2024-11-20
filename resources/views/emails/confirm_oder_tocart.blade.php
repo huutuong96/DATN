@@ -132,31 +132,23 @@
                                                                                     Phí ship
                                                                                 </td>
                                                                                 <th style="padding: 8px; font-size: 13px;">
-                                                                                    {{$shipFee ?? 0}}đ
+                                                                                    {{number_format($shipFee) ?? 0}}đ
                                                                                 </th>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td colspan="2" style="padding: 8px; font-size: 13px; text-align: end;">
-                                                                                    Taxs
+                                                                                    Giảm giá
                                                                                 </td>
                                                                                 <th style="padding: 8px; font-size: 13px;">
-                                                                                    $15.26
-                                                                                </th>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td colspan="2" style="padding: 8px; font-size: 13px; text-align: end;">
-                                                                                    Discount
-                                                                                </td>
-                                                                                <th style="padding: 8px; font-size: 13px;">
-                                                                                    $20.78
+                                                                                    {{number_format($disscount) ?? 0}}đ
                                                                                 </th>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td colspan="2" style="padding: 8px; font-size: 13px; text-align: end;border-top: 1px solid #e9ebec;">
-                                                                                    Total Amount
+                                                                                    Tổng tiền
                                                                                 </td>
                                                                                 <th style="padding: 8px; font-size: 13px;border-top: 1px solid #e9ebec;">
-                                                                                    $338.95
+                                                                                    {{number_format($order->total_amount) ?? 0}}đ
                                                                                 </th>
                                                                             </tr>
                                                                         </tbody>
