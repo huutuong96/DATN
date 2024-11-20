@@ -58,9 +58,7 @@
                                     </thead>
                                     <tbody>
                                         @if($mergedProducts->isEmpty())
-                                            <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
-                                            </tr>
+                                            
                                         @else
                                             @foreach($mergedProducts as $product)
                                                 <tr>
@@ -144,9 +142,7 @@
                                     </thead>
                                     <tbody>
                                         @if($pendingProducts->isEmpty())
-                                            <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
-                                            </tr>
+                                            
                                         @else
                                             @foreach($pendingProducts as $product)
                                                 <tr>
@@ -374,7 +370,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table id="update" class="table align-middle table-nowrap mb-0">
+                                <table id="update2" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Sản phẩm</th>
@@ -383,27 +379,21 @@
                                             <th scope="col">Mã SKU</th>
                                             <th scope="col">Giá Sản phẩm</th>
                                             <th scope="col">Tên Shop</th> 
-                                            <th scope="col">Trạng thái</th>
                                             <th scope="col">Ngày tạo</th>
                                             <th scope="col">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @if($allUpdateProducts->isEmpty())
-                                            <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
-                                            </tr>
+                                            
                                         @else
                                             @foreach($allUpdateProducts as $product)
                                                 <tr>
-                                                    <th scope="row"><a href="#" class="fw-medium">{{ $product->id }}</a></th>
+                                                    <th scope="row"><a href="" class="fw-medium">{{ $product->id }}</a></th>
                                                     <td>
                                                         <img src="{{ $product->image }}" alt="{{ $product->name }}" style="width: 50px; height: 50px;">
                                                         
-                                                        {{-- 
-                                                        @foreach ($product->images as $image)
-                                                            <img src="{{ $image->url }}" alt="{{ $product->id }}" style="width: 30px; height: 30px; margin-top: 5px; margin-right: 5px;">
-                                                        @endforeach --}}
+                                                     
                                                     </td>
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         {{ $product->name }}
@@ -596,7 +586,7 @@
                         <!-- Pagination Links -->
                         <div class="mt-3">
                             <script>
-                                new DataTable('#update', {
+                                new DataTable('#update2', {
                                     language: {   
                                         lengthMenu: "Hiển thị _MENU_ sản phẩm",
                                         search: "Tìm kiếm:" 
@@ -637,7 +627,7 @@
                                     <tbody>
                                         @if($activeProducts->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào hoạt động.</td>
+                                               
                                             </tr>
                                         @else
                                             @foreach($activeProducts as $product)
@@ -859,7 +849,7 @@
                                     <tbody>
                                         @if($rejectedProducts->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào .</td>
+                                               
                                             </tr>
                                         @else
                                             @foreach($rejectedProducts as $product)
@@ -1067,7 +1057,7 @@
                                     <tbody>
                                         @if($violatingProducts->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có sản phẩm nào </td>
+                                              
                                             </tr>
                                         @else
                                             @foreach($violatingProducts as $product)
