@@ -210,9 +210,7 @@ class PurchaseController extends Controller
                 $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
             }
             $user = jwtAuth::parseToken()->authenticate();
-            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
-            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-            ProducttocartModel::whereIn('id', $request->carts)->delete();
+            
             if ($payment->code == 'VNPAY') {
                 $PaymentsController = new PaymentsController();
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
@@ -236,6 +234,9 @@ class PurchaseController extends Controller
                     'url' => $url,
                 ], 200);
             }
+            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
+            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
+            ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
@@ -286,7 +287,6 @@ class PurchaseController extends Controller
             $order->save();
             $data = DB::table("data_mail")->where("groupOrderIds", $groupOrderIds)->first();
             $user = UsersModel::where("email", $data->email)->first();
-            // SendMail::dispatch(json_decode($data->ordersByShop, true) ?? null, $data->total_amount ?? null, json_decode($data->carts, true), $data->totalQuantity ?? null, $data->shipFee ?? null, $data->email);
             DB::table('data_mail')->where("groupOrderIds", $groupOrderIds)->delete();
             // dd(response()->json([
             //     'status' => true,
