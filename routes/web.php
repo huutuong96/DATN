@@ -112,9 +112,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/products/{id}', [ProductController::class, 'showproduct'])->name('products.show');
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
 
-    Route::get('/list_chat', [VnshopController::class, 'list_chat'])->name('list_chat');
-    Route::get('/chat', [VnshopController::class, 'chat'])->name('chat');
-
+    Route::get('/list_notification', [VnshopController::class, 'list_notification'])->name('list_notification');
 
 
 });

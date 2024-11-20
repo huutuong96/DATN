@@ -209,7 +209,7 @@ class PurchaseController extends Controller
             }
             $user = jwtAuth::parseToken()->authenticate();
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
-            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id());
+            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds);
             ProducttocartModel::whereIn('id', $request->carts)->delete();
             if ($payment->code == 'VNPAY') {
                 $PaymentsController = new PaymentsController();

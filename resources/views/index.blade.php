@@ -272,13 +272,11 @@
                                                 @endforeach
                                                 <div
                                                 class="my-3 text-center view-all">
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-soft-success waves-effect waves-light">
+                                                <a href="{{ route('list_notification', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-soft-success waves-effect waves-light">
                                                     Xem tất cả thông báo
                                                     <i
                                                         class="ri-arrow-right-line align-middle"></i>
-                                                </button>
+                                                </a>
                                             </div>
                                             @endif
                                         </div>
