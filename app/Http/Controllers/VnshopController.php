@@ -698,11 +698,8 @@ public function changeStatusTax(Request $request, string $id)
                 'tab' => $tab,
             ])->with('message', 'Không thể thay đổi trạng thái vì thuế đang được áp dụng cho danh mục!');
         }
-
-        // Thay đổi trạng thái thuế
         $tax->status = $request->status;
         $tax->save();
-
         return redirect()->route('taxall', [
             'token' => $token,
             'tab' => $tab,
