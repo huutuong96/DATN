@@ -45,10 +45,8 @@
                                         <tr>
                                             <th scope="col">ID</th>
                                             <th scope="col">Ảnh đại diện</th>
-                                            <th scope="col">Thông tin tài khoản</th>
-                                            <th scope="col">Địa chỉ</th>
-                                            <th scope="col">Ngày tạo</th>
-                                            
+                                            <th scope="col">Thông tin tài khoản</th> 
+                                            <th scope="col">Ngày tạo</th>  
                                             <th scope="col ">Hành động</th>
                                         </tr>
                                     </thead>
@@ -69,11 +67,7 @@
                                                             <span style="font-weight: bold;">{{$user->fullname ?? 'No Name'}}</span>
                                                         </div>
                                                     </td>
-                                                    <td>
-                                                        @foreach($user->address as $address)
-                                                            *. {{ $address->district }}_{{ $address->ward }}_{{ $address->address }}<br>
-                                                        @endforeach
-                                                    </td>
+                                                    
                                                     <td>{{ $user->created_at}}</td>
                                                     
                                                     <td>
@@ -87,7 +81,7 @@
                                                                                                         'status' => 2,
                                                                                                         ]) }}"
                                                                 >
-                                                                <button type="button" class="btn btn-secondary" title="Khóa">
+                                                                <button type="button" class="btn btn-warning" title="Khóa">
                                                                     <i class="ri-lock-line align-middle"></i>
                                                                 </button>                                                                </a>
                                                             </li>
