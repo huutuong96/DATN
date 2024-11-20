@@ -138,7 +138,7 @@
                                                                                                 <strong>Số Điện Thoại:</strong> <span class="text-muted">{{$shop->contact_number ?? "chưa nhập"}}</span>
                                                                                             </div>
                                                                                             <div class="mb-3">
-                                                                                                <strong>Người Tạo:</strong> <span class="text-muted">{{$shop->user[0]->fullname ?? "chưa nhập"}}</span>
+                                                                                                <strong>Người Đại Diện:</strong> <span class="text-muted">{{$shop->user[0]->fullname ?? "chưa nhập"}}</span>
                                                                                             </div>
                                                                                         </div>
                                                                                         <!-- Cột phải -->

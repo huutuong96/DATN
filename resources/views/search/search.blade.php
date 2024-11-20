@@ -172,7 +172,12 @@
                                         </tbody>
                                     </table>
                                     <script>
-                                    new DataTable('#product');
+                                        new DataTable('#product', {
+                                            language: {   
+                                                lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                                search: "Tìm kiếm:" 
+                                            }
+                                        });
                                     </script>
                                 </div>
                                 <div class="tab-pane fade {{session('tab') == 'shops' ? 'show active' : ''}}" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
@@ -301,8 +306,14 @@
                                             @endforeach
                                         </tbody>
                                     </table>
-                                    <script>
-                                        new DataTable('#shop');
+                                   
+                                     <script>
+                                        new DataTable('#shop', {
+                                            language: {   
+                                                lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                                search: "Tìm kiếm:" 
+                                            }
+                                        });
                                     </script>
                                 </div>
                                 <div class="tab-pane fade {{session('tab') == 'users' ? 'show active' : ''}}" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
@@ -450,9 +461,14 @@
                                             @endforeach
                                         </tbody>
                                         
-                                    </table>
+                                    </table>>
                                     <script>
-                                    new DataTable('#usershow');
+                                        new DataTable('#usershow', {
+                                            language: {   
+                                                lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                                search: "Tìm kiếm:" 
+                                            }
+                                        });
                                     </script>
                                 </div>
                                 <div class="tab-pane fade {{session('tab') == 'posts' ? 'show active' : ''}}" id="blog-tab-pane" role="tabpanel" aria-labelledby="blog-tab" tabindex="0">
@@ -543,8 +559,13 @@
                                         </tbody>
                                         
                                     </table>
-                                    <script>
-                                    new DataTable('#blog');
+                                     <script>
+                                        new DataTable('#blog', {
+                                            language: {   
+                                                lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                                search: "Tìm kiếm:" 
+                                            }
+                                        });
                                     </script>
                                 </div>
                             </div>  

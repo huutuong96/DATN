@@ -133,7 +133,7 @@
                                                             {{ $tax->tax_number }}</td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                            {{ $tax->rate }}</td>
+                                                            {{ $tax->rate * 100 }}%</td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             @if($tax->status == 2)
@@ -300,7 +300,7 @@
                                                             {{ $tax->tax_number }}</td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                            {{ $tax->rate }}</td>
+                                                            {{ $tax->rate * 100 }}%</td>
                                                             <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                                 @if($tax->status == 2)
                                                                     Hoạt động
