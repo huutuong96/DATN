@@ -131,7 +131,7 @@
                                                         </li>
                                                         <li class="ms-1">
                                                             <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $user->id }}">
-                                                                <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                <button type="button" class="btn btn-primary" title="Thông tin chi tiết tài khoản">
                                                                     <i class="ri-eye-line align-middle"></i>
                                                                 </button>
                                                             </a>
