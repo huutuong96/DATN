@@ -17,9 +17,8 @@ class PaymentsController extends Controller
      */
     public function index()
     {
-
         $payments = PaymentsModel::all();
-
+       
         if ($payments->isEmpty()) {
             return response()->json(
                 [
@@ -199,33 +198,33 @@ class PaymentsController extends Controller
     // THANH TOÁN BẰNG CỔNG THANH TOÁN
 
     // Hàm này được tạo ra để cho VNPay có chỗ để return về, sẽ được thay thế bằng hàm view trang Checkout SuccessFul
-    // public function checkoutdone(Request $request){
-    //     // xử lý
-    //     $data = ($this->vnpay_return($request));
-    //     // dd($data);
-    //     $insertData = [
-    //         'vnp_Amount' => $data["vnp_Amount"] ?? 0, // Giá trị mặc định nếu không có
-    //         'vnp_BankCode' => "".$data['vnp_BankCode']."",
-    //         'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
-    //         'vnp_CardType' => $data["vnp_CardType"] ?? '',
-    //         // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
-    //         'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
-    //         'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
-    //         'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
-    //         'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
-    //         'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
-    //         'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
-    //         'vnp_SecureHash' => "".$data['vnp_SecureHash']."",
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ];
-    //     // dd($insertData);
+    public function checkoutdone(Request $request){
+        // xử lý
+        $data = ($this->vnpay_return($request));
+        // dd($data);
+        // $insertData = [
+        //     'vnp_Amount' => $request->vnp_Amount ?? 0, // Giá trị mặc định nếu không có
+        //     'vnp_BankCode' => "".$data['vnp_BankCode']."",
+        //     'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
+        //     'vnp_CardType' => $data["vnp_CardType"] ?? '',
+        //     // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
+        //     'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
+        //     'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
+        //     'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
+        //     'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
+        //     'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
+        //     'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
+        //     'vnp_SecureHash' => "".$data['vnp_SecureHash']."",
+        //     'created_at' => now(),
+        //     'updated_at' => now(),
+        // ];
+        // // dd($insertData);
 
-    //     // Chèn dữ liệu vào bảng
-    //     vnpay_transaction::create($insertData);
+        // // Chèn dữ liệu vào bảng
+        // vnpay_transaction::create($insertData);
 
         
-    // }
+    }
     public function vnpay_payment(Request $request, $total_amount, $groupOrderIds)
     {
 
@@ -237,7 +236,9 @@ class PaymentsController extends Controller
             ]);
         }
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://127.0.0.1:8000/api/checkoutdone";
+        $vnp_Returnurl = "https://vnshop.top/api/checkoutdone";
+        // $vnp_Returnurl = "localhost:3000/checkout/success?id=$groupOrderIds";
+
         $vnp_TmnCode = "TIGDFWL4"; //Mã website tại VNPAY
         $vnp_HashSecret = "W09DJQ9Y0K214BWC48SNRZR7UWVE8OPT"; //Chuỗi bí mật
 
@@ -292,7 +293,7 @@ class PaymentsController extends Controller
         }
 
         // dd($vnp_Url);
-        header("Location: $vnp_Url");
+       return $vnp_Url;
 
     }
 
@@ -329,7 +330,8 @@ class PaymentsController extends Controller
 
             // Kiểm tra mã thanh toán thành công (code = 00)
             if ($vnp_ResponseCode == '00') {
-                return $request->all();
+                // return $request->all();
+                header('Location: http://localhost:3000/checkout/success?id='.$vnp_TxnRef);
             } else {
                 // Trường hợp mã thanh toán không thành công
                 return response()->json([

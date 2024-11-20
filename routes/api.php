@@ -287,6 +287,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogsController;
+
 Route::get('/search', function () {
     return "API - VNSHOP";
 })->middleware('CheckPremission:create_category');
@@ -354,7 +355,7 @@ Route::get('/search', function () {
 
                 Route::resource('ships',ShipsController::class);
 
-                Route::resource('payments',PaymentsController::class)->middleware('CheckRole:Admin');
+                Route::resource('payments',PaymentsController::class);
 
                 Route::resource('ships',ShipsController::class);//chu ro lam nen chua bat premission
 

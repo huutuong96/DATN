@@ -1104,6 +1104,7 @@
                 </div>
                 @endif
                 @yield('main')
+                
             </div>
             <!-- End Page-content -->
 
