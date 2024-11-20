@@ -136,7 +136,10 @@
 
                                 <div class="p-2">
                                     <div class="row g-0">
-                                        @foreach ($apps as $app)
+                                        @foreach ($apps as $index => $app)
+                                            @if ($index % 3 == 0 && $index != 0)
+                                                </div><div class="row g-0">
+                                            @endif
                                             <div class="col">
                                                 <a class="dropdown-icon-item" href="{{$app->url}}" target="_blank">
                                                     <img src="{{$app->icon}}" alt="app">
