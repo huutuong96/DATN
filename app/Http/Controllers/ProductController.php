@@ -1042,7 +1042,7 @@ $notification = $notificationController->store(new Request($notificationData));
         $tab = $request->tab;
         $product = Product::find($id);
         if ($product) {
-            $product->status = 5;
+            $product->status = 0;
             $product->save();
             if($request->search){
                 return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
@@ -1088,7 +1088,7 @@ public function ProductAll(Request $request)
     $allProductsCount = Product::count(); 
     $newProductsCount = Product::where('status', 3)->count(); 
     $activeProductsCount = Product::where('status', 2)->count(); 
-    $rejectedProductsCount = Product::where('status', 5)->count(); 
+    $rejectedProductsCount = Product::where('status', 0)->count(); 
     $violatingProductsCount = Product::where('status', 4)->count(); 
     $allUpdateProductsCount = update_product::all()->count();
     $pendingProductsCount = $allUpdateProductsCount + $newProductsCount;
@@ -1108,7 +1108,7 @@ public function ProductAll(Request $request)
     );
     $pendingProducts = Product::where('status', 3)->paginate(10);
     $activeProducts = Product::where('status', 2)->paginate(10);
-    $rejectedProducts = Product::where('status', 5)->paginate(10);
+    $rejectedProducts = Product::where('status', 0)->paginate(10);
     $violatingProducts = Product::where('status', 4)->paginate(10);
     $allProducts = Product::paginate(10); 
     $allUpdateProducts = update_product::paginate(10); 
