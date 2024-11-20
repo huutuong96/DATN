@@ -36,6 +36,9 @@
 
             <div class="page-content">
                 <div class="container-fluid">
+                    <?php 
+                        $subTotal = 0;
+                    ?>
                     @foreach($orders as $order)
                     <div class="row">
                         <!--end col-->
@@ -108,9 +111,7 @@
                                                                                             {{$cart->quantity ?? 1}}
                                                                                 </td>
                                                                                 <td style="padding: 8px; font-size: 13px;">
-                                                                                        <?php 
-                                                                                            $subTotal = 0;
-                                                                                        ?>
+                                                                                        
                                                                                     @if($cart->variant_id != null)
                                                                                         <p style="margin-bottom: 2px; font-size: 13px; color: #878a99;">{{number_format($subTotal += $cartQuantity * $cart->variant_price)}}đ</p>
                                                                                     @else
