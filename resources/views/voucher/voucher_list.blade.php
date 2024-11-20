@@ -80,8 +80,8 @@
                                                         <div class="col-4">
                                                             <div class="mb-3">
                                                                 <label for="ratio" class="form-label">Phần trăm giảm giá</label>
-                                                                <input type="number" class="form-control" id="ratio"
-                                                                    name="ratio" placeholder="Phần trăm giảm giá" required>
+                                                                <input type="text" class="form-control" id="ratio"
+                                                                    name="ratio" placeholder="Phần trăm giảm giá">
                                                             </div>
                                                         </div>
 
@@ -89,7 +89,7 @@
                                                             <div class="mb-3">
                                                                 <label for="ratio" class="form-label">Đơn hàng tối thiểu được áp dụng</label>
                                                                 <input type="number" class="form-control" id="ratio"
-                                                                    name="min_order" placeholder="Đơn hàng tối thiểu được áp dụng" required>
+                                                                    name="min_order" placeholder="Đơn hàng tối thiểu được áp dụng">
                                                             </div>
                                                         </div>
 
@@ -97,7 +97,7 @@
                                                             <div class="mb-3">
                                                                 <label for="code" class="form-label">Mã giảm giá</label>
                                                                 <input type="text" class="form-control" id="code"
-                                                                    name="code" placeholder="Enter code" required>
+                                                                    name="code" placeholder="Enter code">
                                                             </div>
                                                         </div>
 
@@ -110,6 +110,14 @@
                                                                     <option value="2">Active</option>
                                                                     <option value="0">Inactive</option>
                                                                 </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-4">
+                                                            <div class="mb-3">
+                                                                <label for="image_voucher" class="form-label">Hình ảnh</label>
+                                                                <input type="file" class="form-control" id="image_voucher"
+                                                                    name="image_voucher" placeholder="Hình ảnh voucher">
                                                             </div>
                                                         </div>
 

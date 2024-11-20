@@ -22,9 +22,10 @@ class ConfirmOderToCart extends Mailable
     public $email;
     public $paymentMethod;
     public $user;
+    public $disscount;
     // public $typeCheckout;
 
-    public function __construct($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, $email, $paymentMethod, $user)
+    public function __construct($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, $email, $paymentMethod, $user, $disscount)
     {
         $this->orders = $orders;
         $this->total_amount = $total_amount;
@@ -36,6 +37,7 @@ class ConfirmOderToCart extends Mailable
         $this->email = $email;
         $this->paymentMethod = $paymentMethod;
         $this->user = $user;
+        $this->disscount = $disscount ?? 0;
         // $this->typeCheckout = $typeCheckout;
     }
 
