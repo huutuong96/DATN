@@ -131,7 +131,7 @@
                                 aria-expanded="false">
                                 <i class="bx bx-bell fs-22"></i>
                                 <span
-                                    class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">{{ count($notifyMain) }}<span class="visually-hidden">unread messages</span></span>
+                                    class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">{{ count($notifyMain)  }}<span class="visually-hidden">unread messages</span></span>
                             </button>
                             <div
                                 class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
@@ -215,8 +215,8 @@
                                                     <div class="text-reset notification-item d-block dropdown-item position-relative">
                                                         <div class="d-flex">
                                                             <img
-                                                                src="assets/images/users/avatar-2.jpg"
-                                                                class="me-3 rounded-circle avatar-xs flex-shrink-0"
+                                                                src="{{ $notify->image ?? '' }}"
+                                                                class="me-3 rounded-circle avatar-sm flex-shrink-0"
                                                                 alt="user-pic" />
                                                             <div
                                                                 class="flex-grow-1">
@@ -272,13 +272,11 @@
                                                 @endforeach
                                                 <div
                                                 class="my-3 text-center view-all">
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-soft-success waves-effect waves-light">
+                                                <a href="{{ route('list_notification', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-soft-success waves-effect waves-light">
                                                     Xem tất cả thông báo
                                                     <i
                                                         class="ri-arrow-right-line align-middle"></i>
-                                                </button>
+                                                </a>
                                             </div>
                                             @endif
                                         </div>
@@ -959,7 +957,7 @@
                                             href="{{ route('manager',['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-crm">
-                                            Danh sách Quản lý
+                                            Danh sách người quản lý
                                         </a>
                                     </li>
                                     <li class="nav-item">

@@ -212,41 +212,8 @@
                                                                     <h5 class="modal-title" id="blogDetailsModalLabel-{{ $Post->id }}">Chi tiết Bài viết</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
-                                                                <div class="modal-body">
-                                                                    <table class="table table-bordered">
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th class="fw-bold">ID Bài viết</th>
-                                                                                <td>{{ $Post->blog_id }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Tiêu đề</th>
-                                                                                <td>{{ $Post->title }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                
-                                                                                <th class="fw-bold">Nội dung</th>
-                                                                                <td><div class="mb-3">
-                                                                                    <label for="content-{{ $Post->id }}" class="form-label">Nội dung:</label>
-                                                                                    <textarea style="white-space: pre-wrap; width: 950px;" name="content" id="summernote2{{ $Post->id }}" class="form-control" rows="4" required>{{ $Post->content }}</textarea>
-                                                                                </div></td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Hình ảnh</th>
-                                                                                <td class="text-center">
-                                                                                    <img src="{{ $Post->image }}" alt="Ảnh bài viết" class="img-fluid rounded" style="max-width: 150px;">
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Người tạo</th>
-                                                                                <td>{{ $Post->create_by }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Người cập nhật</th>
-                                                                                <td>{{ $Post->updated_by }}</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
+                                                                <div class="modal-body ">
+                                                                    {!! $Post->content !!}
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
