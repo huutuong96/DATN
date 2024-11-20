@@ -186,6 +186,7 @@ class PurchaseController extends Controller
                 $this->addOrderFeesToTotal($order, $shopTotalPrice);
                 $order->save();
             }
+            $discountMainVoucher = 0;
             if ($voucherToMainCode) {
                 $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
                 $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
