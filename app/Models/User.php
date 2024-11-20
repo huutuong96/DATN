@@ -46,4 +46,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'shop_managers', 'shop_id', 'user_id');
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'user_id', 'id');
+    }
 }

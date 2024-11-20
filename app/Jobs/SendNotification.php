@@ -19,6 +19,7 @@ class SendNotification implements ShouldQueue
     protected $title;
     protected $description;
     protected $user_id;
+    protected $images;
 
     public function __construct($title, $description, $user_id)
     {
@@ -32,18 +33,19 @@ class SendNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        $notificationData = [
-            'type' => 'main',
-            'title' => $this->title,
-            'description' => $this->description,
-            'user_id' => $this->user_id,
-        ];
-        $notification = Notification_to_mainModel::create($notificationData);
-        // dd($notification->id);
-        Notification::create([
-            'type' => 'main',
-            'user_id' => $this->user_id,
-            'id_notification' => $notification->id,
-        ]);
+            $notificationData = [
+                'type' => 'main',
+                'title' => $this->title,
+                'description' => $this->description,
+                'user_id' => $this->user_id,
+                'image' => "https://res.cloudinary.com/dg5xvqt5i/image/upload/v1732024013/fmfrngjifcc2dsxy39kj.png",
+            ];
+            $notification = Notification_to_mainModel::create($notificationData);
+            // dd($notification->id);
+            Notification::create([
+                'type' => 'main',
+                'user_id' => $this->user_id,
+                'id_notification' => $notification->id,
+            ]);
     }
 }

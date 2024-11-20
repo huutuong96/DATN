@@ -31,7 +31,8 @@ use App\Models\tax_category;
 use App\Http\Requests\CategoriesRequest;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\categoryattribute;
-
+use App\Models\Message;
+use App\Models\message_detail;
 
 class VnshopController extends Controller
 {
@@ -960,5 +961,6 @@ public function revenue_general(Request $request){
 public function logout(){
     return redirect()->route('login');
 }
- 
+
+
 }
