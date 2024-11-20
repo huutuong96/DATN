@@ -59,7 +59,6 @@ class VnshopController extends Controller
                                 ->where('is_delete', 0)
                                 ->get()
                                 ->count();
-
         $monthlyRevenue = order_fee_details::
         whereMonth('created_at', Carbon::now()->month)
         ->sum('amount');

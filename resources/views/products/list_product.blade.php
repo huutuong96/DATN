@@ -1,5 +1,11 @@
 @extends('index')
 @section('title', 'List Store')
+@section('link')
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+  
+  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+@endsection
 
 @section('main')
    <div class="container-fluid">
@@ -36,7 +42,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table class="table align-middle table-nowrap mb-0">
+                                <table id="all"  class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Sản phẩm</th>
@@ -51,12 +57,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if($mergedProductsPaginated->isEmpty())
+                                        @if($mergedProducts->isEmpty())
                                             <tr>
                                                 <td colspan="6" class="text-center">Không có sản phẩm nào chờ duyệt.</td>
                                             </tr>
                                         @else
-                                            @foreach($mergedProductsPaginated as $product)
+                                            @foreach($mergedProducts as $product)
                                                 <tr>
                                                     <th scope="row"><a href="#" class="fw-medium">{{ $product->id }}</a></th>
                                                     <td>
@@ -96,7 +102,15 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                        {{ $mergedProductsPaginated->appends(['token' => auth()->user()->refesh_token])->links() }}
+                            <script>
+                                new DataTable('#all', {
+                                    language: {   
+                                        lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                        search: "Tìm kiếm:" 
+                                    }
+                                });
+                            </script>
+                            
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -114,7 +128,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table class="table align-middle table-nowrap mb-0">
+                                <table id="pending" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Sản phẩm</th>
@@ -214,67 +228,116 @@
                                                                 <i class="ri-eye-line align-middle"></i>
                                                             </button>
                                                         </a>
-                                                        
-                                                        <!-- Modal to Show Product Details -->
+                                                    
+                                                        <!-- Modal Chi tiết sản phẩm -->
                                                         <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Chi tiết Sản phẩm</h5>
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
                                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                     </div>
                                                                     <div class="modal-body">
-                                                                        <table class="table table-bordered">
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Tên sản phẩm</th>
-                                                                                    <td>{{ $product->name }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Giá</th>
-                                                                                    <td>{{ number_format($product->price, 0, ',', '.') }} VND</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Giá khuyến mãi</th>
-                                                                                    <td>{{ number_format($product->sale_price, 0, ',', '.') }} VND</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Ảnh sản phẩm</th>
-                                                                                    <td class="text-center">
-                                                                                        <img src="{{ $product->image }}" alt="Ảnh sản phẩm" class="img-fluid rounded" style="max-width: 150px;">
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Mô tả sản phẩm</th>
-                                                                                    <td>{{ $product->description }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Số lượng</th>
-                                                                                    <td>{{ $product->quantity }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Shop</th>
-                                                                                    <td>{{ $product->shop->shop_name }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">SKU</th>
-                                                                                    <td>{{ $product->sku }}</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
+                                                                        <div class="card shadow-sm">
+                                                                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                <h5 class="mb-0 text-white">Sản phẩm chi tiết</h5>
+                                                                                <span class="badge bg-success">
+                                                                                    @if($product->status == 3)
+                                                                                    Chưa duyệt
+                                                                                        @endif
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="card-body">
+                                                                              <div class="mb-5 d-flex">
+                                                                                    <span class="text-muted"> 
+                                                                                       @foreach ($product->images as $image)
+                                                                                           <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
+                                                                                       @endforeach
+                                                                                   </span>
+                                                                                  
+                                                                               </div>
+                                                                                <div class="row">
+                                                                                   
+                                                                                    <!-- Cột trái -->
+                                                                                    <div class="col-lg-6">
+                                                                                      
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->id }}</span> 
+                                                                                        </div>
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>
+                                                                                        </div>
+                                                                                       
+                                                                                       
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Mã SKU:</strong> <span class="text-muted">{{ $product->sku }}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Giá sản phẩm:</strong> <span class="text-muted">{{ number_format($product->price, 0, ',', '.') }} VNĐ</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <!-- Cột phải -->
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Trạng thái:</strong> <span class="text-muted">
+                                                                                                @if($product->status == 3)
+                                                                                                Chưa duyệt
+                                                                                                    @endif
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Ngày tạo:</strong> <span class="text-muted">{{ $product->created_at}}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Danh Sách Địa Chỉ -->
+                                                                        <div class="mt-5">
+                                                                            <h4 class="mb-3">Biến thể sản phẩm</h4>
+                                                                            <table class="table table-bordered table-hover shadow-sm">
+                                                                                <thead class="table-light">
+                                                                                    <tr>
+                                                                                        <th>id</th>
+                                                                                        <th>Tên biến thể</th>
+                                                                                        <th>Hình ảnh</th>
+                                                                                        <th>Mã Sku</th>
+                                                                                        <th>Giá </th>
+                
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    @foreach ($product->variants as $variant)
+                                                                                    <tr>
+                                                                                        <td>{{ $variant->id }}</td>
+                                                                                        <td>{{ $variant->name }}</td>
+                                                                                        <td>
+                                                                                           
+                                                                                                <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                                        
+                                                                                        </td>
+                                                                                        <td>{{ $variant->sku }}</td>
+                                                                                        <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
+                                                                                    </tr>
+                                                                                    @endforeach
+                                                                                    
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        </div>
+                                                                  
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
                                                     </div>
+                                                     </div>
                                                     </td>
                                                     
                                                     
@@ -287,7 +350,14 @@
                         </div>
     
                         <div class="mt-3">
-                        {{ $pendingProducts->appends(['token' => auth()->user()->refesh_token,'tab'=>2])->links() }}
+                            <script>
+                                new DataTable('#pending', {
+                                    language: {   
+                                        lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                        search: "Tìm kiếm:" 
+                                    }
+                                });
+                            </script>
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -304,7 +374,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table class="table align-middle table-nowrap mb-0">
+                                <table id="update" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Sản phẩm</th>
@@ -341,10 +411,7 @@
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
                                                     <td>{{$product->shop->shop_name}}</td> 
-                                                    <td>
-                                                        @if($product->status == 3)
-                                                        Chưa duyệt
-                                                    @endif
+                                                    
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
                                                         <!-- Duyệt -->
@@ -411,55 +478,104 @@
                                                                 <i class="ri-eye-line align-middle"></i>
                                                             </button>
                                                         </a>
-                                                        
-                                                        <!-- Modal to Show Product Details -->
+                                                    
+                                                        <!-- Modal Chi tiết sản phẩm -->
                                                         <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Chi tiết Sản phẩm</h5>
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
                                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                     </div>
                                                                     <div class="modal-body">
-                                                                        <table class="table table-bordered">
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Tên sản phẩm</th>
-                                                                                    <td>{{ $product->name }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Giá</th>
-                                                                                    <td>{{ number_format($product->price, 0, ',', '.') }} VND</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Giá khuyến mãi</th>
-                                                                                    <td>{{ number_format($product->sale_price, 0, ',', '.') }} VND</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Ảnh sản phẩm</th>
-                                                                                    <td class="text-center">
-                                                                                        <img src="{{ $product->image }}" alt="Ảnh sản phẩm" class="img-fluid rounded" style="max-width: 150px;">
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Mô tả sản phẩm</th>
-                                                                                    <td>{{ $product->description }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Số lượng</th>
-                                                                                    <td>{{ $product->quantity }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">Shop</th>
-                                                                                    <td>{{ $product->shop->shop_name }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="fw-bold">SKU</th>
-                                                                                    <td>{{ $product->sku }}</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
+                                                                        <div class="card shadow-sm">
+                                                                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                <h5 class="mb-0 text-white">Sản phẩm chi tiết</h5>
+                                                                                <span class="badge bg-success">
+                                                                                    @if($product->status == 3)
+                                                                                    Chưa duyệt
+                                                                                        @endif
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="card-body">
+                                                                              <div class="mb-5 d-flex">
+                                                                                    <span class="text-muted"> 
+                                                                                       @foreach ($product->images as $image)
+                                                                                           <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
+                                                                                       @endforeach
+                                                                                   </span>
+                                                                                  
+                                                                               </div>
+                                                                                <div class="row">
+                                                                                   
+                                                                                    <!-- Cột trái -->
+                                                                                    <div class="col-lg-6">
+                                                                                      
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->id }}</span> 
+                                                                                        </div>
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>
+                                                                                        </div>
+                                                                                       
+                                                                                       
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Mã SKU:</strong> <span class="text-muted">{{ $product->sku }}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Giá sản phẩm:</strong> <span class="text-muted">{{ number_format($product->price, 0, ',', '.') }} VNĐ</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <!-- Cột phải -->
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                           
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Ngày tạo:</strong> <span class="text-muted">{{ $product->created_at}}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Danh Sách Địa Chỉ -->
+                                                                        <div class="mt-5">
+                                                                            <h4 class="mb-3">Biến thể sản phẩm</h4>
+                                                                            <table class="table table-bordered table-hover shadow-sm">
+                                                                                <thead class="table-light">
+                                                                                    <tr>
+                                                                                        <th>id</th>
+                                                                                        <th>Tên biến thể</th>
+                                                                                        <th>Hình ảnh</th>
+                                                                                        <th>Mã Sku</th>
+                                                                                        <th>Giá </th>
+                
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    @foreach ($product->variants as $variant)
+                                                                                    <tr>
+                                                                                        <td>{{ $variant->id }}</td>
+                                                                                        <td>{{ $variant->name }}</td>
+                                                                                        <td>
+                                                                                           
+                                                                                                <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                                        
+                                                                                        </td>
+                                                                                        <td>{{ $variant->sku }}</td>
+                                                                                        <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
+                                                                                    </tr>
+                                                                                    @endforeach
+                                                                                    
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        </div>
+                                                                  
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                                     </div>
@@ -479,7 +595,14 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                        {{ $allUpdateProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
+                            <script>
+                                new DataTable('#update', {
+                                    language: {   
+                                        lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                        search: "Tìm kiếm:" 
+                                    }
+                                });
+                            </script>
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -497,7 +620,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table class="table align-middle table-nowrap mb-0">
+                                <table id="active" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Sản phẩm</th>
@@ -564,8 +687,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                
-                                                    <!-- Button to open product details modal -->
                                                     <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
                                                         <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
                                                             <i class="ri-eye-line align-middle"></i>
@@ -577,49 +698,102 @@
                                                         <div class="modal-dialog modal-lg">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Chi tiết Sản phẩm</h5>
+                                                                    <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <table class="table table-bordered">
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Tên sản phẩm</th>
-                                                                                <td>{{ $product->name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Giá</th>
-                                                                                <td>{{ number_format($product->price, 0, ',', '.') }} VND</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Giá khuyến mãi</th>
-                                                                                <td>{{ number_format($product->sale_price, 0, ',', '.') }} VND</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Ảnh sản phẩm</th>
-                                                                                <td class="text-center">
-                                                                                    <img src="{{ $product->image }}" alt="Ảnh sản phẩm" class="img-fluid rounded" style="max-width: 150px;">
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Mô tả sản phẩm</th>
-                                                                                <td>{{ $product->description }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Số lượng</th>
-                                                                                <td>{{ $product->quantity }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Shop</th>
-                                                                                <td>{{ $product->shop->shop_name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">SKU</th>
-                                                                                <td>{{ $product->sku }}</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
+                                                                    <div class="card shadow-sm">
+                                                                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                            <h5 class="mb-0 text-white">Sản phẩm chi tiết</h5>
+                                                                            <span class="badge bg-success">
+                                                                                @if($product->status == 2)
+                                                                                Hoạt động
+                                                                                    @endif
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="card-body">
+                                                                          <div class="mb-5 d-flex">
+                                                                                <span class="text-muted"> 
+                                                                                   @foreach ($product->images as $image)
+                                                                                       <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
+                                                                                   @endforeach
+                                                                               </span>
+                                                                              
+                                                                           </div>
+                                                                            <div class="row">
+                                                                               
+                                                                                <!-- Cột trái -->
+                                                                                <div class="col-lg-6">
+                                                                                  
+                                                                                    <div class="mb-3 d-flex ">
+                                                                                        <strong>ID:</strong> <span class="text-muted me-5">{{ $product->id }}</span> 
+                                                                                    </div>
+                                                                                    <div class="mb-3 d-flex ">
+                                                                                        <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>
+                                                                                    </div>
+                                                                                   
+                                                                                   
+                                                                                    <div class="mb-3">
+                                                                                        <strong>Mã SKU:</strong> <span class="text-muted">{{ $product->sku }}</span>
+                                                                                    </div>
+                                                                                    <div class="mb-3">
+                                                                                        <strong>Giá sản phẩm:</strong> <span class="text-muted">{{ number_format($product->price, 0, ',', '.') }} VNĐ</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!-- Cột phải -->
+                                                                                <div class="col-lg-6">
+                                                                                    <div class="mb-3">
+                                                                                        <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                    </div>
+                                                                                    <div class="mb-3">
+                                                                                        <strong>Trạng thái:</strong> <span class="text-muted">
+                                                                                            @if($product->status == 2)
+                                                                                           Hoạt động
+                                                                                                @endif
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div class="mb-3">
+                                                                                        <strong>Ngày tạo:</strong> <span class="text-muted">{{ $product->created_at}}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Danh Sách Địa Chỉ -->
+                                                                    <div class="mt-5">
+                                                                        <h4 class="mb-3">Biến thể sản phẩm</h4>
+                                                                        <table class="table table-bordered table-hover shadow-sm">
+                                                                            <thead class="table-light">
+                                                                                <tr>
+                                                                                    <th>id</th>
+                                                                                    <th>Tên biến thể</th>
+                                                                                    <th>Hình ảnh</th>
+                                                                                    <th>Mã Sku</th>
+                                                                                    <th>Giá </th>
+            
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach ($product->variants as $variant)
+                                                                                <tr>
+                                                                                    <td>{{ $variant->id }}</td>
+                                                                                    <td>{{ $variant->name }}</td>
+                                                                                    <td>
+                                                                                       
+                                                                                            <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                                    
+                                                                                    </td>
+                                                                                    <td>{{ $variant->sku }}</td>
+                                                                                    <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
+                                                                                </tr>
+                                                                                @endforeach
+                                                                                
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    </div>
+                                                              
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                                 </div>
@@ -643,7 +817,14 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                        {{ $activeProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
+                            <script>
+                                new DataTable('#active', {
+                                    language: {   
+                                        lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                        search: "Tìm kiếm:" 
+                                    }
+                                });
+                            </script>
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -661,7 +842,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table class="table align-middle table-nowrap mb-0">
+                                <table id="rejected" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Sản phẩm</th>
@@ -699,7 +880,7 @@
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
                                                     <td>{{$product->shop->shop_name}}</td> 
                                                     <td>
-                                                        @if($product->status == 5)
+                                                        @if($product->status == 0)
                                                         từ chối duyệt
                                                    
                                                     @endif
@@ -716,67 +897,117 @@
                                                                 <i class="ri-check-line align-middle"></i>
                                                             </button>
                                                         </form>
-                                                         <!-- Button to open product details modal -->
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
-                                                        <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
-                                                            <i class="ri-eye-line align-middle"></i>
-                                                        </button>
-                                                    </a>
-                                                
-                                                    <!-- Modal Chi tiết sản phẩm -->
-                                                    <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
-                                                        <div class="modal-dialog modal-lg">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Chi tiết Sản phẩm</h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <table class="table table-bordered">
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Tên sản phẩm</th>
-                                                                                <td>{{ $product->name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Giá</th>
-                                                                                <td>{{ number_format($product->price, 0, ',', '.') }} VND</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Giá khuyến mãi</th>
-                                                                                <td>{{ number_format($product->sale_price, 0, ',', '.') }} VND</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Ảnh sản phẩm</th>
-                                                                                <td class="text-center">
-                                                                                    <img src="{{ $product->image }}" alt="Ảnh sản phẩm" class="img-fluid rounded" style="max-width: 150px;">
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Mô tả sản phẩm</th>
-                                                                                <td>{{ $product->description }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Số lượng</th>
-                                                                                <td>{{ $product->quantity }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Shop</th>
-                                                                                <td>{{ $product->shop->shop_name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">SKU</th>
-                                                                                <td>{{ $product->sku }}</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
+                                                            <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                <i class="ri-eye-line align-middle"></i>
+                                                            </button>
+                                                        </a>
+                                                    
+                                                        <!-- Modal Chi tiết sản phẩm -->
+                                                        <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
+                                                            <div class="modal-dialog modal-lg">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="card shadow-sm">
+                                                                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                <h5 class="mb-0 text-white">Sản phẩm chi tiết</h5>
+                                                                                <span class="badge bg-success">
+                                                                                    @if($product->status == 0)
+                                                                                  Từ chối duyệt
+                                                                                        @endif
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="card-body">
+                                                                              <div class="mb-5 d-flex">
+                                                                                    <span class="text-muted"> 
+                                                                                       @foreach ($product->images as $image)
+                                                                                           <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
+                                                                                       @endforeach
+                                                                                   </span>
+                                                                                  
+                                                                               </div>
+                                                                                <div class="row">
+                                                                                   
+                                                                                    <!-- Cột trái -->
+                                                                                    <div class="col-lg-6">
+                                                                                      
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->id }}</span> 
+                                                                                        </div>
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>
+                                                                                        </div>
+                                                                                       
+                                                                                       
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Mã SKU:</strong> <span class="text-muted">{{ $product->sku }}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Giá sản phẩm:</strong> <span class="text-muted">{{ number_format($product->price, 0, ',', '.') }} VNĐ</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <!-- Cột phải -->
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Trạng thái:</strong> <span class="text-muted">
+                                                                                                @if($product->status == 0)
+                                                                                                Từ chối duyệt
+                                                                                                    @endif
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Ngày tạo:</strong> <span class="text-muted">{{ $product->created_at}}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="mt-5">
+                                                                            <h4 class="mb-3">Biến thể sản phẩm</h4>
+                                                                            <table class="table table-bordered table-hover shadow-sm">
+                                                                                <thead class="table-light">
+                                                                                    <tr>
+                                                                                        <th>id</th>
+                                                                                        <th>Tên biến thể</th>
+                                                                                        <th>Hình ảnh</th>
+                                                                                        <th>Mã Sku</th>
+                                                                                        <th>Giá </th>
+                
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    @foreach ($product->variants as $variant)
+                                                                                    <tr>
+                                                                                        <td>{{ $variant->id }}</td>
+                                                                                        <td>{{ $variant->name }}</td>
+                                                                                        <td>
+                                                                                           
+                                                                                                <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                                        
+                                                                                        </td>
+                                                                                        <td>{{ $variant->sku }}</td>
+                                                                                        <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
+                                                                                    </tr>
+                                                                                    @endforeach
+                                                                                    
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        </div>
+                                                                  
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
                                                      
                                                       
                                                     </td>
@@ -793,7 +1024,14 @@
                         <!-- Pagination Links -->
                         <div class="mt-3">
                             
-                        {{ $rejectedProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
+                            <script>
+                                new DataTable('#rejected', {
+                                    language: {   
+                                        lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                        search: "Tìm kiếm:" 
+                                    }
+                                });
+                            </script>
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
@@ -812,7 +1050,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table class="table align-middle table-nowrap mb-0">
+                                <table id="report" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Sản phẩm</th>
@@ -863,67 +1101,118 @@
                                                                 <i class="ri-check-line align-middle"></i>
                                                             </button>
                                                         </form>
-                                                         <!-- Button to open product details modal -->
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
-                                                        <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
-                                                            <i class="ri-eye-line align-middle"></i>
-                                                        </button>
-                                                    </a>
-                                                
-                                                    <!-- Modal Chi tiết sản phẩm -->
-                                                    <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
-                                                        <div class="modal-dialog modal-lg">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Chi tiết Sản phẩm</h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <table class="table table-bordered">
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Tên sản phẩm</th>
-                                                                                <td>{{ $product->name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Giá</th>
-                                                                                <td>{{ number_format($product->price, 0, ',', '.') }} VND</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Giá khuyến mãi</th>
-                                                                                <td>{{ number_format($product->sale_price, 0, ',', '.') }} VND</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Ảnh sản phẩm</th>
-                                                                                <td class="text-center">
-                                                                                    <img src="{{ $product->image }}" alt="Ảnh sản phẩm" class="img-fluid rounded" style="max-width: 150px;">
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Mô tả sản phẩm</th>
-                                                                                <td>{{ $product->description }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Số lượng</th>
-                                                                                <td>{{ $product->quantity }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">Shop</th>
-                                                                                <td>{{ $product->shop->shop_name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th class="fw-bold">SKU</th>
-                                                                                <td>{{ $product->sku }}</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
+                                                            <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                <i class="ri-eye-line align-middle"></i>
+                                                            </button>
+                                                        </a>
+                                                    
+                                                        <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
+                                                            <div class="modal-dialog modal-lg">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="card shadow-sm">
+                                                                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                <h5 class="mb-0 text-white">Sản phẩm chi tiết</h5>
+                                                                                <span class="badge bg-success">
+                                                                                    @if($product->status == 4)
+                                                                                    Vi phạm
+                                                                                        @endif
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="card-body">
+                                                                              <div class="mb-5 d-flex">
+                                                                                    <span class="text-muted"> 
+                                                                                       @foreach ($product->images as $image)
+                                                                                           <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
+                                                                                       @endforeach
+                                                                                   </span>
+                                                                                  
+                                                                               </div>
+                                                                                <div class="row">
+                                                                                   
+                                                                                    <!-- Cột trái -->
+                                                                                    <div class="col-lg-6">
+                                                                                      
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->id }}</span> 
+                                                                                        </div>
+                                                                                        <div class="mb-3 d-flex ">
+                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>
+                                                                                        </div>
+                                                                                       
+                                                                                       
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Mã SKU:</strong> <span class="text-muted">{{ $product->sku }}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Giá sản phẩm:</strong> <span class="text-muted">{{ number_format($product->price, 0, ',', '.') }} VNĐ</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <!-- Cột phải -->
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Trạng thái:</strong> <span class="text-muted">
+                                                                                                @if($product->status == 4)
+                                                                                                Vi phạm
+                                                                                                    @endif
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <strong>Ngày tạo:</strong> <span class="text-muted">{{ $product->created_at}}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Danh Sách Địa Chỉ -->
+                                                                        <div class="mt-5">
+                                                                            <h4 class="mb-3">Biến thể sản phẩm</h4>
+                                                                            <table class="table table-bordered table-hover shadow-sm">
+                                                                                <thead class="table-light">
+                                                                                    <tr>
+                                                                                        <th>id</th>
+                                                                                        <th>Tên biến thể</th>
+                                                                                        <th>Hình ảnh</th>
+                                                                                        <th>Mã Sku</th>
+                                                                                        <th>Giá </th>
+                
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    @foreach ($product->variants as $variant)
+                                                                                    <tr>
+                                                                                        <td>{{ $variant->id }}</td>
+                                                                                        <td>{{ $variant->name }}</td>
+                                                                                        <td>
+                                                                                           
+                                                                                                <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                                        
+                                                                                        </td>
+                                                                                        <td>{{ $variant->sku }}</td>
+                                                                                        <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
+                                                                                    </tr>
+                                                                                    @endforeach
+                                                                                    
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        </div>
+                                                                  
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
                                                      
                                                       
                                                     </td>
@@ -939,7 +1228,14 @@
     
                         <!-- Pagination Links -->
                         <div class="mt-3">
-                        {{ $violatingProducts->appends(['token' => auth()->user()->refesh_token])->links() }}
+                            <script>
+                                new DataTable('#report', {
+                                    language: {   
+                                        lengthMenu: "Hiển thị _MENU_ sản phẩm",
+                                        search: "Tìm kiếm:" 
+                                    }
+                                });
+                            </script>
                         </div>
                     </div><!-- end card-body -->
                 </div><!-- end card -->
