@@ -736,7 +736,8 @@ public function storebanner(BannerRequest $request)
         $dataInsert = [
             'title' => $request->title,
             'content' => $request->content,
-            'URL' => $uploadedImage['secure_url'],
+            'image' => $uploadedImage['seciure_url'],
+            'URL' => $request->URL,
             'status' => $request->status,
             'index' => $request->index,
             'create_by' =>  auth()->user()->id,
@@ -765,6 +766,7 @@ public function updatebanner(BannerRequest $request, $id)
         'title' => $request->title,
         'content' => $request->content,
         'status' => $request->status,
+        'URL' => $request->URL,
         'index' => $request->index,
         'update_by' =>  auth()->user()->id,
     ];
@@ -944,7 +946,14 @@ public function statistBySales(Request $request)
         'bihuyJson',
         'loiJson',
         'TongSoLuongBanRa',
-        'listShop'
+        'listShop',
+        'DangGiao',
+        'DoiTra',
+        'Huy',
+        'HoanThanh',
+        'ThatBai',
+        'ChoDuyet',
+        'ChuaThanhToan',
     ));
 }
 public function revenue_general(Request $request){

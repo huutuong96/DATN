@@ -95,7 +95,7 @@
                                         >
                                             <span
                                                 class="counter-value"
-                                                data-target="{{$checkProduct ?? 0}}"
+                                                data-target="{{$DangGiao ?? 0}}"
                                                 >0</span
                                             >
                                         </h4>
@@ -148,7 +148,7 @@
                                             class="fs-22 fw-semibold ff-secondary mb-4"
                                         >
                                         <span >
-                                        {{ number_format($monthlyRevenue ?? 0)}} vnđ
+                                        {{ $DoiTra ?? 0}} vnđ
                                         </span>
                                         </h4>
                                         <a
@@ -200,7 +200,7 @@
                                             class="fs-22 fw-semibold ff-secondary mb-4"
                                         >
                                         <span >
-                                        {{ number_format($monthlyRevenue ?? 0)}} vnđ
+                                        {{$Huy ?? 0}}
                                         </span>
                                         </h4>
                                         <a
@@ -256,7 +256,7 @@
                                         >
                                             <span
                                                 class="counter-value"
-                                                data-target="{{$TongSoLuongBanRa ?? 0}}"
+                                                data-target="{{$HoanThanh ?? 0}}"
                                                 >0</span
                                             >
                                         </h4>
@@ -310,7 +310,7 @@
                                         >
                                             <span
                                                 class="counter-value"
-                                                data-target="{{$checkProduct ?? 0}}"
+                                                data-target="{{$ThatBai ?? 0}}"
                                                 >0</span
                                             >
                                         </h4>
@@ -363,7 +363,7 @@
                                             class="fs-22 fw-semibold ff-secondary mb-4"
                                         >
                                         <span >
-                                        {{ number_format($monthlyRevenue ?? 0)}} vnđ
+                                        {{ $ChoDuyet ?? 0}}
                                         </span>
                                         </h4>
                                         <a
@@ -415,7 +415,7 @@
                                             class="fs-22 fw-semibold ff-secondary mb-4"
                                         >
                                         <span >
-                                        {{ number_format($monthlyRevenue ?? 0)}} vnđ
+                                        {{ $ChuaThanhToan ?? 0}}
                                         </span>
                                         </h4>
                                         <a

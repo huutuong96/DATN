@@ -959,7 +959,7 @@
                                             href="{{ route('manager',['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-crm">
-                                            Danh sách Quản lý
+                                            Danh sách người quản lý
                                         </a>
                                     </li>
                                     <li class="nav-item">

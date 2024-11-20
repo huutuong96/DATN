@@ -165,6 +165,11 @@
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$user->fullname ?? 'No Name'}}</span>
+                                                            @if( optional($user->role)->title == "OWNER")
+                                                            <span class="badge bg-success text-white" style="font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
+                                                            @else
+                                                            <span class="badge bg-info text-white" style="font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
+                                                            @endif
                                                         </div>
                                                     </td>
                                                     <td>
