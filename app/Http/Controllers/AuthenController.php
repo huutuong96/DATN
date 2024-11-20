@@ -421,9 +421,7 @@ class AuthenController extends Controller
         $notification = Notification::where('user_id', $user->id)->get();
         $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
         $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
-        // dd($notifyMain);
         session(['notifyMain' => $notifyMain]);
-        // dd(session('notifyMain'));
         return redirect()->route('dashboard', ['token' => auth()->user()->refesh_token]);
     }
 

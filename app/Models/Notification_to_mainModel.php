@@ -22,7 +22,8 @@ class Notification_to_mainModel extends Model
         'image',
         'status',
         'create_by',
-        'update_by'
+        'update_by',
+        'group_order_id',
     ];
 
     /**

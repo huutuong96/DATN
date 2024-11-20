@@ -31,7 +31,11 @@ use App\Models\tax_category;
 use App\Http\Requests\CategoriesRequest;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\categoryattribute;
-
+use App\Models\Message;
+use App\Models\message_detail;
+use App\Models\Notification;
+use App\Models\Notification_to_mainModel;
+ 
 
 class VnshopController extends Controller
 {
@@ -697,11 +701,8 @@ public function changeStatusTax(Request $request, string $id)
                 'tab' => $tab,
             ])->with('message', 'Không thể thay đổi trạng thái vì thuế đang được áp dụng cho danh mục!');
         }
-
-        // Thay đổi trạng thái thuế
         $tax->status = $request->status;
         $tax->save();
-
         return redirect()->route('taxall', [
             'token' => $token,
             'tab' => $tab,
@@ -969,5 +970,19 @@ public function revenue_general(Request $request){
 public function logout(){
     return redirect()->route('login');
 }
- 
+
+
+public function list_notification(Request $request){
+        $limit = 20;
+        $user = JWTAuth::parseToken()->authenticate();
+        $notificationIds = Notification::where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->pluck('id_notification');
+        $notificationMain = Notification_to_mainModel::whereIn('id', $notificationIds)
+        ->orderBy('created_at', 'desc') // Thêm sắp xếp nếu cần
+        ->paginate($limit);
+        return view('notification.list_notification', compact('notificationMain'));
 }
+
+}
+

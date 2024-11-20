@@ -93,7 +93,6 @@ class PurchaseController extends Controller
             $totalQuantity = 0;
             $total_amount = 0;
             $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
-
             if (!$addressUser) {
                 return response()->json([
                     'status' => 400,
@@ -113,7 +112,6 @@ class PurchaseController extends Controller
                 $ordersByShop[$shopId]['items'][] = $cart;
             }
             // Process each shop's order
-
             $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
             foreach ($ordersByShop as $shopId => &$shopOrder) {
                 $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
@@ -128,7 +126,13 @@ class PurchaseController extends Controller
                 $weight = 0;
                 $width = 0;
                 $productIds = [];
+                $images = [];
                 foreach ($shopOrder['items'] as $cart) {
+                    if ($cart->variant_image != null) {
+                        $images[] = $cart->variant_image;
+                    }else {
+                        $images[] = $cart->product_image;
+                    }
                     $productIds[] = $cart->product_id;
                     $result = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
                     $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
@@ -205,7 +209,7 @@ class PurchaseController extends Controller
             }
             $user = jwtAuth::parseToken()->authenticate();
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user);
-            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id());
+            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds);
             ProducttocartModel::whereIn('id', $request->carts)->delete();
             if ($payment->code == 'VNPAY') {
                 $PaymentsController = new PaymentsController();
@@ -317,7 +321,6 @@ class PurchaseController extends Controller
         $discountAmount = $totalPrice * $discountPercentage;
         $discountAmount = min($discountAmount, $maxDiscount); // Đảm bảo giảm giá không vượt quá giới hạn
         $discountedPrice = $totalPrice - $discountAmount;
-
         return $discountedPrice;
     }
     private function getValidVoucherCode($code, $type)
@@ -438,12 +441,15 @@ class PurchaseController extends Controller
     }
     private function applyVouchersToMain($voucherToMainCode, &$totalPrice)
     {
-
         if ($voucherToMainCode) {
             $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
-                $totalPrice -= ($totalPrice * $voucherToMain->ratio / 100);
-                // $this->updateVoucherQuantity($voucherToMain);
+                $priceDiscount = $totalPrice * $voucherToMain->ratio / 100;
+                if ($priceDiscount > $voucherToMain->limitValue) {
+                    $totalPrice -= $voucherToMain->limitValue;
+                }else {
+                    $totalPrice -= $priceDiscount;
+                }
             }
         }
         return $totalPrice;
@@ -469,7 +475,6 @@ class PurchaseController extends Controller
         if ($payment->name == 'VNPAY') {
             $status = 12;
         }
-
         $order = OrdersModel::create([
             'payment_id' => $payment->id,
             'group_order_id' => $groupOrderIds,
@@ -800,27 +805,27 @@ class PurchaseController extends Controller
         $PaymentsController = new PaymentsController();
         $data = ($PaymentsController->vnpay_return($request));
         // dd($data);
-        $insertData = [
-            'vnp_Amount' => $data["vnp_Amount"] ?? 0, // Giá trị mặc định nếu không có
-            'vnp_BankCode' => "".$data['vnp_BankCode']."",
-            'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
-            'vnp_CardType' => $data["vnp_CardType"] ?? '',
-            // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
-            'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
-            'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
-            'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
-            'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
-            'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
-            'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
-            'vnp_SecureHash' => "".$data['vnp_SecureHash']."",
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-        // dd($insertData);
+        // $insertData = [
+        //     'vnp_Amount' => $data["vnp_Amount"] ?? 0, // Giá trị mặc định nếu không có
+        //     'vnp_BankCode' => "".$data['vnp_BankCode']."",
+        //     'vnp_BankTranNo' => $data["vnp_BankTranNo"] ?? '',
+        //     'vnp_CardType' => $data["vnp_CardType"] ?? '',
+        //     // 'vnp_OrderInfo' => $data["vnp_OrderInfo"] ?? '',
+        //     'vnp_PayDate' => $data["vnp_PayDate"], // Định dạng ngày giờ
+        //     'vnp_ResponseCode' => $data["vnp_ResponseCode"] ?? '',
+        //     'vnp_TmnCode' => $data["vnp_TmnCode"] ?? '',
+        //     'vnp_TransactionNo' => $data["vnp_TransactionNo"] ?? '',
+        //     'vnp_TransactionStatus' => $data["vnp_TransactionStatus"] ?? '',
+        //     'vnp_TxnRef' => $data["vnp_TxnRef"] ?? '',
+        //     'vnp_SecureHash' => "".$data['vnp_SecureHash']."",
+        //     'created_at' => now(),
+        //     'updated_at' => now(),
+        // ];
+        // // dd($insertData);
 
-        // Chèn dữ liệu vào bảng
-        vnpay_transaction::create($insertData);
-        $this->handlePaymenAndSendEmail($data["vnp_TxnRef"]);
+        // // Chèn dữ liệu vào bảng
+        // vnpay_transaction::create($insertData);
+        // $this->handlePaymenAndSendEmail($data["vnp_TxnRef"]);
         
     }
 }

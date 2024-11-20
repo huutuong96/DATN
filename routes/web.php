@@ -111,6 +111,10 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
     Route::get('/products/{id}', [ProductController::class, 'showproduct'])->name('products.show');
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
+
+    Route::get('/list_notification', [VnshopController::class, 'list_notification'])->name('list_notification');
+
+
 });
 
 
