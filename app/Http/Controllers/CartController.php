@@ -61,6 +61,21 @@ class CartController extends Controller
     $user = JWTAuth::parseToken()->authenticate();
     $cart_to_users = Cart_to_usersModel::where('user_id', $user->id)->first();
     $all_products_to_cart_to_users = ProducttocartModel::where('cart_id', $cart_to_users->id)->get();
+    foreach ($all_products_to_cart_to_users as $cart) {
+        if ($cart->variant_id != null) {
+            $variantStock = product_variants::where('id', $cart->variant_id)->pluck('stock')->first();
+            if ($variantStock <= 0) {
+                $cart->quantiy = 0;
+                $cart->save();
+            }
+        }else{
+            $productStock = Product::where('id', $cart->product_id)->pluck('quantity')->first();
+            if ($productStock <= 0) {
+                $cart->quantiy = 0;
+                $cart->save();
+            }
+        }
+    }
     $shop = Shop::whereIn('id', $all_products_to_cart_to_users->pluck('shop_id'))->select('id', 'shop_name')
         ->select('id', 'shop_name', 'slug')
         ->get();
