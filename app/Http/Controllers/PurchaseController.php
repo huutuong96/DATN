@@ -183,6 +183,7 @@ class PurchaseController extends Controller
                 $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
                 $grandTotalPrice += $shipFee;
                 $order->total_amount = $grandTotalPrice;
+                
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
                 $discountShopVoucher = 0;
                 $totalAdded = 0;
@@ -199,22 +200,23 @@ class PurchaseController extends Controller
                 }
                 $order->total_amount = $grandTotalPrice;
                 $total_amount = $grandTotalPrice;
+
                 // $total_amount += $order->total_amount;
                 $this->addOrderFeesToTotal($order, $grandTotalPrice);
                 $order->voucher_shop_disscount = $discountShopVoucher;
                 $order->save();
             }
+            
             $discountMainVoucher = 0;
             if ($voucherToMainCode) {
-                $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
+                $total_disscount_main = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
                 $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
+                $order->total_amount = $total_disscount_main;
+                $order->save();
             }
-            
             $order->voucher_disscount = $discountMainVoucher;
-            
             $order->save();
             DB::commit();
-
             if($payment->code == 'COD'){
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                 $order->order_infomation = $orderInfomation;
@@ -255,6 +257,7 @@ class PurchaseController extends Controller
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
             SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
             ProducttocartModel::whereIn('id', $request->carts)->delete();
+            
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
