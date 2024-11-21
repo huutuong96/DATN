@@ -72,7 +72,6 @@ class PurchaseController extends Controller
                 ], 400);
             }
         }
-
         // Validate vouchers
         if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
             return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
@@ -182,15 +181,16 @@ class PurchaseController extends Controller
                 $order->total_amount = $grandTotalPrice;
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
                 $discountShopVoucher = 0;
+                $totalAdded = 0;
                 if ($voucherToShopCode != null) {
                     $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
                     $discountShopVoucher = $totalAdded;
-                    if (!$totalAdded) {
-                       return response()->json([
-                           'status' => false,
-                           'message' => 'Mã giảm giá cửa hàng không hợp lệ',
-                       ], 400);
-                    }
+                    // if (!$totalAdded) {
+                    //    return response()->json([
+                    //        'status' => false,
+                    //        'message' => 'Mã giảm giá cửa hàng không hợp lệ',
+                    //    ], 400);
+                    // }
                     $grandTotalPrice -= $totalAdded;
                 }
                 $order->total_amount = $grandTotalPrice;
@@ -442,7 +442,8 @@ class PurchaseController extends Controller
                                   ->where('status', 2)
                                   ->where('shop_id', $shopId)
                                   ->first();
-            if ($voucherToShop) {
+            
+            if ($voucherToShop) { 
 
                 $discountAmount = $totalPrice * $voucherToShop->ratio / 100;
 
