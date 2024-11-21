@@ -148,6 +148,7 @@ class PurchaseController extends Controller
                     $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
                     $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
                     $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id);
+                    // return $orderDetail;
                     $height += $orderDetail->height;
                     $length += $orderDetail->length;
                     $weight += $orderDetail->weight;
@@ -197,6 +198,7 @@ class PurchaseController extends Controller
                 $total_amount = $grandTotalPrice;
                 // $total_amount += $order->total_amount;
                 $this->addOrderFeesToTotal($order, $shopTotalPrice);
+                $order->voucher_shop_disscount = $discountShopVoucher;
                 $order->save();
             }
             $discountMainVoucher = 0;
@@ -204,7 +206,7 @@ class PurchaseController extends Controller
                 $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
                 $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
             }
-            $order->voucher_shop_disscount = $discountShopVoucher;
+            
             $order->voucher_disscount = $discountMainVoucher;
             $order->save();
             AddPointUser::dispatch(auth()->id());
@@ -300,6 +302,7 @@ class PurchaseController extends Controller
             //     'status' => true,
             //     'message' => 'Đặt hàng thành công',]));
             SendNotification::dispatch('Đặt hàng thành công', 'Bạn đã đặt hàng thành công, đơn hàng của bạn đang được xử lý', $user->id);
+            
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công'
@@ -611,7 +614,7 @@ class PurchaseController extends Controller
         // $taxAmount = $this->calculateStateTax($totalPrice);
         // $newTotal = $newTotal - $taxAmount;
         $order->update(['net_amount' => $newTotal]);
-
+        // dd($newTotal);
         return $newTotal;
     }
 
