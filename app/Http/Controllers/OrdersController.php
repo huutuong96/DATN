@@ -6,14 +6,19 @@ use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Product;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OrdersController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = OrdersModel::all();
-
+        $user = JWTAuth::parseToken()->authenticate();
+        $status = $request->status ?? null;
+        if ($status == null) {
+            $orders = OrdersModel::where('user_id', $user->id)->get();
+        }else{
+            $orders = OrdersModel::where('user_id', $user->id)->where('status', $status)->get();
+        }
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
         }
