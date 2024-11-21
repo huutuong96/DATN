@@ -135,6 +135,17 @@ class PurchaseController extends Controller
                     }
                     $productIds[] = $cart->product_id;
                     $result = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
+                    if ($result == 'PRO') {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Sản phẩm ' . $cart->product_name . ' đã hết hàng',
+                        ], 400);
+                    }elseif ($result == 'VAR') {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Sản phẩm ' . $cart->variant_name . ' đã hết hàng',
+                        ], 400);
+                    }
                     $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
                     $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
                     $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id);
@@ -226,7 +237,7 @@ class PurchaseController extends Controller
                     'ship_fee' => $shipFee,
                     'email' => auth()->user()->email,
                 ]);
-
+                ProducttocartModel::whereIn('id', $request->carts)->delete();
                 $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
                 return response()->json([
                     'status' => true,
@@ -240,14 +251,7 @@ class PurchaseController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
-                // 'data' => [
-                //     'orders' => array_map(function($shopOrder) {
-                //         return $shopOrder['order'];
-                //     }, $ordersByShop),
-                //     'totalPrice' => $grandTotalPrice,
-                //     'total_amount' => $total_amount,
-                // ],
-                // 'point' => auth()->user()->point,
+                'data' => $groupOrderIds,
             ], 200);
     
         } catch (\Exception $e) {
@@ -349,14 +353,21 @@ class PurchaseController extends Controller
         
         if ($variantId == null) {
             $result = Product::where('id', $productId)->first();
-            $product->decrement('quantity', $quantity);
+            $result->decrement('quantity', $quantity);
+            if ($result->quantity < 0) {
+                $result->update(['status' => 0]);
+                return $result = 'PRO';
+            }
             return $result;
         }else{
             $result = product_variants::where('id', $variantId)->first();
             $result->decrement('stock', $quantity);
+            if ($result->stock < 0) {
+                $result->update(['status' => 0]);
+                return $result = 'VAR';
+            }
             return $result;
         }
-        // return $result;
     }
 
     private function getProductForShip($productId)

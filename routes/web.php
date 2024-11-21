@@ -51,6 +51,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\webAppController;
 
 Route::get('/', [VnshopController::class, 'login'])->name('login');
 Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
@@ -106,13 +107,14 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/statist-sales', [VnshopController::class, 'statistBySales'])->name('statist.sales');
     Route::post('categories', [VnshopController::class, 'storeCategory'])->name('create_category');
     Route::put('categories', [VnshopController::class, 'updateCategory'])->name('update_category');
-
     Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
     Route::get('/revenue_general', [VnshopController::class, 'revenue_general'])->name('revenue_general');
     Route::get('/products/{id}', [ProductController::class, 'showproduct'])->name('products.show');
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
-
     Route::get('/list_notification', [VnshopController::class, 'list_notification'])->name('list_notification');
+    Route::get('/list_app', [webAppController::class, 'index'])->name('list_app');
+    Route::post('/create_app', [webAppController::class, 'create'])->name('create_app');
+    Route::get('/delete_app', [webAppController::class, 'delete_app'])->name('delete_app');
 
 
 });

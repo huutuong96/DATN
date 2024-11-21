@@ -117,6 +117,40 @@
                                 <i class="bx bx-search fs-22"></i>
                             </button>
                         </div>
+                        <div class="dropdown topbar-head-dropdown ms-1 header-item">
+                            <button type="button" class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bx bx-category-alt fs-22"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-lg p-0 dropdown-menu-end" style="">
+                                <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h6 class="m-0 fw-semibold fs-15"> Web Apps </h6>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> View All Apps
+                                                <i class="ri-arrow-right-s-line align-middle"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-2">
+                                    <div class="row g-0">
+                                        @foreach ($apps as $index => $app)
+                                            @if ($index % 3 == 0 && $index != 0)
+                                                </div><div class="row g-0">
+                                            @endif
+                                            <div class="col">
+                                                <a class="dropdown-icon-item" href="{{$app->url}}" target="_blank">
+                                                    <img src="{{$app->icon}}" alt="app">
+                                                    <span>{{$app->name}}</span>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div
                             class="dropdown topbar-head-dropdown ms-1 header-item"
@@ -762,7 +796,7 @@
                             <a
                                 class="nav-link"
                                 href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}">
-                                <span data-key="t-dashboards"><b>DASH BOARD</b></span>
+                                <span data-key="t-dashboards"><b>MENU</b></span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -1059,8 +1093,8 @@
                                 class="nav-link"
                                 data-key="t-crm">
                                 <i class="ri-dashboard-3-line"></i>
-
-                                Quản lý voucher
+                                <span data-key="t-dashboards">Quản lý voucher</span>
+                                
                             </a>
                         </li>
                         <li class="nav-item">
@@ -1070,8 +1104,8 @@
                                 class="nav-link"
                                 data-key="t-projects">
                                 <i class="ri-dashboard-3-line"></i>
-
-                                Quản lý thuế
+                                <span data-key="t-dashboards">Quản lý thuế</span>
+                                
                             </a>
                         </li>
                     </ul>

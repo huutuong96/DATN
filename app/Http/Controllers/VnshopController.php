@@ -745,15 +745,12 @@ public function storebanner(BannerRequest $request)
         $banner = Banner::create($dataInsert);
         return redirect()->route('bannerall', [
             'token' => $token,
-            
-        ])->with('success', 'banner thuế thành công');
+        ])->with('success', 'thêm banner thành công');
     } catch (\Throwable $th) {
         // Return view with error message
-        return view('bannerall')->with([
-            'status' => false,
-            'message' => "Thêm Banner không thành công",
-            'error' => $th->getMessage()
-        ]);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+        ])->with('success', 'thêm banner thất bại');
     }
 }
 public function updatebanner(BannerRequest $request, $id)
