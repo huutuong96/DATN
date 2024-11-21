@@ -148,7 +148,6 @@ class PurchaseController extends Controller
                     $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
                     $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
                     $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id);
-                    // return $orderDetail;
                     $height += $orderDetail->height;
                     $length += $orderDetail->length;
                     $weight += $orderDetail->weight;
@@ -178,10 +177,12 @@ class PurchaseController extends Controller
                 $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
                 // $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], 99999);
                 // $order->order_infomation = $orderInfomation;
+                
                 AddPointUser::dispatch(auth()->id());
                 $checkRank = $this->check_point_to_user();
                 $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
-                $grandTotalPrice += $shipFee;
+                // $grandTotalPrice += $shipFee;
+                // dd($grandTotalPrice);
                 $order->total_amount = $grandTotalPrice;
                 
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
@@ -215,6 +216,8 @@ class PurchaseController extends Controller
                 $order->save();
             }
             $order->voucher_disscount = $discountMainVoucher;
+            
+            $order->total_amount = $shipFee + $order->total_amount;
             $order->save();
             DB::commit();
             if($payment->code == 'COD'){
@@ -256,8 +259,7 @@ class PurchaseController extends Controller
             }
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
             SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-            ProducttocartModel::whereIn('id', $request->carts)->delete();
-            
+            ProducttocartModel::whereIn('id', $request->carts)->delete();   
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
