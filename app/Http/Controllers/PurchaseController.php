@@ -254,7 +254,7 @@ class PurchaseController extends Controller
             }
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
             SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-            // ProducttocartModel::whereIn('id', $request->carts)->delete();
+            ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
