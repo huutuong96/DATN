@@ -42,38 +42,30 @@
                                                 <form action="{{ route('banner.store', ['token' => auth()->user()->refesh_token]) }}" method="POST" enctype="multipart/form-data">
                                                     @csrf
                                                     <div class="row">
-                                                        <!-- Title Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="title" class="form-label">Tiêu đề</label>
-                                                                <input type="text" class="form-control" placeholder="Tiêu đề" id="title" name="title" required>
+                                                                <input type="text" class="form-control" id="title" name="title" placeholder="Tiêu đề" required>
                                                             </div>
                                                         </div>
-                                                        
-                                                        <!-- Content Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="content" class="form-label">Nội dung</label>
-                                                                <textarea class="form-control" placeholder="Nội dung" id="content" name="content" rows="2" required></textarea>
+                                                                <textarea class="form-control" id="content" name="content" rows="2" placeholder="Nội dung" required></textarea>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Image Upload Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="image" class="form-label">Hình ảnh</label>
                                                                 <input type="file" class="form-control" id="image" name="image" required>
                                                             </div>
                                                         </div>
-                                                        <!-- Image Upload Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="URL" class="form-label">Đường dẫn</label>
                                                                 <input type="text" class="form-control" id="URL" name="URL" required>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Status Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="status" class="form-label">Trạng thái</label>
@@ -84,16 +76,12 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Index Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="index" class="form-label">Thứ tự</label>
                                                                 <input type="number" class="form-control" id="index" name="index" placeholder="Thứ tự hiển thị" required>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Submit Button -->
                                                         <div class="col-lg-12">
                                                             <div class="text-end">
                                                                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -144,8 +132,8 @@
                                                         <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             <img src="{{ $banner->image }}" alt="Post Image" style="max-width: 50%; height: auto;">
                                                         </td>
-                                                        <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                             {{ $banner->URL }}
+                                                        <td style="max-width: 200px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                            {{ \Illuminate\Support\Str::limit($banner->URL, 150, '...') }}
                                                         </td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
