@@ -197,7 +197,7 @@ class CartController extends Controller
             if ($productVariant->stock < $request->quantity) {
                 return response()->json(['error' => 'Số lượng sản phẩm không đủ'], 400);
             }
-            $product_to_cart = ProducttocartModel::where('variant_id', $productVariant->id)->first();
+            $product_to_cart = ProducttocartModel::where('variant_id', $productVariant->id)->where('cart_id', $cart_to_users->id)->first();
             if ($product_to_cart) {
                if ($product_to_cart->variant_id != null && $product_to_cart->variant_id == $productVariant->id) {
                    $product_to_cart->quantity += $request->quantity;
