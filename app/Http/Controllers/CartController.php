@@ -185,15 +185,16 @@ class CartController extends Controller
         }
         $shop = Shop::where('id', $request->shop_id)->first();
         $product = Product::where('id', $request->product_id)->where('status', 2)->where('shop_id', $request->shop_id)->first();
+        
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
         if ($request->variant_id) {
             $productVariant = product_variants::where('id', $request->variant_id)->first();
-            // dd($productVariant->images);
             if (!$productVariant) {
                 return response()->json(['error' => 'Sản phẩm không có biến thể này'], 404);
-            }if ($productVariant->stock < $request->quantity) {
+            }
+            if ($productVariant->stock < $request->quantity) {
                 return response()->json(['error' => 'Số lượng sản phẩm không đủ'], 400);
             }
             $product_to_cart = ProducttocartModel::where('variant_id', $productVariant->id)->first();
@@ -204,7 +205,7 @@ class CartController extends Controller
                    if ($productVariant->stock < $product_to_cart->quantity) {
                         $product_to_cart->quantity = $productVariant->stock;
                         $product_to_cart->save(); 
-                   }
+                    }
                    return response()->json([
                        'status' => true,
                        'message' => "Sản phẩm đã tồn tại trong giỏ hàng của bạn, Thêm só lượng sản phẩm thành công",
