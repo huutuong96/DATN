@@ -178,6 +178,9 @@ class PurchaseController extends Controller
                 $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
                 // $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], 99999);
                 // $order->order_infomation = $orderInfomation;
+                AddPointUser::dispatch(auth()->id());
+                $checkRank = $this->check_point_to_user();
+                $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
                 $grandTotalPrice += $shipFee;
                 $order->total_amount = $grandTotalPrice;
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
@@ -197,7 +200,7 @@ class PurchaseController extends Controller
                 $order->total_amount = $grandTotalPrice;
                 $total_amount = $grandTotalPrice;
                 // $total_amount += $order->total_amount;
-                $this->addOrderFeesToTotal($order, $shopTotalPrice);
+                $this->addOrderFeesToTotal($order, $grandTotalPrice);
                 $order->voucher_shop_disscount = $discountShopVoucher;
                 $order->save();
             }
@@ -208,11 +211,9 @@ class PurchaseController extends Controller
             }
             
             $order->voucher_disscount = $discountMainVoucher;
+            
             $order->save();
-            AddPointUser::dispatch(auth()->id());
-            $checkRank = $this->check_point_to_user();
-            $total_amount = $this->discountsByRank($checkRank, $total_amount);
-            DB::commit();
+            // DB::commit();
 
             if($payment->code == 'COD'){
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
@@ -253,7 +254,7 @@ class PurchaseController extends Controller
             }
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
             SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-            ProducttocartModel::whereIn('id', $request->carts)->delete();
+            // ProducttocartModel::whereIn('id', $request->carts)->delete();
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
@@ -333,6 +334,7 @@ class PurchaseController extends Controller
         $maxDiscount = $rank->limitValue; // Giả sử limitValue là giá trị giảm tối đa
         $discountAmount = $totalPrice * $discountPercentage;
         $discountAmount = min($discountAmount, $maxDiscount); // Đảm bảo giảm giá không vượt quá giới hạn
+        
         $discountedPrice = $totalPrice - $discountAmount;
         return $discountedPrice;
     }
