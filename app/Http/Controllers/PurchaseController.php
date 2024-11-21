@@ -354,7 +354,7 @@ class PurchaseController extends Controller
         if ($variantId == null) {
             $result = Product::where('id', $productId)->first();
             $result->decrement('quantity', $quantity);
-            if ($result->quantity <= 0) {
+            if ($result->quantity < 0) {
                 $result->update(['status' => 0]);
                 return $result = 'PRO';
             }
@@ -362,7 +362,7 @@ class PurchaseController extends Controller
         }else{
             $result = product_variants::where('id', $variantId)->first();
             $result->decrement('stock', $quantity);
-            if ($result->stock <= 0) {
+            if ($result->stock < 0) {
                 $result->update(['status' => 0]);
                 return $result = 'VAR';
             }
