@@ -213,7 +213,7 @@ class PurchaseController extends Controller
             $order->voucher_disscount = $discountMainVoucher;
             
             $order->save();
-            // DB::commit();
+            DB::commit();
 
             if($payment->code == 'COD'){
                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
