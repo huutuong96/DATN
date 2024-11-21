@@ -730,32 +730,34 @@ public function storebanner(BannerRequest $request)
     $image = $request->file('image');
     $cloudinary = new Cloudinary();
     $token = $request->query('token');
-
+   
     try {
         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        
         $dataInsert = [
             'title' => $request->title,
             'content' => $request->content,
-            'image' => $uploadedImage['seciure_url'],
+            'image' => $uploadedImage['secure_url'], 
             'URL' => $request->URL,
             'status' => $request->status,
             'index' => $request->index,
-            'create_by' =>  auth()->user()->id,
+            'create_by' => auth()->user()->id,
         ];
+        
         $banner = Banner::create($dataInsert);
+
         return redirect()->route('bannerall', [
             'token' => $token,
-        ])->with('success', 'thêm banner thành công');
+        ])->with('success', 'Thêm banner thành công');
     } catch (\Throwable $th) {
-        // Return view with error message
         return redirect()->route('bannerall', [
             'token' => $token,
-        ])->with('success', 'thêm banner thất bại');
+        ])->with('error', 'Thêm banner thất bại: ' . $th->getMessage());
     }
 }
+
 public function updatebanner(BannerRequest $request, $id)
 {
-
     $token = $request->token; 
     $tab = $request->tab;
     $banner = Banner::findOrFail($id);
@@ -763,21 +765,29 @@ public function updatebanner(BannerRequest $request, $id)
         'title' => $request->title,
         'content' => $request->content,
         'status' => $request->status,
-        'URL' => $request->URL,
+        'URL' => Str::limit($request->URL, 2083), // Giới hạn độ dài URL
         'index' => $request->index,
-        'update_by' =>  auth()->user()->id,
+        'update_by' => auth()->user()->id,
     ];
-    if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        $dataUpdate['URL'] = $uploadedImage['secure_url'];
+
+    try {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $dataUpdate['image'] = $uploadedImage['secure_url']; // Cập nhật URL hình ảnh
+        }
+        $banner->update($dataUpdate);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật banner thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật banner thất bại: ' . $th->getMessage());
     }
-    $banner->update($dataUpdate);
-    return redirect()->route('bannerall', [
-        'token' => $token,
-        'tab' => $tab,
-    ])->with('message', 'Cập nhật banner thành công!');
 }
 
 public function statistByQuantity(Request $request)
