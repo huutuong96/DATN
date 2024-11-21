@@ -240,14 +240,7 @@ class PurchaseController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
-                // 'data' => [
-                //     'orders' => array_map(function($shopOrder) {
-                //         return $shopOrder['order'];
-                //     }, $ordersByShop),
-                //     'totalPrice' => $grandTotalPrice,
-                //     'total_amount' => $total_amount,
-                // ],
-                // 'point' => auth()->user()->point,
+                'data' => $groupOrderIds,
             ], 200);
     
         } catch (\Exception $e) {
