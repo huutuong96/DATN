@@ -181,8 +181,10 @@ class PurchaseController extends Controller
                 $grandTotalPrice += $shipFee;
                 $order->total_amount = $grandTotalPrice;
                 $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
+                $discountShopVoucher = 0;
                 if ($voucherToShopCode != null) {
                     $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                    $discountShopVoucher = $totalAdded;
                     if (!$totalAdded) {
                        return response()->json([
                            'status' => false,
@@ -202,7 +204,9 @@ class PurchaseController extends Controller
                 $total_amount = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
                 $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
             }
-
+            $order->voucher_shop_disscount = $discountShopVoucher;
+            $order->voucher_disscount = $discountMainVoucher;
+            $order->save();
             AddPointUser::dispatch(auth()->id());
             $checkRank = $this->check_point_to_user();
             $total_amount = $this->discountsByRank($checkRank, $total_amount);
@@ -498,7 +502,6 @@ class PurchaseController extends Controller
 
     private function createOrder(Request $request, $ship_id, $groupOrderIds, $payment)
     {
-
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
         $status = 0;
         if ($payment->name == 'VNPAY') {
@@ -513,7 +516,6 @@ class PurchaseController extends Controller
             'ship_id' => $ship_id->id,
             'status' => $status,
         ]);
-        // dd($order);
         return $order;
     }
 
