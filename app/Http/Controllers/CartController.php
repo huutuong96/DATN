@@ -65,13 +65,13 @@ class CartController extends Controller
         if ($cart->variant_id != null) {
             $variantStock = product_variants::where('id', $cart->variant_id)->pluck('stock')->first();
             if ($variantStock <= 0) {
-                $cart->quantiy = 0;
+                $cart->quantity = 0;
                 $cart->save();
             }
         }else{
             $productStock = Product::where('id', $cart->product_id)->pluck('quantity')->first();
             if ($productStock <= 0) {
-                $cart->quantiy = 0;
+                $cart->quantity = 0;
                 $cart->save();
             }
         }
