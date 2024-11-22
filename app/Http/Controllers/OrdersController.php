@@ -50,6 +50,8 @@ class OrdersController extends Controller
             ->where('status', $status)
             ->orderby('created_at', 'desc')
             ->paginate(15);
+
+            $orders->appends(['status' => $status])->links();
             foreach ($orders as $order) {
                 foreach ($order->orderDetails as $orderDetail) {
                     if($orderDetail->variant!=null){
