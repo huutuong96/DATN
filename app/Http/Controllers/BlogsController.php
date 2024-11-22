@@ -15,7 +15,7 @@ class BlogsController extends Controller
         return response()->json($blogs);
     }
 
-    public function store(BlogRequest $request)
+    public function store(Blogrequest $request)
     {  
        
         $token = $request->query('token');
