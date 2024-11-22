@@ -49,7 +49,7 @@ class OrdersController extends Controller
             ->where('user_id', $user->id)
             ->where('status', $status)
             ->orderby('created_at', 'desc')
-            ->paginate(15);
+            ->paginate(10);
 
             $orders->appends(['status' => $status])->links();
             foreach ($orders as $order) {
