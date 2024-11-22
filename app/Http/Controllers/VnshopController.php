@@ -1049,8 +1049,8 @@ public function rankCreate(Request $request)
             'token' => $token,
         ])->with('message', 'Thêm thành công!');
     }
-}
-
+    
+    
 public function updaterank(RankRequest $request, $id)
 {
     $token = $request->token;
@@ -1080,6 +1080,7 @@ public function updaterank(RankRequest $request, $id)
         ])->with('error', 'Cập nhật rank thất bại: ' . $th->getMessage());
     }
 }
+
 public function changeStatusRank(Request $request, string $id)
 {
     try {
@@ -1100,6 +1101,7 @@ public function changeStatusRank(Request $request, string $id)
         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
     }
 }
+
 public function destroyrank(Request $request, string $id)
 {
     try {
@@ -1118,5 +1120,5 @@ public function destroyrank(Request $request, string $id)
         ])->with('message', 'Xóa Rank không thành công!');
     }
 }
-
 }
+
