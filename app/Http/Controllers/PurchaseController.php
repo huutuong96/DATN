@@ -456,7 +456,7 @@ class PurchaseController extends Controller
         if ($voucherToMainCode) {
             $voucherToMain = voucherToMain::where('code', $voucherToMainCode)->first();
             if ($voucherToMain) {
-                $priceDiscount = $totalPrice * $voucherToMain->ratio;
+                $priceDiscount = $totalPrice * $voucherToMain->ratio / 100;
                 if ($priceDiscount > $voucherToMain->limitValue) {
                     $totalPrice -= $voucherToMain->limitValue;
                 }else {
