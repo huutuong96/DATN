@@ -165,7 +165,6 @@ class PurchaseController extends Controller
                     }
                     $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                 }
-
                 $order->height = $height;
                 $order->length = $length;
                 $order->weight = $weight;
@@ -232,7 +231,8 @@ class PurchaseController extends Controller
                     'ship_fee' => $shipFee,
                     'email' => auth()->user()->email,
                 ]);
-                deleteProductToCart::dispatch($request->carts);
+                    ProducttocartModel::whereIn('id', $request->carts)->delete();
+                // deleteProductToCart::dispatch($request->carts);
                 $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
                 return response()->json([
                     'status' => true,
@@ -242,8 +242,8 @@ class PurchaseController extends Controller
             }
             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
             SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-            // ProducttocartModel::whereIn('id', $request->carts)->delete();
-            deleteProductToCart::dispatch($request->carts);   
+            ProducttocartModel::whereIn('id', $request->carts)->delete();
+            // deleteProductToCart::dispatch($request->carts);   
             return response()->json([
                 'status' => true,
                 'message' => 'Đặt hàng thành công',
@@ -501,8 +501,10 @@ class PurchaseController extends Controller
     {
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
         $status = 1;
+        $order_status = 0;
         if ($payment->code == 'VNPAY') {
-            $status = 5;
+            $status = 2;
+            // $order_status = 12;
         }
         $order = OrdersModel::create([
             'payment_id' => $payment->id,
@@ -512,6 +514,7 @@ class PurchaseController extends Controller
             'delivery_address' => $request->delivery_address ?? $address->address,
             'ship_id' => $ship_id->id,
             'status' => $status,
+            'order_status' => $order_status ?? 0,
         ]);
         return $order;
     }

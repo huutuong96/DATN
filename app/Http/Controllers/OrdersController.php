@@ -47,7 +47,7 @@ class OrdersController extends Controller
         $status = $request->status ?? 1;
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
-            ->where('status', $status)
+            ->where('order_status', $status)
             ->orderby('created_at', 'desc')
             ->paginate(10);
 
@@ -102,19 +102,17 @@ class OrdersController extends Controller
         return $this->successResponse("Lấy dữ liệu thành công", $order);
     }
 
-    public function update(OrderRequest $request, string $id)
+    public function update(Request $request)
     {
-        $order = OrdersModel::find($id);
-
+        $order = OrdersModel::where('id', $request->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
         if (!$order) {
             return $this->errorResponse("Order không tồn tại", 404);
         }
-
         $dataUpdate = [
-            'status' => $request->status ?? $order->status,
-            'update_by' => auth()->id()
+            'order_status' => $request->status ?? $order->status,
+            'update_by' => $user->id,
         ];
-
         try {
             $order->update($dataUpdate);
             return $this->successResponse("Order đã được cập nhật", $order);
