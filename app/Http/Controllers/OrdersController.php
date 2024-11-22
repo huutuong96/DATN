@@ -42,13 +42,14 @@ class OrdersController extends Controller
     }
     public function indexOrderToUser(Request $request)
     {
+        
+        $user = JWTAuth::parseToken()->authenticate();
         $status = $request->status ?? 1;
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
-            ->where('user_id', auth()->id())
+            ->where('user_id', $user->id)
             ->where('status', $status)
             ->orderby('created_at', 'desc')
             ->get();
-           
             foreach ($orders as $order) {
                 foreach ($order->orderDetails as $orderDetail) {
                     if($orderDetail->variant!=null){
@@ -67,12 +68,8 @@ class OrdersController extends Controller
                     }
                 }
             }
-
-        if ($orders->isEmpty()) {
-            return $this->errorResponse("Không tồn tại Order nào", 404);
-        }
     
-        return $this->successResponse('Lấy dữ liệu thành công', $orders);
+        return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
     }
     
     
