@@ -765,7 +765,7 @@ public function updatebanner(BannerRequest $request, $id)
         'title' => $request->title,
         'content' => $request->content,
         'status' => $request->status,
-        'URL' => Str::limit($request->URL, 2083), // Giới hạn độ dài URL
+        'URL' => Str::limit($request->URL, 2083), 
         'index' => $request->index,
         'update_by' => auth()->user()->id,
     ];
@@ -775,7 +775,7 @@ public function updatebanner(BannerRequest $request, $id)
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $dataUpdate['image'] = $uploadedImage['secure_url']; // Cập nhật URL hình ảnh
+            $dataUpdate['image'] = $uploadedImage['secure_url']; 
         }
         $banner->update($dataUpdate);
         return redirect()->route('bannerall', [

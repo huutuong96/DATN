@@ -26,7 +26,7 @@ class BannerRequest extends FormRequest
         return [
             'title' => 'required|string',
             'content' => 'required|string',
-           'URL' => 'required|string|max:2083',
+           'URL' => 'required|url|string|max:2083',
             'status' => 'numeric',
             'index' => 'numeric'
         ];
