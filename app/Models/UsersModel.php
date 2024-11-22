@@ -60,10 +60,10 @@ class UsersModel extends Authenticatable implements JWTSubject {
         return $this->hasMany(AddressModel::class, 'user_id');
     }
 
-    // public function rank()
-    // {
-    //     return $this->belongsTo(RanksModel::class, 'rank_id');
-    // }
+    public function rank()
+    {
+        return $this->belongsTo(RanksModel::class, 'rank_id');
+    }
 
     public function notifications()
     {
