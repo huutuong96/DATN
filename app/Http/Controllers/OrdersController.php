@@ -15,9 +15,9 @@ class OrdersController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $status = $request->status ?? null;
         if ($status == null) {
-            $orders = OrdersModel::where('user_id', $user->id)->get();
+            $orders = OrdersModel::where('user_id', $user->id)->paginate(15);
         }else{
-            $orders = OrdersModel::where('user_id', $user->id)->where('status', $status)->get();
+            $orders = OrdersModel::where('user_id', $user->id)->where('status', $status)->paginate(15);
         }
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);

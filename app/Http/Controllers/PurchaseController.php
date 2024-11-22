@@ -502,7 +502,7 @@ class PurchaseController extends Controller
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
         $status = 1;
         if ($payment->code == 'VNPAY') {
-            $status = 12;
+            $status = 5;
         }
         $order = OrdersModel::create([
             'payment_id' => $payment->id,
