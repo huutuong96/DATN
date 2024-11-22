@@ -42,7 +42,6 @@
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$shop->user[0]->fullname ?? 'No Name'}}</span>
                                                             <span style="color: gray;">{{$shop->user[0]->phone ?? 'No Phone'}}</span>
-                                                            <span style="color: gray;">{{$shop->user[0]->phone ?? 'No Phone'}}</span>
                                                         </div>
                                                     </td>
                                                     <td>

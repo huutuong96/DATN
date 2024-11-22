@@ -37,6 +37,7 @@ use App\Models\Notification;
 use App\Models\Notification_to_mainModel;
 use App\Models\RanksModel;
 use App\Models\recipes;
+use App\Http\Requests\RankRequest;
 
 class VnshopController extends Controller
 {
@@ -628,7 +629,7 @@ class VnshopController extends Controller
     $taxeOFF = Tax::where('status',3)->get();
 
     if ($taxes->isEmpty()) {
-        return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
+        return view('rank.tax')->with('message', 'Không tồn tại thuế nào');
     }
 
     return view('tax.tax', compact('taxes' ,'taxeOFF', 'tab'));
@@ -766,7 +767,7 @@ public function updatebanner(BannerRequest $request, $id)
         'title' => $request->title,
         'content' => $request->content,
         'status' => $request->status,
-        'URL' => Str::limit($request->URL, 2083), // Giới hạn độ dài URL
+        'URL' => Str::limit($request->URL, 2083), 
         'index' => $request->index,
         'update_by' => auth()->user()->id,
     ];
@@ -776,7 +777,7 @@ public function updatebanner(BannerRequest $request, $id)
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $dataUpdate['image'] = $uploadedImage['secure_url']; // Cập nhật URL hình ảnh
+            $dataUpdate['image'] = $uploadedImage['secure_url']; 
         }
         $banner->update($dataUpdate);
         return redirect()->route('bannerall', [
@@ -1005,13 +1006,18 @@ public function rankCreate(Request $request)
 {
     $token = $request->query('token');
     $tab = $request->input('tab', 1); 
+    
     RanksModel::create([
         'title' => $request->title,
         'description' => $request->description,
         'condition' => $request->condition,
+        'value' => $request->value,
+        'limitValue' => $request->limitValue,
         'status' => $request->status,
         'create_by' => auth()->user()->id,
+        'update_by' => null, 
     ]);
+    
     return redirect()->route('rankall', [
         'token' => $token,
         'tab' => $tab,
@@ -1043,5 +1049,74 @@ public function rankCreate(Request $request)
             'token' => $token,
         ])->with('message', 'Thêm thành công!');
     }
+}
+
+public function updaterank(RankRequest $request, $id)
+{
+    $token = $request->token;
+    $tab = $request->tab;
+
+    $rank = RanksModel::findOrFail($id);
+    $dataUpdate = [
+        'title' => $request->title,
+        'description' => $request->description,
+        'condition' => $request->condition,
+        'status' => $request->status,
+        'value' => $request->value,
+        'limitValue' => $request->limitValue,
+        'update_by' => auth()->user()->id,
+    ];
+
+    try {
+        $rank->update($dataUpdate);
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật rank thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật rank thất bại: ' . $th->getMessage());
+    }
+}
+public function changeStatusRank(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $rank = RanksModel::findOrFail($id);
+        $rank->status = $request->status;
+        $rank->save();
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        // Xử lý lỗi và trả về thông báo
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+public function destroyrank(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $rank = RanksModel::findOrFail($id);
+        $rank->delete();
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa Rank thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa Rank không thành công!');
+    }
+}
 
 }
