@@ -36,6 +36,7 @@ use App\Models\message_detail;
 use App\Models\Notification;
 use App\Models\Notification_to_mainModel;
 use App\Models\RanksModel;
+use App\Models\recipes;
 use App\Http\Requests\RankRequest;
 
 class VnshopController extends Controller
@@ -1021,6 +1022,33 @@ public function rankCreate(Request $request)
         'token' => $token,
         'tab' => $tab,
     ])->with('message', 'Thêm rank thành công!');
+
+}
+
+    public function list_recipes(Request $request){
+
+        $limit = 10;
+        $recipes = recipes::all();
+        return view('recipes.recipes',compact(
+            'recipes'
+        ));
+
+    }
+
+    public function recipesCreate(Request $request){
+        $token = $request->query('token');
+        recipes::create([
+            'is_active' => $request->status ?? 2,
+            'code' => $request->code ?? null,
+            'title' => $request->title ?? null,
+            'description' => $request->description ?? null,
+            'type' => $request->type ?? null,
+            'json' => json_encode($request->json),
+        ]);
+        return redirect()->route('list_recipes', [
+            'token' => $token,
+        ])->with('message', 'Thêm thành công!');
+    }
 }
 
 public function updaterank(RankRequest $request, $id)
