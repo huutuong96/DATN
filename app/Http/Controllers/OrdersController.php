@@ -102,19 +102,17 @@ class OrdersController extends Controller
         return $this->successResponse("Lấy dữ liệu thành công", $order);
     }
 
-    public function update(OrderRequest $request, string $id)
+    public function update(Request $request)
     {
-        $order = OrdersModel::find($id);
-
+        $order = OrdersModel::where('id', $request->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
         if (!$order) {
             return $this->errorResponse("Order không tồn tại", 404);
         }
-
         $dataUpdate = [
             'status' => $request->status ?? $order->status,
-            'update_by' => auth()->id()
+            'update_by' => $user->id,
         ];
-
         try {
             $order->update($dataUpdate);
             return $this->successResponse("Order đã được cập nhật", $order);

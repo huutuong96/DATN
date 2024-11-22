@@ -165,7 +165,6 @@ class PurchaseController extends Controller
                     }
                     $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                 }
-
                 $order->height = $height;
                 $order->length = $length;
                 $order->weight = $weight;
@@ -502,8 +501,10 @@ class PurchaseController extends Controller
     {
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
         $status = 1;
+        $order_status = 0;
         if ($payment->code == 'VNPAY') {
-            $status = 5;
+            $status = 2;
+            // $order_status = 12;
         }
         $order = OrdersModel::create([
             'payment_id' => $payment->id,
@@ -513,6 +514,7 @@ class PurchaseController extends Controller
             'delivery_address' => $request->delivery_address ?? $address->address,
             'ship_id' => $ship_id->id,
             'status' => $status,
+            'order_status' => $order_status ?? 0,
         ]);
         return $order;
     }

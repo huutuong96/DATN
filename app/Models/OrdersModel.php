@@ -65,7 +65,8 @@ class OrdersModel extends Model
         'pickup_time',
         'contact_number',
         'client_order_code',
-        'order_infomation'
+        'order_infomation',
+        'order_status',
     ];
 
     protected $hidden = [
