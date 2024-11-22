@@ -1120,5 +1120,7 @@ public function destroyrank(Request $request, string $id)
         ])->with('message', 'Xóa Rank không thành công!');
     }
 }
+
+
 }
 

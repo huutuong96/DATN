@@ -341,7 +341,7 @@ Route::get('/search', function () {
                    
                 });
                 Route::middleware('CheckPremission:handle_blog')->group(function () {
-                    Route::resource('posts', PostController::class)->except(['index']);
+                    // Route::resource('posts', PostController::class)->except(['index']);
                     Route::resource('blogs', BlogsController::class)->except(['index']);
                 });
                 
