@@ -40,12 +40,13 @@ class OrdersController extends Controller
 
         return $this->successResponse('Lấy dữ liệu thành công', $orders);
     }
-    public function indexOrderToUser()
+    public function indexOrderToUser(Request $request)
     {
         $status = $request->status ?? 1;
-        $orders = OrdersModel::with(['orderDetails.variant.product']) // Eager load 'product' qua 'orderDetails'
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', auth()->id())
             ->where('status', $status)
+            ->orderby('created_at', 'desc')
             ->get();
            
             foreach ($orders as $order) {
@@ -63,9 +64,7 @@ class OrdersController extends Controller
                     if( $orderDetail->variant){
                        $orderDetail['product']  = $orderDetail->variant->product;
                        unset($orderDetail->variant['product']);
-
                     }
-                   
                 }
             }
 

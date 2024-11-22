@@ -154,4 +154,8 @@ public function product()
 {
     return $this->belongsTo(Product::class, 'product_id');
 }
+public function shop()
+{
+    return $this->belongsTo(Shop::class, 'shop_id')->select(['id', 'shop_name', 'slug', 'image']);
+}
 }
