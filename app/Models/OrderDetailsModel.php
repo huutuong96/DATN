@@ -17,6 +17,7 @@ class OrderDetailsModel extends Model
         'order_id',
         'product_id',
         'variant_id',
+        'quantity',
         'create_at',
         'update_at',
         'height',

@@ -115,7 +115,8 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/list_app', [webAppController::class, 'index'])->name('list_app');
     Route::post('/create_app', [webAppController::class, 'create'])->name('create_app');
     Route::get('/delete_app', [webAppController::class, 'delete_app'])->name('delete_app');
-
+    Route::get('/rankall', [VnshopController::class, 'rankall'])->name('rankall');
+    Route::post('/rankCreate', [VnshopController::class, 'rankCreate'])->name('rankCreate');
 
 });
 

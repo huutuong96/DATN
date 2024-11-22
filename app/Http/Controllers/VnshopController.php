@@ -35,7 +35,7 @@ use App\Models\Message;
 use App\Models\message_detail;
 use App\Models\Notification;
 use App\Models\Notification_to_mainModel;
- 
+use App\Models\RanksModel;
 
 class VnshopController extends Controller
 {
@@ -990,5 +990,33 @@ public function list_notification(Request $request){
         return view('notification.list_notification', compact('notificationMain'));
 }
 
+public function rankall(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $ranks = RanksModel::where('status',2)->paginate(10);
+    $ranks0ff = RanksModel::where('status',0)->paginate(10);
+
+    return view('ranks.list_rank', compact('ranks', 'ranks0ff', 'tab'));  
+
 }
 
+public function rankCreate(Request $request)
+{
+    $token = $request->query('token');
+    $tab = $request->input('tab', 1); 
+    RanksModel::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'condition' => $request->condition,
+        'status' => $request->status,
+        'create_by' => auth()->user()->id,
+    ]);
+    return redirect()->route('rankall', [
+        'token' => $token,
+        'tab' => $tab,
+    ])->with('message', 'Thêm rank thành công!');
+
+
+}
+
+}

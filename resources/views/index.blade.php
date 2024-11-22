@@ -1108,6 +1108,17 @@
                                 
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('rankall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-projects">
+                                <i class="ri-dashboard-3-line"></i>
+                                <span data-key="t-dashboards">QUẢN LÝ CẤP BẬC</span>
+                                
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <!-- Sidebar -->

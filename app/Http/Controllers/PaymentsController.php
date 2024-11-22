@@ -331,7 +331,7 @@ class PaymentsController extends Controller
             // Kiểm tra mã thanh toán thành công (code = 00)
             if ($vnp_ResponseCode == '00') {
                 // return $request->all();
-                header("Location: $url_pro/success?id=".$vnp_TxnRef);
+                header("Location: $url_pro/checkout/success?id=".$vnp_TxnRef);
             } else {
                 // Trường hợp mã thanh toán không thành công
                 return response()->json([
