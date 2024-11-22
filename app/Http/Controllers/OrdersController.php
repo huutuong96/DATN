@@ -49,7 +49,7 @@ class OrdersController extends Controller
             ->where('user_id', $user->id)
             ->where('status', $status)
             ->orderby('created_at', 'desc')
-            ->get();
+            ->paginate(15);
             foreach ($orders as $order) {
                 foreach ($order->orderDetails as $orderDetail) {
                     if($orderDetail->variant!=null){
