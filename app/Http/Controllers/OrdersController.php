@@ -42,8 +42,10 @@ class OrdersController extends Controller
     }
     public function indexOrderToUser()
     {
+        $status = $request->status ?? 1;
         $orders = OrdersModel::with(['orderDetails.variant.product']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', auth()->id())
+            ->where('status', $status)
             ->get();
            
             foreach ($orders as $order) {
