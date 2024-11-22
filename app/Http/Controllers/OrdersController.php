@@ -47,7 +47,7 @@ class OrdersController extends Controller
         $status = $request->status ?? 1;
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
-            ->where('status', $status)
+            ->where('order_status', $status)
             ->orderby('created_at', 'desc')
             ->paginate(10);
 
@@ -110,7 +110,7 @@ class OrdersController extends Controller
             return $this->errorResponse("Order không tồn tại", 404);
         }
         $dataUpdate = [
-            'status' => $request->status ?? $order->status,
+            'order_status' => $request->status ?? $order->status,
             'update_by' => $user->id,
         ];
         try {
