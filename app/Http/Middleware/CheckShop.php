@@ -19,16 +19,16 @@ class CheckShop
      */
     public function handle(Request $request, Closure $next): Response
     {
-
         $userId = JWTAuth::parseToken()->authenticate();
-        // LẤY ID CỦA SHOP TỪ TẤT CẢ CÁC NGUỒN
-        $shopId = $request->input('shop_id')
-            ?? $request->route('shop_id')
-            ?? $request->query('shop_id')
-            ?? $request->segment(2) // Assuming shop_id might be in the second segment of the URL
-            ?? $request->header('X-Shop-ID') // In case it's passed as a custom header
-            ?? $request->json('shop_id'); // For JSON payloads
-            // dd($userId);
+        // CHECK XEM SHOP NÀY ĐÃ CÓ vnp_TmnCode CỦA VNPAY CHƯA NẾU CHƯA THÌ CHUYỂN VỀ TRANG THÊM MÃ VNPAY
+        // $shopId = $request->id;
+        // $shop = Shop::find($shopId);
+        // if ($shop->vnp_TmnCode == null) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'CỬA HÀNG CHƯA KHAI BÁO MÃ TÀI KHOẢN NGÂN HÀNG CỦA VNPAY',
+        //     ], 400);
+        // }
             if ($userId->role_id == 2 || $userId->role_id == 3 || $userId->role_id == 4) {
                 return $next($request);
             }

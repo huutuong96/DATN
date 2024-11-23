@@ -47,7 +47,7 @@ class OrdersController extends Controller
         $status = $request->status ?? 1;
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
-            ->where('order_status', $status)
+            ->where('order_status', $order_status)
             ->orderby('created_at', 'desc')
             ->paginate(10);
 

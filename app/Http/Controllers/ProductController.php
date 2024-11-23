@@ -22,6 +22,7 @@ use App\Jobs\UploadImagesJob;
 use App\Jobs\UpdateStockAllVariant;
 use App\Jobs\UpdatePriceAllVariant;
 use App\Jobs\UpdateImageAllVariant;
+use App\Models\Shop;
 use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -111,9 +112,14 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // return $request->all();
-        // dd($request->images);
-        // dd($request->images[0]);
+        // $shopId = $request->shop_id;
+        // $shop = Shop::find($shopId);
+        // if ($shop->vnp_TmnCode == null) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'CỬA HÀNG CHƯA KHAI BÁO MÃ TÀI KHOẢN NGÂN HÀNG CỦA VNPAY',
+        //     ], 400);
+        // }
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
