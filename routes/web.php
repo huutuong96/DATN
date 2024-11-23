@@ -121,6 +121,11 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/changeStatusRank/{id}', [VnshopController::class, 'changeStatusRank'])->name('changeStatusRank');
     Route::delete('/destroyrank/{id}', [VnshopController::class, 'destroyrank'])->name('rank.delete');
     Route::get('/changeStatusBanner/{id}', [VnshopController::class, 'changeStatusBanner'])->name('changeStatusBanner');
+    Route::get('/payment_method', [VnshopController::class, 'payment_method'])->name('payment_method');
+    Route::post('/storepaymant', [VnshopController::class, 'storepaymant'])->name('storepaymant');
+    Route::put('/payment_methodupdate/{id}', [VnshopController::class, 'updatepayment'])->name('updatepayment');
+    Route::get('/changeStatuspayment/{id}', [VnshopController::class, 'changeStatuspayment'])->name('changeStatuspayment');
+    Route::delete('/destroypayment/{id}', [VnshopController::class, 'destroypayment'])->name('destroypayment');
 
 
 });
