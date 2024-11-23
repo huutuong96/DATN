@@ -221,6 +221,8 @@ Route::get('/search', function () {
                 Route::post('orders/update', [OrdersController::class, "update"]);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
+                Route::get('order/user/detail/{id}', [OrdersController::class, "OrderToUserDetail"]);
+                
                 Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);
                 
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
@@ -354,7 +356,7 @@ Route::get('/', function () {
 
 
 Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
-// lọc sản phẩm
+// lọc sản phẩmorders
 Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         // NO Auth
         Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);

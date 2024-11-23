@@ -74,6 +74,18 @@ class OrdersController extends Controller
         return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
     }
     
+
+    public function OrderToUserDetail(Request $request, $id)
+    {
+        
+        $user = JWTAuth::parseToken()->authenticate();
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
+            ->where('user_id', $user->id)
+            ->where('id', $id)
+            ->first();            
+        return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
+    }
+
     
     public function HistoryOrderToUser()
 {

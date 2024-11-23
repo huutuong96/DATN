@@ -50,6 +50,7 @@ use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
 use App\Http\Controllers\BlogsController;
+use App\Http\Controllers\ClientEmbedController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\webAppController;
 
@@ -130,4 +131,26 @@ Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mai
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// CLIENT EMBEDED
+Route::get('/wallet', [ClientEmbedController::class, 'wallet'])->name('wallet');
 
