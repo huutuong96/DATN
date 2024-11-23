@@ -39,6 +39,7 @@
                             <div class="card-body p-4">
                                 <div class="p-2 mt-4">
                                     <form action="/api/admin/login" method="POST">
+                                        @csrf
                                         @if(isset($error))
                                         <div class="alert alert-danger">
                                             {{ $error}}
