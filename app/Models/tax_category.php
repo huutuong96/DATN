@@ -15,4 +15,6 @@ class tax_category extends Model
         'tax_id',
         'category_id',
     ];
+
+    public $timestamps = false;
 }

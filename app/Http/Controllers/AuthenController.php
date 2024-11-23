@@ -210,7 +210,7 @@ class AuthenController extends Controller
             "password" => Hash::make($request->password),
             "email" => $request->email,
             "rank_id" => $request->rank_id ?? null,
-            "role_id" => $request->role_id ?? null,
+            "role_id" => 1,
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
         ];
@@ -421,9 +421,7 @@ class AuthenController extends Controller
         $notification = Notification::where('user_id', $user->id)->get();
         $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
         $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
-        // dd($notifyMain);
         session(['notifyMain' => $notifyMain]);
-        // dd(session('notifyMain'));
         return redirect()->route('dashboard', ['token' => auth()->user()->refesh_token]);
     }
 

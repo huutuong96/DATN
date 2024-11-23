@@ -40,7 +40,7 @@
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <table class="table align-middle table-nowrap mb-0">
+                            <table class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID</th>
@@ -48,8 +48,8 @@
                                             <th scope="col">Thông tin tài khoản</th>
                                             <th scope="col">Địa chỉ</th>
                                             <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Mức rank và tích điểm</th>
-                                            <th scope="col">Hành động</th>
+                                            
+                                            <th scope="col ">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -64,11 +64,9 @@
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         <img src="{{$user->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="avatar-xs rounded-circle me-3 material-shadow" style="width: 60px; height: 60px;">
                                                     </td>
-                                                    <td style="display: flex; align-items: center;">
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$user->fullname ?? 'No Name'}}</span>
-                                                            <span style="color: gray;">{{$user->email ?? 'No Email'}}</span>
-                                                            <span style="color: gray;">{{$user->phone ?? 'No Phone'}}</span>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -77,11 +75,24 @@
                                                         @endforeach
                                                     </td>
                                                     <td>{{ $user->created_at}}</td>
-                                                    <td>
-                                                        {{$user->rank->title ?? "Vô danh"}} : {{$user->point}} điểm tích lũy
+                                                    
                                                     <td>
                                                     <ul class="list-inline">
-                                                        <li class="list-inline-item">
+                                                        @if ($user->status == 1)
+                                                            <li class="list-inline-item">
+                                                                <a 
+                                                                    href="{{ route('change_user', [
+                                                                                                        'token' => auth()->user()->refesh_token,
+                                                                                                        'id' => $user->id,
+                                                                                                        'status' => 4,
+                                                                                                        ]) }}"
+                                                                >
+                                                                <button type="button" class="btn btn-warning" title="Khóa">
+                                                                    <i class="ri-lock-line align-middle"></i>
+                                                                </button>                                                                </a>
+                                                            </li>
+                                                        @elseif ($user->status == 2)
+                                                            <li class="list-inline-item">
                                                             <a 
                                                                 href="{{ route('change_user', [
                                                                                                     'token' => auth()->user()->refesh_token,
@@ -89,18 +100,131 @@
                                                                                                     'status' => 2,
                                                                                                     ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">Đồng ý</button>
-                                                        </li>
+                                                            <button type="button" class="btn btn-success" title="mở"> <i class="ri-check-line align-middle"></i></button>
+                                                            </li>
+                                                        @endif
+                                                            
                                                         <li class="list-inline-item">
                                                             <a 
                                                                     href="{{ route('change_user', [
                                                                                                         'token' => auth()->user()->refesh_token,
                                                                                                         'id' => $user->id,
-                                                                                                        'status' => 0,
+                                                                                                        'status' => 5,
                                                                                                         ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-danger waves-effect waves-light">Xóa</button>
+                                                            <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
+                                                                <i class="ri-delete-bin-line align-middle"></i>
+                                                        </button>
                                                             </a>
+                                                        </li>
+                                                        <li class="mt-2 mb-2">
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $user->id }}">
+                                                                <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                    <i class="ri-eye-line align-middle"></i>
+                                                                </button>
+                                                            </a>
+                                                        
+                                                            <!-- Modal Chi tiết sản phẩm -->
+                                                            <div class="modal fade" id="detailsModal-{{ $user->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $user->id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="detailsModalLabel-{{ $user->id }}">Thông tin tài khoản</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="card shadow-sm">
+                                                                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                    <h5 class="mb-0 text-white">Thông Tin Tài Khoản</h5>
+                                                                                    <span class="badge bg-success">Hoạt Động</span>
+                                                                                </div>
+                                                                                <div class="card-body">
+                                                                                    <div class="row">
+                                                                                        <div class="">
+                                                                                            <img src="{{$user->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="rounded-circle me-3 mb-3" style="width: 100px; height: 100px;">
+                                                                                        </div>
+                                                                                        <!-- Cột trái -->
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="mb-3 d-flex ">
+                                                                                                <strong>ID:</strong> <span class="text-muted me-5">{{ $user->id }}</span>
+                                                                                                <strong>CHỨC VỤ: </strong> <span class="text-muted">{{ $user->role->title}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Tên Tài Khoản:</strong> <span class="text-muted">{{ $user->fullname }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Số Điện Thoại:</strong> <span class="text-muted">{{ $user->phone }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Email:</strong> <span class="text-muted">{{ $user->email }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Giới Tính:</strong> <span class="text-muted">{{ $user->genre }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Sinh Nhật:</strong> <span class="text-muted">{{ $user->datebirth }}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Cột phải -->
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Mô Tả:</strong> <span class="text-muted">{{ $user->description }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Thành Viên Hạng:</strong> <span class="text-muted">{{ $user->rank->title ?? "Không hạng" }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Điểm Tích Lũy:</strong> <span class="text-muted">{{ $user->point }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Tạo:</strong> <span class="text-muted">{{ $user->created_at }}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Cập Nhật:</strong> <span class="text-muted">{{ $user->updated_at }}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- Danh Sách Địa Chỉ -->
+                                                                            <div class="mt-5">
+                                                                                <h4 class="mb-3">Danh Sách Địa Chỉ</h4>
+                                                                                <table class="table table-bordered table-hover shadow-sm">
+                                                                                    <thead class="table-light">
+                                                                                        <tr>
+                                                                                            <th>#</th>
+                                                                                            <th>Phân Loại</th>
+                                                                                            <th>Tỉnh/Thành</th>
+                                                                                            <th>Quận/Huyện</th>
+                                                                                            <th>Xã/Phường</th>
+                                                                                            <th>Người Nhận</th>
+                                                                                            <th>Số Điện Thoại</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        @foreach($user->address as $data)
+                                                                                        <tr>
+                                                                                            <td>{{$data->id}}</td>
+                                                                                            <td>{{$data->type}}</td>
+                                                                                            <td>{{$data->province}}</td>
+                                                                                            <td>{{$data->district}}</td>
+                                                                                            <td>{{$data->ward}}</td>
+                                                                                            <td>{{$data->name}}</td>
+                                                                                            <td>{{$data->phone}}</td>
+                                                                                        </tr>
+                                                                                        @endforeach
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </li>
                                                     </ul>
                                                        

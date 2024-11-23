@@ -66,7 +66,7 @@ class ShopController extends Controller
     public function index(Request $request)
     {
         $perPage = 10;
-        $Shops = Shop::where('status', 1)->paginate($perPage);
+        $Shops = Shop::where('status', 2)->paginate($perPage);
 
         if ($Shops->isEmpty()) {
             return $this->errorResponse('Không tồn tại Shop nào');

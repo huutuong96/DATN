@@ -45,7 +45,7 @@
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         {{ $shop->shop_name ?? "Chưa đặt tên"}}
                                                     </td>
-                                                    <td style="display: flex; align-items: center;">
+                                                    <td style="word-wrap: break-word; white-space: normal;">
                                                         <img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="avatar-xs rounded-circle me-3 material-shadow" style="width: 60px; height: 60px;">
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$shop->user[0]->fullname ?? 'No Name'}}</span>
@@ -71,7 +71,87 @@
                                                                                                     'status' => 2,
                                                                                                     ]) }}"
                                                             >
-                                                                <button type="button" class="btn rounded-pill btn-success waves-effect waves-light">Khôi phục</button>
+                                                            <button type="button" class="btn btn-info"
+                                                            title="Khôi phục"
+                                                            onclick="return confirm('Bạn có chắc chắn muốn khôi phục user này?');">
+                                                            <i class="ri-refresh-line align-middle"></i>
+                                                        </button>
+                                                        </li>
+                                                        <li class="mt-2 mb-2">
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $shop->id }}">
+                                                                <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
+                                                                    <i class="ri-eye-line align-middle"></i>
+                                                                </button>
+                                                            </a>
+                                                        
+                                                            <!-- Modal Chi tiết sản phẩm -->
+                                                            <div class="modal fade" id="detailsModal-{{ $shop->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $shop->id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="detailsModalLabel-{{ $shop->id }}">Chi tiết Sản phẩm</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                        <div class="card shadow-sm">
+                                                                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                                                    <h5 class="mb-0 text-white">Thông Tin Shop</h5>
+                                                                                    <span class="badge bg-success">Đã bị xóa</span>
+                                                                                </div>
+                                                                                <div class="card-body">
+                                                                                    <div class="">
+                                                                                        <img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="rounded-circle me-3 mb-3" style="width: 100px; height: 100px;">
+                                                                                    </div>
+                                                                                    <div class="row">
+                                                                                        <!-- Cột trái -->
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="mb-3">
+                                                                                                <strong>ID:</strong> <span class="text-muted">{{$shop->id}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Tên Shop:</strong> <span class="text-muted">{{$shop->shop_name}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Mô Tả:</strong> <span class="text-muted">{{$shop->description}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Mã Shop:</strong> <span class="text-muted">{{$shop->slug}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Số Điện Thoại:</strong> <span class="text-muted">{{$shop->contact_number ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Người Đại Diện:</strong> <span class="text-muted">{{$shop->user[0]->fullname ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Cột phải -->
+                                                                                        <div class="col-lg-6 mb-3">
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Tỉnh/Thành:</strong> <span class="text-muted">{{$shop->province ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Quận/Huyện:</strong> <span class="text-muted">{{$shop->district ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Xã/Phường:</strong> <span class="text-muted">{{$shop->ward ?? "chưa nhập"}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Tạo:</strong> <span class="text-muted">{{$shop->created_at}}</span>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <strong>Ngày Cập Nhật:</strong> <span class="text-muted">{{$shop->updated_at}}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </li>
                                                     </ul>
                                                        

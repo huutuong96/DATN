@@ -15,4 +15,14 @@ class Message extends Model
         'user_id',
         'shop_id',
     ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function shops()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id', 'id');
+    }
 }

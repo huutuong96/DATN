@@ -13,7 +13,10 @@ class configController extends Controller
 {
 
     $configs = ConfigModel::all();
-    return view('config.config_list', compact('configs'));
+    // dd($configs);
+    $information = json_decode($configs[0]->thumbnail);
+    // dd($configs["information"]->name);
+    return view('config.config_list', compact('configs', 'information'));
 }
 
     public function is_active()

@@ -27,7 +27,17 @@ use App\Models\Post;
 use App\Http\Requests\TaxRequest;
 use App\Http\Requests\BannerRequest;
 use App\Models\Banner;
-
+use App\Models\tax_category;
+use App\Http\Requests\CategoriesRequest;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\categoryattribute;
+use App\Models\Message;
+use App\Models\message_detail;
+use App\Models\Notification;
+use App\Models\Notification_to_mainModel;
+use App\Models\RanksModel;
+use App\Models\recipes;
+use App\Http\Requests\RankRequest;
 
 class VnshopController extends Controller
 {
@@ -51,7 +61,6 @@ class VnshopController extends Controller
                                 ->where('is_delete', 0)
                                 ->get()
                                 ->count();
-
         $monthlyRevenue = order_fee_details::
         whereMonth('created_at', Carbon::now()->month)
         ->sum('amount');
@@ -68,12 +77,14 @@ class VnshopController extends Controller
         foreach ($monthlyRevenueOrder as $order) {
             $day = $order->created_at->day; 
             if ($day <= Carbon::now()->day) { 
-
-                $doanhthu[$day] += ($order->total_amount / 100000 );
-                if($order->status == 5){
-                    $luongtrahang[$day] += 1;
+                if($order->status == 2){
+                    $doanhthu[$day] += ($order->total_amount / 1000000 );
+                    if($order->status == 5){
+                        $luongtrahang[$day] += 1;
+                    }
+                    $luotmua[$day] += 1;
+                    
                 }
-                $luotmua[$day] += 1;
                  
             }else{
                 break;
@@ -116,28 +127,6 @@ class VnshopController extends Controller
             'violet'
         ];
         $listCategoryColors= array_slice($colors, 0, count($listCategoryJson));
-        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
-        $listShop = [];
-        foreach ($listShopId as $idKey => $shopId) {
-            $doanhthu = 0;
-            $shop = Shop::where("id", $shopId)->with('user')->first();
-            foreach ($monthlyRevenueOrder as $orderKey => $order) {
-                if($order->status == 2){
-                    if($order->shop_id == $shopId){
-                        $doanhthu += $order->net_amount;
-                    }
-                }
-                
-            }
-            $shop["doanhthu"] = $doanhthu ;
-            $listShop[] = $shop;
-        }
-        // dd($listShop);
-        usort($listShop, function($a, $b) {
-            return $b->doanhthu <=> $a->doanhthu;
-        });
-
-        // $feedBack;
         return view('dashboard.dashboard',compact(
             'checkProduct',
             'checkShop',
@@ -148,7 +137,6 @@ class VnshopController extends Controller
             'listCategoryJson',
             'listCategorydoanhthu',
             'listCategoryColors',
-            'listShop',
             'shopAC'
 
         ));
@@ -193,8 +181,10 @@ class VnshopController extends Controller
     }
     public function list_category($limit = 5){
         $categories = CategoriesModel::orderBy('created_at', 'desc')->whereIn("status", [1, 2])->paginate($limit);
+        $taxes = Tax::where('status',2)->get();
+        $tax_category = tax_category::all();
         return view('categories.list_category',compact(
-            'categories'
+            'categories', 'taxes', 'tax_category'
         ));
     }
     public function trash_category($limit = 5){
@@ -203,6 +193,79 @@ class VnshopController extends Controller
             'categories'
         ));
     }
+    
+    public function storeCategory(CategoriesRequest $request, $limit = 5){
+        $dataInsert = [];
+
+        // Kiểm tra và upload ảnh
+        if ($request->file('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $dataInsert['image'] = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        try {
+            $dataInsert = [
+                'title' => $request->title,
+                'slug' => $request->slug ?? Str::slug($request->title, '-'),
+                'index' => $request->index ?? 1,
+                'status' => $request->status ?? 1,
+                'parent_id' => $request->parent_id ?? null,
+                'create_by' => $user->id,
+                'image' => $dataInsert['image'] ?? null,
+                'tax_id' => $request->tax_id
+            ];
+
+            $category = CategoriesModel::create($dataInsert);
+            $tax_category = tax_category::create([
+                'category_id' => $category->id,
+                'tax_id' => $request->tax_id,
+            ]);
+            $parentId = $category->parent_id;
+            while ($parentId) {
+                $parentAttributes = CategoryAttribute::where('category_id', $parentId)->get();
+
+                foreach ($parentAttributes as $parentAttribute) {
+                    $parentAttribute->status = 0;
+                    $parentAttribute->save();
+                }
+
+                $parentCategory = CategoriesModel::find($parentId);
+                $parentId = $parentCategory ? $parentCategory->parent_id : null;
+            }
+            $subCategories = CategoriesModel::where('parent_id', $category->id)->get();
+            if ($subCategories->isEmpty()) {
+                $attributeIds = $request->attribute_ids;
+                if (is_array($attributeIds) && count($attributeIds) > 0) {
+                    foreach ($attributeIds as $attributeId) {
+                        categoryattribute::insert([
+                            'category_id' => $category->id,
+                            'attribute_id' => $attributeId,
+                        ]);
+                    }
+                }
+            }
+            if($request->back == 1){
+                // session()->put('message', 'Tạo thành công!');
+                return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Tạo thành công!');
+                // return back()->with('message', 'Tạo thành công!');
+            }
+            return response()->json([
+                'status' => true,
+                'message' => "Thêm danh mục thành công",
+                'data' => $category,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Thêm danh mục không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+    
     public function trash_stores($limit = 5){
         $shops = Shop::orderBy('updated_at', 'desc')->where('status', "=", 5 )->paginate($limit);
         return view('stores.trash',compact(
@@ -229,6 +292,51 @@ class VnshopController extends Controller
             $category->save(); 
             return Back()->with('message', 'Cập nhật thành công!');
         }
+    }
+    
+    public function updateCategory(Request $request){
+        $user = JWTAuth::parseToken()->authenticate();
+        try {
+            $categories = CategoriesModel::find($request->id);
+
+            if (!$categories) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Danh mục không tồn tại",
+                ], 404);
+            }
+            if ($request->file('image')) {
+                $image = $request->file('image');
+                $cloudinary = new Cloudinary();
+                $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                $imageUrl = $uploadedImage['secure_url'];
+            }
+
+            $dataUpdate = [
+                'title' => $request->title ?? $categories->title,
+                'slug' => Str::slug($request->title),
+                'index' => $request->index ?? $categories->index,
+                'image' => $imageUrl ?? $categories->image,
+                'status' => $request->status ?? $categories->status,
+                'tax_id' => $request->tax_id,
+                'parent_id' => $request->parent_id ?? $categories->parent_id,
+                'update_by' => $user->id,
+                'updated_at' => now(),
+            ];
+            $categories->update($dataUpdate);
+            $tax_category = tax_category::create([
+                'category_id' => $categories->id,
+                'tax_id' => $request->tax_id,
+            ]);
+            return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Tạo thành công!');
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật danh mục không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+        
     }
     public function changeShop(Request $rqt){
        
@@ -263,19 +371,19 @@ class VnshopController extends Controller
             'blogs','deletedBlog','tab'
         ));
     }
-        public function post(Request $request)
-        {
-            $tab = $request->input('tab', 1); 
-            $Posts = Post::whereNull('deleted_at')
-                        ->with('blog')
-                        ->orderBy('created_at', 'desc') 
-                        ->paginate(10);
-        
-            $blogs = Blog::whereNull('deleted_at')->get();
-            $deletedPost = Post::onlyTrashed()->paginate(10);
-        
-            return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
-        }
+    public function post(Request $request)
+    {
+        $tab = $request->input('tab', 1); 
+        $Posts = Post::whereNull('deleted_at')
+                    ->with('blog')
+                    ->orderBy('created_at', 'desc') 
+                    ->paginate(10);
+    
+        $blogs = Blog::whereNull('deleted_at')->get();
+        $deletedPost = Post::onlyTrashed()->paginate(10);
+    
+        return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
+    }
     
     public function restorepost(Request $request, $id)
     {
@@ -353,6 +461,18 @@ class VnshopController extends Controller
                 'tab'=>$tab,
             ])->with('message', 'Cập nhật voucher main thành công!');
         }
+        public function delete_voucher(request $request, $id)
+        {
+            $token = $request->token;
+            $tab = $request->tab;
+            $voucherMain = voucherToMain::where('id', $id)->firstOrFail();
+            $voucherMain->delete();
+            return redirect()->route('voucherall', [
+                'token' => $token,
+                'tab' => $tab,
+            ])->with('message', 'Xóa voucher main thành công!');
+        }
+        
         
       
         
@@ -372,14 +492,15 @@ class VnshopController extends Controller
     public function costomer($limit = 5){
         $customer_id = RolesModel::where('title', 'CUSTOMER')->first('id');
         // dd($customer_id->id);
-        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->where('role_id', $customer_id->id)->paginate($limit);
+        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('role')->with('rank')->whereIn("status", [1, 2])->where('role_id', $customer_id->id)->paginate($limit);
         // dd($users);
         return view('users.list_customer',compact(
             'users'
         ));
     }
     public function manager($limit = 5){
-        $customer_id = RolesModel::where('title', '!=', 'CUSTOMER')->where('title', '!=', 'OWNER')->pluck('id');
+        $customer_id = RolesModel::where('title', '!=', 'CUSTOMER')->pluck('id');
+        // ->where('title', '!=', 'OWNER')
         // dd($customer_id);
         $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->whereIn('role_id', $customer_id)->paginate($limit);
         $roles = RolesModel::all();
@@ -508,7 +629,7 @@ class VnshopController extends Controller
     $taxeOFF = Tax::where('status',3)->get();
 
     if ($taxes->isEmpty()) {
-        return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
+        return view('rank.tax')->with('message', 'Không tồn tại thuế nào');
     }
 
     return view('tax.tax', compact('taxes' ,'taxeOFF', 'tab'));
@@ -551,6 +672,51 @@ public function update_tax(TaxRequest $request, $id)
         'tab' => $tab,
     ])->with('message', 'Cập nhật thuế thành công!');
 }
+public function destroytax(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $tax = Tax::findOrFail($id);
+        $tax->delete();
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa thuế thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa thuế không thành công!');
+    }
+}
+public function changeStatusTax(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $tax = Tax::findOrFail($id);
+        if (\DB::table('tax_category')->where('tax_id', $tax->id)->exists()) {
+            return redirect()->route('taxall', [
+                'token' => $token,
+                'tab' => $tab,
+            ])->with('message', 'Không thể thay đổi trạng thái vì thuế đang được áp dụng cho danh mục!');
+        }
+        $tax->status = $request->status;
+        $tax->save();
+        return redirect()->route('taxall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Thay đổi trạng thái thuế thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('taxall', [
+            'token' => $request->token,
+            'tab' => $request->tab,
+        ])->with('message', 'Thay đổi trạng thái thuế không thành công!');
+    }
+}
+
+
 public function bannerall(Request $request)
 {
     $tab = $request->input('tab', 1); 
@@ -566,34 +732,34 @@ public function storebanner(BannerRequest $request)
     $image = $request->file('image');
     $cloudinary = new Cloudinary();
     $token = $request->query('token');
-
+   
     try {
         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        
         $dataInsert = [
             'title' => $request->title,
             'content' => $request->content,
-            'URL' => $uploadedImage['secure_url'],
+            'image' => $uploadedImage['secure_url'], 
+            'URL' => $request->URL,
             'status' => $request->status,
             'index' => $request->index,
-            'create_by' =>  auth()->user()->id,
+            'create_by' => auth()->user()->id,
         ];
+        
         $banner = Banner::create($dataInsert);
+
         return redirect()->route('bannerall', [
             'token' => $token,
-            
-        ])->with('success', 'banner thuế thành công');
+        ])->with('success', 'Thêm banner thành công');
     } catch (\Throwable $th) {
-        // Return view with error message
-        return view('bannerall')->with([
-            'status' => false,
-            'message' => "Thêm Banner không thành công",
-            'error' => $th->getMessage()
-        ]);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+        ])->with('error', 'Thêm banner thất bại: ' . $th->getMessage());
     }
 }
+
 public function updatebanner(BannerRequest $request, $id)
 {
-
     $token = $request->token; 
     $tab = $request->tab;
     $banner = Banner::findOrFail($id);
@@ -601,33 +767,360 @@ public function updatebanner(BannerRequest $request, $id)
         'title' => $request->title,
         'content' => $request->content,
         'status' => $request->status,
+        'URL' => Str::limit($request->URL, 2083), 
         'index' => $request->index,
-        'update_by' =>  auth()->user()->id,
+        'update_by' => auth()->user()->id,
     ];
-    if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        $dataUpdate['URL'] = $uploadedImage['secure_url'];
+
+    try {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $dataUpdate['image'] = $uploadedImage['secure_url']; 
+        }
+        $banner->update($dataUpdate);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật banner thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật banner thất bại: ' . $th->getMessage());
     }
-    $banner->update($dataUpdate);
-    return redirect()->route('bannerall', [
+}
+
+public function statistByQuantity(Request $request)
+{
+    $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->get();
+        
+        // $soluong = array_fill(1, Carbon::now()->day, 0);
+        // foreach ($monthlyRevenueOrder as $order) {
+        //     $day = $order->created_at->day; 
+        //     if ($day <= Carbon::now()->day) { 
+
+        //         $soluong[$day] += OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
+        //     }else{
+        //         break;
+        //     }
+        // }
+        $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
+        $tong = 0;
+        foreach ($monthlyRevenueOrder as $order) {
+            $day = $order->created_at->day; // Lấy ngày của order
+            if ($day <= Carbon::now()->day) { 
+                // Tổng số lượng của các sản phẩm trong đơn hàng cho ngày tương ứng
+                if($order->status == 2){
+                    
+                    $soluong[$day] = OrderDetailsModel::where('order_id', $order->id)->whereDay('created_at', $day)
+                        ->sum('quantity'); 
+                    $tong += OrderDetailsModel::where('order_id', $order->id)
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->sum('quantity');
+                }
+            } else {
+                break;
+            }
+        }
+        $soluongJson = array_values($soluong);
+
+        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+        $listShop = [];
+
+        foreach ($listShopId as $idKey => $shopId) {
+            $shop = Shop::where("id", $shopId)->with('user')->first();
+            $soluong = OrderDetailsModel::where("shop_id", $shopId)->whereMonth('created_at', Carbon::now()->month)->get()->sum("quantity"); 
+
+            $shop["soluong"] = $soluong ;
+            $listShop[] = $shop;
+        }
+        // dd($listShop);
+        usort($listShop, function($a, $b) {
+            return $b->soluong <=> $a->soluong; 
+
+        });
+         
+        return view('statist.quantity_sold',compact('soluongJson',
+                                                'listShop',
+                                                'tong'
+                                             )
+                    );
+    // return view('statist.quantity_sold'); 
+}
+public function statistByRevenue(Request $request)
+{   
+    $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->get();
+        
+        $doanhthu = array_fill(1, Carbon::now()->day, 0);
+        foreach ($monthlyRevenueOrder as $order) {
+            $day = $order->created_at->day; 
+            if ($day <= Carbon::now()->day) { 
+                if($order->status == 2){
+                    $doanhthu[$day] += ($order->total_amount  );     
+                }
+            }else{
+                break;
+            }
+        }
+        $doanhthuJson = array_values($doanhthu);
+        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+        $listShop = [];
+        foreach ($listShopId as $idKey => $shopId) {
+            $doanhthu = 0;
+            $shop = Shop::where("id", $shopId)->with('user')->first();
+            foreach ($monthlyRevenueOrder as $orderKey => $order) {
+                if($order->status == 2){
+                    if($order->shop_id == $shopId){
+                        $doanhthu += $order->net_amount;
+                    }
+                }
+                
+            }
+            $shop["doanhthu"] = $doanhthu ;
+            $listShop[] = $shop;
+        }
+        // dd($listShop);
+        usort($listShop, function($a, $b) {
+            return $b->doanhthu <=> $a->doanhthu;
+        });
+
+        // $feedBack;
+        return view('statist.revenue',compact('doanhthuJson',
+                                                'listShop'
+                                             )
+                    );
+    }
+public function statistBySales(Request $request)
+{
+    $TongSoLuongBanRa = OrdersModel::count();
+    $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->count();
+    $DoiTra = OrdersModel::whereIn("order_status", [9])->count();
+    $Huy = OrdersModel::whereIn("order_status", [10])->count();
+    $HoanThanh = OrdersModel::whereIn("order_status", [7,8])->count();
+    $ThatBai = OrdersModel::whereIn("order_status", [6])->count();
+    $ChoDuyet = OrdersModel::whereIn("order_status", [0,1,2,3])->count();
+    $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->count();
+
+    $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+    ->get();
+    $luongtrahang = array_fill(1, Carbon::now()->day, 0);
+    $luotmua = array_fill(1, Carbon::now()->day, 0);
+    $bihuy = array_fill(1, Carbon::now()->day, 0);
+    $loi = array_fill(1, Carbon::now()->day, 0);
+
+    foreach ($monthlyRevenueOrder as $order) {
+        $day = $order->created_at->day; 
+        if ($day <= Carbon::now()->day) { 
+            if($order->status == 2){
+                if($order->status == 5){
+                    $luongtrahang[$day] += 1;
+                }
+                if($order->status == 5){
+                    $bihuy[$day] += 1;
+                }
+                if($order->status == 5){
+                    $loi[$day] += 1;
+                }
+                $luotmua[$day] += 1;
+            }
+                
+        }else{
+            break;
+        }
+    }
+    $luongtrahangJson = array_values($luongtrahang);
+    $luotmuaJson = array_values($luotmua);
+    $bihuyJson = array_values($bihuy);
+    $loiJson = array_values($loi);
+
+    $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+    $listShop = [];
+    foreach ($listShopId as $idKey => $shopId) {
+        $shop = Shop::where("id", $shopId)->with('user')->first();
+        $shop["luotban"] = OrdersModel::where("shop_id", $shopId)->count();
+        $listShop[] = $shop;
+    }
+    // dd($listShop);
+    usort($listShop, function($a, $b) {
+        return $b->doanhthu <=> $a->doanhthu;
+    });
+    return view('statist.sales',compact(
+        'luongtrahangJson',
+        'luotmuaJson',
+        'bihuyJson',
+        'loiJson',
+        'TongSoLuongBanRa',
+        'listShop',
+        'DangGiao',
+        'DoiTra',
+        'Huy',
+        'HoanThanh',
+        'ThatBai',
+        'ChoDuyet',
+        'ChuaThanhToan',
+    ));
+}
+public function revenue_general(Request $request){
+    $token = $request->token; 
+    $totalRevenue = order_fee_details::sum('amount');
+    // return redirect()->route('revenue_general', [
+    //     'token' => $token,
+    //     'totalRevenue' => $totalRevenue,
+    // ]);
+
+    return view('revenue.revenue_general', compact('totalRevenue'));
+}
+public function logout(){
+    return redirect()->route('login');
+}
+
+
+public function list_notification(Request $request){
+        $limit = 20;
+        $user = JWTAuth::parseToken()->authenticate();
+        $notificationIds = Notification::where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->pluck('id_notification');
+        $notificationMain = Notification_to_mainModel::whereIn('id', $notificationIds)
+        ->orderBy('created_at', 'desc') // Thêm sắp xếp nếu cần
+        ->paginate($limit);
+        return view('notification.list_notification', compact('notificationMain'));
+}
+
+public function rankall(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $ranks = RanksModel::where('status',2)->paginate(10);
+    $ranks0ff = RanksModel::where('status',0)->paginate(10);
+
+    return view('ranks.list_rank', compact('ranks', 'ranks0ff', 'tab'));  
+
+}
+
+public function rankCreate(Request $request)
+{
+    $token = $request->query('token');
+    $tab = $request->input('tab', 1); 
+    
+    RanksModel::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'condition' => $request->condition,
+        'value' => $request->value,
+        'limitValue' => $request->limitValue,
+        'status' => $request->status,
+        'create_by' => auth()->user()->id,
+        'update_by' => null, 
+    ]);
+    
+    return redirect()->route('rankall', [
         'token' => $token,
         'tab' => $tab,
-    ])->with('message', 'Cập nhật banner thành công!');
+    ])->with('message', 'Thêm rank thành công!');
+
 }
 
+    public function list_recipes(Request $request){
 
-    public function revenue_general(Request $request){
-        $token = $request->token; 
-        $totalRevenue = order_fee_details::sum('amount');
-        // return redirect()->route('revenue_general', [
-        //     'token' => $token,
-        //     'totalRevenue' => $totalRevenue,
-        // ]);
+        $limit = 10;
+        $recipes = recipes::all();
+        return view('recipes.recipes',compact(
+            'recipes'
+        ));
 
-        return view('revenue.revenue_general', compact('totalRevenue'));
     }
 
+    public function recipesCreate(Request $request){
+        $token = $request->query('token');
+        recipes::create([
+            'is_active' => $request->status ?? 2,
+            'code' => $request->code ?? null,
+            'title' => $request->title ?? null,
+            'description' => $request->description ?? null,
+            'type' => $request->type ?? null,
+            'json' => json_encode($request->json),
+        ]);
+        return redirect()->route('list_recipes', [
+            'token' => $token,
+        ])->with('message', 'Thêm thành công!');
+    }
+    
+    
+public function updaterank(RankRequest $request, $id)
+{
+    $token = $request->token;
+    $tab = $request->tab;
+
+    $rank = RanksModel::findOrFail($id);
+    $dataUpdate = [
+        'title' => $request->title,
+        'description' => $request->description,
+        'condition' => $request->condition,
+        'status' => $request->status,
+        'value' => $request->value,
+        'limitValue' => $request->limitValue,
+        'update_by' => auth()->user()->id,
+    ];
+
+    try {
+        $rank->update($dataUpdate);
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật rank thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật rank thất bại: ' . $th->getMessage());
+    }
+}
+
+public function changeStatusRank(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $rank = RanksModel::findOrFail($id);
+        $rank->status = $request->status;
+        $rank->save();
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        // Xử lý lỗi và trả về thông báo
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+
+public function destroyrank(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $rank = RanksModel::findOrFail($id);
+        $rank->delete();
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa Rank thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa Rank không thành công!');
+    }
+}
+
 
 }
+

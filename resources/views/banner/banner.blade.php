@@ -13,17 +13,6 @@
 @section('main')
     <div class="container-fluid">
         <div class="row">
-            @if (session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link {{ $tab == 1 ? 'active' : '' }}" id="nav-home-tab" data-bs-toggle="tab"
@@ -53,51 +42,46 @@
                                                 <form action="{{ route('banner.store', ['token' => auth()->user()->refesh_token]) }}" method="POST" enctype="multipart/form-data">
                                                     @csrf
                                                     <div class="row">
-                                                        <!-- Title Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="title" class="form-label">Tiêu đề</label>
-                                                                <input type="text" class="form-control" placeholder="Tiêu đề" id="title" name="title" required>
+                                                                <input type="text" class="form-control" id="title" name="title" placeholder="Tiêu đề" required>
                                                             </div>
                                                         </div>
-                                                        
-                                                        <!-- Content Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="content" class="form-label">Nội dung</label>
-                                                                <textarea class="form-control" placeholder="Nội dung" id="content" name="content" rows="2" required></textarea>
+                                                                <textarea class="form-control" id="content" name="content" rows="2" placeholder="Nội dung" required></textarea>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Image Upload Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="image" class="form-label">Hình ảnh</label>
                                                                 <input type="file" class="form-control" id="image" name="image" required>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Status Field -->
+                                                        <div class="col-6">
+                                                            <div class="mb-3">
+                                                                <label for="URL" class="form-label">Đường dẫn</label>
+                                                                <input type="text" class="form-control" id="URL" name="URL" required>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="status" class="form-label">Trạng thái</label>
-                                                                <select style="width: 130px" class="form-control" id="status" name="status" required>
+                                                                <select style="width: 507px;left: 2rem;" style="width: 130px" class="form-control" id="status" name="status" required>
                                                                     <option value="" disabled selected>Chọn trạng thái</option>
                                                                     <option value="2">Active</option>
                                                                     <option value="3">Inactive</option>
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Index Field -->
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="index" class="form-label">Thứ tự</label>
                                                                 <input type="number" class="form-control" id="index" name="index" placeholder="Thứ tự hiển thị" required>
                                                             </div>
                                                         </div>
-                                                
-                                                        <!-- Submit Button -->
                                                         <div class="col-lg-12">
                                                             <div class="text-end">
                                                                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -124,6 +108,7 @@
                                                     <th scope="col">tiêu đề</th>
                                                     <th scope="col">nội dung</th>
                                                     <th scope="col">Hình ảnh</th>
+                                                    <th scope="col">Đường dẫn</th>
                                                     <th scope="col">Trạng thái</th>
                                                     <th scope="col">Vị trí</th>
                                                     <th scope="col">Người tạo</th>
@@ -145,7 +130,10 @@
                                                             {{ \Illuminate\Support\Str::limit($banner->content, 150, '...') }}
                                                         </td>
                                                         <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                            <img src="{{ $banner->URL }}" alt="Post Image" style="max-width: 50%; height: auto;">
+                                                            <img src="{{ $banner->image }}" alt="Post Image" style="max-width: 50%; height: auto;">
+                                                        </td>
+                                                        <td style="max-width: 200px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                            {{ \Illuminate\Support\Str::limit($banner->URL, 150, '...') }}
                                                         </td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
@@ -163,8 +151,8 @@
                                                             {{ $banner->user->fullname }}</td>
                                                             <td>
                                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $banner->id }}">
-                                                                    <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                                        Chỉnh sửa
+                                                                    <button type="button" class="btn btn-primary" title="Chỉnh sửa">                      
+                                                                            <i class="ri-edit-line align-middle"></i>
                                                                     </button>
                                                                 </a>
                                                             
@@ -206,9 +194,16 @@
                                                                                             <div class="mb-3">
                                                                                                 <label for="image" class="form-label">Hình ảnh</label>
                                                                                                 <input type="file" class="form-control" id="image" name="image">
-                                                                                                @if ($banner->URL)
-                                                                                                    <img src="{{ $banner->URL }}" alt="Banner Image" style="max-width: 100px; margin-top: 10px;">
+                                                                                                @if ($banner->image)
+                                                                                                    <img src="{{ $banner->image }}" alt="Banner Image" style="max-width: 100px; margin-top: 10px;">
                                                                                                 @endif
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-6">
+                                                                                            <div class="mb-3">
+                                                                                                <label for="URL" class="form-label">Đường dẫn</label>
+                                                                                                <input type="text" class="form-control" id="URL" value="{{ $banner->URL ?? ''}}" name="URL">
+
                                                                                             </div>
                                                                                         </div>
                                                                                 
@@ -216,7 +211,7 @@
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="status" class="form-label">Trạng thái</label>
-                                                                                                <select style="width: 130px" class="form-control" id="status" name="status" required>
+                                                                                                <select style="width: 507px;left: 2rem;" class="form-control" id="status" name="status" required>
                                                                                                     <option value="2" {{ $banner->status == 2 ? 'selected' : '' }}>Active</option>
                                                                                                     <option value="3" {{ $banner->status == 3 ? 'selected' : '' }}>Inactive</option>
                                                                                                 </select>
@@ -285,6 +280,7 @@
                                                     <th scope="col">tiêu đề</th>
                                                     <th scope="col">nội dung</th>
                                                     <th scope="col">Hình ảnh</th>
+                                                    <th scope="col">Đường dẫn</th>
                                                     <th scope="col">Trạng thái</th>
                                                     <th scope="col">Vị trí</th>
                                                     <th scope="col">Người tạo</th>
@@ -307,7 +303,10 @@
                                                             {{ \Illuminate\Support\Str::limit($banner->content, 150, '...') }}
                                                         </td>
                                                         <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                            <img src="{{ $banner->URL }}" alt="Post Image" style="max-width: 50%; height: auto;">
+                                                            <img src="{{ $banner->image }}" alt="Post Image" style="max-width: 50%; height: auto;">
+                                                        </td>
+                                                        <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                             {{ $banner->URL }}
                                                         </td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
@@ -326,7 +325,7 @@
                                                             <td>
                                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $banner->id }}">
                                                                     <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                                        Chỉnh sửa
+                                                                        <i class="ri-edit-line align-middle"></i>
                                                                     </button>
                                                                 </a>
                                                             
@@ -362,6 +361,15 @@
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="image" class="form-label">Hình ảnh</label>
+                                                                                                <input type="file" class="form-control" id="image" name="image">
+                                                                                                @if ($banner->image)
+                                                                                                    <img src="{{ $banner->image }}" alt="Banner Image" style="max-width: 100px; margin-top: 10px;">
+                                                                                                @endif
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-6">
+                                                                                            <div class="mb-3">
+                                                                                                <label for="image" class="form-label">Đường dẫn</label>
                                                                                                 <input type="file" class="form-control" id="image" name="image">
                                                                                                 @if ($banner->URL)
                                                                                                     <img src="{{ $banner->URL }}" alt="Banner Image" style="max-width: 100px; margin-top: 10px;">

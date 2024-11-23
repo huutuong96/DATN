@@ -99,7 +99,7 @@
                         <!-- <form class="col-xl-6 p-3"> -->
                         <div class="form-group m-0">
                             <div class="input-group">
-                                <input name='search' type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                <input name='search' type="text" class="form-control" placeholder="Tìm kiếm ..." aria-label="Recipient's username">
                                 <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
                             </div>
                         </div>
@@ -117,6 +117,40 @@
                                 <i class="bx bx-search fs-22"></i>
                             </button>
                         </div>
+                        <div class="dropdown topbar-head-dropdown ms-1 header-item">
+                            <button type="button" class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bx bx-category-alt fs-22"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-lg p-0 dropdown-menu-end" style="">
+                                <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h6 class="m-0 fw-semibold fs-15"> Web Apps </h6>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> View All Apps
+                                                <i class="ri-arrow-right-s-line align-middle"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-2">
+                                    <div class="row g-0">
+                                        @foreach ($apps as $index => $app)
+                                            @if ($index % 3 == 0 && $index != 0)
+                                                </div><div class="row g-0">
+                                            @endif
+                                            <div class="col">
+                                                <a class="dropdown-icon-item" href="{{$app->url}}" target="_blank">
+                                                    <img src="{{$app->icon}}" alt="app">
+                                                    <span>{{$app->name}}</span>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div
                             class="dropdown topbar-head-dropdown ms-1 header-item"
@@ -131,7 +165,7 @@
                                 aria-expanded="false">
                                 <i class="bx bx-bell fs-22"></i>
                                 <span
-                                    class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">{{ count($notifyMain) }}<span class="visually-hidden">unread messages</span></span>
+                                    class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">{{ count($notifyMain)  }}<span class="visually-hidden">unread messages</span></span>
                             </button>
                             <div
                                 class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
@@ -215,8 +249,8 @@
                                                     <div class="text-reset notification-item d-block dropdown-item position-relative">
                                                         <div class="d-flex">
                                                             <img
-                                                                src="assets/images/users/avatar-2.jpg"
-                                                                class="me-3 rounded-circle avatar-xs flex-shrink-0"
+                                                                src="{{ $notify->image ?? '' }}"
+                                                                class="me-3 rounded-circle avatar-sm flex-shrink-0"
                                                                 alt="user-pic" />
                                                             <div
                                                                 class="flex-grow-1">
@@ -272,13 +306,11 @@
                                                 @endforeach
                                                 <div
                                                 class="my-3 text-center view-all">
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-soft-success waves-effect waves-light">
+                                                <a href="{{ route('list_notification', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-soft-success waves-effect waves-light">
                                                     Xem tất cả thông báo
                                                     <i
                                                         class="ri-arrow-right-line align-middle"></i>
-                                                </button>
+                                                </a>
                                             </div>
                                             @endif
                                         </div>
@@ -576,7 +608,7 @@
                                     <span class="align-middle">Thông tin</span></a>
                                 <a
                                     class="dropdown-item"
-                                    href="{{ route('adminLogout', session()->token()) }}"><i
+                                    href="{{ route('login') }}"><i
                                         class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>
                                     <span
                                         class="align-middle"
@@ -760,8 +792,12 @@
                 <div class="container-fluid">
                     <div id="two-column-menu"></div>
                     <ul class="navbar-nav" id="navbar-nav">
-                        <li class="menu-title">
-                            <span data-key="t-menu">Menu</span>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="{{ route('dashboard', ['token' => auth()->user()->refesh_token]) }}">
+                                <span data-key="t-dashboards"><b>MENU</b></span>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a
@@ -772,7 +808,7 @@
                                 aria-expanded="false"
                                 aria-controls="sidebarDashboards">
                                 <i class=" ri-currency-line"></i>
-                                <span data-key="t-dashboards">Quản lý doanh thu</span>
+                                <span data-key="t-dashboards">Trang quản lý</span>
                             </a>
                             <div
                                 class="collapse menu-dropdown"
@@ -780,26 +816,26 @@
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a
-                                            href="#"
+                                            href="{{ route('statist_revenue', ['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-analytics">
-                                            Quản lý doanh thu
+                                            Quản lý tổng quát và doanh thu
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a
-                                            href="dashboard-crm.html"
-                                            class="nav-link"
-                                            data-key="t-crm">
-                                            Quản lý doanh thu tổng quát
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="index.html"
+                                             href="{{ route('statist.quantity_sold', ['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-ecommerce">
-                                            Quản lý doanh thu theo shop
+                                            Quản lý tổng quát theo số lượng sản phẩm bán ra
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a
+                                             href="{{ route('statist.sales', ['token' => auth()->user()->refesh_token]) }}"
+                                            class="nav-link"
+                                            data-key="t-ecommerce">
+                                            Quản lý tổng quát đơn hàng
                                         </a>
                                     </li>
 
@@ -955,7 +991,7 @@
                                             href="{{ route('manager',['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-crm">
-                                            Danh sách Quản lý
+                                            Danh sách người quản lý
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -1027,14 +1063,7 @@
                                             Thông tin cơ bản của sàn
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a
-                                            href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
-                                            class="nav-link"
-                                            data-key="t-crm">
-                                            Quản lý voucher
-                                        </a>
-                                    </li>
+                                    
                                     <li class="nav-item">
                                         <a
                                             href="{{ route('bannerall', ['token' => auth()->user()->refesh_token]) }}"
@@ -1044,14 +1073,7 @@
                                         </a>
                                     </li>
             
-                                    <li class="nav-item">
-                                        <a
-                                            href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
-                                            class="nav-link"
-                                            data-key="t-projects">
-                                            Quản lý thuế
-                                        </a>
-                                    </li>
+                                    
                                 </ul>
                             </div>
                         </li>
@@ -1063,6 +1085,50 @@
                                 <span data-key="t-dashboards">Xét duyệt sản phẩm</span>
                             </a>
 
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-crm">
+                                <i class="ri-dashboard-3-line"></i>
+                                <span data-key="t-dashboards">Quản lý voucher</span>
+                                
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-projects">
+                                <i class="ri-dashboard-3-line"></i>
+                                <span data-key="t-dashboards">Quản lý thuế</span>
+                                
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('rankall', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-projects">
+                                <i class="ri-dashboard-3-line"></i>
+                                <span data-key="t-dashboards">QUẢN LÝ CẤP BẬC</span>
+                                
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('list_recipes', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-projects">
+                                <i class="ri-dashboard-3-line"></i>
+                                <span data-key="t-dashboards">MASTER DATA</span>
+                                
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -1092,6 +1158,7 @@
                 </div>
                 @endif
                 @yield('main')
+                
             </div>
             <!-- End Page-content -->
 
@@ -1127,7 +1194,7 @@
     <!--end back-to-top-->
 
     <!--preloader-->
-    <div id="preloader">
+    <!-- <div id="preloader">
         <div id="status">
             <div
                 class="spinner-border text-primary avatar-sm"
@@ -1135,7 +1202,7 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- JAVASCRIPT -->
     <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/libs/simplebar/simplebar.min.js"></script>
@@ -1157,9 +1224,6 @@
     <!-- Dashboard init -->
     <script src="assets/js/pages/dashboard-ecommerce.init.js"></script>
 
-    <!-- linecharts init -->
-    <!-- <script src="assets/js/pages/apexcharts-line.init.js"></script> -->
-    <!-- App js -->
     <script src="assets/js/app.js"></script>
 </body>
 

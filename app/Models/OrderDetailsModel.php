@@ -17,6 +17,7 @@ class OrderDetailsModel extends Model
         'order_id',
         'product_id',
         'variant_id',
+        'quantity',
         'create_at',
         'update_at',
         'height',
@@ -29,6 +30,8 @@ class OrderDetailsModel extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+    // Trong model OrderDetail
+
     public function variant()
     {
         return $this->belongsTo(product_variants::class, 'variant_id');
