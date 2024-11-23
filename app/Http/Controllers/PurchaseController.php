@@ -193,17 +193,18 @@ class PurchaseController extends Controller
                     $this->addOrderFeesToTotal($order, $grandTotalPrice);
                     $order->voucher_shop_disscount = $discountShopVoucher;
                     $order->save();
-                }
-                $discountMainVoucher = 0;
-                if ($voucherToMainCode) {
-                    $total_disscount_main = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
-                    $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
-                    $order->total_amount = $total_disscount_main;
+                    $discountMainVoucher = 0;
+                    if ($voucherToMainCode) {
+                        $total_disscount_main = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
+                        $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
+                        $order->total_amount = $total_disscount_main;
+                        $order->save();
+                    }
+                    $order->voucher_disscount = $discountMainVoucher;
+                    $order->total_amount = $shipFee + $order->total_amount;
                     $order->save();
                 }
-                $order->voucher_disscount = $discountMainVoucher;
-                $order->total_amount = $shipFee + $order->total_amount;
-                $order->save();
+                
                 DB::commit();
                 if($payment->code == 'COD'){
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);

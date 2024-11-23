@@ -39,6 +39,7 @@ class Shop extends Model
         'ward',
         'ward_id',
         'vnp_TmnCode',
+        'wallet',
     ];
     public function learns()
     {
