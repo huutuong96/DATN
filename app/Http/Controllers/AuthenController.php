@@ -400,17 +400,17 @@ class AuthenController extends Controller
         $credentials = $request->only('email', 'password');
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
+                return view("login")->with('error', 'Tài khoản và mật khẩu không đúng!');
             }
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Không thể tạo token'], 500);
+            return view("login")->with('error', 'Không thể tạo token!');
         }
         $user = UsersModel::where('email', $request->email)->first();
         if (!$user) {
-            return response()->json(['error' => 'Tài khoản không tồn tại'], 404);
+            return view("login")->with('error', 'Tài khoản không tồn tại!');
         }
         if ($user->status == 101) {
-            return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
+            return view("login")->with('error', 'Tài khoản và mật khẩu không đúng!');
         }
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
