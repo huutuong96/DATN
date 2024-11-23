@@ -287,11 +287,21 @@ class VnshopController extends Controller
     public function changeCategory(Request $rqt){
        
         $category = CategoriesModel::find($rqt->id);
+        // if($rqt->status == ){
+
+        // }
+        $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)->where("status", 2)->get();
         if ($category) {
-            $category->status =$rqt->status; 
-            $category->save(); 
-            return Back()->with('message', 'Cập nhật thành công!');
+            if($chillrenCategory){
+                return Back()->with('message', 'Cập nhật không thành công vì có danh mục con đang hoạt động!');
+            }else{
+                $category->status =$rqt->status; 
+                $category->save(); 
+                return Back()->with('message', 'Cập nhật thành công!');
+            }
+           
         }
+        return Back()->with('message', 'Không có sản phẩm nào!');
     }
     
     public function updateCategory(Request $request){
@@ -1077,6 +1087,26 @@ public function changeStatusRank(Request $request, string $id)
     }
 }
 
+public function changeStatusBanner(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $banner = Banner::findOrFail($id);
+        $banner->status = $request->status;
+        $banner->save();
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        // Xử lý lỗi và trả về thông báo
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
 public function destroyrank(Request $request, string $id)
 {
     try {
