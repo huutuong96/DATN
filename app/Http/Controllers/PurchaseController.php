@@ -221,7 +221,6 @@ class PurchaseController extends Controller
                     }
                     $order->voucher_disscount = $discountMainVoucher;
                     $order->total_amount = $shipFee + $order->total_amount;
-                    return  $order;
                     $order->save();
                 }
 
