@@ -148,6 +148,7 @@ class ShopController extends Controller
                 'district_id' => $request->district_id,
                 'ward' => $request->ward ?? null,
                 'ward_id' => $request->ward_id,
+                'vnp_TmnCode' => $request->vnp_TmnCode ?? null,
             ];
 
             if ($request->hasFile('image')) {

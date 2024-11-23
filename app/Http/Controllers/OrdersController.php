@@ -44,14 +44,14 @@ class OrdersController extends Controller
     {
         
         $user = JWTAuth::parseToken()->authenticate();
-        $status = $request->status ?? 1;
+        $order_status = $request->order_status ?? 1;
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
-            ->where('order_status', $status)
+            ->where('order_status', $order_status)
             ->orderby('created_at', 'desc')
             ->paginate(10);
 
-            $orders->appends(['status' => $status])->links();
+            $orders->appends(['order_status' => $order_status])->links();
             foreach ($orders as $order) {
                 foreach ($order->orderDetails as $orderDetail) {
                     if($orderDetail->variant!=null){

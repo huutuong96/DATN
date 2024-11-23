@@ -181,7 +181,6 @@ class PurchaseController extends Controller
                     $checkRank = $this->check_point_to_user();
                     $grandTotalPrice = $this->discountsByRank($checkRank, $grandTotalPrice);
                     $order->total_amount = $grandTotalPrice;
-                    $order->status = OrdersModel::STATUS_PENDING_CONFIRMATION;
                     $discountShopVoucher = 0;
                     $totalAdded = 0;
                     if ($voucherToShopCode != null) {

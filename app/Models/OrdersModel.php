@@ -83,7 +83,6 @@ class OrdersModel extends Model
         'from_province_name',
         'to_name',
         'to_phone',
-        'to_address',
         'to_ward_name',
         'to_district_name',
         'to_province_name',
