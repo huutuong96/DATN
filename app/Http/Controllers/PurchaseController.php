@@ -158,15 +158,15 @@ class PurchaseController extends Controller
                         $shopOrder['orderDetails'][] = $orderDetail;
                         $shopTotalPrice += $totalPrice;
                         $totalQuantity += $cart->quantity;
-                        $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
-                        $shopTotalPrice += $tax;
-                        if (!$tax) {
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
-                            ], 400);
-                        }
-                        $this->addStateTaxToOrder($order, $tax, $cart->product_id);
+                        // $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+                        // $shopTotalPrice += $tax;
+                        // if (!$tax) {
+                        //     return response()->json([
+                        //         'status' => false,
+                        //         'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
+                        //     ], 400);
+                        // }
+                        // $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                     }
                     $order->height = $height;
                     $order->length = $length;
@@ -202,7 +202,20 @@ class PurchaseController extends Controller
                         $order->save();
                     }
                     $order->voucher_disscount = $discountMainVoucher;
-                    $order->total_amount = $shipFee + $order->total_amount;
+                    $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+                        $shopTotalPrice += $tax;
+                        if (!$tax) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
+                            ], 400);
+                        }
+                        $this->addStateTaxToOrder($order, $tax, $cart->product_id);
+                    $order->vat = $tax;
+                    $order->price_before_vat = $shopTotalPrice;
+                    $order->price_after_vat = $shopTotalPrice + $tax;
+                    $order->total_amount = $shipFee + $order->total_amount + $tax;
+                    return $order;
                     $order->save();
                 }
 

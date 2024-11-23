@@ -67,6 +67,9 @@ class OrdersModel extends Model
         'client_order_code',
         'order_infomation',
         'order_status',
+        'price_before_vat',
+        'price_after_vat',
+        'vat',
     ];
 
     protected $hidden = [
@@ -82,7 +85,7 @@ class OrdersModel extends Model
         'from_district_name',
         'from_province_name',
         // 'to_name',
-        'to_phone',
+        // 'to_phone',
         'to_ward_name',
         'to_district_name',
         'to_province_name',
