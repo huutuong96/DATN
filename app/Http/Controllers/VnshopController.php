@@ -38,6 +38,9 @@ use App\Models\Notification_to_mainModel;
 use App\Models\RanksModel;
 use App\Models\recipes;
 use App\Http\Requests\RankRequest;
+use App\Models\PaymentsModel;
+use App\Http\Requests\PaymentRequest;
+
 
 class VnshopController extends Controller
 {
@@ -1126,6 +1129,110 @@ public function destroyrank(Request $request, string $id)
     }
 }
 
+public function payment_method(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $payment_method = PaymentsModel::where('status',1)->paginate(10);
+    $payment_method0ff = PaymentsModel::where('status',0)->paginate(10);
+
+    return view('payment_method.payment_method_list', compact('payment_method', 'payment_method0ff', 'tab'));  
+
+}
+public function storepaymant(PaymentRequest $request)
+{
+
+    $token = $request->query('token');
+    $tab = $request->input('tab', 1); 
+    $dataInsert = [
+        "name" => $request->name,
+        "code" => $request->code,
+        "description" => $request->description,
+        "status" => $request->status,
+    ];
+
+    try {
+        PaymentsModel::create($dataInsert);
+        return redirect()
+            ->route('payment_method' , [
+                'token' => $token,
+                'tab' => $tab,
+            ]) 
+            ->with('success', 'Thêm phương thức thanh toán thành công');
+    } catch (\Throwable $th) {
+        return redirect()
+            ->back()
+            ->with('error', 'Thêm phương thức thanh toán không thành công: ' . $th->getMessage())
+            ->withInput(); 
+    }
+}
+
+public function updatepayment(PaymentRequest $request, $id)
+{
+    $payment = PaymentsModel::findOrFail($id);
+    
+    $token = $request->token;
+    $tab = $request->tab;
+    $dataUpdate = [
+        "name" => $request->name,
+        "code" => $request->code,
+        "description" => $request->description,
+        "status" => $request->status,
+    ];
+
+    try {
+        $payment->update($dataUpdate);
+
+        return redirect()
+        ->route('payment_method' , [
+            'token' => $token,
+            'tab' => $tab,
+        ]) ->with('success', 'Cập nhật phương thức thanh toán thành công');
+    } catch (\Throwable $th) {
+        return redirect()
+            ->back()
+            ->with('error', 'Cập nhật phương thức thanh toán không thành công: ' . $th->getMessage())
+            ->withInput();
+    }
+}
+
+public function changeStatuspayment(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $payment = PaymentsModel::findOrFail($id);
+        $payment->status = $request->status;
+        $payment->save();
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+
+public function destroypayment(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $payment = PaymentsModel::findOrFail($id);
+        $payment->delete();
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa payment_method thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa payment_method không thành công!');
+    }
+}
 
 
 

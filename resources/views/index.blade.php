@@ -1119,6 +1119,17 @@
                                 
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a
+                             class="nav-link menu-link"
+                                href="{{ route('payment_method', ['token' => auth()->user()->refesh_token]) }}"
+                                class="nav-link"
+                                data-key="t-projects">
+                                <i class="ri-dashboard-3-line"></i>
+                                <span data-key="t-dashboards"> Phương thức thanh toán</span>
+                                
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <!-- Sidebar -->
