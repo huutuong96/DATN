@@ -123,11 +123,13 @@ class ProductController extends Controller
             if($checkSlug){
                 $slug = $checkSlug->slug;
                 $slug .= '-' . rand(1000, 9999);
+            }else{
+                $slug = $request->slug ?? Str::slug($request->name);
             }
             $dataInsert = [
                 'name' => $request->name,
                 'sku' => $request->sku ?? $this->generateSKU(),
-                'slug' => $slug ?? ($request->slug ?? Str::slug($request->name))
+                'slug' => $slug,
                 'description' => $request->description,
                 'infomation' => json_encode($request->infomation),
                 'price' => $request->price,

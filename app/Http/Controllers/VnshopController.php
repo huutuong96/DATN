@@ -287,11 +287,21 @@ class VnshopController extends Controller
     public function changeCategory(Request $rqt){
        
         $category = CategoriesModel::find($rqt->id);
+        // if($rqt->status == ){
+
+        // }
+        $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)->where("status", 2)->get();
         if ($category) {
-            $category->status =$rqt->status; 
-            $category->save(); 
-            return Back()->with('message', 'Cập nhật thành công!');
+            if($chillrenCategory){
+                return Back()->with('message', 'Cập nhật không thành công vì có danh mục con đang hoạt động!');
+            }else{
+                $category->status =$rqt->status; 
+                $category->save(); 
+                return Back()->with('message', 'Cập nhật thành công!');
+            }
+           
         }
+        return Back()->with('message', 'Không có sản phẩm nào!');
     }
     
     public function updateCategory(Request $request){
