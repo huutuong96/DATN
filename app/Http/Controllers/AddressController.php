@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\AddressModel;
 use Illuminate\Http\Request;
 use App\Http\Requests\AddressRequest;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 class AddressController extends Controller
 {
     /**
@@ -12,7 +14,8 @@ class AddressController extends Controller
     public function index()
     {
         try {
-            $Address = AddressModel::all();
+            $user = JWTAuth::parseToken()->authenticate();
+            $Address = AddressModel::where('user_id', $user->id)->get();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dữ liệu được lấy thành công',
@@ -40,12 +43,21 @@ class AddressController extends Controller
      */
     public function store(AddressRequest $request)
     {
+        $user = JWTAuth::parseToken()->authenticate();
         $Address = [
-            "address"=> $request->address,
-            "type"=> $request->type,
-            "default"=> $request->default,
-            "status"=> $request->status,
-            "user_id" => auth()->user()->id
+            "address"=> $request->address ?? null,
+            "province" => $request->province ?? null,
+            "province_id" => $request->province_id ?? null,
+            "district" => $request->district ?? null,
+            "district_id" => $request->district_id ?? null,
+            "ward" => $request->ward ?? null,
+            "ward_id" => $request->ward_id ?? null,
+            "type"=> $request->type ?? null,
+            "default"=> $request->default ?? 0,
+            "status"=> $request->status ?? 1,
+            "user_id" => $user->id,
+            "name"=> $request->status ?? null,
+            "phone" => $request->status ?? null,
         ];
         AddressModel::create($Address);
         $dataDone = [
@@ -88,17 +100,25 @@ class AddressController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AddressRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
+        $user = JWTAuth::parseToken()->authenticate();
+        AddressModel::where('user_id', $user->id)->update(['default' => 0]);
         $Address = AddressModel::findOrFail($id);
-
         $Address->update([
-            "address"=> $request->address,
-            "type"=> $request->type,
-            "status"=> $request->status,
-            "default"=> $request->default,
-            "updated_at"=> now(),
-            "user_id" => auth()->user()->id
+            "address"=> $request->address ?? $Address->address,
+            "province" => $request->province ?? $Address->province,
+            "province_id" => $request->province_id ?? $Address->province_id,
+            "district" => $request->district ?? $Address->district,
+            "district_id" => $request->district_id ?? $Address->district_id,
+            "ward" => $request->ward ?? $Address->ward,
+            "ward_id" => $request->ward_id ?? $Address->ward_id,
+            "type"=> $request->type ?? $Address->type,
+            "default"=> $request->default ?? 0,
+            "status"=> $request->status ?? 1,
+            "user_id" => $user->id,
+            "name"=> $request->status ?? null,
+            "phone" => $request->status ?? null,
         ]);
 
         $dataDone = [

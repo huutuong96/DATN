@@ -1,9 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Jobs\SendNotification;
 use Illuminate\Http\Request;
 use App\Models\voucherToMain;
 use App\Http\Requests\VoucherRequest;
+use App\Models\User;
+use Cloudinary\Cloudinary;
 
 class VoucherToMainController extends Controller
 {
@@ -38,7 +42,10 @@ class VoucherToMainController extends Controller
     public function store(VoucherRequest $request)
     {
         $token = $request->query('token');
-        
+        $users = User::select('id')->get();
+        if ($request->image_voucher) {
+            $voucherImage = $this->storeImage($request->image_voucher);
+        }
         $voucherMain = new voucherToMain();
         $voucherMain->title = $request->title;
         $voucherMain->description = $request->description;
@@ -47,10 +54,15 @@ class VoucherToMainController extends Controller
         $voucherMain->ratio = $request->ratio;
         $voucherMain->code = $request->code;
         $voucherMain->status = $request->status;
+        $voucherMain->min = $request->min_order;
+        $voucherMain->image = $voucherImage ?? null;
         $voucherMain->create_by = auth()->user()->id;
         $voucherMain->save();
         try {
             $voucherMain->save();
+            foreach ($users as $user) {
+                SendNotification::dispatch($voucherMain->title, $voucherMain->description, $user->id, null, $voucherImage);
+            }
             return redirect()->route('voucherall', [
                 'token' => $token,
             ])->with('message', 'Thêm voucher main thành công');
@@ -127,5 +139,12 @@ class VoucherToMainController extends Controller
             'message' => $message,
             'error' => $error
         ], $status);
+    }
+
+    private function storeImage($image)
+    {
+        $cloudinary = new Cloudinary();
+        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        return $uploadedImage['secure_url'];
     }
 }

@@ -20,7 +20,7 @@ class CheckShop
     public function handle(Request $request, Closure $next): Response
     {
 
-        $userId = JWTAuth::parseToken()->authenticate()->id;
+        $userId = JWTAuth::parseToken()->authenticate();
         // LẤY ID CỦA SHOP TỪ TẤT CẢ CÁC NGUỒN
         $shopId = $request->input('shop_id')
             ?? $request->route('shop_id')
@@ -28,7 +28,7 @@ class CheckShop
             ?? $request->segment(2) // Assuming shop_id might be in the second segment of the URL
             ?? $request->header('X-Shop-ID') // In case it's passed as a custom header
             ?? $request->json('shop_id'); // For JSON payloads
-
+            // dd($userId);
             if ($userId->role_id == 2 || $userId->role_id == 3 || $userId->role_id == 4) {
                 return $next($request);
             }

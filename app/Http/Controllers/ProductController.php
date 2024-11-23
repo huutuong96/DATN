@@ -1088,7 +1088,7 @@ public function ProductAll(Request $request)
     $allProductsCount = Product::count(); 
     $newProductsCount = Product::where('status', 3)->count(); 
     $activeProductsCount = Product::where('status', 2)->count(); 
-    $rejectedProductsCount = Product::where('status', 5)->count(); 
+    $rejectedProductsCount = Product::where('status', 0)->count(); 
     $violatingProductsCount = Product::where('status', 4)->count(); 
     $allUpdateProductsCount = update_product::all()->count();
     $pendingProductsCount = $allUpdateProductsCount + $newProductsCount;
@@ -1106,12 +1106,21 @@ public function ProductAll(Request $request)
         $currentPage,
         ['path' => $request->url()]
     );
-    $pendingProducts = Product::where('status', 3)->paginate(10);
-    $activeProducts = Product::where('status', 2)->paginate(10);
-    $rejectedProducts = Product::where('status', 5)->paginate(10);
-    $violatingProducts = Product::where('status', 4)->paginate(10);
-    $allProducts = Product::paginate(10); 
-    $allUpdateProducts = update_product::paginate(10); 
+    $pendingProducts = Product::where('status', 3)
+    ->with(['images', 'variants'])->get();
+
+    $activeProducts = Product::where('status', 2)
+        ->with(['images', 'variants'])->get();
+
+    $rejectedProducts = Product::where('status', 0)
+        ->with(['images', 'variants'])->get();
+
+    $violatingProducts = Product::where('status', 4)
+        ->with(['images', 'variants'])->get();
+
+    $allProducts = Product::with(['images', 'variants'])->get();
+
+    $allUpdateProducts = update_product::with(['variants'])->get();
 
 
     return view('products.list_product', compact(
@@ -1121,6 +1130,14 @@ public function ProductAll(Request $request)
         'violatingProducts', 'tab'
     ));
 }
+
+    public function showproduct($id)
+    {
+        $product = Product::findOrFail($id);
+        return view('products.show', compact('product'));
+    }
+
+
     public function showReportForm(Request $request, $id)
     {
         $token = $request->query('token'); // Lấy token từ URL

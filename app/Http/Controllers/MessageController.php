@@ -8,7 +8,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Shop;
 use App\Models\Shop_manager;
 use Cloudinary\Cloudinary;
-
+use App\Events\MessageSent;
 class MessageController extends Controller
 {
 
@@ -50,6 +50,7 @@ class MessageController extends Controller
             "images" => $imageUrls, // Chuyển mảng URL thành chuỗi JSON để lưu vào DB
             'send_by' => $user->id, // Đây là id của khách hàng gửi tin nhắn
         ]);
+        broadcast(new MessageSent($request->content))->toOthers();
         $notificationData = [
             'type' => 'main',
             'user_id' => $user->id,

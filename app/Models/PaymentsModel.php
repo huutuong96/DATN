@@ -17,6 +17,7 @@ class PaymentsModel extends Model
      */
     protected $fillable = [
         'name',
+        'code',
         'description',
         'status',
     ];

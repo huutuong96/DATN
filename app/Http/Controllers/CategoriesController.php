@@ -9,6 +9,7 @@ use App\Models\CategoriesModel;
 use App\Models\categoryattribute;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\CategoriesRequest;
+use App\Models\tax_category;
 
 class CategoriesController extends Controller
 {
@@ -43,6 +44,8 @@ class CategoriesController extends Controller
 
     public function store(CategoriesRequest $request)
     {
+        
+        
         $dataInsert = [];
 
         // Kiểm tra và upload ảnh
@@ -63,10 +66,14 @@ class CategoriesController extends Controller
                 'parent_id' => $request->parent_id ?? null,
                 'create_by' => $user->id,
                 'image' => $dataInsert['image'] ?? null,
+                'tax_id' => $request->tax_id
             ];
 
             $category = CategoriesModel::create($dataInsert);
-
+            $tax_category = tax_category::create([
+                'category_id' => $category->id,
+                'tax_id' => $request->tax_id,
+            ]);
             $parentId = $category->parent_id;
             while ($parentId) {
                 $parentAttributes = CategoryAttribute::where('category_id', $parentId)->get();
@@ -91,7 +98,11 @@ class CategoriesController extends Controller
                     }
                 }
             }
-
+            if($request->back == 1){
+                session()->put('message', 'Tạo thành công!');
+                // return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Tạo thành công!');
+                // return back()->with('message', 'Tạo thành công!');
+            }
             return response()->json([
                 'status' => true,
                 'message' => "Thêm danh mục thành công",
@@ -188,9 +199,11 @@ class CategoriesController extends Controller
                 'update_by' => $user->id,
                 'updated_at' => now(),
             ];
-
             $categories->update($dataUpdate);
-
+            $tax_category = tax_category::create([
+                'category_id' => $categories->id,
+                'tax_id' => $request->tax_id,
+            ]);
             return response()->json([
                 'status' => true,
                 'message' => "Cập nhật danh mục thành công",

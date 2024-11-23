@@ -18,5 +18,11 @@ class Voucher extends Model
         'updated_at',
         'user_id',
         'code',
+        'shop_id',
+        'max',
+        'min',
+        'ratio',
+        'title',
+        'description',
     ];
 }

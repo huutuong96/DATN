@@ -100,10 +100,8 @@
                                             <tr>
                                                 <th scope="col">ID</th>
                                                 <th scope="col">blog</th>
-                                                <th scope="col">slug</th>
                                                 <th scope="col">tiêu đề</th>
                                                 <th scope="col">Hình ảnh</th>
-                                                <th scope="col">nội dung</th>
                                                 <th scope="col">Người tạo</th>
                                                 <th scope="col">Hành động</th>
                                             </tr>
@@ -114,22 +112,19 @@
                                             <tr>
                                                 <th scope="row"><a href="#" class="fw-medium">{{$Post->id}}</a></th>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog->name ?? "Danh mục đã bị xóa" }}</td>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
-                                                <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                    <img src="{{ $Post->image }}" alt="Post Image" style="max-width: 100%; height: auto;">
+                                                <td style="max-width: 100px; height: 90px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                    <img src="{{ $Post->image }}" alt="Post Image" style="max-width: 70%; height: auto;">
                                                 </td>
                                                 
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                    {{ \Illuminate\Support\Str::limit($Post->content, 150, '...') }}
-                                                </td>
+
                                                 
                                                 
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->user->fullname }}</td>
                                                 <td>
                                                     <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $Post->id }}">
                                                         <button type="button" class="btn btn-primary" title="Chỉnh sửa">
-                                                            Chỉnh sửa
+                                                            <i class="ri-edit-line align-middle"></i>
                                                         </button>
                                                     </a>
                                                 
@@ -197,11 +192,47 @@
                                                     <!-- Delete form -->
                                                     <form action="{{ route('post.destroy', ['token' => auth()->user()->refesh_token, 'id' => $Post->id, 'tab' => 1]) }}" method="POST" style="display: inline;">
                                                         @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" style="background: ;border-radius: 5px; border: 1px solid black; color: red; cursor: pointer; height: 37px; width: 80px;" onclick="return confirm('Bạn có chắc chắn muốn xóa blog này?');">
-                                                            🗑️ Xóa
+                                                        @method('DELETE')                                                       
+                                                            <button type="submit" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa post này?');">
+                                                                <i class="ri-delete-bin-line align-middle"></i>
                                                         </button>
                                                     </form>
+                                                    <!-- Button to open blog details modal -->
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#blogDetailsModal-{{ $Post->id }}">
+                                                        <button type="button" class="btn btn-primary" title="Chi tiết bài viết">
+                                                            <i class="ri-eye-line align-middle"></i> 
+                                                        </button>
+                                                    </a>
+
+                                                    <!-- Modal Chi tiết bài viết -->
+                                                    <div class="modal fade" id="blogDetailsModal-{{ $Post->id }}" tabindex="-1" aria-labelledby="blogDetailsModalLabel-{{ $Post->id }}" aria-hidden="true">
+                                                        <div class="modal-dialog modal-xl">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="blogDetailsModalLabel-{{ $Post->id }}">Chi tiết Bài viết</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body ">
+                                                                    {!! $Post->content !!}
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <script>
+                                                        $(document).ready(function() {
+                                                            $('#summernote2{{ $Post->id }}').summernote({
+                                                                placeholder: 'Nội dung bài viết',
+                                                                tabsize: 2,
+                                                                height: 300,
+                                                                width:950,
+                                                                lineHeights: ['0.8', '1.2', '1.5', '1.8', '2.0', '2.5'] // Dòng tự động xuống hàng
+                                                            });
+                                                        });
+                                                    </script>
+                                                    
                                                 </td>
                                                 
                                                 
@@ -239,7 +270,7 @@
                                             <tr>
                                                 <th scope="col">ID</th>
                                                 <th scope="col">blog</th>
-                                                <th scope="col">slug</th>
+                                                <th scope="col">Hình ảnh</th>
                                                 <th scope="col">tiêu đề</th>
                                                 <th scope="col">nội dung</th>
                                                 <th scope="col">Người tạo</th>
@@ -253,9 +284,12 @@
                                                 {{-- @dd( $Post->posts) --}}
                                                 <th scope="row"><a href="#" class="fw-medium">{{$Post->id}}</a></th>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->blog_id}}</td>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->slug }}</td>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
-                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->content }}</td>
+                                                <td style="max-width: 100px; height: 90px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                    <img src="{{ $Post->image }}" alt="Post Image" style="max-width: 70%; height: auto;">
+                                                </td>                                                <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->title }}</td>
+                                                <td style="max-width: 200px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                    {{ \Illuminate\Support\Str::limit($Post->content, 150, '...') }}
+                                                </td>
                                                 <td style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">{{ $Post->user->fullname }}</td>
                                                 <td>
                                                     <form action="{{ route('post.restore',[
@@ -264,9 +298,11 @@
                                                                                                 'tab'=>2,
                                                                                                 ]) }}" method="POST" style="display: inline;">
                                                         @csrf
-                                                        <button type="submit" style="background: none; border: none; color: green; cursor: pointer;" onclick="return confirm('Bạn có chắc chắn muốn khôi phục post này?');">
-                                                            🔄 Khôi Phục
-                                                        </button>
+                                                        <button type="submit" class="btn btn-info"
+                                                                    title="Khôi phục"
+                                                                    onclick="return confirm('Bạn có chắc chắn muốn khôi phục bài viết này?');">
+                                                                    <i class="ri-refresh-line align-middle"></i>
+                                                                </button>
                                                     </form>
                                                 </td>
                                                 

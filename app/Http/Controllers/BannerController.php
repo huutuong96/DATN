@@ -14,7 +14,7 @@ class BannerController extends Controller
      */
     public function index()
     {
-        $banners = Banner::all();
+        $banners = Banner::where('status', 2)->get();
         if ($banners->isEmpty()) {
             return response()->json([
                 'status' => false,

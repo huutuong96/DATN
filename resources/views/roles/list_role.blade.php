@@ -83,7 +83,10 @@
                                                     <a
                                                         href="{{ route('list_permission', ['token' => auth()->user()->refesh_token,
                                                                                         'id' => $role->id]) }}">
-                                                        <button type="button" class="btn btn-info waves-effect waves-light">Cấp Quyền</button>
+                                                       <button type="button" class="btn btn-secondary" title="Cấp quyền">
+                                                        <i class="ri-shield-user-line align-middle"></i>
+                                                    </button>
+                                                    
                                                     </a>
                                                 </li>
 
@@ -95,7 +98,10 @@
                                                                                                 'id' => $role->id,
                                                                                                 'status' => 3,
                                                                                                 ]) }}">
-                                                        <button type="button" class="btn btn-warning waves-effect waves-light">Tắt</button>
+                                                       <button type="button" class="btn btn-warning" title="Tắt">
+                                                        <i class="ri-close-line align-middle"></i>
+                                                    </button>
+                                                    
                                                     </a>
                                                 </li>
                                                 @elseif ($role->status == 3)
@@ -106,14 +112,17 @@
                                                                                             'id' => $role->id,
                                                                                             'status' => 2,
                                                                                             ]) }}">
-                                                        <button type="button" class="btn btn-success waves-effect waves-light">Bật</button>
+                                                        <button type="button" class="btn btn-primary" title="Bật">
+                                                            <i class="ri-power-line align-middle"></i>
+                                                        </button>
+                                                        
 
 
                                                 </li>
                                                 @endif
                                                 <li class="list-inline-item">
                                                     <!-- Toggle Between Modals -->
-                                                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal{{ $role->id }}">Chỉnh sửa</button>
+                                                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" title="chỉnh sửa" data-bs-target="#firstmodal{{ $role->id }}"><i class="ri-edit-line align-middle"></i></button>
                                                     <!-- First modal dialog -->
                                                     <div class="modal fade" id="firstmodal{{ $role->id }}" aria-hidden="true" aria-labelledby="..." tabindex="-1">
                                                         <div class="modal-dialog modal-dialog-centered">
@@ -170,7 +179,9 @@
                                                                                             'id' => $role->id,
                                                                                             'status' => 0,
                                                                                             ]) }}">
-                                                        <button type="button" class="btn btn-danger waves-effect waves-light">Xóa</button>
+                                                         <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa quyền này?');">
+                                                            <i class="ri-delete-bin-line align-middle"></i>
+                                                    </button>
                                                     </a>
                                                 </li>
                                             </ul>
