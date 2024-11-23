@@ -23,6 +23,8 @@ use App\Jobs\UpdateStockAllVariant;
 use App\Jobs\UpdatePriceAllVariant;
 use App\Jobs\UpdateImageAllVariant;
 use App\Models\Shop;
+use App\Models\Tax;
+use App\Models\tax_category;
 use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -120,6 +122,10 @@ class ProductController extends Controller
         //         'message' => 'CỬA HÀNG CHƯA KHAI BÁO MÃ TÀI KHOẢN NGÂN HÀNG CỦA VNPAY',
         //     ], 400);
         // }
+        $tax_category = tax_category::where('category_id', $request->category_id)->first();
+        $taxes = Tax::find($tax_category->tax_id);
+        $taxAmount = $request->price * $taxes->rate;
+        // return $taxAmount;
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -138,7 +144,7 @@ class ProductController extends Controller
                 'slug' => $slug,
                 'description' => $request->description,
                 'infomation' => json_encode($request->infomation),
-                'price' => $request->price,
+                'price' => $request->price + $taxAmount,
                 'sale_price' => $request->sale_price ?? null,
                 'image' => $request->images[0] ?? null,
                 'quantity' => $request->stock ?? 0,

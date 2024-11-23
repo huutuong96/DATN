@@ -168,6 +168,19 @@ class PurchaseController extends Controller
                         // }
                         // $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                     }
+                    $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+                        // $shopTotalPrice += $tax;
+                        if (!$tax) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
+                            ], 400);
+                        }
+                        $this->addStateTaxToOrder($order, $tax, $cart->product_id);
+                    $order->vat = $tax;
+                    $order->price_before_vat = $shopTotalPrice;
+                    $order->price_after_vat = $shopTotalPrice + $tax;
+                    $shopTotalPrice = $shopTotalPrice + $tax;
                     $order->height = $height;
                     $order->length = $length;
                     $order->weight = $weight;
@@ -180,7 +193,10 @@ class PurchaseController extends Controller
                     $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
                     AddPointUser::dispatch(auth()->id());
                     $checkRank = $this->check_point_to_user();
+                    $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);
+                    $newtotal = $this->addOrderFeesToTotal($order, $shopTotalPrice);
                     $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
+                    $order->disscount_by_rank = $get_discountsByRank;
                     $order->total_amount = $shopTotalPrice;
                     $discountShopVoucher = 0;
                     $totalAdded = 0;
@@ -189,9 +205,11 @@ class PurchaseController extends Controller
                         $discountShopVoucher = $totalAdded;
                         $shopTotalPrice -= $totalAdded;
                     }
+                    
+                    $order->net_amount -= $totalAdded;
+                    // return $order->net_amount;
                     $order->total_amount = $shopTotalPrice;
                     $total_amount = $shopTotalPrice;
-                    $net_amount = $this->addOrderFeesToTotal($order, $shopTotalPrice);
                     // $order->net_amount = $shopTotalPrice;
                     $order->voucher_shop_disscount = $discountShopVoucher;
                     $discountMainVoucher = 0;
@@ -202,20 +220,8 @@ class PurchaseController extends Controller
                         $order->save();
                     }
                     $order->voucher_disscount = $discountMainVoucher;
-                    $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
-                        $shopTotalPrice += $tax;
-                        if (!$tax) {
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
-                            ], 400);
-                        }
-                        $this->addStateTaxToOrder($order, $tax, $cart->product_id);
-                    $order->vat = $tax;
-                    $order->price_before_vat = $shopTotalPrice;
-                    $order->price_after_vat = $shopTotalPrice + $tax;
-                    $order->total_amount = $shipFee + $order->total_amount + $tax;
-                    return $order;
+                    $order->total_amount = $shipFee + $order->total_amount;
+                    return  $order;
                     $order->save();
                 }
 
@@ -341,11 +347,23 @@ class PurchaseController extends Controller
         }
         $discountPercentage = $rank->value; // Giả sử value là phần trăm giảm giá (0.2 = 20%)
         $maxDiscount = $rank->limitValue; // Giả sử limitValue là giá trị giảm tối đa
-        $discountAmount = $totalPrice * $discountPercentage / 100;
+        $discountAmount = $totalPrice * $discountPercentage;
         $discountAmount = min($discountAmount, $maxDiscount); // Đảm bảo giảm giá không vượt quá giới hạn
-        
         $discountedPrice = $totalPrice - $discountAmount;
         return $discountedPrice;
+    }
+    private function get_discountsByRank($checkRank, $totalPrice)
+    {
+        $rank = RanksModel::where('id', $checkRank)->first();
+        if (!$rank) {
+            return $totalPrice; // Không có rank, không áp dụng giảm giá
+        }
+        $discountPercentage = $rank->value; // Giả sử value là phần trăm giảm giá (0.2 = 20%)
+        $maxDiscount = $rank->limitValue; // Giả sử limitValue là giá trị giảm tối đa
+        $discountAmount = $totalPrice * $discountPercentage;
+        $discountAmount = min($discountAmount, $maxDiscount); // Đảm bảo giảm giá không vượt quá giới hạn
+        
+        return $discountAmount;
     }
     private function getValidVoucherCode($code, $type)
     {
@@ -446,7 +464,7 @@ class PurchaseController extends Controller
         }
         return $voucherId;
     }
-    private function applyVouchersToShop($voucherToShopCode, &$totalPrice, $shopId)
+    private function applyVouchersToShop($voucherToShopCode, $totalPrice, $shopId)
     {
         $discountAmount = null;
         if ($voucherToShopCode) {
@@ -582,11 +600,9 @@ class PurchaseController extends Controller
         $tax_category = tax_category::where('category_id', $product->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
         $totalTaxAmount = 0;
-            $taxAmount = $totalPriceOfShop * $taxes->rate;
-            $totalTaxAmount += $taxAmount;
-        // Round to 2 decimal places
-        $totalTaxAmount = round($totalTaxAmount, 2);
-        return $totalTaxAmount;
+        $taxAmount = $totalPriceOfShop * $taxes->rate;
+        $totalTaxAmount += $taxAmount;
+        return (int)$totalTaxAmount;
     }
 
     private function addStateTaxToOrder($order, $tax, $product_id)
@@ -606,25 +622,24 @@ class PurchaseController extends Controller
     {
         $platformFees = platform_fees::all();
         $totalFeeAmount = 0;
-
         foreach ($platformFees as $fee) {
-            $feeAmount = $totalPriceOfShop * $fee->rate / 100;
-
-            // dd( $feeAmount );
+            $feeAmount = $totalPriceOfShop * $fee->rate;
             $totalFeeAmount += $feeAmount;
 
             order_fee_details::create([
                 'order_id' => $order->id,
                 'platform_fee_id' => $fee->id,
-                'amount' => round($feeAmount, 2)
+                'amount' => $feeAmount,
             ]);
         }
-
-        return round($totalFeeAmount, 2);
+        $order->platform_fee = (int)$totalFeeAmount;
+        $order->save();
+        return (int)$totalFeeAmount;
     }
 
     private function addOrderFeesToTotal($order, $totalPrice)
-    {
+    {   
+        //246960.0 
         $feeAmount = $this->calculateOrderFees($order, $totalPrice);
         $newTotal = $totalPrice - $feeAmount;
         $order->update(['net_amount' => $newTotal]);

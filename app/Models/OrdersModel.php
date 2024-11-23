@@ -70,6 +70,8 @@ class OrdersModel extends Model
         'price_before_vat',
         'price_after_vat',
         'vat',
+        'disscount_by_rank',
+        'platform_fee',
     ];
 
     protected $hidden = [
