@@ -122,6 +122,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::put('/update_rank/{id}', [VnshopController::class, 'updaterank'])->name('rank.update');
     Route::get('/changeStatusRank/{id}', [VnshopController::class, 'changeStatusRank'])->name('changeStatusRank');
     Route::delete('/destroyrank/{id}', [VnshopController::class, 'destroyrank'])->name('rank.delete');
+    Route::get('/changeStatusBanner/{id}', [VnshopController::class, 'changeStatusBanner'])->name('changeStatusBanner');
 
 
 });
