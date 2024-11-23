@@ -41,9 +41,9 @@
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
-        <div class="main-content">
+        <div class="main-content" style="width: auto; margin: 0; padding: 0;">
 
-            <div class="page-content">
+            <div class="page-content" style="width: auto; margin: 0; padding: 0;">
                 <div class="container-fluid">
                     <div class="row dash-nft">
                         <div class="col-xxl-9">
