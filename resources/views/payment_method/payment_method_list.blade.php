@@ -63,20 +63,21 @@
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
                                                                 <label for="status" class="form-label">Trạng Thái <span class="text-danger">*</span></label>
-                                                                <select class="form-control" id="status" name="status" required>
+                                                                <select style="width: 507px;left: 2rem;" class="form-control mt-3" id="status" name="status" required>
                                                                     <option value="" disabled selected>Chọn trạng thái</option>
                                                                     <option value="1">Kích hoạt</option>
                                                                     <option value="0">Không kích hoạt</option>
                                                                 </select>
                                                             </div>
                                                         </div>
+                                                        
                                                         {{-- <div class="col-md-6">
                                                             <div class="mb-3">
                                                                 <label for="settings" class="form-label">Thiết Lập (Tùy Chọn)</label>
                                                                 <input type="text" class="form-control" placeholder="Nhập thiết lập (nếu có)" id="settings" name="settings" maxlength="255">
                                                             </div>
                                                         </div> --}}
-                                                        <div class="col-12">
+                                                        <div class="col-12 mt-5">
                                                             <div class="text-end">
                                                                 <button type="submit" class="btn btn-primary">Thêm Phương Thức</button>
                                                             </div>
