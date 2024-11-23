@@ -1115,7 +1115,7 @@
                                 class="nav-link"
                                 data-key="t-projects">
                                 <i class="ri-dashboard-3-line"></i>
-                                <span data-key="t-dashboards">QUẢN LÝ CẤP BẬC</span>
+                                <span data-key="t-dashboards">Quản lý cấp bậc</span>
                                 
                             </a>
                         </li>
