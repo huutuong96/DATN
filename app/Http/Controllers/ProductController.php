@@ -119,10 +119,17 @@ class ProductController extends Controller
             $cloudinary = new Cloudinary();
             DB::beginTransaction();
             $mainImageUrl = null;
+            $checkSlug = Product::where("slug", $request->slug ?? Str::slug($request->name))->first();
+            if($checkSlug){
+                $slug = $checkSlug->slug;
+                $slug .= '-' . rand(1000, 9999);
+            }else{
+                $slug = $request->slug ?? Str::slug($request->name);
+            }
             $dataInsert = [
                 'name' => $request->name,
                 'sku' => $request->sku ?? $this->generateSKU(),
-                'slug' => $request->slug ?? Str::slug($request->name),
+                'slug' => $slug,
                 'description' => $request->description,
                 'infomation' => json_encode($request->infomation),
                 'price' => $request->price,
@@ -591,6 +598,12 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = Product::with(['images', 'variants'])->find($id);
+        if ($products->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => "Không tồn tại sản phẩm nào",
+            ], 404);
+        }
         $product->view_count += 1;
         $product->save();
 
