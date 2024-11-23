@@ -6,14 +6,19 @@ use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Product;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OrdersController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = OrdersModel::all();
-
+        $user = JWTAuth::parseToken()->authenticate();
+        $status = $request->status ?? null;
+        if ($status == null) {
+            $orders = OrdersModel::where('user_id', $user->id)->paginate(15);
+        }else{
+            $orders = OrdersModel::where('user_id', $user->id)->where('status', $status)->paginate(15);
+        }
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
         }
@@ -35,12 +40,18 @@ class OrdersController extends Controller
 
         return $this->successResponse('Lấy dữ liệu thành công', $orders);
     }
-    public function indexOrderToUser()
+    public function indexOrderToUser(Request $request)
     {
-        $orders = OrdersModel::with(['orderDetails.variant.product']) // Eager load 'product' qua 'orderDetails'
-            ->where('user_id', auth()->id())
-            ->get();
-           
+        
+        $user = JWTAuth::parseToken()->authenticate();
+        $status = $request->status ?? 1;
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
+            ->where('user_id', $user->id)
+            ->where('order_status', $status)
+            ->orderby('created_at', 'desc')
+            ->paginate(10);
+
+            $orders->appends(['status' => $status])->links();
             foreach ($orders as $order) {
                 foreach ($order->orderDetails as $orderDetail) {
                     if($orderDetail->variant!=null){
@@ -56,17 +67,11 @@ class OrdersController extends Controller
                     if( $orderDetail->variant){
                        $orderDetail['product']  = $orderDetail->variant->product;
                        unset($orderDetail->variant['product']);
-
                     }
-                   
                 }
             }
-
-        if ($orders->isEmpty()) {
-            return $this->errorResponse("Không tồn tại Order nào", 404);
-        }
     
-        return $this->successResponse('Lấy dữ liệu thành công', $orders);
+        return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
     }
     
     
@@ -97,19 +102,17 @@ class OrdersController extends Controller
         return $this->successResponse("Lấy dữ liệu thành công", $order);
     }
 
-    public function update(OrderRequest $request, string $id)
+    public function update(Request $request)
     {
-        $order = OrdersModel::find($id);
-
+        $order = OrdersModel::where('id', $request->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
         if (!$order) {
             return $this->errorResponse("Order không tồn tại", 404);
         }
-
         $dataUpdate = [
-            'status' => $request->status ?? $order->status,
-            'update_by' => auth()->id()
+            'order_status' => $request->status ?? $order->status,
+            'update_by' => $user->id,
         ];
-
         try {
             $order->update($dataUpdate);
             return $this->successResponse("Order đã được cập nhật", $order);

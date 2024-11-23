@@ -327,11 +327,11 @@ class PaymentsController extends Controller
         // So sánh mã bảo mật trả về từ VNPAY với mã bảo mật tự tính toán
         if ($secureHash === $vnp_SecureHash) {
 
-
+        $url_pro = env('URL_PRODUCTION');
             // Kiểm tra mã thanh toán thành công (code = 00)
             if ($vnp_ResponseCode == '00') {
                 // return $request->all();
-                header('Location: http://localhost:3000/checkout/success?id='.$vnp_TxnRef);
+                header("Location: $url_pro/checkout/success?id=".$vnp_TxnRef);
             } else {
                 // Trường hợp mã thanh toán không thành công
                 return response()->json([

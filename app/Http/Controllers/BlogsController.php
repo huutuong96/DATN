@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Blog;
-use App\Http\Requests\BlogRequest;
+use App\Http\Requests\Blogrequest;
 
 class BlogsController extends Controller
 {
@@ -15,7 +15,7 @@ class BlogsController extends Controller
         return response()->json($blogs);
     }
 
-    public function store(BlogRequest $request)
+    public function store(Blogrequest $request)
     {  
        
         $token = $request->query('token');

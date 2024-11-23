@@ -35,7 +35,9 @@ use App\Models\Message;
 use App\Models\message_detail;
 use App\Models\Notification;
 use App\Models\Notification_to_mainModel;
- 
+use App\Models\RanksModel;
+use App\Models\recipes;
+use App\Http\Requests\RankRequest;
 
 class VnshopController extends Controller
 {
@@ -59,7 +61,6 @@ class VnshopController extends Controller
                                 ->where('is_delete', 0)
                                 ->get()
                                 ->count();
-
         $monthlyRevenue = order_fee_details::
         whereMonth('created_at', Carbon::now()->month)
         ->sum('amount');
@@ -628,7 +629,7 @@ class VnshopController extends Controller
     $taxeOFF = Tax::where('status',3)->get();
 
     if ($taxes->isEmpty()) {
-        return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
+        return view('rank.tax')->with('message', 'Không tồn tại thuế nào');
     }
 
     return view('tax.tax', compact('taxes' ,'taxeOFF', 'tab'));
@@ -731,35 +732,34 @@ public function storebanner(BannerRequest $request)
     $image = $request->file('image');
     $cloudinary = new Cloudinary();
     $token = $request->query('token');
-
+   
     try {
         $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+        
         $dataInsert = [
             'title' => $request->title,
             'content' => $request->content,
-            'image' => $uploadedImage['seciure_url'],
+            'image' => $uploadedImage['secure_url'], 
             'URL' => $request->URL,
             'status' => $request->status,
             'index' => $request->index,
-            'create_by' =>  auth()->user()->id,
+            'create_by' => auth()->user()->id,
         ];
+        
         $banner = Banner::create($dataInsert);
+
         return redirect()->route('bannerall', [
             'token' => $token,
-            
-        ])->with('success', 'banner thuế thành công');
+        ])->with('success', 'Thêm banner thành công');
     } catch (\Throwable $th) {
-        // Return view with error message
-        return view('bannerall')->with([
-            'status' => false,
-            'message' => "Thêm Banner không thành công",
-            'error' => $th->getMessage()
-        ]);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+        ])->with('error', 'Thêm banner thất bại: ' . $th->getMessage());
     }
 }
+
 public function updatebanner(BannerRequest $request, $id)
 {
-
     $token = $request->token; 
     $tab = $request->tab;
     $banner = Banner::findOrFail($id);
@@ -767,21 +767,29 @@ public function updatebanner(BannerRequest $request, $id)
         'title' => $request->title,
         'content' => $request->content,
         'status' => $request->status,
-        'URL' => $request->URL,
+        'URL' => Str::limit($request->URL, 2083), 
         'index' => $request->index,
-        'update_by' =>  auth()->user()->id,
+        'update_by' => auth()->user()->id,
     ];
-    if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $cloudinary = new Cloudinary();
-        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        $dataUpdate['URL'] = $uploadedImage['secure_url'];
+
+    try {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $cloudinary = new Cloudinary();
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $dataUpdate['image'] = $uploadedImage['secure_url']; 
+        }
+        $banner->update($dataUpdate);
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật banner thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật banner thất bại: ' . $th->getMessage());
     }
-    $banner->update($dataUpdate);
-    return redirect()->route('bannerall', [
-        'token' => $token,
-        'tab' => $tab,
-    ])->with('message', 'Cập nhật banner thành công!');
 }
 
 public function statistByQuantity(Request $request)
@@ -983,6 +991,136 @@ public function list_notification(Request $request){
         ->paginate($limit);
         return view('notification.list_notification', compact('notificationMain'));
 }
+
+public function rankall(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $ranks = RanksModel::where('status',2)->paginate(10);
+    $ranks0ff = RanksModel::where('status',0)->paginate(10);
+
+    return view('ranks.list_rank', compact('ranks', 'ranks0ff', 'tab'));  
+
+}
+
+public function rankCreate(Request $request)
+{
+    $token = $request->query('token');
+    $tab = $request->input('tab', 1); 
+    
+    RanksModel::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'condition' => $request->condition,
+        'value' => $request->value,
+        'limitValue' => $request->limitValue,
+        'status' => $request->status,
+        'create_by' => auth()->user()->id,
+        'update_by' => null, 
+    ]);
+    
+    return redirect()->route('rankall', [
+        'token' => $token,
+        'tab' => $tab,
+    ])->with('message', 'Thêm rank thành công!');
+
+}
+
+    public function list_recipes(Request $request){
+
+        $limit = 10;
+        $recipes = recipes::all();
+        return view('recipes.recipes',compact(
+            'recipes'
+        ));
+
+    }
+
+    public function recipesCreate(Request $request){
+        $token = $request->query('token');
+        recipes::create([
+            'is_active' => $request->status ?? 2,
+            'code' => $request->code ?? null,
+            'title' => $request->title ?? null,
+            'description' => $request->description ?? null,
+            'type' => $request->type ?? null,
+            'json' => json_encode($request->json),
+        ]);
+        return redirect()->route('list_recipes', [
+            'token' => $token,
+        ])->with('message', 'Thêm thành công!');
+    }
+    
+    
+public function updaterank(RankRequest $request, $id)
+{
+    $token = $request->token;
+    $tab = $request->tab;
+
+    $rank = RanksModel::findOrFail($id);
+    $dataUpdate = [
+        'title' => $request->title,
+        'description' => $request->description,
+        'condition' => $request->condition,
+        'status' => $request->status,
+        'value' => $request->value,
+        'limitValue' => $request->limitValue,
+        'update_by' => auth()->user()->id,
+    ];
+
+    try {
+        $rank->update($dataUpdate);
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật rank thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật rank thất bại: ' . $th->getMessage());
+    }
+}
+
+public function changeStatusRank(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $rank = RanksModel::findOrFail($id);
+        $rank->status = $request->status;
+        $rank->save();
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        // Xử lý lỗi và trả về thông báo
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+
+public function destroyrank(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $rank = RanksModel::findOrFail($id);
+        $rank->delete();
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa Rank thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('rankall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa Rank không thành công!');
+    }
+}
+
 
 }
 
