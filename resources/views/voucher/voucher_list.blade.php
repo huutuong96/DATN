@@ -60,7 +60,7 @@
                                                                     required></textarea>
                                                             </div>
                                                         </div>
-                                                        <div class="col-4">
+                                                        <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="quantity" class="form-label">Số lượng</label>
                                                                 <input type="number" class="form-control" id="quantity"
@@ -68,7 +68,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-4">
+                                                        <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="limitValue" class="form-label">Tổng tiền sản phẩm</label>
                                                                 <input type="number" class="form-control" id="limitValue"
@@ -77,7 +77,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-4">
+                                                        <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="ratio" class="form-label">Phần trăm giảm giá</label>
                                                                 <input type="number" class="form-control" id="ratio"
@@ -85,7 +85,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-4">
+                                                        <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="ratio" class="form-label">Đơn hàng tối thiểu được áp dụng</label>
                                                                 <input type="number" class="form-control" id="ratio"
@@ -104,8 +104,13 @@
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="status" class="form-label">Status</label>
-                                                                <select style="width: 130px" class="form-control" id="status"
-                                                                    name="status" required>
+                                                                <select style="    width: 513px;
+                                                                                    margin-top: -12px;
+                                                                                    left: 2em;"
+                                                                        class="form-control" id="status"
+                                                                        name="status"
+                                                                        required
+                                                                >
                                                                     <option  value="" disabled selected>chọn trạng thái</option>
                                                                     <option value="2">Active</option>
                                                                     <option value="0">Inactive</option>
@@ -212,54 +217,59 @@
                                                                                                 <textarea class="form-control" placeholder="Nội dung" id="description-{{ $voucherMain->id }}" name="description" rows="2" required>{{ $voucherMain->description }}</textarea>
                                                                                             </div>
                                                                                         </div>
-                                                                                        <div class="col-4">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="quantity-{{ $voucherMain->id }}" class="form-label">Số lượng</label>
-                                                                                                <input type="number" class="form-control" id="quantity-{{ $voucherMain->id }}"
-                                                                                                    name="quantity" placeholder="Số lượng" value="{{ $voucherMain->quantity }}" required>
+                                                                                        <div class="row">
+                                                                                            
+                                                                                            <div class="col-6">
+                                                                                                <div class="mb-3">
+                                                                                                    <label for="quantity-{{ $voucherMain->id }}" class="form-label">Số lượng</label>
+                                                                                                    <input type="number" class="form-control" id="quantity-{{ $voucherMain->id }}"
+                                                                                                        name="quantity" placeholder="Số lượng" value="{{ $voucherMain->quantity }}" required>
+                                                                                                </div>
+                                                                                            </div>
+                                                                
+                                                                                            <div class="col-6">
+                                                                                                <div class="mb-3">
+                                                                                                    <label for="limitValue-{{ $voucherMain->id }}" class="form-label">Tổng tiền sản phẩm</label>
+                                                                                                    <input type="number" class="form-control" id="limitValue-{{ $voucherMain->id }}"
+                                                                                                        name="limitValue" placeholder="Tổng tiền sản phẩm"
+                                                                                                        value="{{ $voucherMain->limitValue }}" required>
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
+                                                                                        <div class="row">
+                                                                                            <div class="col-6">
+                                                                                                <div class="mb-3">
+                                                                                                    <label for="ratio-{{ $voucherMain->id }}" class="form-label">Phần trăm giảm giá</label>
+                                                                                                    <input type="number" class="form-control" id="ratio-{{ $voucherMain->id }}"
+                                                                                                        name="ratio" placeholder="Phần trăm giảm giá" value="{{ $voucherMain->ratio }}" required>
+                                                                                                </div>
+                                                                                            </div>
                                                             
-                                                                                        <div class="col-4">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="limitValue-{{ $voucherMain->id }}" class="form-label">Tổng tiền sản phẩm</label>
-                                                                                                <input type="number" class="form-control" id="limitValue-{{ $voucherMain->id }}"
-                                                                                                    name="limitValue" placeholder="Tổng tiền sản phẩm"
-                                                                                                    value="{{ $voucherMain->limitValue }}" required>
+                                                                                            <div class="col-6">
+                                                                                                <div class="mb-3">
+                                                                                                    <label for="code-{{ $voucherMain->id }}" class="form-label">Mã giảm giá</label>
+                                                                                                    <input type="text" class="form-control" id="code-{{ $voucherMain->id }}"
+                                                                                                        name="code" placeholder="Enter code" value="{{ $voucherMain->code }}" required>
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
-                                                            
-                                                                                        <div class="col-4">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="ratio-{{ $voucherMain->id }}" class="form-label">Phần trăm giảm giá</label>
-                                                                                                <input type="number" class="form-control" id="ratio-{{ $voucherMain->id }}"
-                                                                                                    name="ratio" placeholder="Phần trăm giảm giá" value="{{ $voucherMain->ratio }}" required>
+                                                                                        <div class="row">
+                                                                                            <div class="col-6">
+                                                                                                <div class="mb-3">
+                                                                                                    <label for="status-{{ $voucherMain->id }}" class="form-label">Trạng thái</label>
+                                                                                                    <select style="width: 130px" class="form-control" id="status-{{ $voucherMain->id }}"
+                                                                                                        name="status" required>
+                                                                                                        <option value="" disabled>Chọn trạng thái</option>
+                                                                                                        <option value="2" {{ $voucherMain->status == 2 ? 'selected' : '' }}>Active</option>
+                                                                                                        <option value="0" {{ $voucherMain->status == 0 ? 'selected' : '' }}>Inactive</option>
+                                                                                                    </select>
+                                                                                                </div>
                                                                                             </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-6">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="code-{{ $voucherMain->id }}" class="form-label">Mã giảm giá</label>
-                                                                                                <input type="text" class="form-control" id="code-{{ $voucherMain->id }}"
-                                                                                                    name="code" placeholder="Enter code" value="{{ $voucherMain->code }}" required>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-6">
-                                                                                            <div class="mb-3">
-                                                                                                <label for="status-{{ $voucherMain->id }}" class="form-label">Trạng thái</label>
-                                                                                                <select style="width: 130px" class="form-control" id="status-{{ $voucherMain->id }}"
-                                                                                                    name="status" required>
-                                                                                                    <option value="" disabled>Chọn trạng thái</option>
-                                                                                                    <option value="2" {{ $voucherMain->status == 2 ? 'selected' : '' }}>Active</option>
-                                                                                                    <option value="0" {{ $voucherMain->status == 0 ? 'selected' : '' }}>Inactive</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                            
-                                                                                        <div class="col-lg-12">
-                                                                                            <div class="text-end">
-                                                                                                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                                                                
+                                                                                            <div class="col-6">
+                                                                                                <div class="text-end">
+                                                                                                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
