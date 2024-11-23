@@ -159,6 +159,7 @@ class PurchaseController extends Controller
                         $shopTotalPrice += $totalPrice;
                         $totalQuantity += $cart->quantity;
                         $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+                        $shopTotalPrice += $tax;
                         if (!$tax) {
                             return response()->json([
                                 'status' => false,
@@ -190,7 +191,8 @@ class PurchaseController extends Controller
                     }
                     $order->total_amount = $shopTotalPrice;
                     $total_amount = $shopTotalPrice;
-                    $this->addOrderFeesToTotal($order, $shopTotalPrice);
+                    $net_amount = $this->addOrderFeesToTotal($order, $shopTotalPrice);
+                    // $order->net_amount = $shopTotalPrice;
                     $order->voucher_shop_disscount = $discountShopVoucher;
                     $discountMainVoucher = 0;
                     if ($voucherToMainCode) {
@@ -201,12 +203,13 @@ class PurchaseController extends Controller
                     }
                     $order->voucher_disscount = $discountMainVoucher;
                     $order->total_amount = $shipFee + $order->total_amount;
-                    
                     $order->save();
                 }
-                return $ordersByShop;
 
-                // DB::commit();
+                // return $ordersByShop;
+                // return ($grandTotalPrice + $shipFee) - $discountMainVoucher;
+
+                DB::commit();
                 if($payment->code == 'COD'){
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                     $order->order_infomation = $orderInfomation;
@@ -243,6 +246,7 @@ class PurchaseController extends Controller
                         'url' => $url,
                     ], 200);
                 }
+                $total_amount = ($grandTotalPrice + $shipFee) - $discountMainVoucher;
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
                 // ProducttocartModel::whereIn('id', $request->carts)->delete();
