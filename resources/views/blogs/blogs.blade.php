@@ -40,18 +40,18 @@
                                                     <div class="row">
                                                         <div class="col-6">
                                                             <div class="mb-3">
-                                                                <label for="name" class="form-label">Name</label>
+                                                                <label for="name" class="form-label">Tên Doanh mục bài viết</label>
                                                                 <input type="text" class="form-control"
-                                                                    placeholder="Enter blog name" id="name"
+                                                                    placeholder="Tên Doanh mục bài viết" id="name"
                                                                     name="name" required>
                                                             </div><!--end mb-3-->
                                                         </div><!--end col-->
 
                                                         <div class="col-6">
                                                             <div class="mb-3">
-                                                                <label for="title" class="form-label">Title</label>
+                                                                <label for="title" class="form-label">Tiêu đề</label>
                                                                 <input type="text" class="form-control"
-                                                                    placeholder="Enter blog title" id="title"
+                                                                    placeholder="Tiêu đề" id="title"
                                                                     name="title" required>
                                                             </div><!--end mb-3-->
                                                         </div><!--end col-->
