@@ -53,11 +53,10 @@
                                                 <h4 class="fs-18 lh-base mb-0">VÍ CỦA CỬA HÀNG:  <br> <span class="text-success">{{$shop->shop_name ?? null}}</span> </h4>
                                                 <p class="mb-0 mt-2 pt-1 text-muted">Rút tiền từ ví về tài khoản ngân hàng của bạn</p>
                                                 <div class="d-flex gap-3 mt-4">
-                                                    <a href="#!" class="btn btn-primary">Discover Now </a>
                                                     @if($shop->account_number == null || $shop->bank_name == null || $shop->owner_bank == null )
                                                         <button class="btn btn-success" disabled>RÚT TIỀN</button>
                                                     @else
-                                                        <a href="https://vnshop.top/" class="btn btn-success">RÚT TIỀN</a>
+                                                        <a href="#!"  class="btn btn-success"  data-bs-toggle="modal" data-bs-target=".exampleModalFullscreen1">RÚT TIỀN</a>
                                                     @endif
                                                 </div>
                                             </div>
@@ -69,19 +68,6 @@
                                 <div class="col-xl-3 col-md-6">
                                     <div class="card card-height-100">
                                         <div class="card-body">
-                                            <!-- <div class="float-end">
-                                                <div class="dropdown card-header-dropdown">
-                                                    <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        <span class="text-muted fs-18"><i class="mdi mdi-dots-vertical align-middle"></i></span>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item" href="#">Today</a>
-                                                        <a class="dropdown-item" href="#">Last Week</a>
-                                                        <a class="dropdown-item" href="#">Last Month</a>
-                                                        <a class="dropdown-item" href="#">Current Year</a>
-                                                    </div>
-                                                </div>
-                                            </div> -->
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm flex-shrink-0">
                                                     <span class="avatar-title bg-info-subtle rounded fs-3">
@@ -93,11 +79,10 @@
                                                 </div>
                                             </div>
                                             <div class="mt-4 pt-1">
-                                                <h4 class="fs-22 fw-semibold ff-secondary mb-0"><span class="counter-value" >{{$shop->wallet ?? 0}}đ</span> </h4>
+                                                <h4 class="fs-22 fw-semibold ff-secondary mb-0"><span class="counter-value" >{{number_format($shop->wallet) ?? 0}}đ</span> </h4>
                                                 @if($shop->account_number == null || $shop->bank_name == null || $shop->owner_bank == null )
                                                     <p class="mt-4 mb-0 text-muted"><span class="badge bg-success-subtle text-danger mb-0" >CHƯA THIẾT LẬP TÀI KHOẢN NGÂN HÀNG</span></p><br>
                                                     <a href="#!" class="btn btn-success" data-bs-toggle="modal" data-bs-target=".exampleModalFullscreen">TÀI KHOẢN NGÂN HÀNG</a>
-                                                    <!-- <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target=".exampleModalFullscreen">Fullscreen Modal</button> -->
                                                 @else
                                                     <p class="mt-4 mb-0 text-muted"><span class="badge bg-success-subtle text-success mb-0" style="font-size: 13px;">CÓ THỂ RÚT TIỀN</span></p>
                                                 @endif
@@ -227,8 +212,65 @@
                         </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+</div><!-- /.modal -->
 
+
+<div class="modal fade exampleModalFullscreen1" tabindex="-1" aria-labelledby="exampleModalFullscreenLabel1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+                        <div class="col-xl-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title mb-0">NHẬP SỐ TIỀN RÚT</h4>
+                                </div><!-- end card header -->
+                                <div class="card-body">
+                                    <form action="{{route('shop_request_get_cash')}}" class="form-steps" method="post">
+                                        @csrf
+                                        <div class="text-center pt-3 pb-4 mb-1 d-flex justify-content-center">
+                                            <img src="{{$config->logo_header}}" class="card-logo card-logo-dark" alt="logo dark" height="17">
+                                        </div>
+                                        <div class="step-arrow-nav mb-4">
+
+                                            <ul class="nav nav-pills custom-nav nav-justified" role="tablist">
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link done" id="steparrow-gen-info-tab" data-bs-toggle="pill" data-bs-target="#steparrow-gen-info" type="button" role="tab" aria-controls="steparrow-gen-info" aria-selected="false" data-position="0" tabindex="-1">RÚT TIỀN VỀ TÀI KHOẢN</button>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="tab-content">
+                                          
+                                                <div class="tab-pane fade show active" id="steparrow-gen-info" role="tabpanel" aria-labelledby="steparrow-gen-info-tab">
+                                                    <div>
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label" for="steparrow-gen-info-email-input">SỐ TIỀN</label>
+                                                                    <input name="get_cash" type="text" class="form-control" id="steparrow-gen-info-email-input" placeholder="ex: 0987654321" required="">
+                                                                    <input type="hidden" name="user" value="{{$user->id}}">
+                                                                    <input type="hidden" name="shop_id" value="{{$shop->id}}">
+                                                                    <div class="invalid-feedback">Vui lòng nhập số tiền</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start gap-3 mt-4">
+                                                        <button type="submit" class="btn btn-success btn-label right ms-auto nexttab nexttab" data-nexttab="steparrow-description-info-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>RÚT TIỀN</button>
+                                                    </div>
+                                                </div>
+                                                <!-- end tab pane -->
+                                           
+                                        </div>
+                                        <!-- end tab content -->
+                                    </form>
+                                </div>
+                                <!-- end card body -->
+                            </div>
+                            <!-- end card -->
+                        </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
    
 
     <!-- JAVASCRIPT -->
