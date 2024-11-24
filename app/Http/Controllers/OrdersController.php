@@ -6,6 +6,7 @@ use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Product;
+use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OrdersController extends Controller
@@ -142,6 +143,7 @@ class OrdersController extends Controller
         $dataUpdate = [
             'order_status' => $request->status ?? $order->status,
             'update_by' => $user->id,
+            'update_at' => Carbon::now(),
         ];
         try {
             $order->update($dataUpdate);
@@ -161,6 +163,7 @@ class OrdersController extends Controller
         $dataUpdate = [
             'order_status' => 10,
             'update_by' => $user->id,
+            'update_at' => Carbon::now(),
         ];
         try {
             $order->update($dataUpdate);

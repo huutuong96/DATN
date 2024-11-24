@@ -34,6 +34,7 @@ use App\Jobs\AddPointUser;
 use App\Jobs\deleteProductToCart;
 use App\Models\product_variants;
 use App\Models\vnpay_transaction;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class PurchaseController extends Controller
@@ -542,6 +543,8 @@ class PurchaseController extends Controller
             'ship_id' => $ship_id->id,
             'status' => $status,
             'order_status' => $order_status ?? 0,
+            'update_at' => Carbon::now(),
+            'created_at' => Carbon::now(),
         ]);
         return $order;
     }
