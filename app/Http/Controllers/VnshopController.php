@@ -464,6 +464,7 @@ class VnshopController extends Controller
             $voucherMain->description = $request->description ?? $voucherMain->description;
             $voucherMain->quantity = $request->quantity ?? $voucherMain->quantity;
             $voucherMain->limitValue = $request->limitValue ?? $voucherMain->limitValue;
+            $voucherMain->min = $request->min_order ?? $voucherMain->min;
             $voucherMain->ratio = $request->ratio ?? $voucherMain->ratio;
             $voucherMain->code = $request->code ?? $voucherMain->code;
             $voucherMain->status = $request->status ?? $voucherMain->status;
@@ -1103,7 +1104,6 @@ public function changeStatusBanner(Request $request, string $id)
             'tab' => $tab,
         ])->with('message', 'Cập nhật trạng thái thành công!');
     } catch (\Throwable $th) {
-        // Xử lý lỗi và trả về thông báo
         return redirect()->route('bannerall', [
             'token' => $token,
             'tab' => $tab,
