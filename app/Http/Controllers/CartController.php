@@ -206,7 +206,8 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
-        $tax_category = tax_category::where('category_id', $request->category_id)->first();
+        
+        $tax_category = tax_category::where('category_id', $product->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
         // $taxAmount = $request->price * $taxes->rate;
         if ($request->variant_id) {
