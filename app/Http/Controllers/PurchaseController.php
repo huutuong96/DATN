@@ -158,15 +158,6 @@ class PurchaseController extends Controller
                         $shopOrder['orderDetails'][] = $orderDetail;
                         $shopTotalPrice += $totalPrice;
                         $totalQuantity += $cart->quantity;
-                        // $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
-                        // $shopTotalPrice += $tax;
-                        // if (!$tax) {
-                        //     return response()->json([
-                        //         'status' => false,
-                        //         'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
-                        //     ], 400);
-                        // }
-                        // $this->addStateTaxToOrder($order, $tax, $cart->product_id);
                     }
                     $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
                         // $shopTotalPrice += $tax;
@@ -207,10 +198,9 @@ class PurchaseController extends Controller
                     }
                     
                     $order->net_amount -= $totalAdded;
-                    // return $order->net_amount;
+                    $shopData->wallet = $shopData->wallet + $order->net_amount;
                     $order->total_amount = $shopTotalPrice;
                     $total_amount = $shopTotalPrice;
-                    // $order->net_amount = $shopTotalPrice;
                     $order->voucher_shop_disscount = $discountShopVoucher;
                     $discountMainVoucher = 0;
                     if ($voucherToMainCode) {
@@ -223,10 +213,8 @@ class PurchaseController extends Controller
                     $order->total_amount = $shipFee + $order->total_amount;
                     $order->save();
                 }
-
                 // return $ordersByShop;
                 // return ($grandTotalPrice + $shipFee) - $discountMainVoucher;
-
                 DB::commit();
                 if($payment->code == 'COD'){
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);

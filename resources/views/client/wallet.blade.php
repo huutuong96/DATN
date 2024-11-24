@@ -36,8 +36,6 @@
 
     <!-- Begin page -->
     <div id="layout-wrapper">
-
-
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -52,21 +50,26 @@
                                     <div class="card overflow-hidden">
                                         <div class="card-body bg-marketplace d-flex">
                                             <div class="flex-grow-1">
-                                                <h4 class="fs-18 lh-base mb-0">Discover, Collect, Sell and Create <br> your own <span class="text-success">NFTs.</span> </h4>
-                                                <p class="mb-0 mt-2 pt-1 text-muted">The world's first and largest digital marketplace.</p>
+                                                <h4 class="fs-18 lh-base mb-0">VÍ CỦA CỬA HÀNG:  <br> <span class="text-success">{{$shop->shop_name ?? null}}</span> </h4>
+                                                <p class="mb-0 mt-2 pt-1 text-muted">Rút tiền từ ví về tài khoản ngân hàng của bạn</p>
                                                 <div class="d-flex gap-3 mt-4">
                                                     <a href="#!" class="btn btn-primary">Discover Now </a>
-                                                    <a href="#!" class="btn btn-success">Create Your Own</a>
+                                                    @if($shop->account_number == null || $shop->bank_name == null || $shop->owner_bank == null )
+                                                        <button class="btn btn-success" disabled>RÚT TIỀN</button>
+                                                    @else
+                                                        <a href="https://vnshop.top/" class="btn btn-success">RÚT TIỀN</a>
+                                                    @endif
                                                 </div>
                                             </div>
                                             <img src="assets/images/bg-d.png" alt="" class="img-fluid" />
                                         </div>
                                     </div>
                                 </div><!--end col-->
+                            
                                 <div class="col-xl-3 col-md-6">
                                     <div class="card card-height-100">
                                         <div class="card-body">
-                                            <div class="float-end">
+                                            <!-- <div class="float-end">
                                                 <div class="dropdown card-header-dropdown">
                                                     <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         <span class="text-muted fs-18"><i class="mdi mdi-dots-vertical align-middle"></i></span>
@@ -78,40 +81,7 @@
                                                         <a class="dropdown-item" href="#">Current Year</a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm flex-shrink-0">
-                                                    <span class="avatar-title bg-info-subtle rounded fs-3">
-                                                        <i class="bx bx-dollar-circle text-info"></i>
-                                                    </span>
-                                                </div>
-                                                <div class="flex-grow-1 ps-3">
-                                                    <h5 class="text-muted text-uppercase fs-13 mb-0">Total Revenue</h5>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4 pt-1">
-                                                <h4 class="fs-22 fw-semibold ff-secondary mb-0">$<span class="counter-value" data-target="559526.564"></span> </h4>
-                                                <p class="mt-4 mb-0 text-muted"><span class="badge bg-danger-subtle text-danger mb-0 me-1"> <i class="ri-arrow-down-line align-middle"></i> 3.96 % </span> vs. previous month</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div><!--end col-->
-                                <div class="col-xl-3 col-md-6">
-                                    <div class="card card-height-100">
-                                        <div class="card-body">
-                                            <div class="float-end">
-                                                <div class="dropdown card-header-dropdown">
-                                                    <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        <span class="text-muted fs-18"><i class="mdi mdi-dots-vertical align-middle"></i></span>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item" href="#">Today</a>
-                                                        <a class="dropdown-item" href="#">Last Week</a>
-                                                        <a class="dropdown-item" href="#">Last Month</a>
-                                                        <a class="dropdown-item" href="#">Current Year</a>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            </div> -->
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm flex-shrink-0">
                                                     <span class="avatar-title bg-info-subtle rounded fs-3">
@@ -119,12 +89,18 @@
                                                     </span>
                                                 </div>
                                                 <div class="flex-grow-1 ps-3">
-                                                    <h5 class="text-muted text-uppercase fs-13 mb-0">Estimated</h5>
+                                                    <h5 class="fs-18 lh-base mb-0 ">VÍ VNSHOP</h5>
                                                 </div>
                                             </div>
                                             <div class="mt-4 pt-1">
-                                                <h4 class="fs-22 fw-semibold ff-secondary mb-0">$<span class="counter-value" data-target="624562.564"></span> </h4>
-                                                <p class="mt-4 mb-0 text-muted"><span class="badge bg-success-subtle text-success mb-0"> <i class="ri-arrow-up-line align-middle"></i> 16.24 % </span> vs. previous month</p>
+                                                <h4 class="fs-22 fw-semibold ff-secondary mb-0"><span class="counter-value" >{{$shop->wallet ?? 0}}đ</span> </h4>
+                                                @if($shop->account_number == null || $shop->bank_name == null || $shop->owner_bank == null )
+                                                    <p class="mt-4 mb-0 text-muted"><span class="badge bg-success-subtle text-danger mb-0" >CHƯA THIẾT LẬP TÀI KHOẢN NGÂN HÀNG</span></p><br>
+                                                    <a href="#!" class="btn btn-success" data-bs-toggle="modal" data-bs-target=".exampleModalFullscreen">TÀI KHOẢN NGÂN HÀNG</a>
+                                                    <!-- <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target=".exampleModalFullscreen">Fullscreen Modal</button> -->
+                                                @else
+                                                    <p class="mt-4 mb-0 text-muted"><span class="badge bg-success-subtle text-success mb-0" style="font-size: 13px;">CÓ THỂ RÚT TIỀN</span></p>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -146,7 +122,112 @@
 
     </div>
     <!-- END layout-wrapper -->
+<!-- Full screen modal content -->
+<div class="modal fade exampleModalFullscreen" tabindex="-1" aria-labelledby="exampleModalFullscreenLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+                        <div class="col-xl-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title mb-0">THIẾT LẬP TÀI KHOẢN NGÂN HÀNG CHO CỬA HÀNG</h4>
+                                </div><!-- end card header -->
+                                <div class="card-body">
+                                    <form action="{{route('updateBank', ['shop_id' => $shop->id])}}" class="form-steps" method="post">
+                                        @csrf
+                                        <div class="text-center pt-3 pb-4 mb-1 d-flex justify-content-center">
+                                            <img src="{{$config->logo_header}}" class="card-logo card-logo-dark" alt="logo dark" height="17">
+                                        </div>
+                                        <div class="step-arrow-nav mb-4">
 
+                                            <ul class="nav nav-pills custom-nav nav-justified" role="tablist">
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link done" id="steparrow-gen-info-tab" data-bs-toggle="pill" data-bs-target="#steparrow-gen-info" type="button" role="tab" aria-controls="steparrow-gen-info" aria-selected="false" data-position="0" tabindex="-1">Tài khoản ngân hàng</button>
+                                                </li>
+                                                <!-- <li class="nav-item" role="presentation">
+                                                    <button class="nav-link active" id="steparrow-description-info-tab" data-bs-toggle="pill" data-bs-target="#steparrow-description-info" type="button" role="tab" aria-controls="steparrow-description-info" aria-selected="true" data-position="1">Description</button>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link" id="pills-experience-tab" data-bs-toggle="pill" data-bs-target="#pills-experience" type="button" role="tab" aria-controls="pills-experience" aria-selected="false" data-position="2" tabindex="-1">Finish</button>
+                                                </li> -->
+                                            </ul>
+                                        </div>
+
+                                        <div class="tab-content">
+                                          
+                                                <div class="tab-pane fade show active" id="steparrow-gen-info" role="tabpanel" aria-labelledby="steparrow-gen-info-tab">
+                                                    <div>
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label" for="steparrow-gen-info-email-input">Số Tài khoản</label>
+                                                                    <input name="account_number" type="text" class="form-control" id="steparrow-gen-info-email-input" placeholder="ex: 0987654321" required="">
+                                                                    <div class="invalid-feedback">Vui lòng nhập số tài khoản</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label" for="steparrow-gen-info-username-input">Nhập Tên Ngân hàng</label>
+                                                                    <input name="bank_name" type="text" class="form-control" id="steparrow-gen-info-username-input" placeholder="ex: VCB" required="">
+                                                                    <div class="invalid-feedback">Vui lòng nhập tên ngân hàng</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label" for="steparrow-gen-info-confirm-password-input">Nhập tên chủ sở hữu</label>
+                                                            <input name="owner_bank" type="text" class="form-control" id="steparrow-gen-info-confirm-password-input" placeholder="ex: Nguyễn Văn A" required="">
+                                                            <div class="invalid-feedback">Vui lòng nhập tên chủ sở hữu</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start gap-3 mt-4">
+                                                        <button type="submit" class="btn btn-success btn-label right ms-auto nexttab nexttab" data-nexttab="steparrow-description-info-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Thêm Số Tài Khoản</button>
+                                                    </div>
+                                                </div>
+                                                <!-- end tab pane -->
+
+                                                <!-- <div class="tab-pane fade show active" id="steparrow-description-info" role="tabpanel" aria-labelledby="steparrow-description-info-tab">
+                                                    <div>
+                                                        <div class="mb-3">
+                                                            <label for="formFile" class="form-label">Upload Image</label>
+                                                            <input class="form-control" type="file" id="formFile">
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label" for="des-info-description-input">Description</label>
+                                                            <textarea class="form-control" placeholder="Enter Description" id="des-info-description-input" rows="3" required=""></textarea>
+                                                            <div class="invalid-feedback">Please enter a description</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start gap-3 mt-4">
+                                                        <button type="button" class="btn btn-light btn-label previestab" data-previous="steparrow-gen-info-tab"><i class="ri-arrow-left-line label-icon align-middle fs-16 me-2"></i> Back to General</button>
+                                                        <button type="button" class="btn btn-success btn-label right ms-auto nexttab nexttab" data-nexttab="pills-experience-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Submit</button>
+                                                    </div>
+                                                </div> -->
+                                                <!-- end tab pane -->
+
+                                                <!-- <div class="tab-pane fade" id="pills-experience" role="tabpanel" aria-labelledby="pills-experience-tab">
+                                                    <div class="text-center">
+
+                                                        <div class="avatar-md mt-5 mb-4 mx-auto">
+                                                            <div class="avatar-title bg-light text-success display-4 rounded-circle">
+                                                                <i class="ri-checkbox-circle-fill"></i>
+                                                            </div>
+                                                        </div>
+                                                        <h5>Well Done !</h5>
+                                                        <p class="text-muted">You have Successfully Signed Up</p>
+                                                    </div>
+                                                </div> -->
+                                                <!-- end tab pane -->
+                                           
+                                        </div>
+                                        <!-- end tab content -->
+                                    </form>
+                                </div>
+                                <!-- end card body -->
+                            </div>
+                            <!-- end card -->
+                        </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
    
 

@@ -20,6 +20,5 @@ class ConfigModel extends Model
         'create_by'
     ];
     public $timestamps = false;
-   
-    
+
 }

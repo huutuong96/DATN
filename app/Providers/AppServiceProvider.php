@@ -23,16 +23,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useBootstrap();
-        // auth()->user()->can(name bất kỳ)
-        DB::listen(function ($query) {
-            Log::info('SQL Query: '.$query->sql);
-            Log::info('Bindings: '.json_encode($query->bindings));
-            Log::info('Time: '.$query->time);
+        // Paginator::useBootstrap();
+        // // auth()->user()->can(name bất kỳ)
+        // DB::listen(function ($query) {
+        //     Log::info('SQL Query: '.$query->sql);
+        //     Log::info('Bindings: '.json_encode($query->bindings));
+        //     Log::info('Time: '.$query->time);
+        // });
+        // $config = ConfigModel::where('is_active', 1)->first();
+        // // dd($config);
+        // // $config = (new configController)->
+        // View::share('config', $config);
+
+        View::composer('*', function ($view) {
+            $config = ConfigModel::where('is_active', 1)->first();
+            $view->with('config', $config);
         });
-        $config = ConfigModel::where('is_active', 1)->first();
-        // dd($config);
-        // $config = (new configController)->
-        View::share('config', $config);
     }
 }
