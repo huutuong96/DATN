@@ -64,8 +64,9 @@ class ClientEmbedController extends Controller
     }
     public function product_update(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $shop = Shop::where('id', $request->shop_id)->first();
-        return view('client.product_update' , compact('shop','user'));
+        // $user = JWTAuth::parseToken()->authenticate();
+        // $shop = Shop::where('id', $request->shop_id)->first();
+        // return view('client.product_update' , compact('shop','user'));
+        return view('client.product_update');
     }
 }
