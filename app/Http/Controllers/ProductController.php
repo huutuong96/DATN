@@ -125,7 +125,7 @@ class ProductController extends Controller
         $tax_category = tax_category::where('category_id', $request->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
         $taxAmount = $request->price * $taxes->rate;
-        // return $taxAmount;
+        // dd($request->price);
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -192,7 +192,7 @@ class ProductController extends Controller
                         'id_fe' => $variant['id'] ?? null,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
                         'stock' => $variant['stock'] ?? $request->stock,
-                        'price' => $variant['price'] + $taxAmount ?? $product->price,
+                        'price' => $variant['price'] * ($taxes->rate + 1) ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
@@ -219,12 +219,12 @@ class ProductController extends Controller
                 $lowest_price = $product_variants_get_price->min('price');
                 if($highest_price == $lowest_price){
                     $product->update([
-                        'show_price' => $highest_price + $taxAmount,
+                        'show_price' => $highest_price * ($taxes->rate + 1),
                     ]);
                 }
                 if($highest_price != $lowest_price){
                     $product->update([
-                        'show_price' => $lowest_price . " - " . $highest_price + $taxAmount,
+                        'show_price' => $lowest_price . " - " . $highest_price,
                     ]);
                 }
             }
