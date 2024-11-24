@@ -142,8 +142,8 @@ class OrdersController extends Controller
         }
         $dataUpdate = [
             'order_status' => $request->status ?? $order->status,
-            'update_by' => $user->id,
-            'update_at' => Carbon::now(),
+            'updated_by' => $user->id,
+            'updated_at' => Carbon::now(),
         ];
         try {
             $order->update($dataUpdate);
@@ -162,8 +162,8 @@ class OrdersController extends Controller
         }
         $dataUpdate = [
             'order_status' => 10,
-            'update_by' => $user->id,
-            'update_at' => Carbon::now(),
+            'updated_by' => $user->id,
+            'updated_at' => Carbon::now(),
         ];
         try {
             $order->update($dataUpdate);
