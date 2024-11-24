@@ -218,6 +218,7 @@ Route::get('/search', function () {
                 Route::get('user/admin/logout', [AuthenController::class, "adminLogout"])->name('adminLogout');
 
                 Route::resource('orders', OrdersController::class);
+                Route::get('orders/cancelOrder/{id}', [OrdersController::class, "cancelOrder"]);
                 Route::post('orders/update', [OrdersController::class, "update"]);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);

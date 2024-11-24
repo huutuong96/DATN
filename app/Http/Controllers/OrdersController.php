@@ -151,6 +151,25 @@ class OrdersController extends Controller
         }
     }
 
+    public function cancelOrder(Request $request)
+    {
+        $order = OrdersModel::where('id', $request->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$order) {
+            return $this->errorResponse("Order không tồn tại", 404);
+        }
+        $dataUpdate = [
+            'order_status' => 10,
+            'update_by' => $user->id,
+        ];
+        try {
+            $order->update($dataUpdate);
+            return $this->successResponse("Order đã được cập nhật", $order);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Cập nhật Order không thành công", $th->getMessage());
+        }
+    }
+
     public function destroy(string $id)
     {
         $order = OrdersModel::find($id);
