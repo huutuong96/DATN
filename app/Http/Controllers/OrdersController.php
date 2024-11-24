@@ -79,7 +79,7 @@ class OrdersController extends Controller
     {
         
         $user = JWTAuth::parseToken()->authenticate();
-        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
             ->where('id', $id)
             ->get();

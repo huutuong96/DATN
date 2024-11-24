@@ -182,6 +182,7 @@ class PurchaseController extends Controller
                     $service = $this->get_infomaiton_services($shopData, $addressUser);
                     $productForShip = $this->getProductForShip($productIds);
                     $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
+                    $order->ship_fee = $shipFee;
                     AddPointUser::dispatch(auth()->id());
                     $checkRank = $this->check_point_to_user();
                     $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);

@@ -62,4 +62,10 @@ class ClientEmbedController extends Controller
         ]);
         return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
     }
+    public function product_update(Request $request)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        $shop = Shop::where('id', $request->shop_id)->first();
+        return view('client.product_update' , compact('shop','user'));
+    }
 }
