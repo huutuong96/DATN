@@ -235,7 +235,7 @@ class CartController extends Controller
                }
             }else {
                 // dd($productVariant->images);
-                $price_after_tax = $productVariant->price * $taxes->rate;
+                $price_after_tax = $productVariant->price * ($taxes->rate + 1);
                 $product_to_cart = ProducttocartModel::create([
                      'cart_id' => $cart_to_users->id,
                      'quantity' => $request->quantity ?? 1,
@@ -279,7 +279,7 @@ class CartController extends Controller
                         'product' => $product_to_cart,
                     ], 200);
             }
-            $price_after_tax = $product->price * $taxes->rate;
+            $price_after_tax = $product->price * ($taxes->rate + 1);
             $product_to_cart = ProducttocartModel::create([
                 'cart_id' => $cart_to_users->id,
                 'product_id' => $product->id,
