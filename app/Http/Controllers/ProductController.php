@@ -215,11 +215,11 @@ class ProductController extends Controller
                 }
 
                 $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
-                $highest_price = $product_variants_get_price->max('price');
+                $highest_price = $product_variants_get_price->max('price') * ($taxes->rate + 1);
                 $lowest_price = $product_variants_get_price->min('price');
                 if($highest_price == $lowest_price){
                     $product->update([
-                        'show_price' => $highest_price * ($taxes->rate + 1),
+                        'show_price' => $highest_price,
                     ]);
                 }
                 if($highest_price != $lowest_price){
