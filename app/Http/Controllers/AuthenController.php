@@ -427,8 +427,10 @@ class AuthenController extends Controller
             $rank = RanksModel::where('id', $user_present->rank_id)->first();
             $user_present->shop_id = $shop?->id;
             $user_present->cart_id = $cartUser?->id;
-            $user_present->rank_rate = $rank?->value;
-
+            $user_present->rank = [
+                'rank_rate' => $rank->value,
+                'limit_value' => $rank->limitValue,
+            ];
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
