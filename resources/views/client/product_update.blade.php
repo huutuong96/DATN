@@ -58,10 +58,7 @@
                                         </div>
                                         <div>
                                             <label>Mô tả của sản phẩm</label>
-
-                                            <div id="ckeditor-classic">
-                                               
-                                            </div>
+                                            <textarea name="description" id="" cols="30" rows="10"></textarea>
                                         </div>
                                     </div>
                                 </div>

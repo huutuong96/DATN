@@ -192,7 +192,7 @@ class ProductController extends Controller
                         'id_fe' => $variant['id'] ?? null,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
                         'stock' => $variant['stock'] ?? $request->stock,
-                        'price' => $variant['price'] ?? $product->price,
+                        'price' => $variant['price'] + $taxAmount ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
@@ -219,12 +219,12 @@ class ProductController extends Controller
                 $lowest_price = $product_variants_get_price->min('price');
                 if($highest_price == $lowest_price){
                     $product->update([
-                        'show_price' => $highest_price,
+                        'show_price' => $highest_price + $taxAmount,
                     ]);
                 }
                 if($highest_price != $lowest_price){
                     $product->update([
-                        'show_price' => $lowest_price . " - " . $highest_price,
+                        'show_price' => $lowest_price . " - " . $highest_price + $taxAmount,
                     ]);
                 }
             }
