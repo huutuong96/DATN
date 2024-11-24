@@ -82,7 +82,25 @@ class OrdersController extends Controller
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
             ->where('id', $id)
-            ->first();            
+            ->get();
+            foreach ($orders as $order) {
+                foreach ($order->orderDetails as $orderDetail) {
+                    if($orderDetail->variant!=null){
+                        $variant = $orderDetail->variant;  
+                    }else{
+                        $product = $orderDetail->product;  
+                    }
+                  
+                }
+            }
+            foreach ($orders as $key => $order) {
+                foreach ($order->orderDetails as $orderDetail  ) {
+                    if( $orderDetail->variant){
+                       $orderDetail['product']  = $orderDetail->variant->product;
+                       unset($orderDetail->variant['product']);
+                    }
+                }
+            }
         return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
     }
 
