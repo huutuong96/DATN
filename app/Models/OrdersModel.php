@@ -73,6 +73,7 @@ class OrdersModel extends Model
         'disscount_by_rank',
         'platform_fee',
         'ship_fee',
+        'updated_by',
     ];
 
     protected $hidden = [
