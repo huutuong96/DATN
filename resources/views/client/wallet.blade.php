@@ -46,7 +46,7 @@
                     <div class="row dash-nft">
                         <div class="col-xxl-6">
                             <div class="row">
-                                <div class="col-xl-6">
+                                <div class="col-xl-6 col-md-6">
                                     <div class="card overflow-hidden">
                                         <div class="card-body bg-marketplace d-flex">
                                             <div class="flex-grow-1">
