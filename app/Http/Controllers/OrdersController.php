@@ -164,7 +164,7 @@ class OrdersController extends Controller
         ];
         try {
             $order->update($dataUpdate);
-            return $this->successResponse("Order đã được cập nhật", $order);
+            return $this->successResponse("Order đã được cập nhật");
         } catch (\Throwable $th) {
             return $this->errorResponse("Cập nhật Order không thành công", $th->getMessage());
         }
