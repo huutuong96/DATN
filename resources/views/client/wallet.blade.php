@@ -225,7 +225,7 @@
                                 </div><!-- end card header -->
                                 <div class="card-body">
                                     <form action="{{route('shop_request_get_cash')}}" class="form-steps" method="post">
-                                        @csrf
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <div class="text-center pt-3 pb-4 mb-1 d-flex justify-content-center">
                                             <img src="{{$config->logo_header}}" class="card-logo card-logo-dark" alt="logo dark" height="17">
                                         </div>
