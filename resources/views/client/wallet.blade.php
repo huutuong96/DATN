@@ -65,7 +65,7 @@
                                     </div>
                                 </div><!--end col-->
                             
-                                <div class="col-xl-3 col-md-3">
+                                <div class="col-xl-4 col-md-3">
                                     <div class="card card-height-100">
                                         <div class="card-body">
                                             <div class="d-flex align-items-center">
