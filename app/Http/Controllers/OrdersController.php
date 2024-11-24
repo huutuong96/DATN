@@ -49,7 +49,7 @@ class OrdersController extends Controller
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
             ->where('order_status', $order_status)
-            ->orderby('created_at', 'desc')
+            ->orderby('updated_at', 'desc')
             ->paginate(10);
 
             $orders->appends(['order_status' => $order_status])->links();
