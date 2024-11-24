@@ -19,42 +19,42 @@
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="mb-3">
-                                                <label for="title" class="form-label">Title</label>
-                                                <input type="text" class="form-control" placeholder="Enter category title" id="title" required>
+                                                <label for="title" class="form-label">Tiêu đề</label>
+                                                <input type="text" class="form-control" placeholder="tiêu đề doanh mục" id="title" required>
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-6">
                                             <div class="mb-3">
-                                                <label for="index" class="form-label">Index</label>
+                                                <label for="index" class="form-label">vị trí</label>
                                                 <input type="number" class="form-control" value="1" id="index" required>
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-12">
                                             <div class="mb-3">
-                                                <label for="image" class="form-label">Image URL</label>
+                                                <label for="image" class="form-label">Hình ảnh</label>
                                                 <input type="file" class="form-control" placeholder="Enter image URL" id="image">
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-6">
                                             <div class="mb-3">
-                                                <label for="status" class="form-label">Status</label>
+                                                <label for="status" class="form-label">Trạng thái</label>
                                                 <input type="number" class="form-control" value="1" id="status" required>
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-6">
                                             <div class="mb-3">
-                                                <label for="parentId" class="form-label">Parent ID</label>
+                                                <label for="parentId" class="form-label">Doanh mục cha</label>
                                                 <input type="number" class="form-control" placeholder="Enter parent ID" id="parentId">
                                             </div><!--end mb-3-->
                                         </div><!--end col-->
 
                                         <div class="col-lg-12">
                                             <div class="text-end">
-                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                <button type="submit" class="btn btn-primary">Thêm</button>
                                             </div><!--end text-end-->
                                         </div><!--end col-->
                                     </div><!--end row-->
@@ -202,21 +202,21 @@
                                                                     <div class="row">
                                                                         <div class="col-12">
                                                                             <div class="mb-3">
-                                                                                <label for="titleInput" class="form-label">Title</label>
+                                                                                <label for="titleInput" class="form-label">Tiêu đề</label>
                                                                                 <input name="title" type="text" class="form-control" value="{{$category->title}}" id="titleInput" required>
                                                                             </div>
                                                                         </div><!--end col-->            
                                                                         <input type="hidden" name="index" class="form-control" value="{{$category->index}}" id="indexInput" required>
                                                                         <div class="col-12">
                                                                             <div class="mb-3">
-                                                                                <label for="imageInput" class="form-label">Image URL</label>
+                                                                                <label for="imageInput" class="form-label">Hình ảnh</label>
                                                                                 <input type="file" name="imageInput" class="form-control" placeholder="Enter image URL" id="imageInput">
                                                                             </div>
                                                                         </div><!--end col-->
                                                                         <input type="hidden" name="status" class="form-control" value="{{$category->status}}" id="statusInput" required>
                                                                         <div class="col-12">
                                                                             <div class="mb-3">
-                                                                                <label for="parentIdInput" class="form-label">Parent ID</label>
+                                                                                <label for="parentIdInput" class="form-label">Doanh mục cha</label>
                                                                                 <input type="number" name="parent_id" class="form-control" value="{{$category->parent_id }}" id="parentIdInput">
                                                                             </div>
                                                                         </div><!--end col-->

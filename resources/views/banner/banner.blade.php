@@ -243,7 +243,7 @@
                                                                         href="{{ route('changeStatusBanner', [
                                                                                                             'token' => auth()->user()->refesh_token,
                                                                                                             'id' => $banner->id,
-                                                                                                            'status' => 0,
+                                                                                                            'status' => 3,
                                                                                                             'tab'=>1
                                                                                                             ]) }}"
                                                                     >
@@ -252,6 +252,7 @@
                                                                         </button>
                                                                     </a>
                                                                 </li>
+                                                                
                                                             
                                                                
                                                             </td>

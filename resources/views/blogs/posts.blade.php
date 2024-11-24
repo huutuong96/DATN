@@ -37,8 +37,8 @@
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <div class="mb-3">
-                                                            <label for="title" class="form-label">Title</label>
-                                                            <input type="text" class="form-control" placeholder="Enter post title" id="title" name="title" required>
+                                                            <label for="title" class="form-label">Tiêu đề</label>
+                                                            <input type="text" class="form-control" placeholder="Tiêu đề" id="title" name="title" required>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
                                             
@@ -55,7 +55,7 @@
                                                     </div><!--end col-->
                                                     <div class="col-12">
                                                         <div class="mb-3">
-                                                            <label for="image" class="form-label">Image</label>
+                                                            <label for="image" class="form-label">Hình ảnh</label>
                                                             <input type="file" class="form-control" id="image" name="image" accept="image/*">
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
@@ -63,7 +63,7 @@
                                             
                                                     <div class="col-12">
                                                         <div class="mb-3">
-                                                            <label for="content" class="form-label">Content</label>
+                                                            <label for="content" class="form-label">Nội dung</label>
                                                             <textarea class="form-control" placeholder="Enter post content" id="summernote" name="content" rows="4" required></textarea>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
@@ -71,7 +71,7 @@
                                                    
                                                     <div class="col-lg-12">
                                                         <div class="text-end">
-                                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                                            <button type="submit" class="btn btn-primary">Thêm</button>
                                                         </div><!--end text-end-->
                                                     </div><!--end col-->
                                                 </div><!--end row-->
