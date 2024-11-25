@@ -1121,16 +1121,6 @@ public function ProductAll(Request $request)
     $allProducts = Product::all(); 
     $allUpdateProducts = update_product::all();
     $mergedProducts = $allProducts->merge($allUpdateProducts);
-    $perPage = 10; // Số sản phẩm mỗi trang
-    $currentPage = LengthAwarePaginator::resolveCurrentPage();
-    $currentItems = $mergedProducts->slice(($currentPage - 1) * $perPage, $perPage)->values();
-    $mergedProductsPaginated = new LengthAwarePaginator(
-        $currentItems, 
-        $mergedProducts->count(), 
-        $perPage, 
-        $currentPage,
-        ['path' => $request->url()]
-    );
     $pendingProducts = Product::where('status', 3)
     ->with(['images', 'variants'])->get();
 
@@ -1151,7 +1141,7 @@ public function ProductAll(Request $request)
     return view('products.list_product', compact(
         'allProductsCount', 'pendingProductsCount', 'activeProductsCount', 
         'rejectedProductsCount', 'violatingProductsCount', 'mergedProducts','newProductsCount','allUpdateProductsCount','allUpdateProducts',
-        'pendingProducts', 'activeProducts', 'rejectedProducts', 'mergedProductsPaginated',
+        'pendingProducts', 'activeProducts', 'rejectedProducts',
         'violatingProducts', 'tab'
     ));
 }

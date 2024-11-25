@@ -1,6 +1,8 @@
 @extends('index')
 @section('title', 'List Store')
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
 @section('main')
     <div class="container-fluid">
         <div class="row">
@@ -74,7 +76,7 @@
                             <div class="card-body">
                                 <div class="live-preview">
                                     <div class="table-responsive">
-                                        <table class="table align-middle table-nowrap mb-0">
+                                        <table id="blogallnew" class="table align-middle table-nowrap mb-0">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">ID</th>
@@ -193,7 +195,29 @@
                                     </div>
                                 </div>
                                 <div class="mt-3">
-                                    {{ $blogs->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                    <script>
+                                        new DataTable('#blogallnew', {
+                                            language: {   
+                                                lengthMenu: "Hiển thị _MENU_ Doanh mục bài viết",
+                                                search: "Tìm kiếm:"
+                                            },
+                                            initComplete: function () {
+                                                document.querySelector('#blogallnew_wrapper').style.fontFamily = '"Times New Roman", Times, serif';
+                                                document.querySelectorAll('#blogallnew thead th').forEach(th => {
+                                                    th.style.fontFamily = '"Times New Roman", Times, serif';
+                                                    th.style.fontWeight = 'bold'; 
+                                                });
+                                                document.querySelectorAll('#blogallnew tbody td').forEach(td => {
+                                                    td.style.fontFamily = '"Times New Roman", Times, serif';
+                                                });
+                                                document.querySelector('#blogallnew_filter label').style.fontFamily = '"Times New Roman", Times, serif';
+                                                document.querySelector('#blogallnew_length label').style.fontFamily = '"Times New Roman", Times, serif';
+                                            }
+                                        });
+                                    </script>
+                                    
+                                    
+                                    
                                 </div>
                             </div><!-- end card-body -->
                         </div><!-- end card -->
@@ -212,7 +236,7 @@
                             <div class="card-body">
                                 <div class="live-preview">
                                     <div class="table-responsive">
-                                        <table class="table align-middle table-nowrap mb-0">
+                                        <table id="blogalldelete" class="table align-middle table-nowrap mb-0">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">ID</th>
@@ -269,7 +293,26 @@
                                     </div>
                                 </div>
                                 <div class="mt-3">
-                                    {{ $deletedBlog->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                    <script>
+                                        new DataTable('#blogalldeleteall', {
+                                            language: {   
+                                                lengthMenu: "Hiển thị _MENU_ Doanh mục bài viết",
+                                                search: "Tìm kiếm:"
+                                            },
+                                            initComplete: function () {
+                                                document.querySelector('#blogalldeleteall_wrapper').style.fontFamily = '"Times New Roman", Times, serif';
+                                                document.querySelectorAll('#blogalldeleteall thead th').forEach(th => {
+                                                    th.style.fontFamily = '"Times New Roman", Times, serif';
+                                                    th.style.fontWeight = 'bold'; 
+                                                });
+                                                document.querySelectorAll('#blogalldeleteall tbody td').forEach(td => {
+                                                    td.style.fontFamily = '"Times New Roman", Times, serif';
+                                                });
+                                                document.querySelector('#blogalldeleteall_filter label').style.fontFamily = '"Times New Roman", Times, serif';
+                                                document.querySelector('#blogalldeleteall_length label').style.fontFamily = '"Times New Roman", Times, serif';
+                                            }
+                                        });
+                                    </script>
                                 </div>
                             </div><!-- end card-body -->
                         </div><!-- end card -->
