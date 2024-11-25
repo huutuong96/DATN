@@ -243,7 +243,7 @@
                                                                         href="{{ route('changeStatusBanner', [
                                                                                                             'token' => auth()->user()->refesh_token,
                                                                                                             'id' => $banner->id,
-                                                                                                            'status' => 0,
+                                                                                                            'status' => 3,
                                                                                                             'tab'=>1
                                                                                                             ]) }}"
                                                                     >
@@ -252,6 +252,7 @@
                                                                         </button>
                                                                     </a>
                                                                 </li>
+                                                                
                                                             
                                                                
                                                             </td>
@@ -319,7 +320,7 @@
                                                         <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             <img src="{{ $banner->image }}" alt="Post Image" style="max-width: 50%; height: auto;">
                                                         </td>
-                                                        <td style="max-width: 200px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                         <td style="max-width: 200px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             {{ \Illuminate\Support\Str::limit($banner->URL, 150, '...') }}
                                                         </td>
                                                         <td

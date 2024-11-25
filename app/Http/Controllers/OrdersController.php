@@ -6,6 +6,7 @@ use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Product;
+use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OrdersController extends Controller
@@ -44,14 +45,14 @@ class OrdersController extends Controller
     {
         
         $user = JWTAuth::parseToken()->authenticate();
-        $status = $request->status ?? 1;
-        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop']) // Eager load 'product' qua 'orderDetails'
+        $order_status = $request->order_status ?? 1;
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
-            ->where('order_status', $status)
-            ->orderby('created_at', 'desc')
+            ->where('order_status', $order_status)
+            ->orderby('updated_at', 'desc')
             ->paginate(10);
 
-            $orders->appends(['status' => $status])->links();
+            $orders->appends(['order_status' => $order_status])->links();
             foreach ($orders as $order) {
                 foreach ($order->orderDetails as $orderDetail) {
                     if($orderDetail->variant!=null){
@@ -74,6 +75,36 @@ class OrdersController extends Controller
         return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
     }
     
+
+    public function OrderToUserDetail(Request $request, $id)
+    {
+        
+        $user = JWTAuth::parseToken()->authenticate();
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment']) // Eager load 'product' qua 'orderDetails'
+            ->where('user_id', $user->id)
+            ->where('id', $id)
+            ->get();
+            foreach ($orders as $order) {
+                foreach ($order->orderDetails as $orderDetail) {
+                    if($orderDetail->variant!=null){
+                        $variant = $orderDetail->variant;  
+                    }else{
+                        $product = $orderDetail->product;  
+                    }
+                  
+                }
+            }
+            foreach ($orders as $key => $order) {
+                foreach ($order->orderDetails as $orderDetail  ) {
+                    if( $orderDetail->variant){
+                       $orderDetail['product']  = $orderDetail->variant->product;
+                       unset($orderDetail->variant['product']);
+                    }
+                }
+            }
+        return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
+    }
+
     
     public function HistoryOrderToUser()
 {
@@ -111,11 +142,32 @@ class OrdersController extends Controller
         }
         $dataUpdate = [
             'order_status' => $request->status ?? $order->status,
-            'update_by' => $user->id,
+            'updated_by' => $user->id,
+            'updated_at' => Carbon::now(),
         ];
         try {
             $order->update($dataUpdate);
             return $this->successResponse("Order đã được cập nhật", $order);
+        } catch (\Throwable $th) {
+            return $this->errorResponse("Cập nhật Order không thành công", $th->getMessage());
+        }
+    }
+
+    public function cancelOrder(Request $request)
+    {
+        $order = OrdersModel::where('id', $request->id)->first();
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$order) {
+            return $this->errorResponse("Order không tồn tại", 404);
+        }
+        $dataUpdate = [
+            'order_status' => 10,
+            'updated_by' => $user->id,
+            'updated_at' => Carbon::now(),
+        ];
+        try {
+            $order->update($dataUpdate);
+            return $this->successResponse("Order đã được cập nhật");
         } catch (\Throwable $th) {
             return $this->errorResponse("Cập nhật Order không thành công", $th->getMessage());
         }

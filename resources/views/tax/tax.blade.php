@@ -328,7 +328,7 @@
                                                                         <div class="modal-content">
                                                                             <div class="modal-header">
                                                                                 <h5 class="modal-title" id="editModalLabel-{{ $tax->id }}">
-                                                                                    Chỉnh sửa Voucher</h5>
+                                                                                    Chỉnh sửa Thuế</h5>
                                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                                     aria-label="Close"></button>
                                                                             </div>

@@ -31,7 +31,6 @@ use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
-
 /**
  * Paginate a collection.
  *
@@ -233,37 +232,6 @@ class AuthenController extends Controller
         return response()->json($dataDone, 201);
     }
 
-/**
- * @OA\Get(
- *     path="api/confirm/{token}",
- *     summary="Confirm user account",
- *     description="Confirms a user account using a token and activates the account.",
- *     tags={"Authentication"},
- *     @OA\Parameter(
- *         name="token",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="string"),
- *         description="The token for account confirmation"
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Account activated successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Tài khoản đã được kích hoạt, vui lòng đăng nhập lại")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Account not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="Tài khoản không tồn tại, Vui lòng đăng ký lại")
- *         )
- *     )
- * )
- */
     public function confirm(Request $request)
     {
         $user = UsersModel::where('refesh_token', $request->token)->first();
@@ -383,7 +351,6 @@ class AuthenController extends Controller
 
         $user->refesh_token = $token;
         $user->save();
-
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
@@ -457,10 +424,10 @@ class AuthenController extends Controller
             $user_present = JWTAuth::parseToken()->authenticate();
             $shop = Shop::where('owner_id', $user_present->id)->first();
             $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
-
+            $rank = RanksModel::where('id', $user_present->rank_id)->first();
             $user_present->shop_id = $shop?->id;
             $user_present->cart_id = $cartUser?->id;
-
+            $user_present->rank = $rank;
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',

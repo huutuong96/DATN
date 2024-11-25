@@ -17,7 +17,7 @@ class PaymentsController extends Controller
      */
     public function index()
     {
-        $payments = PaymentsModel::all();
+        $payments = PaymentsModel::where('status', 1)->get();
        
         if ($payments->isEmpty()) {
             return response()->json(
