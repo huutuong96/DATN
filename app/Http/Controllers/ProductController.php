@@ -598,7 +598,7 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = Product::with(['images', 'variants'])->find($id);
-        if ($products->isEmpty()) {
+        if (!$product) {
             return response()->json([
                 'status' => false,
                 'message' => "Không tồn tại sản phẩm nào",
