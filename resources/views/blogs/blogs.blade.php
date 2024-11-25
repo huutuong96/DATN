@@ -294,22 +294,22 @@
                                 </div>
                                 <div class="mt-3">
                                     <script>
-                                        new DataTable('#blogalldeleteall', {
+                                        new DataTable('#blogalldelete', {
                                             language: {   
                                                 lengthMenu: "Hiển thị _MENU_ Doanh mục bài viết",
                                                 search: "Tìm kiếm:"
                                             },
                                             initComplete: function () {
-                                                document.querySelector('#blogalldeleteall_wrapper').style.fontFamily = '"Times New Roman", Times, serif';
-                                                document.querySelectorAll('#blogalldeleteall thead th').forEach(th => {
+                                                document.querySelector('#blogalldelete_wrapper').style.fontFamily = '"Times New Roman", Times, serif';
+                                                document.querySelectorAll('#blogalldelete thead th').forEach(th => {
                                                     th.style.fontFamily = '"Times New Roman", Times, serif';
                                                     th.style.fontWeight = 'bold'; 
                                                 });
-                                                document.querySelectorAll('#blogalldeleteall tbody td').forEach(td => {
+                                                document.querySelectorAll('#blogalldelete tbody td').forEach(td => {
                                                     td.style.fontFamily = '"Times New Roman", Times, serif';
                                                 });
-                                                document.querySelector('#blogalldeleteall_filter label').style.fontFamily = '"Times New Roman", Times, serif';
-                                                document.querySelector('#blogalldeleteall_length label').style.fontFamily = '"Times New Roman", Times, serif';
+                                                document.querySelector('#blogalldelete_filter label').style.fontFamily = '"Times New Roman", Times, serif';
+                                                document.querySelector('#blogalldelete_length label').style.fontFamily = '"Times New Roman", Times, serif';
                                             }
                                         });
                                     </script>
