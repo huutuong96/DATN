@@ -1122,7 +1122,6 @@
                                 <span data-key="t-dashboards">Phương thức thanh toán</span>
                             </a>
                         </li>
-                        
                     </ul>
                 </div>
                 <!-- Sidebar -->
