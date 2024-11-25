@@ -424,10 +424,10 @@ class AuthenController extends Controller
             $user_present = JWTAuth::parseToken()->authenticate();
             $shop = Shop::where('owner_id', $user_present->id)->first();
             $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
-
+            $rank = RanksModel::where('id', $user_present->rank_id)->first();
             $user_present->shop_id = $shop?->id;
             $user_present->cart_id = $cartUser?->id;
-
+            $user_present->rank = $rank;
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',

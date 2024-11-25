@@ -34,6 +34,7 @@ use App\Jobs\AddPointUser;
 use App\Jobs\deleteProductToCart;
 use App\Models\product_variants;
 use App\Models\vnpay_transaction;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class PurchaseController extends Controller
@@ -182,6 +183,7 @@ class PurchaseController extends Controller
                     $service = $this->get_infomaiton_services($shopData, $addressUser);
                     $productForShip = $this->getProductForShip($productIds);
                     $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
+                    $order->ship_fee = $shipFee;
                     AddPointUser::dispatch(auth()->id());
                     $checkRank = $this->check_point_to_user();
                     $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);
@@ -211,6 +213,7 @@ class PurchaseController extends Controller
                     }
                     $order->voucher_disscount = $discountMainVoucher;
                     $order->total_amount = $shipFee + $order->total_amount;
+                    $this->order_update_infomaion($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                     $order->save();
                 }
                 // return $ordersByShop;
@@ -540,6 +543,8 @@ class PurchaseController extends Controller
             'ship_id' => $ship_id->id,
             'status' => $status,
             'order_status' => $order_status ?? 0,
+            'update_at' => Carbon::now(),
+            'created_at' => Carbon::now(),
         ]);
         return $order;
     }
@@ -848,6 +853,70 @@ class PurchaseController extends Controller
             "items" => $items,
         ]);
         return $orderShipGHN;
+    }
+
+    public function order_update_infomaion($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $orderDetails, $cod_amount = 0){
+        $user = JWTAuth::parseToken()->authenticate();
+        $address = AddressModel::where('user_id', $user->id)->where('default', 1)->first();
+        // Tạo mảng items bằng array_map
+        $items = array_map(function($detail) {
+            $product = $detail->product;
+            $variant = $detail->variant;
+            return [
+                "name" => $product->name ?? "Sản phẩm không xác định",
+                "code" => $variant->sku ?? $product->sku ?? "SKU không xác định",
+                "quantity" => 1,
+                "price" => $detail->subtotal,
+                "length" => $detail->length,
+                "width" => $detail->width,
+                "weight" => $detail->weight,
+                "height" => $detail->height,
+                "category" => [
+                    "level1" => $product->category->title ?? "Danh mục không xác định"
+                ]
+            ];
+        }, $orderDetails);
+        $service_id = $order->weight >= 2000 ? 100039 : 53320;
+        // Cập nhật đơn hàng chỉ một lần
+        $order->update([
+            "payment_type_id" => 2,
+            "note" => $request->note ?? "",
+            "required_note" => $request->required_note ?? "KHONGCHOXEMHANG",
+            "return_phone" => $shopData->contact_number,
+            "return_address" => $shopData->pick_up_address,
+            "return_district_id" => $shopData->district_id,
+            "return_ward_code" => $shopData->ward_id,
+            "client_order_code" => $orderShipGHN['data']['order_code'] ?? null,
+            "from_name" => $shopData->shop_name,
+            "from_phone" => $shopData->contact_number,
+            "from_address" => $shopData->pick_up_address . ", " . $shopData->ward . ", " . $shopData->district . ", " . $shopData->province . ", Vietnam",
+            "from_ward_name" => $shopData->ward,
+            "from_district_name" => $shopData->district,
+            "from_province_name" => $shopData->province,
+            "to_name" => $user->fullname,
+            "to_phone" => $user->phone,
+            "to_address" => $address->address . ", " . $address->ward . ", " . $address->district . ", " . $address->province . ", Vietnam",
+            "to_ward_name" => $address->ward,
+            "to_district_name" => $address->district,
+            "to_province_name" => $address->province,
+            "cod_amount" => $cod_amount,
+            "content" => $request->content ?? "",
+            "weight" => $order->weight ?? 1000,
+            "length" => $order->length ?? 20,
+            "width" => $order->width ?? 20,
+            "height" => $order->height,
+            "cod_failed_amount" => 0,
+            "pick_station_id" => 1444,
+            "deliver_station_id" => null,
+            "insurance_value" => 10000,
+            "service_id" => $service_id,
+            "service_type_id" => 2,
+            "coupon" => null,
+            "pickup_time" => 1692840132,
+            "pick_shift" => [2],
+            "items" => $items,
+        ]);
+        return $order;
     }
     //----------------------------------------------------------------------
 

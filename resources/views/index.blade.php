@@ -1122,6 +1122,16 @@
                                 <span data-key="t-dashboards">Phương thức thanh toán</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link menu-link"
+                                href="{{ route('product_update') }}"
+                                data-key="t-projects">
+                                <i class="ri-bank-card-line"></i> 
+                                <span data-key="t-dashboards">test</span>
+                            </a>
+                        </li>
+                        
                     </ul>
                 </div>
                 <!-- Sidebar -->

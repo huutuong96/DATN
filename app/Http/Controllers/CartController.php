@@ -206,7 +206,8 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
-        $tax_category = tax_category::where('category_id', $request->category_id)->first();
+        
+        $tax_category = tax_category::where('category_id', $product->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
         // $taxAmount = $request->price * $taxes->rate;
         if ($request->variant_id) {
@@ -234,7 +235,7 @@ class CartController extends Controller
                }
             }else {
                 // dd($productVariant->images);
-                $price_after_tax = $productVariant->price * $taxes->rate;
+                $price_after_tax = $productVariant->price * ($taxes->rate + 1);
                 $product_to_cart = ProducttocartModel::create([
                      'cart_id' => $cart_to_users->id,
                      'quantity' => $request->quantity ?? 1,
@@ -278,7 +279,7 @@ class CartController extends Controller
                         'product' => $product_to_cart,
                     ], 200);
             }
-            $price_after_tax = $product->price * $taxes->rate;
+            $price_after_tax = $product->price * ($taxes->rate + 1);
             $product_to_cart = ProducttocartModel::create([
                 'cart_id' => $cart_to_users->id,
                 'product_id' => $product->id,

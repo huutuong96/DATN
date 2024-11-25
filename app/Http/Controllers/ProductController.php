@@ -125,7 +125,7 @@ class ProductController extends Controller
         $tax_category = tax_category::where('category_id', $request->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
         $taxAmount = $request->price * $taxes->rate;
-        // return $taxAmount;
+        // dd($request->price);
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -192,7 +192,7 @@ class ProductController extends Controller
                         'id_fe' => $variant['id'] ?? null,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
                         'stock' => $variant['stock'] ?? $request->stock,
-                        'price' => $variant['price'] ?? $product->price,
+                        'price' => $variant['price'] * ($taxes->rate + 1) ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
@@ -610,7 +610,7 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = Product::with(['images', 'variants'])->find($id);
-        if ($products->isEmpty()) {
+        if (!$product) {
             return response()->json([
                 'status' => false,
                 'message' => "Không tồn tại sản phẩm nào",

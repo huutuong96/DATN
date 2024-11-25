@@ -72,6 +72,8 @@ class OrdersModel extends Model
         'vat',
         'disscount_by_rank',
         'platform_fee',
+        'ship_fee',
+        'updated_by',
     ];
 
     protected $hidden = [
@@ -163,4 +165,10 @@ public function shop()
 {
     return $this->belongsTo(Shop::class, 'shop_id')->select(['id', 'shop_name', 'slug', 'image']);
 }
+
+public function payment()
+{
+    return $this->belongsTo(PaymentsModel::class, 'payment_id')->select(['id', 'name', 'code']);
 }
+}
+
