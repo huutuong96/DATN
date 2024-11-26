@@ -76,7 +76,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td>{{$product->shop->shop_name ?? "vô danh"}}</td> 
                                                     <td>
                                                         @if($product->status == 3)
                                                         Chưa duyệt
@@ -120,7 +120,7 @@
             <div class="col-xl-12">
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm chờ duyệt</h4>
+                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm mới chờ duyệt</h4>
                     </div><!-- end card header -->
     
                     <div class="card-body">
@@ -367,7 +367,7 @@
             <div class="col-xl-12">
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm chờ duyệt</h4>
+                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm cập nhật chờ duyệt</h4>
                     </div><!-- end card header -->
     
                     <div class="card-body">
@@ -403,7 +403,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td>{{$product->shop->shop_name ?? "Vô danh"}}</td> 
                                                     
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
@@ -418,43 +418,6 @@
                                                                 <i class="ri-check-line align-middle"></i>
                                                             </button>
                                                         </form>
-                                                     
-                                                        <!-- Báo cáo vi phạm -->
-                                                        
-                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#reportModal">
-                                                                <button type="submit" class="btn btn-danger" title="Báo cáo vi phạm">
-                                                                    <i class="ri-error-warning-line align-middle"></i> 
-                                                                </button>
-                                                            </a>
-                                                        
-                        
-                                                        <!-- Modal Báo cáo vi phạm -->
-                                                        <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-                                                            <div class="modal-dialog">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="reportModalLabel">Báo cáo vi phạm</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <form action="{{ route('products.submitReport', [
-                                                                            'id' => $product->id,
-                                                                            'token' => auth()->user()->refesh_token,
-                                                                            'tab' => 6
-                                                                        ]) }}" method="POST">
-                                                                            @csrf
-                                                                            <div class="mb-3">
-                                                                                <label for="reason" class="form-label">Lý do vi phạm:</label>
-                                                                                <textarea name="reason" id="reason" class="form-control" required></textarea>
-                                                                            </div>
-                                                                            <button type="submit" class="btn btn-danger">Gửi báo cáo</button>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                        
-                                                    
                                                         <!-- Không duyệt -->
                                                         <form action="{{ route('products.reject',[
                                                                                                 'token' => auth()->user()->refesh_token,
@@ -493,9 +456,11 @@
                                                                             <div class="card-body">
                                                                               <div class="mb-5 d-flex">
                                                                                     <span class="text-muted"> 
-                                                                                       @foreach ($product->images as $image)
-                                                                                           <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
-                                                                                       @endforeach
+                                                                                       @if(is_array($product->images))
+                                                                                            @foreach ($product->images as $image)
+                                                                                                <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
+                                                                                            @endforeach
+                                                                                       @endif
                                                                                    </span>
                                                                                   
                                                                                </div>
@@ -522,7 +487,7 @@
                                                                                     <!-- Cột phải -->
                                                                                     <div class="col-lg-6">
                                                                                         <div class="mb-3">
-                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Vô danh"}}</span>
                                                                                         </div>
                                                                                         <div class="mb-3">
                                                                                            
@@ -545,25 +510,28 @@
                                                                                         <th>Tên biến thể</th>
                                                                                         <th>Hình ảnh</th>
                                                                                         <th>Mã Sku</th>
+                                                                                        <th>số lượng tồn kho</th>
                                                                                         <th>Giá </th>
                 
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    @foreach ($product->variants as $variant)
-                                                                                    <tr>
-                                                                                        <td>{{ $variant->id }}</td>
-                                                                                        <td>{{ $variant->name }}</td>
-                                                                                        <td>
-                                                                                           
-                                                                                                <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
-                                                                        
-                                                                                        </td>
-                                                                                        <td>{{ $variant->sku }}</td>
-                                                                                        <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
-                                                                                    </tr>
-                                                                                    @endforeach
-                                                                                    
+                                                                                    @if(is_array(json_decode($product->json_variants)))
+                                                                                        @foreach (json_decode($product->json_variants) as $variant)
+                                                                                        <tr>
+                                                                                            <td>{{ $variant->id }}</td>
+                                                                                            <td>{{ $variant->name ?? "chưa nhập" }}</td>
+                                                                                            <td>
+                                                                                            
+                                                                                                    <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                                            
+                                                                                            </td>
+                                                                                            <td>{{ $variant->sku }}</td>
+                                                                                            <td>{{ $variant->stock }}</td>
+                                                                                            <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
+                                                                                        </tr>
+                                                                                        @endforeach
+                                                                                    @endif
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>

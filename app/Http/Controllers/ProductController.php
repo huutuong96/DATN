@@ -1205,8 +1205,14 @@ public function ProductAll(Request $request)
 
     $allProducts = Product::with(['images', 'variants'])->get();
 
-    $allUpdateProducts = update_product::with(['variants'])->get();
-
+    // $allUpdateProducts = update_product::with(['variants'])->get();
+// $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
+    $allUpdateProducts = update_product::orderBy("updated_at", "desc")
+    ->get()
+    ->groupBy("product_id")
+    ->map(function ($group) {
+        return $group->first(); // Lấy bản ghi mới nhất trong từng nhóm
+    });
 
     return view('products.list_product', compact(
         'allProductsCount', 'pendingProductsCount', 'activeProductsCount', 
