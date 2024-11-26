@@ -938,7 +938,7 @@ class ProductController extends Controller
                 DB::table('products')->where('id', $id)->update($newData);
                 DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
                
-                if($newDT->change_of  != 0){
+                if(json_decode($newDT->change_of)  != 0){
                     foreach(json_decode($newDT->change_of) as $data){
                         // dd($variant);
                         $variant = product_variants::find($data->id);
@@ -952,7 +952,7 @@ class ProductController extends Controller
                         // $imageData = $this->storeImageVariant($request->images, $variant);
 
                         $variant->update([
-                            'sku' => $data->stock,
+                            'sku' => $data->sku,
                             'stock' => $data->stock ,
                             'price' => $data->price ,
                             'images' => $data->images,

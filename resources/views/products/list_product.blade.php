@@ -516,8 +516,8 @@
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    @if(is_array(json_decode($product->json_variants)))
-                                                                                        @foreach (json_decode($product->json_variants) as $variant)
+                                                                                    @if(is_array(json_decode($product->change_of)))
+                                                                                        @foreach (json_decode($product->change_of) as $variant)
                                                                                         <tr>
                                                                                             <td>{{ $variant->id }}</td>
                                                                                             <td>{{ $variant->name ?? "chưa nhập" }}</td>
