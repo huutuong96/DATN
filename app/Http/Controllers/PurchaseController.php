@@ -543,7 +543,7 @@ class PurchaseController extends Controller
             'ship_id' => $ship_id->id,
             'status' => $status,
             'order_status' => $order_status ?? 0,
-            'update_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
             'created_at' => Carbon::now(),
         ]);
         return $order;
