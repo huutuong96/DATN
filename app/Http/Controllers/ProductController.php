@@ -867,7 +867,7 @@ class ProductController extends Controller
             'slug' => $request->filled('slug') ?? $request->slug,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation ,
-            'price' => $request->variantMode ? 0 : $product->price, // nếu có biến thể thì nó = 0
+            'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0
             'sale_price' => $request->sale_price ?? $product->sale_price,
             'image' => $mainImageUrl,
             'quantity' => $request->quantity ?? $product->quantity,
