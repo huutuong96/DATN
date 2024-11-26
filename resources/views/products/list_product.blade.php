@@ -45,12 +45,12 @@
                                 <table id="all"  class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
-                                            <th scope="col">ID Sản phẩm</th>
-                                            <th scope="col">Hình ảnh</th>
-                                            <th scope="col">Tên sản phẩm</th>
-                                            <th scope="col">Mã SKU</th>
+                                            <th scope="col-1">ID Sản phẩm</th>
+                                            <th scope="col-3">Hình ảnh</th>
+                                            <th scope="col-3">Tên sản phẩm</th>
+                                            <th scope="col-3">Mã SKU</th>
                                             <th scope="col">Giá Sản phẩm</th>
-                                            <th scope="col">Tên Shop</th> 
+                                            <th scope="col-3">Tên Shop</th> 
                                             <th scope="col">Trạng thái</th>
                                             <th scope="col">Ngày tạo</th>
                                           
@@ -129,15 +129,18 @@
                                 <table id="pending" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
-                                            <th scope="col">ID Sản phẩm</th>
-                                            <th scope="col">Hình ảnh</th>
-                                            <th scope="col">Tên sản phẩm</th>
-                                            <th scope="col">Mã SKU</th>
-                                            <th scope="col">Giá Sản phẩm</th>
-                                            <th scope="col">Tên Shop</th> 
-                                            <th scope="col">Trạng thái</th>
-                                            <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Hành động</th>
+                                            <th scope="col" style="width: 10%;">ID Sản phẩm</th>
+                                            <th scope="col" style="width: 15%;">Hình ảnh</th>
+                                            <th scope="col" style="width: 20%;">Tên sản phẩm</th>
+                                            <th scope="col" style="width: 10%;">Mã SKU</th>
+                                            <th scope="col" style="width: 15%;">Giá Sản phẩm</th>
+                                            <th scope="col" style="width: 15%;">Tên Shop</th>
+                                            <th scope="col" style="width: 10%;">Trạng thái</th>
+                                            <th scope="col" style="width: 10%;">Ngày tạo</th>
+                                            <th scope="col" style="width: 10%;">Hành động</th>
+                                            
+
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -156,7 +159,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name}}</td> 
                                                     <td>
                                                         @if($product->status == 3)
                                                         Chưa duyệt
