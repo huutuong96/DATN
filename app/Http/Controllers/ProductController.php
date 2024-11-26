@@ -859,7 +859,7 @@ class ProductController extends Controller
         } else {
             $mainImageUrl = $product->image;
         }
-        // dd($request->change_of);
+
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
@@ -961,7 +961,22 @@ class ProductController extends Controller
                    
 
                 }
-
+                
+                $product = Product::find($id);
+                $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
+                $highest_price = $product_variants_get_price->max('price');
+                $lowest_price = $product_variants_get_price->min('price');
+                
+                if($highest_price == $lowest_price){
+                    $product->update([
+                        'show_price' => $highest_price,
+                    ]);
+                }
+                if($highest_price != $lowest_price){
+                    $product->update([
+                        'show_price' => $lowest_price . " - " . $highest_price,
+                    ]);
+                }
 
             }else{
                 DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
