@@ -228,7 +228,7 @@ class PaymentsController extends Controller
     public function vnpay_payment(Request $request, $total_amount, $groupOrderIds)
     {
 
-        $orders = OrdersModel::where('group_order_id', $groupOrderIds)->where('status', 1)->get();
+        $orders = OrdersModel::where('group_order_id', $groupOrderIds)->where('order_status', 0)->get();
         if ($orders->isEmpty()) {
             return response()->json([
                 'status' => 'false',
