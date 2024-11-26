@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Paginator::useBootstrap();
+        Paginator::useBootstrap();
         // // auth()->user()->can(name bất kỳ)
         // DB::listen(function ($query) {
         //     Log::info('SQL Query: '.$query->sql);

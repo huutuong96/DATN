@@ -837,6 +837,85 @@ class ProductController extends Controller
         $product->save();
         return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
+    public function updateProduct(Request $request, string $id)
+    // ProductRequest
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => "Sản phẩm không tồn tại",
+            ], 404);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $cloudinary = new Cloudinary();
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+            $mainImageUrl = $uploadedImage['secure_url']; 
+        } else {
+            $mainImageUrl = $product->image;
+        }
+        // dd($request->change_of);
+        $dataInsert = [
+            'product_id' => $product->id,
+            'name' => $request->name ?? $product->name,
+            'sku' => $product->sku,
+            'slug' => $request->filled('slug') ?? $request->slug,
+            'description' => $request->description ?? $product->description,
+            'infomation' => $request->infomation ?? $product->infomation ,
+            'price' => $request->variantMode ? 0 : $product->price, // nếu có biến thể thì nó = 0
+            'sale_price' => $request->sale_price ?? $product->sale_price,
+            'image' => $mainImageUrl,
+            'quantity' => $request->quantity ?? $product->quantity,
+            'parent_id' => $request->parent_id ?? $product->parent_id,
+            'update_by' => $user->id,
+            'category_id' => $request->category_id ?? $product->category_id,
+            'shop_id' => $request->shop_id ?? $product->shop_id,
+            'height' => $request->height ?? $product->height,
+            'length' => $request->length ?? $product->length,
+            'weight' => $request->weight ?? $product->weight,
+            'width' => $request->width ?? $product->width,
+            'created_at' => $product->created_at,
+            'show_price' => $request->show_price ?? $product->show_price,
+            'brand' => $request->brand ?? $product->brand,
+            'json_variants' => json_encode($request->variant ?? null),
+            'admin_note' => $request->admin_note ?? $product->admin_note,
+            'is_delete' => $request->is_delete ?? $product->is_delete,
+            'updated_at' => now(),
+            
+            'update_version' => $product->update_version + 1,
+            'change_of' => json_encode($request->variantMode === true ? 1 : 0 ) ,
+        ];
+        try {
+            DB::table('update_product')->insert($dataInsert);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
+                    $imageUrl = $uploadedImage['secure_url'];
+
+                    Image::create([
+                        'product_id' => $product->id,
+                        'url' => $imageUrl,
+                        'status' => 0,
+                    ]);
+                }
+            }
+            return response()->json([
+                'status' => true,
+                'message' => "Yêu cầu của bạn đã được gửi vui lòng chờ xét duyệt"
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => "Yêu cầu Cập nhật không thành công",
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
     
     public function handleUpdateProduct(Request $request, string $id)
     // ProductRequest
@@ -844,7 +923,7 @@ class ProductController extends Controller
 
         try {
             if($request-> action == "ok"){
-                $newDT = DB::table("update_product")->where("product_id", $id)->first();
+                $newDT = DB::table("update_product")->orderBy("updated_at", "desc")->where("product_id", $id)->first();
                 $ollDT = DB::table("products")->where("id", $id)->first();
                 $ollData = (array) $ollDT;
                 $newData = (array) $newDT;
@@ -855,52 +934,43 @@ class ProductController extends Controller
                 $newData["id"] = $newData["product_id"];
                 unset($newData["product_id"]);
                 DB::table('products')->where('id', $id)->update($newData);
-                DB::table('update_product')->where('id', $newDT->id)->delete();
-                if($request->change  != null){
-                    if($request->change === "all"){
-                        // lấy tất cả biến thể xong cập nhật
-                        $variants = product_variants::where('product_id', $id)->get();
-                        foreach ($variants as $key => $variant) {
-                            $variant->update([
-                                'stock' => $request->stock ?? $variant->stock,
-                                'price' => $request->price ?? $variant->price,
-                                // 'images' => isset($imageData) ? json_encode($imageData) : $variant->images, phần này cân xu lý them
-                            ]);
-                        };
-                        $output["variants"] = $variants;
-                    }else{
-                        $variants = product_variants::whereIn('id', $request->change)->get();
-                        foreach ($variants as $key => $variant) {
-                            $variant->update([
-                                'stock' => $request->stock ?? $variant->stock,
-                                'price' => $request->price ?? $variant->price,
-                                // 'images' => isset($imageData) ? json_encode($imageData) : $variant->images, phần này cân xu lý them
-                            ]);
-                        };
-                        $output["variants"] = $variants;
+                DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
+               
+                if($newDT->change_of  == 1){
+                    foreach(json_decode($newDT->json_variants) as $data){
+                        // dd($variant);
+                        $variant = product_variants::find($data->id);
+                        if (!$variant) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => "Không tồn tại biến thể nào",
+                            ], 404);
+                        }
+
+                        // $imageData = $this->storeImageVariant($request->images, $variant);
+
+                        $variant->update([
+                            'sku' => $data->stock,
+                            'stock' => $data->stock ,
+                            'price' => $data->price ,
+                            'images' => $data->images,
+                        ]);
                     }
+                   
 
                 }
 
-                $notificationData = [
-                    'type' => 'main',
-                    'title' => 'Chỉnh sửa sản phẩm thành công',
-                    'description' => 'Sản phẩm của bạn đã được chỉnh sửa thành công',
-                    'user_id' => $newData["shop_id"],
-                ];
-                $notificationController = new NotificationController();
-                $notification = $notificationController->store(new Request($notificationData));
 
             }else{
-                DB::table('update_product')->where('id', $newDT->id)->delete();
+                DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
                 $notificationData = [
                     'type' => 'main',
                     'title' => 'Chỉnh sửa sản phẩm không được chấp nhận',
                     'description' => 'Sản phẩm của bạn đã không được chấp nhận thay đổi dữ liệu',
                     'user_id' => $newData["shop_id"],
                 ];
-                $notificationController = new NotificationController();
-$notification = $notificationController->store(new Request($notificationData));
+                // $notificationController = new NotificationController();
+                // $notification = $notificationController->store(new Request($notificationData));
             }
             //---------------------------------
             return response()->json([
