@@ -470,7 +470,7 @@
                                                                                     <div class="col-lg-6">
                                                                                       
                                                                                         <div class="mb-3 d-flex ">
-                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->id }}</span> 
+                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->product_id }}</span> 
                                                                                         </div>
                                                                                         <div class="mb-3 d-flex ">
                                                                                             <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>

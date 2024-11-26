@@ -840,7 +840,8 @@ class ProductController extends Controller
     public function updateProduct(Request $request, string $id)
     // ProductRequest
     {
-        $product = Product::find($id);
+        
+        $product = Product::find($id); 
         if (!$product) {
             return response()->json([
                 'status' => false,
@@ -881,14 +882,15 @@ class ProductController extends Controller
             'created_at' => $product->created_at,
             'show_price' => $request->show_price ?? $product->show_price,
             'brand' => $request->brand ?? $product->brand,
-            'json_variants' => json_encode($request->variant ?? null),
+            'json_variants' => $product->json_variants ,
             'admin_note' => $request->admin_note ?? $product->admin_note,
             'is_delete' => $request->is_delete ?? $product->is_delete,
             'updated_at' => now(),
             
             'update_version' => $product->update_version + 1,
-            'change_of' => json_encode($request->variantMode === true ? 1 : 0 ) ,
+            'change_of' => $request->variantMode === true ? json_encode($request->variant) : json_encode(0) ,
         ];
+        
         try {
             DB::table('update_product')->insert($dataInsert);
             if ($request->hasFile('images')) {
@@ -936,8 +938,8 @@ class ProductController extends Controller
                 DB::table('products')->where('id', $id)->update($newData);
                 DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
                
-                if($newDT->change_of  == 1){
-                    foreach(json_decode($newDT->json_variants) as $data){
+                if($newDT->change_of  != 0){
+                    foreach(json_decode($newDT->change_of) as $data){
                         // dd($variant);
                         $variant = product_variants::find($data->id);
                         if (!$variant) {

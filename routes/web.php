@@ -127,7 +127,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::put('/payment_methodupdate/{id}', [VnshopController::class, 'updatepayment'])->name('updatepayment');
     Route::get('/changeStatuspayment/{id}', [VnshopController::class, 'changeStatuspayment'])->name('changeStatuspayment');
     Route::delete('/destroypayment/{id}', [VnshopController::class, 'destroypayment'])->name('destroypayment');
-
+    Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
 
 });
 
