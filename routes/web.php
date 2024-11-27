@@ -160,7 +160,6 @@ Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mai
 Route::get('/wallet', [ClientEmbedController::class, 'wallet'])->name('wallet');
 Route::post('/wallet/updateBank', [ClientEmbedController::class, 'updateBank'])->name('updateBank');
 Route::post('/wallet/shop_request_get_cash', [ClientEmbedController::class, 'shop_request_get_cash'])->name('shop_request_get_cash');
-Route::get('/product_update', [ClientEmbedController::class, 'product_update'])->name('product_update');
 
 
 

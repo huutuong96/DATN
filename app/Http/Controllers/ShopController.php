@@ -31,12 +31,13 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Categori_shopsModel;
 use App\Models\Learning_sellerModel;
 use App\Models\AddressModel;
+use App\Models\history_get_cash_shops;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
 use App\Models\UsersModel;
 use Illuminate\Support\Facades\Http;
-
+use Carbon\Carbon;
 
 class ShopController extends Controller
 {
@@ -1058,5 +1059,50 @@ class ShopController extends Controller
             'status' => true,
             'message' => 'Xóa sản phẩm thành công',
         ], 200);
+    }
+
+    public function wallet(Request $request)
+    {
+        $shop = Shop::where('id', $request->shop_id)->select('id','shop_name', 'wallet' ,'account_number', 'bank_name' , 'owner_bank')->first();
+        if (!$shop) {
+            return $this->errorResponse('Shop không tồn tại', 404);
+        }
+        return $this->successResponse('Lấy thông tin ví thành công', $shop);
+    }
+
+    public function history_get_cash(Request $request)
+    {
+        $shop = Shop::where('id', $request->shop_id)->select('id')->first();
+        if (!$shop) {
+            return $this->errorResponse('Shop không tồn tại', 404);
+        }
+        $startDate = Carbon::now()->subWeek()->format('Y-m-d');
+        $startDateMonth = Carbon::now()->subMonth()->format('Y-m-d');
+        $startDate = Carbon::now()->subWeek()->format('Y-m-d');
+        $endDate = Carbon::now()->format('Y-m-d');
+        $totalWeek = history_get_cash_shops::where('shop_id', $shop->id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('cash');
+        $totalMonth = history_get_cash_shops::where('shop_id', $shop->id)
+            ->whereBetween('date', [$startDateMonth, $endDate])
+            ->sum('cash');
+        $totalCash = history_get_cash_shops::where('shop_id', $shop->id)
+            ->sum('cash');
+        $history = [
+            'total_week' => $totalWeek,
+            'total_month' => $totalMonth,
+            'total_cash' => $totalCash,
+        ];
+        return $this->successResponse('Lịch sử rút tiền', $history);
+    }
+
+    public function number_of_withdrawals(Request $request)
+    {
+        $shop = Shop::where('id', $request->shop_id)->select('id')->first();
+        if (!$shop) {
+            return $this->errorResponse('Shop không tồn tại', 404);
+        }
+        $history = history_get_cash_shops::where('shop_id', $shop->id)->get();
+        return $this->successResponse('Lịch sử các lần rút tiền', $history);
     }
 }

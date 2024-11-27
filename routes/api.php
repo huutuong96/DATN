@@ -319,8 +319,9 @@ Route::get('/search', function () {
             Route::get('shop/order_report', [ShopController::class, 'orderReport']);
             Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
-
-
+            Route::get('shops/wallet/{shop_id}', [ShopController::class, 'wallet']);
+            Route::get('shops/history_get_cash/{shop_id}', [ShopController::class, 'history_get_cash']);
+            Route::get('shops/number_of_withdrawals/{shop_id}', [ShopController::class, 'number_of_withdrawals']);
 
             Route::get('main/config', [configController::class, 'index']);
             Route::post('main/config', [configController::class, 'store']);

@@ -51,6 +51,7 @@ class ClientEmbedController extends Controller
         $shop->update([
             'wallet' => $cash ?? $shop->wallet,
         ]);
+        
         history_get_cash_shops::create([
             'shop_id' => $shop->id ?? null,
             'user_id' =>  $user ?? null,
@@ -60,13 +61,9 @@ class ClientEmbedController extends Controller
             'bank_name' => $shop->bank_name ?? null,
             'owner_bank' => $shop->owner_bank ?? null,
         ]);
+
+        
         return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
     }
-    public function product_update(Request $request)
-    {
-        // $user = JWTAuth::parseToken()->authenticate();
-        // $shop = Shop::where('id', $request->shop_id)->first();
-        // return view('client.product_update' , compact('shop','user'));
-        return view('client.product_update');
-    }
+
 }
