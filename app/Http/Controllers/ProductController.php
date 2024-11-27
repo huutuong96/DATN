@@ -34,9 +34,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('checkShip')->only('store');
+    }
+
+
     public function index(Request $request)
     {
         $status = 2;

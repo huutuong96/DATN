@@ -2,15 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Shop;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\Learning_sellerModel;
-use App\Models\Shop_manager;
-use App\Models\Shop;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
-class CheckShop
+class checkShip
 {
     /**
      * Handle an incoming request.
@@ -19,9 +16,9 @@ class CheckShop
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $userId = JWTAuth::parseToken()->authenticate();
-        // $shopId = $request->id;
-        $shop = Shop::where('owner_id', $userId->id)->select('id', 'shopid_GHN')->first();
+
+        $shopId = $request->id;
+        $shop = Shop::where('id', $shopId)->select('id', 'shopid_GHN')->first();
         if ($shop->shopid_GHN == null) {
             return response()->json([
                 'status' => false,
@@ -29,10 +26,6 @@ class CheckShop
                 'url' => 'xxx'
             ], 400);
         }
-            if ($userId->role_id == 2 || $userId->role_id == 3 || $userId->role_id == 4) {
-                return $next($request);
-            }
-            
-        
+        return $next($request);
     }
 }
