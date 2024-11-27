@@ -808,7 +808,7 @@ class ProductController extends Controller
     }
     
     
-    public function filterShops(Request $request)
+    public function filterProducts(Request $request)
     {
         $limit = $request->limit ?? 20;
         $query = Product::query();
@@ -827,8 +827,10 @@ class ProductController extends Controller
             if ($request->has('view_count')) {
                 $query->orderby('view_count', 'desc');
             }
+            if ($request->has('shop_id')) {
+                $query->where('shop_id', $request->shop_id);
+            }
             $products = $query->paginate($limit);
-
         if ($products->isEmpty()) {
             return response()->json([
                 'message' => 'Không có sản phẩm nào'

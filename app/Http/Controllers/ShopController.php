@@ -283,7 +283,7 @@ class ShopController extends Controller
             'tax' => $tax,
             'banner' => $bannerShop,
             'Vouchers' => $VoucherToShop,
-            'products' => $products,
+            // 'products' => $products,
             'categories' => $category,
         ]);
     }
