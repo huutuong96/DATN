@@ -919,91 +919,90 @@ class ProductController extends Controller
     }
 
     
-    public function handleUpdateProduct(Request $request, string $id)
-    // ProductRequest
-    {
-
-        try {
-            if($request-> action == "ok"){
-                $newDT = DB::table("update_product")->orderBy("updated_at", "desc")->where("product_id", $id)->first();
-                $ollDT = DB::table("products")->where("id", $id)->first();
-                $ollData = (array) $ollDT;
-                $newData = (array) $newDT;
-                DB::table('products_old')->insert($ollData);
-                $change_of = $data = json_decode($newData["change_of"], true);
-                unset($newData["change_of"]);
-                $newData["created_at"] = $newData["updated_at"];
-                $newData["id"] = $newData["product_id"];
-                unset($newData["product_id"]);
-                DB::table('products')->where('id', $id)->update($newData);
-                DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
+    // public function handleUpdateProduct(Request $request, string $id)
+    // // ProductRequest
+    // {
+    //     $tab = $request->tab;
+    //     try {
+    //         if($request-> action == 1){
+    //             $newDT = DB::table("update_product")->orderBy("updated_at", "desc")->where("product_id", $id)->first();
+    //             $ollDT = DB::table("products")->where("id", $id)->first();
+    //             $ollData = (array) $ollDT;
+    //             $newData = (array) $newDT;
+    //             DB::table('products_old')->insert($ollData);
+    //             $change_of = $data = json_decode($newData["change_of"], true);
+    //             unset($newData["change_of"]);
+    //             $newData["created_at"] = $newData["updated_at"];
+    //             $newData["id"] = $newData["product_id"];
+    //             unset($newData["product_id"]);
+    //             DB::table('products')->where('id', $id)->update($newData);
+    //             DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
                
-                if(json_decode($newDT->change_of)  != 0){
-                    foreach(json_decode($newDT->change_of) as $data){
-                        // dd($variant);
-                        $variant = product_variants::find($data->id);
-                        if (!$variant) {
-                            return response()->json([
-                                'status' => false,
-                                'message' => "Không tồn tại biến thể nào",
-                            ], 404);
-                        }
+    //             if(json_decode($newDT->change_of)  != 0){
+    //                 foreach(json_decode($newDT->change_of) as $data){
+    //                     // dd($variant);
+    //                     $variant = product_variants::find($data->id);
+    //                     if (!$variant) {
+    //                         return response()->json([
+    //                             'status' => false,
+    //                             'message' => "Không tồn tại biến thể nào",
+    //                         ], 404);
+    //                     }
 
-                        // $imageData = $this->storeImageVariant($request->images, $variant);
+    //                     // $imageData = $this->storeImageVariant($request->images, $variant);
 
-                        $variant->update([
-                            'sku' => $data->sku,
-                            'stock' => $data->stock ,
-                            'price' => $data->price ,
-                            'images' => $data->images,
-                        ]);
-                    }
+    //                     $variant->update([
+    //                         'sku' => $data->sku,
+    //                         'stock' => $data->stock ,
+    //                         'price' => $data->price ,
+    //                         'images' => $data->images,
+    //                     ]);
+    //                 }
                    
 
-                }
+    //             }
                 
-                $product = Product::find($id);
-                $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
-                $highest_price = $product_variants_get_price->max('price');
-                $lowest_price = $product_variants_get_price->min('price');
+    //             $product = Product::find($id);
+    //             $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
+    //             $highest_price = $product_variants_get_price->max('price');
+    //             $lowest_price = $product_variants_get_price->min('price');
                 
-                if($highest_price == $lowest_price){
-                    $product->update([
-                        'show_price' => $highest_price,
-                    ]);
-                }
-                if($highest_price != $lowest_price){
-                    $product->update([
-                        'show_price' => $lowest_price . " - " . $highest_price,
-                    ]);
-                }
+    //             if($highest_price == $lowest_price){
+    //                 $product->update([
+    //                     'show_price' => $highest_price,
+    //                 ]);
+    //             }
+    //             if($highest_price != $lowest_price){
+    //                 $product->update([
+    //                     'show_price' => $lowest_price . " - " . $highest_price,
+    //                 ]);
+    //             }
 
-            }else{
-                DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
-                $notificationData = [
-                    'type' => 'main',
-                    'title' => 'Chỉnh sửa sản phẩm không được chấp nhận',
-                    'description' => 'Sản phẩm của bạn đã không được chấp nhận thay đổi dữ liệu',
-                    'user_id' => $newData["shop_id"],
-                ];
-                // $notificationController = new NotificationController();
-                // $notification = $notificationController->store(new Request($notificationData));
-            }
-            //---------------------------------
-            return response()->json([
-                'status' => true,
-                'message' => "cập nhật thành công",
-                'product' => "ok",
-            ], 200);
+    //         }else{
+    //             DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
+    //             $notificationData = [
+    //                 'type' => 'main',
+    //                 'title' => 'Chỉnh sửa sản phẩm không được chấp nhận',
+    //                 'description' => 'Sản phẩm của bạn đã không được chấp nhận thay đổi dữ liệu',
+    //                 'user_id' => $newData["shop_id"],
+    //             ];
+    //             // $notificationController = new NotificationController();
+    //             // $notification = $notificationController->store(new Request($notificationData));
+    //         }
+    //         //---------------------------------
+    //         return redirect()->route('product_all', [
+    //             'token' => auth()->user()->refesh_token,
+    //             'tab' => $tab
+    //         ])->with('message', 'Đã cập nhật sản phẩm.');
 
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => "Cập nhật thất bại",
-                'error' => $th->getMessage(),
-            ], 500);
-        }
-    }
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => "Cập nhật thất bại",
+    //             'error' => $th->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     public function updateFastProduct(Request $request, string $id)
     // ProductRequest

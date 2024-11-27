@@ -41,6 +41,23 @@ use App\Http\Requests\RankRequest;
 use App\Models\PaymentsModel;
 use App\Http\Requests\PaymentRequest;
 
+use App\Models\Image;
+use App\Http\Requests\ProductRequest;
+;
+use App\Models\ColorsModel;
+use App\Models\variantattribute;
+use App\Models\attributevalue;
+use App\Models\product_variants;
+use App\Models\Attribute;
+
+use App\Services\ImageUploadService;
+use App\Jobs\UploadImageJob;
+use App\Jobs\UploadImagesJob;
+use App\Jobs\UpdateStockAllVariant;
+use App\Jobs\UpdatePriceAllVariant;
+use App\Jobs\UpdateImageAllVariant;
+
+use App\Models\update_product;
 
 class VnshopController extends Controller
 {
@@ -1293,6 +1310,83 @@ public function destroypayment(Request $request, string $id)
         ])->with('message', 'Xóa payment_method không thành công!');
     }
 }
+
+public function handleUpdateProduct(Request $request, string $id)
+// ProductRequest
+{
+    $tab = $request->tab;
+    try {
+        if ($request->action == 1) {
+            $newDT = DB::table("update_product")->orderBy("updated_at", "desc")->where("product_id", $id)->first();
+            $ollDT = DB::table("products")->where("id", $id)->first();
+            $ollData = (array) $ollDT;
+            $newData = (array) $newDT;
+            DB::table('products_old')->insert($ollData);
+            $change_of = $data = json_decode($newData["change_of"], true);
+            unset($newData["change_of"]);
+            $newData["created_at"] = $newData["updated_at"];
+            $newData["id"] = $newData["product_id"];
+            unset($newData["product_id"]);
+            DB::table('products')->where('id', $id)->update($newData);
+            DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
+    
+            if (json_decode($newDT->change_of) != 0) {
+                foreach (json_decode($newDT->change_of) as $data) {
+                    $variant = product_variants::find($data->id);
+                    if (!$variant) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Không tồn tại biến thể nào",
+                        ], 404);
+                    }
+    
+                    $variant->update([
+                        'sku' => $data->sku,
+                        'stock' => $data->stock,
+                        'price' => $data->price,
+                        'images' => $data->images,
+                    ]);
+                }
+            }
+    
+            $product = Product::find($id);
+            $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
+            $highest_price = $product_variants_get_price->max('price');
+            $lowest_price = $product_variants_get_price->min('price');
+    
+            if ($highest_price == $lowest_price) {
+                $product->update([
+                    'show_price' => $highest_price,
+                ]);
+            }
+            if ($highest_price != $lowest_price) {
+                $product->update([
+                    'show_price' => $lowest_price . " - " . $highest_price,
+                ]);
+            }
+    
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => $tab
+            ])->with('message', 'Đã cập nhật sản phẩm.');
+    
+        } else {
+            DB::table('update_product')->where('product_id', $id)->delete();
+    
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => $tab
+            ])->with('error', 'Từ chối cập nhật.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->route('product_all', [
+            'token' => auth()->user()->refesh_token,
+            'tab' => $tab
+        ])->with('error', 'Đã xảy ra lỗi không mong muốn: ' . $e->getMessage());
+    }
+    
+}
+
 
 
 

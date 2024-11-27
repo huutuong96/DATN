@@ -51,6 +51,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogsController;
+use App\Http\Controllers\VnshopController;
 
 Route::get('/search', function () {
     return "API - VNSHOP";
@@ -249,7 +250,7 @@ Route::get('/search', function () {
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
 
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);     // update product
-            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
+           
 
 
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
@@ -264,7 +265,7 @@ Route::get('/search', function () {
             Route::post('product/uploadImage', [ProductController::class, 'upload']);
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);
-            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
+           
 
 
             // Platform Fees Routes
