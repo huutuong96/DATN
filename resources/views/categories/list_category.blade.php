@@ -54,8 +54,8 @@
                                                 <div class="mb-3">
                                                     <label for="parent_id" class="form-label">Chọn danh mục cha</label>
                                                     <select name="parent_id" id="parent_id" class="form-control">
-                                                        <option value="">Chọn danh mục</option> 
-                                                        <option value="0">doanh mục cha</option>                                                    
+                                                        <option value="0">Không thuộc danh mục nào</option> 
+                                                        <option value="0">Danh mục khác (không phân loại rõ ràng)</option>                                                  
                                                         @foreach ($categoryTree as $category)
                                                       
                                                             <option value="{{ $category->id }}">{{ $category->title }}</option>
@@ -121,7 +121,20 @@
                                         <th scope="row"><a href="#" class="fw-medium">{{$category->id}}</a></th>
                                         <td>{{$category->title}}</td>
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
-                                        <td>{{$category->parent_id ?? "Đây là danh mục cha"}}</td>
+                                        <td>
+                                        <!-- {{$category->parent_id ?? "Đây là danh mục cha"}} -->
+                                             @if ($category->parent_id === null || $category->parent_id == 0)
+                                                <option value="0" {{ old('parent_id', $category->parent_id) === 0 ? 'selected' : '' }}>Doanh mục cha</option>
+                                            @else
+                                                @foreach($categories as $detail)
+                                                    @if ($category->parent_id === $detail->id)
+                                                        <option value="{{$detail->id}}">{{$detail->title}}</option>
+                                                    @endif
+                                                <!-- <option value="{{$category->parent_id}}">đây là danh mục chưa sửa</option> -->
+                                                @endforeach 
+        
+                                            @endif
+                                        </td>
                                         <td>
                                         <div class="col-lg-8">
                                             <select name="tax_id" class="form-control js-example-templating">
@@ -209,12 +222,19 @@
                                                                             <div class="mb-3">
                                                                                 <label for="parent_id" class="form-label">Chọn danh mục cha</label>
                                                                                 <select name="parent_id" id="parent_id" class="form-control">
-                                                                                    <option value="">Chọn danh mục</option>  
-                    
-                                                                                    @foreach ($categoryTree as $category)
                                                                                         @if ($category->parent_id === null || $category->parent_id == 0)
                                                                                             <option value="0" {{ old('parent_id', $category->parent_id) === 0 ? 'selected' : '' }}>Doanh mục cha</option>
+                                                                                        @else
+                                                                                            @foreach($categories as $detail)
+                                                                                                @if ($category->parent_id === $detail->id)
+                                                                                                    <option value="{{$detail->id}}">{{$detail->title}}</option>
+                                                                                                @endif
+                                                                                            <!-- <option value="{{$category->parent_id}}">đây là danh mục chưa sửa</option> -->
+                                                                                            @endforeach 
+                                                                                            
                                                                                         @endif
+                                                                                    @foreach ($categoryTree as $category)
+                                                                                        
                                                                                         <option value="{{ $category->id }}" {{ old('parent_id', $category->parent_id) == $category->id ? 'selected' : '' }}>
                                                                                             {{ $category->title }}
                                                                                         </option>
