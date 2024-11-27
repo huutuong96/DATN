@@ -831,13 +831,19 @@ class ProductController extends Controller
                 $query->where('shop_id', $request->shop_id);
             }
             
+            // if ($request->sort == 'price') {
+            //     $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", -1) AS UNSIGNED) ELSE price END DESC');
+            // }
+            // if ($request->sort == '-price') {
+            //     $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE price END ASC');
+            // }
             if ($request->sort == 'price') {
-                $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", -1) AS UNSIGNED) ELSE price END DESC');
+                $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END ASC');
             }
             if ($request->sort == '-price') {
-                $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE price END ASC');
+                $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
-            $products = $query->paginate($limit);
+            $products = $query->where('status', 2)->paginate($limit);
         if ($products->isEmpty()) {
             return response()->json([
                 'message' => 'Không có sản phẩm nào'
