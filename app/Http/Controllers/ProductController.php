@@ -830,10 +830,11 @@ class ProductController extends Controller
             if ($request->has('shop_id')) {
                 $query->where('shop_id', $request->shop_id);
             }
-            if ($request->has('price')) {
+            
+            if ($request->sort == 'price') {
                 $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", -1) AS UNSIGNED) ELSE price END DESC');
             }
-            if ($request->has('-price')) {
+            if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE price END ASC');
             }
             $products = $query->paginate($limit);
