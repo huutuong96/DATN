@@ -813,7 +813,9 @@ class ProductController extends Controller
         $limit = $request->limit ?? 20;
         $query = Product::query();
             if ($request->has('min_price') && $request->has('max_price')) {
-                $query->whereBetween('price', [$request->min_price, $request->max_price]);
+                $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price]);
+                // $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price])
+                //       ->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), 'ASC');      
             }
             if ($request->has('category_id')) {
                 $query->where('category_id', $request->category_id);
@@ -831,12 +833,6 @@ class ProductController extends Controller
                 $query->where('shop_id', $request->shop_id);
             }
             
-            // if ($request->sort == 'price') {
-            //     $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", -1) AS UNSIGNED) ELSE price END DESC');
-            // }
-            // if ($request->sort == '-price') {
-            //     $query->orderByRaw('CASE WHEN price = 0 OR price IS NULL THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE price END ASC');
-            // }
             if ($request->sort == 'price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END ASC');
             }

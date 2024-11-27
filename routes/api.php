@@ -362,6 +362,7 @@ Route::get('/', function () {
         // lọc sản phẩmorders
         Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         Route::get('/shops/filter', [ShopController::class, 'filterShops']);
+        Route::get('/shops/categories', [ShopController::class, 'getShopByCategory']);
 
         // NO Auth
         Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);

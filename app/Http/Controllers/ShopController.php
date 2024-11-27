@@ -1138,4 +1138,31 @@ class ShopController extends Controller
     
         return response()->json($shops);
     }
+
+    public function getShopByCategory(Request $request)
+    {
+        $limit = $request->limit ?? 20;
+        $query = CategoriesModel::query();
+        if ($request->has('category_id')) {
+            $query->where('id', $request->category_id);
+        }
+        $categories = $query->get();
+        $result = $categories->map(function ($category) {
+            $nestedCategories = CategoriesModel::where('parent_id', $category->id)->pluck('id');
+            return [
+            'id' => $category->id,
+            'name' => $category->title,
+            'slug' => $category->slug,
+            'nest' => $nestedCategories,
+            ];
+        });
+
+        if ($result->isEmpty()) {
+            return response()->json([
+            'message' => 'Không có danh mục nào'
+            ], 404);
+        }
+
+        return response()->json($result->first());
+    }
 }
