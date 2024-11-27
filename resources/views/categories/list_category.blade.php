@@ -54,9 +54,10 @@
                                                 <div class="mb-3">
                                                     <label for="parent_id" class="form-label">Chọn danh mục cha</label>
                                                     <select name="parent_id" id="parent_id" class="form-control">
-                                                        <option value="">Chọn danh mục</option>                                                     
+                                                        <option value="">Chọn danh mục</option> 
+                                                        <option value="0">doanh mục cha</option>                                                    
                                                         @foreach ($categoryTree as $category)
-                                                        <option value="{{$category->parent_id == 0 }}">doanh mục cha</option>
+                                                      
                                                             <option value="{{ $category->id }}">{{ $category->title }}</option>
                                                             @if ($category->children && $category->children->isNotEmpty())
                                                                 @foreach ($category->children as $child)
