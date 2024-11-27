@@ -806,17 +806,28 @@ class ProductController extends Controller
             'data' => $products,
         ]);
     }
-    public function filterProducts(Request $request)
+    
+    
+    public function filterShops(Request $request)
     {
+        $limit = $request->limit ?? 20;
         $query = Product::query();
-        if ($request->has('min_price') && $request->has('max_price')) {
-            $query->whereBetween('price', [$request->min_price, $request->max_price]);
-        }
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-        $products = $query->paginate(100
-    );
+            if ($request->has('min_price') && $request->has('max_price')) {
+                $query->whereBetween('price', [$request->min_price, $request->max_price]);
+            }
+            if ($request->has('category_id')) {
+                $query->where('category_id', $request->category_id);
+            }
+            if ($request->has('created_at')) {
+                $query->orderby('created_at', 'desc');
+            }
+            if ($request->has('sold_count')) {
+                $query->orderby('sold_count', 'desc');
+            }
+            if ($request->has('view_count')) {
+                $query->orderby('view_count', 'desc');
+            }
+            $products = $query->paginate($limit);
 
         if ($products->isEmpty()) {
             return response()->json([
@@ -1381,6 +1392,7 @@ public function ProductAll(Request $request)
 //     }
 //     return $combinations;
 // }
+
 
 
 }

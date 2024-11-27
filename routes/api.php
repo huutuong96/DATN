@@ -358,9 +358,11 @@ Route::get('/', function () {
 
 
 
-Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
-// lọc sản phẩmorders
-Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+        Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
+        // lọc sản phẩmorders
+        Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+        Route::get('/shops/filter', [ShopController::class, 'filterShops']);
+
         // NO Auth
         Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
         Route::get('products/{id}', [ProductController::class, 'show']);
@@ -389,15 +391,6 @@ Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         Route::get('/api/documentation', function () {
             return view('swagger');
         });
-
-
-
-
-
-
-
-
-
 
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
