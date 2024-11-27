@@ -818,8 +818,8 @@ class ProductController extends Controller
             if ($request->has('category_id')) {
                 $query->where('category_id', $request->category_id);
             }
-            if ($request->has('created_at')) {
-                $query->orderby('created_at', 'desc');
+            if ($request->has('updated_at')) {
+                $query->orderby('updated_at', 'desc');
             }
             if ($request->has('sold_count')) {
                 $query->orderby('sold_count', 'desc');
@@ -843,7 +843,16 @@ class ProductController extends Controller
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
+            // $shops = [];
+            // foreach ($query->get() as $product) {
+            //     $shopId = $product->shop_id;
+            //     if (!in_array($shopId, array_column($shops, 'id'))) {
+            //         $shops[] = Shop::find($shopId);
+            //     }
+            // }
+            $query->with('shop');
             $products = $query->where('status', 2)->paginate($limit);
+
         if ($products->isEmpty()) {
             return response()->json([
                 'message' => 'Không có sản phẩm nào'
