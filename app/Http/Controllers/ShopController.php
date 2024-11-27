@@ -1072,7 +1072,7 @@ class ShopController extends Controller
 
     public function history_get_cash(Request $request)
     {
-        $shop = Shop::where('id', $request->shop_id)->select('id')->first();
+        $shop = Shop::where('id', $request->shop_id)->select('id', 'wallet')->first();
         if (!$shop) {
             return $this->errorResponse('Shop không tồn tại', 404);
         }
@@ -1080,18 +1080,21 @@ class ShopController extends Controller
         $startDateMonth = Carbon::now()->subMonth()->format('Y-m-d');
         $startDate = Carbon::now()->subWeek()->format('Y-m-d');
         $endDate = Carbon::now()->format('Y-m-d');
-        $totalWeek = history_get_cash_shops::where('shop_id', $shop->id)
+        $totalWeek = (int) history_get_cash_shops::where('shop_id', $shop->id)
             ->whereBetween('date', [$startDate, $endDate])
             ->sum('cash');
-        $totalMonth = history_get_cash_shops::where('shop_id', $shop->id)
+
+        $totalMonth = (int) history_get_cash_shops::where('shop_id', $shop->id)
             ->whereBetween('date', [$startDateMonth, $endDate])
             ->sum('cash');
-        $totalCash = history_get_cash_shops::where('shop_id', $shop->id)
+
+        $totalCash = (int) history_get_cash_shops::where('shop_id', $shop->id)
             ->sum('cash');
         $history = [
             'total_week' => $totalWeek,
             'total_month' => $totalMonth,
             'total_cash' => $totalCash,
+            'not_paid_yet' => $shop->wallet ?? 0,
         ];
         return $this->successResponse('Lịch sử rút tiền', $history);
     }
