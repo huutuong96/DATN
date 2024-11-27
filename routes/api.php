@@ -264,7 +264,7 @@ Route::get('/search', function () {
             Route::post('product/uploadImage', [ProductController::class, 'upload']);
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);
-            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
+            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct'])->name('handleUpdateProduct');
 
 
             // Platform Fees Routes

@@ -922,9 +922,11 @@ class ProductController extends Controller
     public function handleUpdateProduct(Request $request, string $id)
     // ProductRequest
     {
+        // dd(  $request->action);
+        // // $id= $request->id;
 
         try {
-            if($request-> action == "ok"){
+            if($request->action == 1){
                 $newDT = DB::table("update_product")->orderBy("updated_at", "desc")->where("product_id", $id)->first();
                 $ollDT = DB::table("products")->where("id", $id)->first();
                 $ollData = (array) $ollDT;
