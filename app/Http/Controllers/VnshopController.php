@@ -246,7 +246,7 @@ class VnshopController extends Controller
                 'slug' => $request->slug ?? Str::slug($request->title, '-'),
                 'index' => $request->index ?? 1,
                 'status' => $request->status ?? 1,
-                'parent_id' => $request->input('parent_id') == 0 ? 0 : $request->input('parent_id'),
+                'parent_id' => $request->parent_id ?? null,
                 'create_by' => $user->id,
                 'image' => $dataInsert['image'] ?? null,
                 'tax_id' => $request->tax_id

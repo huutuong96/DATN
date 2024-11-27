@@ -408,9 +408,10 @@
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
                                                         <!-- Duyệt -->
-                                                        <form action="{{ route( 'products.approve' ,[
+                                                        <form action="{{ route( 'handleUpdateProduct' ,[
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $product->id,
+                                                                                                'action'=> 1,
                                                                                                 'tab'=>6,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
@@ -419,9 +420,10 @@
                                                             </button>
                                                         </form>
                                                         <!-- Không duyệt -->
-                                                        <form action="{{ route('products.reject',[
+                                                        <form action="{{ route('handleUpdateProduct',[
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $product->id,
+                                                                                                'action'=> 2,
                                                                                                 'tab'=>6,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
