@@ -1144,11 +1144,19 @@ class ShopController extends Controller
         $limit = $request->limit ?? 20;
         $query = CategoriesModel::query();
         if ($request->has('category_id')) {
-            $query->where('id', $request->category_id);
+            $query->where('id', $request->category_id)->where('status', 2);
         }
         $categories = $query->get();
         $result = $categories->map(function ($category) {
-            $nestedCategories = CategoriesModel::where('parent_id', $category->id)->pluck('id');
+            $nestedCategories = CategoriesModel::where('parent_id', $category->id)
+            ->get(['id', 'title', 'slug'])
+            ->map(function ($nestedCategory) {
+                return [
+                'id' => $nestedCategory->id,
+                'title' => $nestedCategory->title,
+                'slug' => $nestedCategory->slug,
+                ];
+            });
             return [
             'id' => $category->id,
             'name' => $category->title,
