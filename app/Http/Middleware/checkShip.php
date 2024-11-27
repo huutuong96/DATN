@@ -17,7 +17,7 @@ class checkShip
     public function handle(Request $request, Closure $next): Response
     {
 
-        $shopId = $request->id;
+        $shopId = $request->shop_id;
         $shop = Shop::where('id', $shopId)->select('id', 'shopid_GHN')->first();
         if ($shop->shopid_GHN == null) {
             return response()->json([
