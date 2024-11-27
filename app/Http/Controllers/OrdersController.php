@@ -35,26 +35,27 @@ class OrdersController extends Controller
     public function indexOrderToShop($id)
     {
         $orders = OrdersModel::where('shop_id', $id)
-            ->with('orderDetails','payment') // Load cả order details
-            ->get();
+            ->with('orderDetails', 'payment') 
+            ->paginate(10); 
+    
         foreach ($orders as $order) {
             foreach ($order->orderDetails as $orderDetail) {
-                if($orderDetail->variant!=null){
-                    $variant = $orderDetail->variant;  
-                }else{
-                    $product = $orderDetail->product;  
+                if ($orderDetail->variant != null) {
+                    $variant = $orderDetail->variant;
+                } else {
+                    $product = $orderDetail->product;
                 }
-            
             }
         }
         foreach ($orders as $key => $order) {
-            foreach ($order->orderDetails as $orderDetail  ) {
-                if( $orderDetail->variant){
-                $orderDetail['product']  = $orderDetail->variant->product;
-                unset($orderDetail->variant['product']);
+            foreach ($order->orderDetails as $orderDetail) {
+                if ($orderDetail->variant) {
+                    $orderDetail['product'] = $orderDetail->variant->product;
+                    unset($orderDetail->variant['product']);
                 }
             }
         }
+    
         if ($orders->isEmpty()) {
             return $this->errorResponse("Không tồn tại Order nào", 404);
         }
