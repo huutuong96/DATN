@@ -392,7 +392,7 @@
                                         @else
                                             @foreach($allUpdateProducts as $product)
                                                 <tr>
-                                                    <th scope="row"><a href="" class="fw-medium">{{ $product->id }}</a></th>
+                                                    <th scope="row"><a href="" class="fw-medium">{{ $product->product_id }}</a></th>
                                                     <td>
                                                         <img src="{{ $product->image }}" alt="{{ $product->name }}" style="width: 50px; height: 50px;">
                                                         
@@ -410,7 +410,7 @@
                                                         <!-- Duyệt -->
                                                         <form action="{{ route( 'handleUpdateProduct' ,[
                                                                                                 'token' => auth()->user()->refesh_token,
-                                                                                                'id' => $product->id,
+                                                                                                'id' => $product->product_id,
                                                                                                 'action'=> 1,
                                                                                                 'tab'=>6,
                                                                                                 ]) }}" method="POST" style="display:inline;">
@@ -422,7 +422,7 @@
                                                         <!-- Không duyệt -->
                                                         <form action="{{ route('handleUpdateProduct',[
                                                                                                 'token' => auth()->user()->refesh_token,
-                                                                                                'id' => $product->id,
+                                                                                                'id' => $product->product_id,
                                                                                                 'action'=> 2,
                                                                                                 'tab'=>6,
                                                                                                 ]) }}" method="POST" style="display:inline;">

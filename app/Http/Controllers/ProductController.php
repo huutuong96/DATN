@@ -922,6 +922,8 @@ class ProductController extends Controller
     public function handleUpdateProduct(Request $request, string $id)
     // ProductRequest
     {
+        // dd(  $request->action);zzz
+        // // $id= $request->id;
 
         try {
             if($request-> action == 1){
