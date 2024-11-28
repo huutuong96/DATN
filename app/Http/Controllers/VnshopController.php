@@ -202,7 +202,7 @@ class VnshopController extends Controller
     public function list_category($limit = 5)
     {
         $categories = CategoriesModel::orderBy('created_at', 'desc')
-        ->whereIn("status", [1, 2])
+        ->whereIn("status", [2])
         ->get();  
         $categoryTree = $this->buildTree($categories);
 
@@ -223,7 +223,8 @@ class VnshopController extends Controller
         $tree = [];
     
         foreach ($categories as $category) {
-            if ($category->parent_id === $parentId) {
+           
+            if ($category->parent_id == $parentId) { 
                 $children = $this->buildTree($categories, $category->id);
                 if ($children->isNotEmpty()) {
                     $category->children = $children;
@@ -232,7 +233,6 @@ class VnshopController extends Controller
             }
         }
     
-        // Trả về một Collection của các danh mục (bao gồm cha, con, cháu)
         return collect($tree);
     }
     
