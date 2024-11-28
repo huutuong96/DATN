@@ -79,7 +79,7 @@ class ClientEmbedController extends Controller
         if (!$user) {
             return redirect()->back()->with('error', 'Tài khoản không tồn tại');
         }
-        $shop = Shop::where('owner_id', $user->id)->select('id', 'shopid_GHN', 'province_id', 'district_id', 'ward_id', 'pick_up_address')->first();
+        $shop = Shop::where('owner_id', $user->id)->select('id', 'shopid_GHN', 'province_id', 'district_id', 'ward_id', 'location')->first();
         if (!$shop) {
             return redirect()->back()->with('error', 'Shop không tồn tại');
         }
@@ -95,14 +95,13 @@ class ClientEmbedController extends Controller
         ])->post('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/register', [
             'district_id' => (int) $shop->district_id,
             'ward_code' =>  $shop->ward_id,
-            'address' => $shop->pick_up_address,
-            'name' => $user->fullname,
-            'phone' =>  $user->phone,
+            'address' => $shop->location,
+            'name' => $user->fullname ?? $request->fullname,
+            'phone' =>  $user->phone ?? $request->phone,
         ]);
         $shop->update([
             'shopid_GHN' => $response->json()['data']['shop_id'] ?? null
         ]);
-
         return view('shipping.register_shipping_success');
         // return redirect()->back()->with('success', 'Cập nhật mã shop GHN thành công');
     }    
