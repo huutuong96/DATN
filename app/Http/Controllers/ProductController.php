@@ -884,7 +884,7 @@ class ProductController extends Controller
         }
 
         $user = JWTAuth::parseToken()->authenticate();
-        $images = 
+        // $images = 
 
         $dataInsert = [
             'product_id' => $product->id,
