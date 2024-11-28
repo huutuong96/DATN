@@ -28,7 +28,7 @@ class VoucherRequest extends FormRequest
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:0',
             'condition' => 'nullable',
-            'ratio' => 'nullable|numeric',
+           'ratio' => 'nullable|numeric',
             'code' => 'nullable|string|max:100',
             'status' => 'required',
         ];

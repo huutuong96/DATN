@@ -38,6 +38,26 @@ use App\Models\Notification_to_mainModel;
 use App\Models\RanksModel;
 use App\Models\recipes;
 use App\Http\Requests\RankRequest;
+use App\Models\PaymentsModel;
+use App\Http\Requests\PaymentRequest;
+
+use App\Models\Image;
+use App\Http\Requests\ProductRequest;
+;
+use App\Models\ColorsModel;
+use App\Models\variantattribute;
+use App\Models\attributevalue;
+use App\Models\product_variants;
+use App\Models\Attribute;
+
+use App\Services\ImageUploadService;
+use App\Jobs\UploadImageJob;
+use App\Jobs\UploadImagesJob;
+use App\Jobs\UpdateStockAllVariant;
+use App\Jobs\UpdatePriceAllVariant;
+use App\Jobs\UpdateImageAllVariant;
+
+use App\Models\update_product;
 
 class VnshopController extends Controller
 {
@@ -179,14 +199,45 @@ class VnshopController extends Controller
     
         return $totalSubtotal;
     }
-    public function list_category($limit = 5){
-        $categories = CategoriesModel::orderBy('created_at', 'desc')->whereIn("status", [1, 2])->paginate($limit);
-        $taxes = Tax::where('status',2)->get();
+    public function list_category($limit = 5)
+    {
+        $categories = CategoriesModel::orderBy('created_at', 'desc')
+        ->whereIn("status", [1, 2])
+        ->get();  
+        $categoryTree = $this->buildTree($categories);
+
+        $taxes = Tax::where('status', 2)->get();
         $tax_category = tax_category::all();
-        return view('categories.list_category',compact(
-            'categories', 'taxes', 'tax_category'
+    
+        return view('categories.list_category', compact(
+            'categoryTree', 'taxes', 'tax_category', 'categories',
         ));
     }
+
+
+    /**
+     * Hàm đệ quy xây dựng cấu trúc cây danh mục
+     */
+    private function buildTree($categories, $parentId = null)
+    {
+        $tree = [];
+    
+        foreach ($categories as $category) {
+            if ($category->parent_id === $parentId) {
+                $children = $this->buildTree($categories, $category->id);
+                if ($children->isNotEmpty()) {
+                    $category->children = $children;
+                }
+                $tree[] = $category;
+            }
+        }
+    
+        // Trả về một Collection của các danh mục (bao gồm cha, con, cháu)
+        return collect($tree);
+    }
+    
+    
+    
     public function trash_category($limit = 5){
         $categories = CategoriesModel::orderBy('updated_at', 'desc')->where('status', "=", 5 )->paginate($limit);
         return view('categories.trash',compact(
@@ -284,18 +335,57 @@ class VnshopController extends Controller
             'shops'
         ));
     }
-    public function changeCategory(Request $rqt){
+    // public function changeCategory(Request $rqt){
        
+    //     $category = CategoriesModel::find($rqt->id);
+    //     // if($rqt->status == ){
+
+    //     // }
+    //     $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)->where("status", 2)->get();
+    //     if ($category) {
+    //         if($chillrenCategory){
+    //             return Back()->with('message', 'Cập nhật không thành công vì có danh mục con đang hoạt động!');
+    //         }else{
+    //             $category->status =$rqt->status; 
+    //             $category->save(); 
+    //             return Back()->with('message', 'Cập nhật thành công!');
+    //         }
+           
+    //     }
+    //     return Back()->with('message', 'Không có sản phẩm nào!');
+    // }
+    public function changeCategory(Request $rqt)
+    {
         $category = CategoriesModel::find($rqt->id);
-        if ($category) {
-            $category->status =$rqt->status; 
-            $category->save(); 
-            return Back()->with('message', 'Cập nhật thành công!');
+        if (!$category) {
+            return Back()->with('message', 'Không tìm thấy danh mục!');
         }
+        if ($category->parent_id === null || $category->parent_id == 0) {
+            $chillrenCategory = CategoriesModel::where("parent_id", $category->id)
+                                                ->where("status", 2) 
+                                                ->get();
+            if ($chillrenCategory->isNotEmpty()) {
+                return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục con đang hoạt động!');
+            }
+            foreach ($chillrenCategory as $child) {
+                $grandchildren = CategoriesModel::where("parent_id", $child->id)
+                                                 ->where("status", 2) 
+                                                 ->get();
+                if ($grandchildren->isNotEmpty()) {
+                    return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục cháu đang hoạt động!');
+                }
+            }
+        }
+        $category->status = $rqt->status;  
+        $category->save(); 
+    
+        return Back()->with('message', 'Cập nhật thành công!');
     }
+    
     
     public function updateCategory(Request $request){
         $user = JWTAuth::parseToken()->authenticate();
+        // dd($request);
         try {
             $categories = CategoriesModel::find($request->id);
 
@@ -328,7 +418,7 @@ class VnshopController extends Controller
                 'category_id' => $categories->id,
                 'tax_id' => $request->tax_id,
             ]);
-            return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Tạo thành công!');
+            return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Cập nhật thành công!');
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -451,6 +541,7 @@ class VnshopController extends Controller
             $voucherMain->description = $request->description ?? $voucherMain->description;
             $voucherMain->quantity = $request->quantity ?? $voucherMain->quantity;
             $voucherMain->limitValue = $request->limitValue ?? $voucherMain->limitValue;
+            $voucherMain->min = $request->min_order ?? $voucherMain->min;
             $voucherMain->ratio = $request->ratio ?? $voucherMain->ratio;
             $voucherMain->code = $request->code ?? $voucherMain->code;
             $voucherMain->status = $request->status ?? $voucherMain->status;
@@ -1025,31 +1116,6 @@ public function rankCreate(Request $request)
 
 }
 
-    public function list_recipes(Request $request){
-
-        $limit = 10;
-        $recipes = recipes::all();
-        return view('recipes.recipes',compact(
-            'recipes'
-        ));
-
-    }
-
-    public function recipesCreate(Request $request){
-        $token = $request->query('token');
-        recipes::create([
-            'is_active' => $request->status ?? 2,
-            'code' => $request->code ?? null,
-            'title' => $request->title ?? null,
-            'description' => $request->description ?? null,
-            'type' => $request->type ?? null,
-            'json' => json_encode($request->json),
-        ]);
-        return redirect()->route('list_recipes', [
-            'token' => $token,
-        ])->with('message', 'Thêm thành công!');
-    }
-    
     
 public function updaterank(RankRequest $request, $id)
 {
@@ -1102,6 +1168,25 @@ public function changeStatusRank(Request $request, string $id)
     }
 }
 
+public function changeStatusBanner(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $banner = Banner::findOrFail($id);
+        $banner->status = $request->status;
+        $banner->save();
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
 public function destroyrank(Request $request, string $id)
 {
     try {
@@ -1120,6 +1205,189 @@ public function destroyrank(Request $request, string $id)
         ])->with('message', 'Xóa Rank không thành công!');
     }
 }
+
+public function payment_method(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $payment_method = PaymentsModel::where('status',1)->paginate(10);
+    $payment_method0ff = PaymentsModel::where('status',0)->paginate(10);
+
+    return view('payment_method.payment_method_list', compact('payment_method', 'payment_method0ff', 'tab'));  
+
+}
+public function storepaymant(PaymentRequest $request)
+{
+
+    $token = $request->query('token');
+    $tab = $request->input('tab', 1); 
+    $dataInsert = [
+        "name" => $request->name,
+        "code" => $request->code,
+        "description" => $request->description,
+        "status" => $request->status,
+    ];
+
+    try {
+        PaymentsModel::create($dataInsert);
+        return redirect()
+            ->route('payment_method' , [
+                'token' => $token,
+                'tab' => $tab,
+            ]) 
+            ->with('success', 'Thêm phương thức thanh toán thành công');
+    } catch (\Throwable $th) {
+        return redirect()
+            ->back()
+            ->with('error', 'Thêm phương thức thanh toán không thành công: ' . $th->getMessage())
+            ->withInput(); 
+    }
+}
+
+public function updatepayment(PaymentRequest $request, $id)
+{
+    $payment = PaymentsModel::findOrFail($id);
+    
+    $token = $request->token;
+    $tab = $request->tab;
+    $dataUpdate = [
+        "name" => $request->name,
+        "code" => $request->code,
+        "description" => $request->description,
+        "status" => $request->status,
+    ];
+
+    try {
+        $payment->update($dataUpdate);
+
+        return redirect()
+        ->route('payment_method' , [
+            'token' => $token,
+            'tab' => $tab,
+        ]) ->with('success', 'Cập nhật phương thức thanh toán thành công');
+    } catch (\Throwable $th) {
+        return redirect()
+            ->back()
+            ->with('error', 'Cập nhật phương thức thanh toán không thành công: ' . $th->getMessage())
+            ->withInput();
+    }
+}
+
+public function changeStatuspayment(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $payment = PaymentsModel::findOrFail($id);
+        $payment->status = $request->status;
+        $payment->save();
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+
+public function destroypayment(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $payment = PaymentsModel::findOrFail($id);
+        $payment->delete();
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa payment_method thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa payment_method không thành công!');
+    }
+}
+
+public function handleUpdateProduct(Request $request, string $id)
+// ProductRequest
+{
+    $tab = $request->tab;
+    try {
+        if ($request->action == 1) {
+            $newDT = DB::table("update_product")->orderBy("updated_at", "desc")->where("product_id", $id)->first();
+            $ollDT = DB::table("products")->where("id", $id)->first();
+            $ollData = (array) $ollDT;
+            $newData = (array) $newDT;
+            DB::table('products_old')->insert($ollData);
+            $change_of = $data = json_decode($newData["change_of"], true);
+            unset($newData["change_of"]);
+            $newData["created_at"] = $newData["updated_at"];
+            $newData["id"] = $newData["product_id"];
+            unset($newData["product_id"]);
+            DB::table('products')->where('id', $id)->update($newData);
+            DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
+    
+            if (json_decode($newDT->change_of) != 0) {
+                foreach (json_decode($newDT->change_of) as $data) {
+                    $variant = product_variants::find($data->id);
+                    if (!$variant) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Không tồn tại biến thể nào",
+                        ], 404);
+                    }
+    
+                    $variant->update([
+                        'sku' => $data->sku,
+                        'stock' => $data->stock,
+                        'price' => $data->price,
+                        'images' => $data->images,
+                    ]);
+                }
+            }
+    
+            $product = Product::find($id);
+            $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
+            $highest_price = $product_variants_get_price->max('price');
+            $lowest_price = $product_variants_get_price->min('price');
+    
+            if ($highest_price == $lowest_price) {
+                $product->update([
+                    'show_price' => $highest_price,
+                ]);
+            }
+            if ($highest_price != $lowest_price) {
+                $product->update([
+                    'show_price' => $lowest_price . " - " . $highest_price,
+                ]);
+            }
+    
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => $tab
+            ])->with('message', 'Đã cập nhật sản phẩm.');
+    
+        } else {
+            DB::table('update_product')->where('product_id', $id)->delete();
+    
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => $tab
+            ])->with('error', 'Từ chối cập nhật.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->route('product_all', [
+            'token' => auth()->user()->refesh_token,
+            'tab' => $tab
+        ])->with('error', 'Đã xảy ra lỗi không mong muốn: ' . $e->getMessage());
+    }
+    
+}
+
+
 
 
 }

@@ -39,7 +39,12 @@
                             <div class="card-body p-4">
                                 <div class="p-2 mt-4">
                                     <form action="/api/admin/login" method="POST">
-
+                                        @csrf
+                                        @if(isset($error))
+                                        <div class="alert alert-danger">
+                                            {{ $error}}
+                                        </div>
+                                        @endif
                                         <div class="mb-3">
                                             <label for="email" class="form-label">Email</label>
                                             <input type="text" name="email" class="form-control" id="email" placeholder="Nhập Email">

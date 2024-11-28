@@ -51,6 +51,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogsController;
+use App\Http\Controllers\VnshopController;
 
 Route::get('/search', function () {
     return "API - VNSHOP";
@@ -218,9 +219,12 @@ Route::get('/search', function () {
                 Route::get('user/admin/logout', [AuthenController::class, "adminLogout"])->name('adminLogout');
 
                 Route::resource('orders', OrdersController::class);
+                Route::get('orders/cancelOrder/{id}', [OrdersController::class, "cancelOrder"]);
                 Route::post('orders/update', [OrdersController::class, "update"]);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
+                Route::get('order/user/detail/{id}', [OrdersController::class, "OrderToUserDetail"]);
+                
                 Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);
                 
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
@@ -229,7 +233,7 @@ Route::get('/search', function () {
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
-            Route::post('products', [ProductController::class, 'store']);
+            Route::post('products', action: [ProductController::class, 'store']);
 
             Route::post('products/{id}', [ProductController::class, 'update']);
             Route::post('product/upload', [ProductController::class, 'upload']);
@@ -246,7 +250,7 @@ Route::get('/search', function () {
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
 
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);     // update product
-            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
+           
 
 
             Route::post('product/update_variant/{id}', [ProductController::class, 'updateVariant']);
@@ -261,7 +265,7 @@ Route::get('/search', function () {
             Route::post('product/uploadImage', [ProductController::class, 'upload']);
             Route::post('products/update_fast_product/{id}', [ProductController::class, 'updateFastProduct']);
             Route::post('products/update_product/{id}', [ProductController::class, 'updateProduct']);
-            Route::post('products/update/handle/{id}', [ProductController::class, 'handleUpdateProduct']);
+           
 
 
             // Platform Fees Routes
@@ -316,8 +320,9 @@ Route::get('/search', function () {
             Route::get('shop/order_report', [ShopController::class, 'orderReport']);
             Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
-
-
+            Route::get('shops/wallet/{shop_id}', [ShopController::class, 'wallet']);
+            Route::get('shops/history_get_cash/{shop_id}', [ShopController::class, 'history_get_cash']);
+            Route::get('shops/number_of_withdrawals/{shop_id}', [ShopController::class, 'number_of_withdrawals']);
 
             Route::get('main/config', [configController::class, 'index']);
             Route::post('main/config', [configController::class, 'store']);
@@ -353,9 +358,12 @@ Route::get('/', function () {
 
 
 
-Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
-// lọc sản phẩm
-Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+        Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
+        // lọc sản phẩmorders
+        Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+        Route::get('/shops/filter', [ShopController::class, 'filterShops']);
+        Route::get('/shops/categories', [ShopController::class, 'getShopByCategory']);
+
         // NO Auth
         Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
         Route::get('products/{id}', [ProductController::class, 'show']);
@@ -384,15 +392,6 @@ Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         Route::get('/api/documentation', function () {
             return view('swagger');
         });
-
-
-
-
-
-
-
-
-
 
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');

@@ -19,16 +19,16 @@ class CheckShop
      */
     public function handle(Request $request, Closure $next): Response
     {
-
         $userId = JWTAuth::parseToken()->authenticate();
-        // LẤY ID CỦA SHOP TỪ TẤT CẢ CÁC NGUỒN
-        $shopId = $request->input('shop_id')
-            ?? $request->route('shop_id')
-            ?? $request->query('shop_id')
-            ?? $request->segment(2) // Assuming shop_id might be in the second segment of the URL
-            ?? $request->header('X-Shop-ID') // In case it's passed as a custom header
-            ?? $request->json('shop_id'); // For JSON payloads
-            // dd($userId);
+        // $shopId = $request->id;
+        $shop = Shop::where('owner_id', $userId->id)->select('id', 'shopid_GHN')->first();
+        if ($shop->shopid_GHN == null) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Vui lòng cập nhật thiết lập đơn vị vận chuyển',
+                'url' => 'https://vnshop.top/register/shipping/view'
+            ], 400);
+        }
             if ($userId->role_id == 2 || $userId->role_id == 3 || $userId->role_id == 4) {
                 return $next($request);
             }
