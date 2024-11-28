@@ -907,7 +907,7 @@ class ProductController extends Controller
             'quantity' => $request->stock ?? $product->stock,
             'parent_id' => $request->parent_id ?? $product->parent_id,
             'update_by' => $user->id,
-            'category_id' => $request->category_id ?? $product->category_id,
+            'category_id' => $request->category ?? $product->category,
             'shop_id' => $request->shop_id ?? $product->shop_id,
             'height' => $request->height ?? $product->height,
             'length' => $request->length ?? $product->length,
