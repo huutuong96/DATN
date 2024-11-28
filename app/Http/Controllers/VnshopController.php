@@ -113,7 +113,7 @@ class VnshopController extends Controller
         $doanhthuJson = array_values($doanhthu);
         $luongtrahangJson = array_values($luongtrahang);
         $luotmuaJson = array_values($luotmua);
-        $listCategory =( CategoriesModel::where("parent_id", null)->get());
+        $listCategory =( CategoriesModel::where("parent_id", 0)->get());
 
         $listCategoryJson = array_column($listCategory->toArray(), 'title');
         
