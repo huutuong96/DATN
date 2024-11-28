@@ -130,7 +130,7 @@
                                                     @if ($category->parent_id === $detail->id)
                                                         <option value="{{$detail->id}}">{{$detail->title}}</option>
                                                     @endif
-                                                <!-- <option value="{{$category->parent_id}}">đây là danh mục chưa sửa</option> -->
+                                              
                                                 @endforeach 
         
                                             @endif
