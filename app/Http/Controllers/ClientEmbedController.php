@@ -84,7 +84,7 @@ class ClientEmbedController extends Controller
         if ($shop->shopid_GHN != null) {
             return redirect()->back()->with('error', 'Shop đã đăng ký đơn vị vận chuyển');
         }
-        if ($shop->province_id == null || $shop->district_id == null || $shop->ward_id == null || $shop->pick_up_address == null) {
+        if ($shop->province_id == null || $shop->district_id == null || $shop->ward_id == null) {
             return redirect()->back()->with('error', 'Vui lòng cập nhật địa chỉ shop');
         }
         $response = Http::withHeaders([
