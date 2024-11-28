@@ -27,7 +27,7 @@ class CheckShop
                 'status' => false,
                 'message' => 'Vui lòng cập nhật thiết lập đơn vị vận chuyển',
                 'url' => 'https://vnshop.top/register/shipping/view'
-            ], 400);
+            ], 408);
         }
             if ($userId->role_id == 2 || $userId->role_id == 3 || $userId->role_id == 4) {
                 return $next($request);
