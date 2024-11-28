@@ -16,9 +16,10 @@ class CategoriesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = CategoriesModel::where('status', 1)->get();
+        $limit = $request->limit ?? 10;
+        $categories = CategoriesModel::where('status', 2)->paginate($limit);
 
         if ($categories->isEmpty()) {
             return response()->json(
@@ -27,12 +28,6 @@ class CategoriesController extends Controller
                     'message' => "Không tồn tại danh mục nào"
                 ]
             );
-        }
-        foreach ($categories as $category) {
-            $category->id = intval($category->id);
-            $category->index = intval($category->index);
-            $category->status = intval($category->status);
-            $category->parent_id = intval($category->parent_id);
         }
 
         return response()->json([

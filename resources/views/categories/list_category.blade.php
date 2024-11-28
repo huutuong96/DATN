@@ -127,10 +127,9 @@
                                                 <option value="0" {{ old('parent_id', $category->parent_id) == 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                             @else
                                                 @foreach($categories as $detail)
-                                                    @if ($category->parent_id === $detail->id)
+                                                    @if ($category->parent_id == $detail->id)
                                                         <option value="{{$detail->id}}">{{$detail->title}}</option>
                                                     @endif
-                                              
                                                 @endforeach 
         
                                             @endif

@@ -208,7 +208,7 @@ class AuthenController extends Controller
             "fullname" => $request->fullname,
             "password" => Hash::make($request->password),
             "email" => $request->email,
-            "rank_id" => $request->rank_id ?? null,
+            "rank_id" => $request->rank_id ?? 1,
             "role_id" => 1,
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
