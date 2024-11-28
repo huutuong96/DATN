@@ -178,13 +178,10 @@ class VnshopController extends Controller
         return view('products.list_product');
     }
     function getAllCategoryIds($categoryId) {
-        // Lấy tất cả danh mục con của $categoryId
         $categories = CategoriesModel::where('parent_id', $categoryId)->get();
     
-        $categoryIds = [$categoryId]; // Bắt đầu từ ID của danh mục cha
-    
+        $categoryIds = [$categoryId]; 
         foreach ($categories as $category) {
-            // Đệ quy để lấy danh mục con
             $categoryIds = array_merge($categoryIds, $this->getAllCategoryIds($category->id));
         }
     
@@ -202,7 +199,7 @@ class VnshopController extends Controller
     public function list_category($limit = 5)
     {
         $categories = CategoriesModel::orderBy('created_at', 'desc')
-        ->whereIn("status", [1, 2])
+        ->whereIn("status", [2])
         ->get();  
         $categoryTree = $this->buildTree($categories);
 
@@ -223,7 +220,8 @@ class VnshopController extends Controller
         $tree = [];
     
         foreach ($categories as $category) {
-            if ($category->parent_id === $parentId) {
+           
+            if ($category->parent_id == $parentId) { 
                 $children = $this->buildTree($categories, $category->id);
                 if ($children->isNotEmpty()) {
                     $category->children = $children;
@@ -232,7 +230,6 @@ class VnshopController extends Controller
             }
         }
     
-        // Trả về một Collection của các danh mục (bao gồm cha, con, cháu)
         return collect($tree);
     }
     
