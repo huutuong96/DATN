@@ -242,7 +242,7 @@ class AuthenController extends Controller
 
             $cart_to_users = Cart_to_usersModel::create([
                 'user_id' => $user->id,
-                'status' => 1,
+                'status' => 2,
             ]);
             $activeDone = [
                 'status' => true,
@@ -292,45 +292,6 @@ class AuthenController extends Controller
         }
     }
 
-/**
- * @OA\Post(
- *     path="api/login",
- *     summary="User login",
- *     description="Logs in a user and returns a JWT token.",
- *     tags={"Authentication"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"email", "password"},
- *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *             @OA\Property(property="password", type="string", example="password123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Login successful",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đăng nhập thành công"),
- *             @OA\Property(property="token", type="string", example="jwt_token_here")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid credentials",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Tài khoản hoặc mật khẩu không đúng")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Token creation failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Không thể tạo token")
- *         )
- *     )
- * )
- */
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -449,37 +410,6 @@ class AuthenController extends Controller
         }
     }
 
-    /**
- * @OA\Put(
- *     path="api/users/{id}",
- *     summary="Update user status",
- *     description="Updates the status of a user to 103 (account locked).",
- *     tags={"Users"},
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="string"),
- *         description="The ID of the user"
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Account locked successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Tài khoản đã bị khóa")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="User not found or inactive",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="User not found or inactive")
- *         )
- *     )
- * )
- */
     public function update(Request $request, string $id)
     {
         $user = UsersModel::where('id', $id)->where('status', 1)->first();
