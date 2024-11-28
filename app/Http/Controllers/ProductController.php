@@ -34,9 +34,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('checkShip')->only('store');
+    }
+
+
     public function index(Request $request)
     {
         $status = 2;
@@ -806,17 +809,48 @@ class ProductController extends Controller
             'data' => $products,
         ]);
     }
+    
+    
     public function filterProducts(Request $request)
     {
+        $limit = $request->limit ?? 20;
         $query = Product::query();
-        if ($request->has('min_price') && $request->has('max_price')) {
-            $query->whereBetween('price', [$request->min_price, $request->max_price]);
-        }
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-        $products = $query->paginate(100
-    );
+            if ($request->has('min_price') && $request->has('max_price')) {
+                $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price]);
+                // $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price])
+                //       ->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), 'ASC');      
+            }
+            if ($request->has('category_id')) {
+                $query->where('category_id', $request->category_id);
+            }
+            if ($request->has('updated_at')) {
+                $query->orderby('updated_at', 'desc');
+            }
+            if ($request->has('sold_count')) {
+                $query->orderby('sold_count', 'desc');
+            }
+            if ($request->has('view_count')) {
+                $query->orderby('view_count', 'desc');
+            }
+            if ($request->has('shop_id')) {
+                $query->where('shop_id', $request->shop_id);
+            }
+            
+            if ($request->sort == 'price') {
+                $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END ASC');
+            }
+            if ($request->sort == '-price') {
+                $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
+            }
+            // $shops = [];
+            // foreach ($query->get() as $product) {
+            //     $shopId = $product->shop_id;
+            //     if (!in_array($shopId, array_column($shops, 'id'))) {
+            //         $shops[] = Shop::find($shopId);
+            //     }
+            // }
+            $query->with('shop');
+            $products = $query->where('status', 2)->paginate($limit);
 
         if ($products->isEmpty()) {
             return response()->json([
@@ -1381,6 +1415,7 @@ public function ProductAll(Request $request)
 //     }
 //     return $combinations;
 // }
+
 
 
 }

@@ -320,8 +320,9 @@ Route::get('/search', function () {
             Route::get('shop/order_report', [ShopController::class, 'orderReport']);
             Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
-
-
+            Route::get('shops/wallet/{shop_id}', [ShopController::class, 'wallet']);
+            Route::get('shops/history_get_cash/{shop_id}', [ShopController::class, 'history_get_cash']);
+            Route::get('shops/number_of_withdrawals/{shop_id}', [ShopController::class, 'number_of_withdrawals']);
 
             Route::get('main/config', [configController::class, 'index']);
             Route::post('main/config', [configController::class, 'store']);
@@ -357,9 +358,12 @@ Route::get('/', function () {
 
 
 
-Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
-// lọc sản phẩmorders
-Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+        Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
+        // lọc sản phẩmorders
+        Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+        Route::get('/shops/filter', [ShopController::class, 'filterShops']);
+        Route::get('/shops/categories', [ShopController::class, 'getShopByCategory']);
+
         // NO Auth
         Route::get('product/get_variant/{id}', [ProductController::class, 'getVariant']);
         Route::get('products/{id}', [ProductController::class, 'show']);
@@ -388,15 +392,6 @@ Route::get('/products/filter', [ProductController::class, 'filterProducts']);
         Route::get('/api/documentation', function () {
             return view('swagger');
         });
-
-
-
-
-
-
-
-
-
 
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');

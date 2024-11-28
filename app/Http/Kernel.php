@@ -29,9 +29,9 @@ class Kernel extends HttpKernel
         // 'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
         'SendNotification' => \App\Http\Middleware\SendNotification::class,
         'CheckShop' => \App\Http\Middleware\CheckShop::class,
+        'checkShip' => \App\Http\Middleware\checkShip::class,
         'checkRole' => \App\Http\Middleware\CheckRole::class,
         'checkToken' => \App\Http\Middleware\checkToken::class,
-        'getNotification' => \App\Http\Middleware\getNotification::class,
     ];
     /**
      * The application's route middleware groups.

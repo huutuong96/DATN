@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\history_get_cash_shops;
+use App\Models\UsersModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ClientEmbedController extends Controller
@@ -51,6 +53,7 @@ class ClientEmbedController extends Controller
         $shop->update([
             'wallet' => $cash ?? $shop->wallet,
         ]);
+        
         history_get_cash_shops::create([
             'shop_id' => $shop->id ?? null,
             'user_id' =>  $user ?? null,
@@ -60,13 +63,47 @@ class ClientEmbedController extends Controller
             'bank_name' => $shop->bank_name ?? null,
             'owner_bank' => $shop->owner_bank ?? null,
         ]);
+
+        
         return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
     }
-    public function product_update(Request $request)
+
+    public function register_shipping(Request $request)
     {
-        // $user = JWTAuth::parseToken()->authenticate();
-        // $shop = Shop::where('id', $request->shop_id)->first();
-        // return view('client.product_update' , compact('shop','user'));
-        return view('client.product_update');
-    }
+        $user = UsersModel::where('email', $request->email)->select('id', 'fullname', 'phone')->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'Tài khoản không tồn tại');
+        }
+        $shop = Shop::where('owner_id', $user->id)->select('id', 'shopid_GHN', 'province_id', 'district_id', 'ward_id', 'pick_up_address')->first();
+        if (!$shop) {
+            return redirect()->back()->with('error', 'Shop không tồn tại');
+        }
+        // if ($shop->shopid_GHN != null) {
+        //     return redirect()->back()->with('error', 'Shop đã đăng ký đơn vị vận chuyển');
+        // }
+        // if ($shop->province_id == null || $shop->district_id == null || $shop->ward_id == null || $shop->pick_up_address == null) {
+        //     return redirect()->back()->with('error', 'Vui lòng cập nhật địa chỉ shop');
+        // }
+        // $response = Http::withHeaders([
+        //     'Token' => env('TOKEN_API_GIAO_HANG_NHANH_DEV'),
+        //     'Content-Type' => 'application/json',
+        // ])->post('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/register', [
+        //     'district_id' => (int) $shop->district_id,
+        //     'ward_code' =>  $shop->ward_id,
+        //     'address' => $shop->pick_up_address,
+        //     'name' => $user->fullname,
+        //     'phone' =>  $user->phone,
+        // ]);
+        // $shop->update([
+        //     'shopid_GHN' => $response->json()['data']['shop_id'] ?? null
+        // ]);
+
+        return view('shipping.register_shipping_success');
+        // return redirect()->back()->with('success', 'Cập nhật mã shop GHN thành công');
+    }    
+
+    public function register_shipping_view(Request $request)
+    {
+       return view('shipping.registerGHN');
+    }    
 }
