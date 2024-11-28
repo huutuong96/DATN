@@ -178,13 +178,10 @@ class VnshopController extends Controller
         return view('products.list_product');
     }
     function getAllCategoryIds($categoryId) {
-        // Lấy tất cả danh mục con của $categoryId
         $categories = CategoriesModel::where('parent_id', $categoryId)->get();
     
-        $categoryIds = [$categoryId]; // Bắt đầu từ ID của danh mục cha
-    
+        $categoryIds = [$categoryId]; 
         foreach ($categories as $category) {
-            // Đệ quy để lấy danh mục con
             $categoryIds = array_merge($categoryIds, $this->getAllCategoryIds($category->id));
         }
     
