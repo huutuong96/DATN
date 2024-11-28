@@ -119,7 +119,7 @@ class VnshopController extends Controller
         
         $listCategoryID = array_column($listCategory->toArray(), 'id');
         // $categoryId = 1;
-        $listCategorydoanhthu = array_fill(1, count($listCategoryJson), -1, 0);
+        $listCategorydoanhthu = array_fill(1, count($listCategoryJson) -1, 0);
         foreach ($listCategoryID as $key => $id) {
             $totalRevenue = $this->calculateSubtotalByCategory($id);
             // dd($totalRevenue);
