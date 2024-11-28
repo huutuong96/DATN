@@ -102,7 +102,7 @@ class ClientEmbedController extends Controller
         $shop->update([
             'shopid_GHN' => $response->json()['data']['shop_id'] ?? null
         ]);
-
+        return $shop;
         return view('shipping.register_shipping_success');
         // return redirect()->back()->with('success', 'Cập nhật mã shop GHN thành công');
     }    
