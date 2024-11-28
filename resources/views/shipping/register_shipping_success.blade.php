@@ -50,7 +50,7 @@
                                 <h1 class="display-2 coming-soon-text">Thành công</h1>
                             </div>
                             <div>
-                            <a href="#" class="btn btn-success btn-label waves-effect right waves-light rounded-pill"><i class="ri-check-double-line label-icon align-middle rounded-pill fs-16 ms-2"></i> Trở Về Trang Chủ</a>
+                            <a href="https://vshop.io.vn/" class="btn btn-success btn-label waves-effect right waves-light rounded-pill"><i class="ri-check-double-line label-icon align-middle rounded-pill fs-16 ms-2"></i> Trở Về Trang Chủ</a>
                             </div>
                         </div>
                     </div>
