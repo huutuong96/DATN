@@ -120,7 +120,7 @@
                                         <th scope="row"><a href="#" class="fw-medium">{{$category->id}}</a></th>
                                         <td>{{$category->title}}</td>
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
-                                        <td>
+                                        <td> 
                                              @if ($category->parent_id == null || $category->parent_id == 0)
                                                 <option value="0" {{ old('parent_id', $category->parent_id) == 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                             @else

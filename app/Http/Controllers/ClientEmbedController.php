@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\history_get_cash_shops;
+use App\Models\User;
 use App\Models\UsersModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -32,32 +33,33 @@ class ClientEmbedController extends Controller
 
     public function shop_request_get_cash(Request $request)
     {
-       $user = $request->user;
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => "Token không đúng",
-            ], 401);
-        }
+    //    $user = $request->user;
+    //    $user = UsersModel::where('email', $user)->select('id')->first();
+    //     if (!$user) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => "Token không đúng",
+    //         ], 401);
+    //     }
         $shop = Shop::where('id', $request->shop_id)->first();
-        if (!$user) {
-            return redirect()->back()->with('error', 'Vui lòng đăng nhập');
-        }
-        if ($shop->wallet < $request->get_cash) {
-            return response()->json([
-                'status' => false,
-                'message' => "Số dư trong ví không đủ",
-            ], 401);
-        }
-        $cash = $shop->wallet - $request->get_cash;
+        // if (!$user) {
+        //     return redirect()->back()->with('error', 'Vui lòng đăng nhập');
+        // }
+        // if ($shop->wallet < $request->get_cash) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => "Số dư trong ví không đủ",
+        //     ], 401);
+        // }
+        // $cash = $shop->wallet - $request->get_cash;
         $shop->update([
-            'wallet' => $cash ?? $shop->wallet,
+            'wallet' => 0,
         ]);
         
         history_get_cash_shops::create([
             'shop_id' => $shop->id ?? null,
             'user_id' =>  $user ?? null,
-            'cash' => $request->get_cash ?? null,
+            'cash' => $shop->wallet ?? null,
             'date' => Carbon::now() ?? null,
             'account_number' => $shop->account_number ?? null,
             'bank_name' => $shop->bank_name ?? null,
@@ -84,7 +86,7 @@ class ClientEmbedController extends Controller
         if ($shop->shopid_GHN != null) {
             return redirect()->back()->with('error', 'Shop đã đăng ký đơn vị vận chuyển');
         }
-        if ($shop->province_id == null || $shop->district_id == null || $shop->ward_id == null || $shop->pick_up_address == null) {
+        if ($shop->province_id == null || $shop->district_id == null || $shop->ward_id == null) {
             return redirect()->back()->with('error', 'Vui lòng cập nhật địa chỉ shop');
         }
         $response = Http::withHeaders([

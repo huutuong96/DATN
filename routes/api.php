@@ -323,6 +323,8 @@ Route::get('/search', function () {
             Route::get('shops/wallet/{shop_id}', [ShopController::class, 'wallet']);
             Route::get('shops/history_get_cash/{shop_id}', [ShopController::class, 'history_get_cash']);
             Route::get('shops/number_of_withdrawals/{shop_id}', [ShopController::class, 'number_of_withdrawals']);
+            Route::post('shops/shop_request_get_cash/{shop_id}', [ShopController::class, 'shop_request_get_cash']);
+
 
             Route::get('main/config', [configController::class, 'index']);
             Route::post('main/config', [configController::class, 'store']);
