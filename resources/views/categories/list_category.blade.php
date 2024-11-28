@@ -157,13 +157,13 @@
                                         </td>
                                         <td>
                                             <ul class="list-inline">
-                                                @if ($category->status == 1)
+                                                @if ($category->status == 2)
                                                     <li class="list-inline-item">
                                                         <a 
                                                             href="{{ route('change_category', [
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $category->id,
-                                                                                                'status' => 2,
+                                                                                                'status' => 1,
                                                                                                 ]) }}"
                                                         >
                                                             <button type="button" class="btn btn-warning waves-effect waves-light" title="Khóa">
@@ -171,13 +171,13 @@
                                                             </button>
                                                         </a>
                                                     </li>
-                                                @elseif ($category->status == 2)
+                                                @elseif ($category->status == 1)
                                                     <li class="list-inline-item">
                                                     <a 
                                                         href="{{ route('change_category', [
                                                                                             'token' => auth()->user()->refesh_token,
                                                                                             'id' => $category->id,
-                                                                                            'status' => 1,
+                                                                                            'status' => 2,
                                                                                             ]) }}"
                                                     >
                                                     <button type="button" class="btn btn-success" title="Bật">
