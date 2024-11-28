@@ -16,7 +16,7 @@ class CategoriesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $limit = $request->limit ?? 10;
         $categories = CategoriesModel::where('status', 2)->paginate($limit);
