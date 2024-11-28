@@ -232,7 +232,6 @@ class VnshopController extends Controller
     
         return collect($tree);
     }
-  
     
     
     

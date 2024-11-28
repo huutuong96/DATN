@@ -1141,6 +1141,7 @@ class ShopController extends Controller
 
     public function getShopByCategory(Request $request)
     {
+        dd($request);
         $limit = $request->limit ?? 20;
         $query = CategoriesModel::query();
         if ($request->has('category_id')) {
