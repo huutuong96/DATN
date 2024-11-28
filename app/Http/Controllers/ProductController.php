@@ -884,15 +884,7 @@ class ProductController extends Controller
         }
 
         $user = JWTAuth::parseToken()->authenticate();
-        // $cloudinary = new Cloudinary();
-
-        // if ($request->hasFile('image')) {
-        //     $image = $request->file('image');
-        //     $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-        //     $mainImageUrl = $uploadedImage['secure_url']; 
-        // } else {
-        //     $mainImageUrl = $product->image;
-        // }
+        $images = 
 
         $dataInsert = [
             'product_id' => $product->id,
@@ -903,7 +895,7 @@ class ProductController extends Controller
             'infomation' => $request->infomation ?? $product->infomation ,
             'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0
             'sale_price' => $request->sale_price ?? $product->sale_price,
-            'image' => json_encode($request->images),
+            'image' => $product->image,
             'quantity' => $request->stock ?? $product->quantity,
             'parent_id' => $request->parent_id ?? $product->parent_id,
             'update_by' => $user->id,
