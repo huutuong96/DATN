@@ -49,7 +49,6 @@
                                                     <input type="number" class="form-control" value="1" name="status" required>
                                                 </div>
                                             </div>
-                                            {{-- @dd($categoryTree); --}}
                                             <div class="col-6">
                                                 <div class="mb-3">
                                                     <label for="parent_id" class="form-label">Chọn danh mục cha</label>
@@ -122,9 +121,8 @@
                                         <td>{{$category->title}}</td>
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
                                         <td>
-                                        <!-- {{$category->parent_id ?? "Đây là danh mục cha"}} -->
                                              @if ($category->parent_id == null || $category->parent_id == 0)
-                                                <option value="0" {{ old('parent_id', $category->parent_id) === 0 ? 'selected' : '' }}>Doanh mục cha</option>
+                                                <option value="0" {{ old('parent_id', $category->parent_id) == 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                             @else
                                                 @foreach($categories as $detail)
                                                     @if ($category->parent_id == $detail->id)
