@@ -64,8 +64,11 @@ class ClientEmbedController extends Controller
             'owner_bank' => $shop->owner_bank ?? null,
         ]);
 
-        
-        return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
+        return response()->json([
+            'status' => true,
+            'message' => "Yêu cầu rút tiền thành công",
+        ], 200);
+        // return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
     }
 
     public function register_shipping(Request $request)
