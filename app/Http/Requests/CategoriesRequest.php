@@ -26,7 +26,7 @@ class CategoriesRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'index' => 'required|integer',
-            'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'required|integer|in:0,1',
             'parent_id' => 'nullable|integer',
             'category_id_main' => 'integer'
