@@ -123,14 +123,13 @@
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
                                         <td>
                                         <!-- {{$category->parent_id ?? "Đây là danh mục cha"}} -->
-                                             @if ($category->parent_id === null || $category->parent_id == 0)
+                                             @if ($category->parent_id == null || $category->parent_id == 0)
                                                 <option value="0" {{ old('parent_id', $category->parent_id) === 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                             @else
                                                 @foreach($categories as $detail)
-                                                    @if ($category->parent_id === $detail->id)
+                                                    @if ($category->parent_id == $detail->id)
                                                         <option value="{{$detail->id}}">{{$detail->title}}</option>
                                                     @endif
-                                                <!-- <option value="{{$category->parent_id}}">đây là danh mục chưa sửa</option> -->
                                                 @endforeach 
         
                                             @endif
@@ -157,13 +156,13 @@
                                         </td>
                                         <td>
                                             <ul class="list-inline">
-                                                @if ($category->status == 1)
+                                                @if ($category->status == 2)
                                                     <li class="list-inline-item">
                                                         <a 
                                                             href="{{ route('change_category', [
                                                                                                 'token' => auth()->user()->refesh_token,
                                                                                                 'id' => $category->id,
-                                                                                                'status' => 2,
+                                                                                                'status' => 1,
                                                                                                 ]) }}"
                                                         >
                                                             <button type="button" class="btn btn-warning waves-effect waves-light" title="Khóa">
@@ -171,13 +170,13 @@
                                                             </button>
                                                         </a>
                                                     </li>
-                                                @elseif ($category->status == 2)
+                                                @elseif ($category->status == 1)
                                                     <li class="list-inline-item">
                                                     <a 
                                                         href="{{ route('change_category', [
                                                                                             'token' => auth()->user()->refesh_token,
                                                                                             'id' => $category->id,
-                                                                                            'status' => 1,
+                                                                                            'status' => 2,
                                                                                             ]) }}"
                                                     >
                                                     <button type="button" class="btn btn-success" title="Bật">

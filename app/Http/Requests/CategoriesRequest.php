@@ -27,7 +27,7 @@ class CategoriesRequest extends FormRequest
             'title' => 'required|string|max:255',
             'index' => 'required|integer',
             'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'status' => 'required|integer|in:0,1',
+            'status' => 'required|integer',
             'parent_id' => 'nullable|integer',
             'category_id_main' => 'integer'
         ];
@@ -51,7 +51,6 @@ class CategoriesRequest extends FormRequest
 
             'status.required' => 'Trạng thái là bắt buộc.',
             'status.integer' => 'Trạng thái phải là số nguyên.',
-            'status.in' => 'Trạng thái chỉ có thể là 0 hoặc 1.',
 
             'parent_id.nullable' => 'Parent ID có thể để trống.',
             'parent_id.integer' => 'Parent ID phải là số nguyên.',
