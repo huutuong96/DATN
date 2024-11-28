@@ -903,7 +903,7 @@ class ProductController extends Controller
             'infomation' => $request->infomation ?? $product->infomation ,
             'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0
             'sale_price' => $request->sale_price ?? $product->sale_price,
-            'image' => $request->images,
+            'image' => json_encode($request->images),
             'quantity' => $request->stock ?? $product->stock,
             'parent_id' => $request->parent_id ?? $product->parent_id,
             'update_by' => $user->id,
