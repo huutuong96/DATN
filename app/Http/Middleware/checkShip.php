@@ -23,7 +23,7 @@ class checkShip
             return response()->json([
                 'status' => false,
                 'message' => 'Vui lòng cập nhật thiết lập đơn vị vận chuyển',
-                'url' => 'xxx'
+                'url' => 'https://vnshop.top/register/shipping/view'
             ], 400);
         }
         return $next($request);
