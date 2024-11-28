@@ -215,7 +215,7 @@ class VnshopController extends Controller
     /**
      * Hàm đệ quy xây dựng cấu trúc cây danh mục
      */
-    private function buildTree($categories, $parentId = null)
+    private function buildTree($categories, $parentId = 0)
     {
         $tree = [];
     
