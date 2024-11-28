@@ -122,9 +122,9 @@
                                         <td>{{$category->title}}</td>
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
                                         <td>
-                                        <!-- {{$category->parent_id ?? "Đây là danh mục cha"}} -->
-                                             @if ($category->parent_id === null || $category->parent_id == 0)
-                                                <option value="0" {{ old('parent_id', $category->parent_id) === 0 ? 'selected' : '' }}>Doanh mục cha</option>
+                        
+                                             @if ($category->parent_id == null || $category->parent_id == 0)
+                                                <option value="0" {{ old('parent_id', $category->parent_id) == 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                             @else
                                                 @foreach($categories as $detail)
                                                     @if ($category->parent_id === $detail->id)
