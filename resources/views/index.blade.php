@@ -128,7 +128,11 @@
                                             <h6 class="m-0 fw-semibold fs-15"> Web Apps </h6>
                                         </div>
                                         <div class="col-auto">
-                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> View All Apps
+                                            <a href="{{ route('setting_admin', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> Cài Đặt
+                                                <i class="ri-arrow-right-s-line align-middle"></i></a>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> Tất cả
                                                 <i class="ri-arrow-right-s-line align-middle"></i></a>
                                         </div>
                                     </div>
