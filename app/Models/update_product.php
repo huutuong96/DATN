@@ -40,4 +40,8 @@ class update_product extends Model
         'is_delete',
         'admin_note',
     ];
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
 }
