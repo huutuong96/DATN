@@ -200,9 +200,12 @@ class VnshopController extends Controller
     public function list_category($limit = 5)
     {
         $categories = CategoriesModel::orderBy('created_at', 'desc')
+        ->whereIn("status", [1,2])
+        ->get();  
+        $category = CategoriesModel::orderBy('created_at', 'desc')
         ->whereIn("status", [2])
         ->get();  
-        $categoryTree = $this->buildTree($categories);
+        $categoryTree = $this->buildTree($category);
 
         $taxes = Tax::where('status', 2)->get();
         $tax_category = tax_category::all();

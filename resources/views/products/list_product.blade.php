@@ -403,7 +403,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name ?? "Vô danh"}}</td> 
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name}}</td>
                                                     
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
@@ -438,6 +438,7 @@
                                                         </a>
                                                     
                                                         <!-- Modal Chi tiết sản phẩm -->
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id}}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
                                                         <div class="modal fade" id="detailsModal-{{ $product->product_id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
