@@ -431,15 +431,14 @@
                                                                 <i class="ri-close-circle-line align-middle"></i> 
                                                             </button>
                                                         </form>
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->product_id }}">
                                                             <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
                                                                 <i class="ri-eye-line align-middle"></i>
                                                             </button>
                                                         </a>
-                                                    
                                                         <!-- Modal Chi tiết sản phẩm -->
                                                         <div class="modal fade" id="detailsModal-{{ $product->product_id}}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
-                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
@@ -639,7 +638,7 @@
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <form action="{{ route('products.submitReport', ['id' => $product->id, 'token' => auth()->user()->refresh_token, 'tab' => 3]) }}" method="POST">
+                                                                    <form action="{{ route('products.submitReport', ['id' => $product->id, 'token' => auth()->user()->refesh_token, 'tab' => 3]) }}" method="POST">
                                                                         @csrf
                                                                         <div class="mb-3">
                                                                             <label for="reason-{{ $product->id }}" class="form-label">Lý do vi phạm:</label>
