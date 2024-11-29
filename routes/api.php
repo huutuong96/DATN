@@ -374,6 +374,7 @@ Route::get('/', function () {
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
+        Route::get('categories_store_product', [CategoriesController::class, 'indexstoreproduct']);
 
         Route::get('search', [ProductController::class, 'search']);
         Route::get('/products/slug/{slug}', [ProductController::class, 'getProductToSlug']);

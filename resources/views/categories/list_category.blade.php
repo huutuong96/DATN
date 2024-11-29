@@ -221,8 +221,8 @@
                                                                             <div class="mb-3">
                                                                                 <label for="parent_id" class="form-label">Chọn danh mục cha</label>
                                                                                 <select name="parent_id" id="parent_id" class="form-control">
-                                                                                        @if ($category->parent_id === null || $category->parent_id == 0)
-                                                                                            <option value="0" {{ old('parent_id', $category->parent_id) === 0 ? 'selected' : '' }}>Doanh mục cha</option>
+                                                                                        @if ($category->parent_id ===null || $category->parent_id == 0)
+                                                                                            <option value="0" {{ old('parent_id', $category->parent_id) == 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                                                                         @else
                                                                                             @foreach($categories as $detail)
                                                                                                 @if ($category->parent_id === $detail->id)

@@ -438,11 +438,11 @@
                                                         </a>
                                                     
                                                         <!-- Modal Chi tiết sản phẩm -->
-                                                        <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id}}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->product_id }}">Thông tin sản phẩm chi tiết</h5>
                                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                     </div>
                                                                     <div class="modal-body">

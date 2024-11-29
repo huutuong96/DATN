@@ -36,6 +36,26 @@ class CategoriesController extends Controller
             'data' => $categories
         ], 200);
     }
+    public function indexstoreproduct(Request $request)
+    {
+       
+        $categories = CategoriesModel::where('status', 2)->get();
+
+        if ($categories->isEmpty()) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "Không tồn tại danh mục nào"
+                ]
+            );
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy dữ liệu thành công',
+            'data' => $categories
+        ], 200);
+    }
 
     public function store(CategoriesRequest $request)
     {
