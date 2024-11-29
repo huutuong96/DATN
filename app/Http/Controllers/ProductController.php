@@ -889,7 +889,7 @@ class ProductController extends Controller
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
-            'sku' => $request->sku,
+            'sku' => $request->sku ?? null,
             'slug' => $request->filled('slug') ?? $request->slug,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation ,
@@ -905,6 +905,7 @@ class ProductController extends Controller
             'length' => $request->length ?? $product->length,
             'weight' => $request->weight ?? $product->weight,
             'width' => $request->width ?? $product->width,
+            'status' =>  $product->status,
             'created_at' => $product->created_at,
             'show_price' => $request->show_price ?? $product->show_price,
             'brand' => $request->brand ?? $product->brand,
