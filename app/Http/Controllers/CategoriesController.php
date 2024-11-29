@@ -18,6 +18,26 @@ class CategoriesController extends Controller
      */
     public function index(Request $request)
     {
+
+        $categories = CategoriesModel::where('status', 2)->paginate($limit);
+
+        if ($categories->isEmpty()) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "Không tồn tại danh mục nào"
+                ]
+            );
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy dữ liệu thành công',
+            'data' => $categories
+        ], 200);
+    }
+    public function categoryAll(Request $request)
+    {
         $limit = $request->limit ?? 10;
         $categories = CategoriesModel::where('status', 2)->paginate($limit);
 
