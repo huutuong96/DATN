@@ -19,7 +19,7 @@ class CategoriesController extends Controller
     public function index(Request $request)
     {
 
-        $categories = CategoriesModel::where('status', 2)->paginate($limit);
+        $categories = CategoriesModel::where('status', 2)->get();
 
         if ($categories->isEmpty()) {
             return response()->json(
