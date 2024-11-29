@@ -18,7 +18,7 @@ class CategoriesController extends Controller
      */
     public function index(Request $request)
     {
-        $limit = $request->limit ?? 10;
+
         $categories = CategoriesModel::where('status', 2)->paginate($limit);
 
         if ($categories->isEmpty()) {
@@ -36,10 +36,10 @@ class CategoriesController extends Controller
             'data' => $categories
         ], 200);
     }
-    public function indexstoreproduct(Request $request)
+    public function categoryAll(Request $request)
     {
-       
-        $categories = CategoriesModel::where('status', 2)->get();
+        $limit = $request->limit ?? 10;
+        $categories = CategoriesModel::where('status', 2)->paginate($limit);
 
         if ($categories->isEmpty()) {
             return response()->json(

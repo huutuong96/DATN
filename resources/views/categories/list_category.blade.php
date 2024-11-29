@@ -49,11 +49,10 @@
                                                     <input type="number" class="form-control" value="1" name="status" required>
                                                 </div>
                                             </div>
-                                            {{-- @dd($categoryTree); --}}
                                             <div class="col-6">
                                                 <div class="mb-3">
-                                                    <label for="parent_id" class="form-label">Chọn danh mục cha</label>
-                                                    <select name="parent_id" id="parent_id" class="form-control">
+                                                    <label for="parent_id2" class="form-label">Chọn danh mục cha</label>
+                                                    <select name="parent_id2" id="parent_id2" class="form-control">
                                                         <option value="0">Không thuộc danh mục nào</option> 
                                                         <option value="0">Danh mục khác (không phân loại rõ ràng)</option>                                                  
                                                         @foreach ($categoryTree as $category)
@@ -121,8 +120,7 @@
                                         <th scope="row"><a href="#" class="fw-medium">{{$category->id}}</a></th>
                                         <td>{{$category->title}}</td>
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
-                                        <td>
-                        
+                                        <td> 
                                              @if ($category->parent_id == null || $category->parent_id == 0)
                                                 <option value="0" {{ old('parent_id', $category->parent_id) == 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                             @else
@@ -221,11 +219,11 @@
                                                                             <div class="mb-3">
                                                                                 <label for="parent_id" class="form-label">Chọn danh mục cha</label>
                                                                                 <select name="parent_id" id="parent_id" class="form-control">
-                                                                                        @if ($category->parent_id ===null || $category->parent_id == 0)
+                                                                                        @if ($category->parent_id == null || $category->parent_id == 0)
                                                                                             <option value="0" {{ old('parent_id', $category->parent_id) == 0 ? 'selected' : '' }}>Doanh mục cha</option>
                                                                                         @else
                                                                                             @foreach($categories as $detail)
-                                                                                                @if ($category->parent_id === $detail->id)
+                                                                                                @if ($category->parent_id == $detail->id)
                                                                                                     <option value="{{$detail->id}}">{{$detail->title}}</option>
                                                                                                 @endif
                                                                                             <!-- <option value="{{$category->parent_id}}">đây là danh mục chưa sửa</option> -->

@@ -439,6 +439,7 @@
                                                     
                                                         <!-- Modal Chi tiết sản phẩm -->
                                                         <div class="modal fade" id="detailsModal-{{ $product->product_id}}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">

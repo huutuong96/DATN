@@ -113,7 +113,7 @@ class VnshopController extends Controller
         $doanhthuJson = array_values($doanhthu);
         $luongtrahangJson = array_values($luongtrahang);
         $luotmuaJson = array_values($luotmua);
-        $listCategory =( CategoriesModel::where("parent_id", null)->get());
+        $listCategory =( CategoriesModel::where("parent_id", 0)->get());
 
         $listCategoryJson = array_column($listCategory->toArray(), 'title');
         
@@ -215,7 +215,7 @@ class VnshopController extends Controller
     /**
      * Hàm đệ quy xây dựng cấu trúc cây danh mục
      */
-    private function buildTree($categories, $parentId = null)
+    private function buildTree($categories, $parentId = 0)
     {
         $tree = [];
     

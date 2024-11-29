@@ -884,30 +884,22 @@ class ProductController extends Controller
         }
 
         $user = JWTAuth::parseToken()->authenticate();
-        $cloudinary = new Cloudinary();
-
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $mainImageUrl = $uploadedImage['secure_url']; 
-        } else {
-            $mainImageUrl = $product->image;
-        }
+        // $images = 
 
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
-            'sku' => $product->sku,
+            'sku' => $request->sku,
             'slug' => $request->filled('slug') ?? $request->slug,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation ,
             'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0
             'sale_price' => $request->sale_price ?? $product->sale_price,
-            'image' => $mainImageUrl,
-            'quantity' => $request->quantity ?? $product->quantity,
+            'image' => $product->image,
+            'quantity' => $request->stock ?? $product->quantity,
             'parent_id' => $request->parent_id ?? $product->parent_id,
             'update_by' => $user->id,
-            'category_id' => $request->category_id ?? $product->category_id,
+            'category_id' => $request->category ?? $product->category_id,
             'shop_id' => $request->shop_id ?? $product->shop_id,
             'height' => $request->height ?? $product->height,
             'length' => $request->length ?? $product->length,

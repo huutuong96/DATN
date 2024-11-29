@@ -1173,4 +1173,49 @@ class ShopController extends Controller
 
         return response()->json($result->first());
     }
+
+
+    public function shop_request_get_cash(Request $request)
+    {
+    //    $user = $request->user;
+    //    $user = UsersModel::where('email', $user)->select('id')->first();
+    //     if (!$user) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => "Token không đúng",
+    //         ], 401);
+    //     }
+        $shop = Shop::where('id', $request->shop_id)->first();
+        // if (!$user) {
+        //     return redirect()->back()->with('error', 'Vui lòng đăng nhập');
+        // }
+        // if ($shop->wallet < $request->get_cash) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => "Số dư trong ví không đủ",
+        //     ], 401);
+        // }
+        // $cash = $shop->wallet - $request->get_cash;
+        
+        
+        history_get_cash_shops::create([
+            'shop_id' => $shop->id ?? null,
+            'user_id' =>  $user ?? null,
+            'cash' => $shop->wallet ?? null,
+            'date' => Carbon::now() ?? null,
+            'account_number' => $shop->account_number ?? null,
+            'bank_name' => $shop->bank_name ?? null,
+            'owner_bank' => $shop->owner_bank ?? null,
+        ]);
+
+        $shop->update([
+            'wallet' => 0,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => "Yêu cầu rút tiền thành công",
+        ], 200);
+        // return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
+    }
 }
