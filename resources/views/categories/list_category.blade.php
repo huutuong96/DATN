@@ -52,7 +52,7 @@
                                             <div class="col-6">
                                                 <div class="mb-3">
                                                     <label for="parent_id2" class="form-label">Chọn danh mục cha</label>
-                                                    <select name="parent_id2" id="parent_id2" class="form-control">
+                                                    <select name="parent_id" id="parent_id" class="form-control">
                                                         <option value="0">Không thuộc danh mục nào</option> 
                                                         <option value="0">Danh mục khác (không phân loại rõ ràng)</option>                                                  
                                                         @foreach ($categoryTree as $category)
