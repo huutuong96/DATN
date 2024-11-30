@@ -515,6 +515,7 @@ class ShopController extends Controller
         $orders = OrdersModel::with('orderDetails')
         ->where('shop_id', $shop->id)
         ->where('order_status', $status)
+        ->orderBy('updated_at', 'desc')
         ->paginate($limit);
         return $this->successResponse("Lấy đơn hàng thành công", $orders);
     }
