@@ -398,3 +398,9 @@ Route::get('/', function () {
 
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
+
+        Route::post('import/products', [ProductController::class, "importProducts"])->name('importProducts');
+        Route::get('export/products', [ProductController::class, "exportProducts"])->name('exportProducts');
+
+
+        

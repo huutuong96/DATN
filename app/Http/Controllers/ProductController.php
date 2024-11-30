@@ -1,11 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Exports\AdminExport;
+use App\Exports\ImageExport;
+use App\Exports\ManagerExport;
+use App\Exports\ProductsExport;
+use App\Exports\SellerExport;
+use App\Exports\ShopExport;
+use App\Exports\UserExport;
 use App\Models\CategoriesModel;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Image;
 use App\Http\Requests\ProductRequest;
+use App\Imports\imagesProductImport;
+use App\Imports\MultiSheetImport;
+use App\Imports\ProductExport;
+use App\Imports\ProductImport;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
@@ -28,6 +40,8 @@ use App\Models\tax_category;
 use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Imports\UsersImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 use Illuminate\Support\Facades\DB;
@@ -1409,6 +1423,51 @@ public function ProductAll(Request $request)
 //     return $combinations;
 // }
 
-
-
+       public function importProducts(Request $request){
+            try {
+                Excel::import(new ProductImport, $request->file('file'));
+                $products = Product::latest()->take($request->file('file')->getSize())->select('id')->get();
+                return 'Import thành công';
+            } catch (\Throwable $th) {
+            
+            }
+       }
+       public function exportProducts(){
+            try {
+                return Excel::download(new ProductsExport, 'vnshop-products.xlsx');
+            } catch (\Throwable $th) {
+                return 'export thất bại: ' . $th->getMessage();
+            }
+       }
+       public function exportUsers(){
+            try {
+                return Excel::download(new UserExport, 'vnshop-customer.xlsx');
+            } catch (\Throwable $th) {
+                return 'export thất bại: ' . $th->getMessage();
+            }
+       }
+       public function exportdata(Request $request){
+        try {
+            if ($request->data == 'products') {
+                return Excel::download(new ProductsExport($request), 'vnshop-products.xlsx');
+            }
+            if ($request->data == 'customers') {
+                return Excel::download(new UserExport, 'vnshop-customer.xlsx');
+            }
+            if ($request->data == 'sellers') {
+                return Excel::download(new SellerExport, 'vnshop-sellers.xlsx');
+            }
+            if ($request->data == 'managers') {
+                return Excel::download(new ManagerExport, 'vnshop-managers.xlsx');
+            }
+            if ($request->data == 'admins') {
+                return Excel::download(new AdminExport, 'vnshop-Admins.xlsx');
+            }
+            if ($request->data == 'shops') {
+                return Excel::download(new ShopExport, 'vnshop-shops.xlsx');
+            }
+        } catch (\Throwable $th) {
+            return 'export thất bại: ' . $th->getMessage();
+        }
+   }
 }
