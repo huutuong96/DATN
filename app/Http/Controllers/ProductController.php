@@ -697,9 +697,17 @@ class ProductController extends Controller
         } else {
             $mainImageUrl = $product->image;
         }
+        $checkSlug = Product::where("slug", $request->slug ?? Str::slug($request->name))->first();
+        if($checkSlug){
+            $slug = $checkSlug->slug;
+            $slug .= '-' . rand(1000, 9999);
+        }else{
+            $slug = $request->slug ?? Str::slug($request->name);
+        }
         $dataInsert = [
             'name' => $request->name ?? $product->name,
-            'slug' => $request->filled('slug') ? $request->slug : Str::slug($request->name ?? $product->name),
+            'slug' => $slug,
+            'sku' => $request->sku ?? $product->sku,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation,
             'price' => $request->price ?? $product->price,
