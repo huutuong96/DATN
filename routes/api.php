@@ -400,7 +400,7 @@ Route::get('/', function () {
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
 
         Route::post('import/products', [ProductController::class, "importProducts"])->name('importProducts');
-        Route::get('export/products', [ProductController::class, "exportProducts"])->name('exportProducts');
+        Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
 
 
         

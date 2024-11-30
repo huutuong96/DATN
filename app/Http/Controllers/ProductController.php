@@ -1432,39 +1432,14 @@ public function ProductAll(Request $request)
             
             }
        }
-       public function exportProducts(){
-            try {
-                return Excel::download(new ProductsExport, 'vnshop-products.xlsx');
-            } catch (\Throwable $th) {
-                return 'export thất bại: ' . $th->getMessage();
-            }
-       }
-       public function exportUsers(){
-            try {
-                return Excel::download(new UserExport, 'vnshop-customer.xlsx');
-            } catch (\Throwable $th) {
-                return 'export thất bại: ' . $th->getMessage();
-            }
-       }
+      
        public function exportdata(Request $request){
         try {
             if ($request->data == 'products') {
                 return Excel::download(new ProductsExport($request), 'vnshop-products.xlsx');
             }
-            if ($request->data == 'customers') {
-                return Excel::download(new UserExport, 'vnshop-customer.xlsx');
-            }
-            if ($request->data == 'sellers') {
-                return Excel::download(new SellerExport, 'vnshop-sellers.xlsx');
-            }
-            if ($request->data == 'managers') {
-                return Excel::download(new ManagerExport, 'vnshop-managers.xlsx');
-            }
-            if ($request->data == 'admins') {
-                return Excel::download(new AdminExport, 'vnshop-Admins.xlsx');
-            }
-            if ($request->data == 'shops') {
-                return Excel::download(new ShopExport, 'vnshop-shops.xlsx');
+            if ($request->data == 'users') {
+                return Excel::download(new UserExport($request), 'vnshop-customer.xlsx');
             }
         } catch (\Throwable $th) {
             return 'export thất bại: ' . $th->getMessage();
