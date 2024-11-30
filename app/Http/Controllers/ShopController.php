@@ -510,10 +510,10 @@ class ShopController extends Controller
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
-        $status = $request->status ?? 0;
+        $status = $request->order_status ?? 0;
         $orders = OrdersModel::with('orderDetails')
         ->where('shop_id', $shop->id)
-        ->where('status', $status)
+        ->where('order_status', $status)
         ->paginate(10);
         return $this->successResponse("Lấy đơn hàng thành công", $orders);
     }

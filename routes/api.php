@@ -204,7 +204,7 @@ Route::get('/search', function () {
                     Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"])->middleware('CheckRole:Seller');
                     Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
                     Route::get('shop/order/{id}', [ShopController::class, "get_order_to_shop_by_status"]);
-                    Route::put('shop/order/{id}', [ShopController::class, "update_status_order"]);
+                    Route::put('shop/update/order/{id}', [ShopController::class, "update_status_order"]);
                     Route::post('shop/register_ship_giao_hang_nhanh', [ShopController::class, "register_ship_giao_hang_nhanh"]);
                     // Route::post('shop/get_store_ship_giao_hang_nhanh', [ShopController::class, "get_store_ship_giao_hang_nhanh"]);
 
