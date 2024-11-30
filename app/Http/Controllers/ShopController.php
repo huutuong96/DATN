@@ -1117,10 +1117,15 @@ class ShopController extends Controller
     public function wallet(Request $request)
     {
         $shop = Shop::where('id', $request->shop_id)->select('id','shop_name', 'wallet' ,'account_number', 'bank_name' , 'owner_bank')->first();
+        $history = history_get_cash_shops::where('shop_id', $shop->id)->select('id', 'cash', 'date')->paginate(10);
         if (!$shop) {
             return $this->errorResponse('Shop không tồn tại', 404);
         }
-        return $this->successResponse('Lấy thông tin ví thành công', $shop);
+        $data = [
+            'shop' => $shop,
+            'history' => $history,
+        ];
+        return $this->successResponse('Lấy thông tin ví thành công', $data);
     }
 
     public function history_get_cash(Request $request)
