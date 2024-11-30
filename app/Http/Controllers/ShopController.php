@@ -504,16 +504,17 @@ class ShopController extends Controller
         return $this->successResponse("Lấy đơn hàng thành công", $order);
     }
 
-    public function get_order_to_shop_by_status(string $id, string $status)
+    public function get_order_to_shop_by_status(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
+        $status = $request->status ?? 0;
         $orders = OrdersModel::with('orderDetails')
         ->where('shop_id', $shop->id)
         ->where('status', $status)
-        ->get();
+        ->paginate(10);
         return $this->successResponse("Lấy đơn hàng thành công", $orders);
     }
 

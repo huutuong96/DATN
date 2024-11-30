@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\AdminExport;
 use App\Exports\ImageExport;
 use App\Exports\ManagerExport;
+use App\Exports\OrderExport;
 use App\Exports\ProductsExport;
 use App\Exports\SellerExport;
 use App\Exports\ShopExport;
@@ -1448,6 +1449,9 @@ public function ProductAll(Request $request)
             }
             if ($request->data == 'users') {
                 return Excel::download(new UserExport($request), 'vnshop-customer.xlsx');
+            }
+            if ($request->data == 'orders') {
+                return Excel::download(new OrderExport($request), 'vnshop-orders.xlsx');
             }
         } catch (\Throwable $th) {
             return 'export thất bại: ' . $th->getMessage();
