@@ -519,6 +519,23 @@ class ShopController extends Controller
         ->where('status', $status)
         ->orderBy('updated_at', 'desc')
         ->paginate($limit);
+        foreach ($orders as $order) {
+            foreach ($order->orderDetails as $orderDetail) {
+                if ($orderDetail->variant != null) {
+                    $variant = $orderDetail->variant;
+                } else {
+                    $product = $orderDetail->product;
+                }
+            }
+        }
+        foreach ($orders as $key => $order) {
+            foreach ($order->orderDetails as $orderDetail) {
+                if ($orderDetail->variant) {
+                    $orderDetail['product'] = $orderDetail->variant->product;
+                    unset($orderDetail->variant['product']);
+                }
+            }
+        }
         return $this->successResponse("Lấy đơn hàng thành công", $orders);
     }
 
