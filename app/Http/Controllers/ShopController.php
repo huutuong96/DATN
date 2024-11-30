@@ -558,6 +558,51 @@ class ShopController extends Controller
         ], 200);
     }
 
+    public function get_dashboard_shop(string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        }
+        $orders_wait_confirm = OrdersModel::where('shop_id', $shop->id)->where('order_status', 0)->count();
+        $orders_confirmed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 1)->count();
+        $orders_prepare = OrdersModel::where('shop_id', $shop->id)->where('order_status', 2)->count();
+        $orders_packed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 3)->count();
+        $orders_handed_over = OrdersModel::where('shop_id', $shop->id)->where('order_status', 4)->count();
+        $orders_shipping = OrdersModel::where('shop_id', $shop->id)->where('order_status', 5)->count();
+        $orders_delivery_failed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 6)->count();
+        $orders_delivered = OrdersModel::where('shop_id', $shop->id)->where('order_status', 7)->count();
+        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
+        $orders_refund = OrdersModel::where('shop_id', $shop->id)->where('order_status', 9)->count();
+        $orders_canceled = OrdersModel::where('shop_id', $shop->id)->where('order_status', 10)->count();
+
+        $totalOrder = OrdersModel::where('shop_id', $shop->id)->count();
+        $totalProduct = Product::where('shop_id', $shop->id)->count();
+        $totalRevenue = OrdersModel::where('shop_id', $shop->id)->sum('net_amount');
+        $totalFollow = Follow_to_shop::where('shop_id', $shop->id)->count();
+        $totalView = $shop->visits;
+        $totalRating = $shop->rating;
+        return $this->successResponse("Lấy dữ liệu thành công", [
+            'total_order' => $totalOrder,
+            'total_product' => $totalProduct,
+            'total_revenue' => $totalRevenue,
+            'total_follow' => $totalFollow,
+            'total_view' => $totalView,
+            'total_rating' => $totalRating,
+            'orders_wait_confirm' => $orders_wait_confirm,
+            'orders_confirmed' => $orders_confirmed,
+            'orders_prepare' => $orders_prepare,
+            'orders_packed' => $orders_packed,
+            'orders_handed_over' => $orders_handed_over,
+            'orders_shipping' => $orders_shipping,
+            'orders_delivery_failed' => $orders_delivery_failed,
+            'orders_delivered' => $orders_delivered,
+            'orders_complete' => $orders_complete,
+            'orders_refund' => $orders_refund,
+            'orders_canceled' => $orders_canceled,
+        ]);
+    }
+
     public function get_voucher_to_shop(string $id)
     {
         $shop = Shop::find($id);
