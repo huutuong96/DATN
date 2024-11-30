@@ -559,26 +559,35 @@ class ShopController extends Controller
                 'message' => 'Shop không tồn tại',
             ], 404);
         }
-        
-        if ($request->status) {
+        $limit = $request->input('limit', 10); 
+        $limit = is_numeric($limit) && $limit > 0 ? (int)$limit : 10;
+    
+        $query = Product::where('shop_id', $shop->id);
+    
+        if ($request->has('status')) {
             $status = $request->status;
-            $product = Product::where('shop_id', $shop->id)
-                              ->where('status', $status)
-                            //   ->where('status', '!=', 5)
-                              ->paginate(20);
-            $product->appends(['status' => $status]);
+    
+            if ($status == 1) {
+                $query->where('status', '!=', 5);
+            } else {
+                $query->where('status', $status);
+            }
         }
-        if ($request->status == 1) {
-            $product = Product::where('shop_id', $shop->id)->where('status', '!=', 5)->paginate(20);
+    
+        $product = $query->paginate($limit);
+        if ($request->has('status')) {
+            $product->appends(['status' => $request->status]);
         }
-
-        $product->load('variants', 'attributes' );
+    
+        $product->load('variants', 'attributes');
+    
         return response()->json([
             'status' => true,
             'message' => 'Lấy sản phẩm thành công',
             'data' => $product,
         ], 200);
     }
+    
 
     public function get_dashboard_shop(string $id)
     {
