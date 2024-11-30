@@ -700,6 +700,7 @@ class ProductController extends Controller
         $dataInsert = [
             'name' => $request->name ?? $product->name,
             'slug' => $request->filled('slug') ? $request->slug : Str::slug($request->name ?? $product->name),
+            'sku' => $request->sku ?? $product->sku,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation,
             'price' => $request->price ?? $product->price,
