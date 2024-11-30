@@ -430,41 +430,39 @@ class AuthenController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
-            $uploadedavatar = $cloudinary->uploadApi()->upload($avatar->getRealPath());
-            $avatarUrl = $uploadedavatar['secure_url'];
-        }
+        // if ($request->hasFile('avatar')) {
+        //     $avatar = $request->file('avatar');
+        //     $uploadedavatar = $cloudinary->uploadApi()->upload($avatar->getRealPath());
+        //     $avatarUrl = $uploadedavatar['secure_url'];
+        // }
         $dataUpdate = [
             "fullname" => $request->fullname ?? $user->fullname,
             "phone" => $request->phone ?? $user->phone,
             "email" => $request->email ?? $user->email,
-            "description" => $request->description ?? $user->description,
-            "genre" => $request->genre ?? $user->genre,
-            "datebirth" => $request->datebirth ?? $user->datebirth,
+            "genre" => $request->genre ?? 1,
+            "datebirth" => $request->datebirth ? date('Y-m-d', strtotime($request->datebirth)) : null,
             "updated_at" => now(),
-            "avatar" => $avatarUrl ?? $user->avatar,
+            "avatar" => $request->avatar ?? $user->avatar,
             "description" => $request->description ?? $user->description,
         ];
         UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
         if($request->input('address')){
             if ($request->input('address')['default'] == 1) {
-                AddressModel::where('default', 1)->update(['default' => null]);
+                AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
             }
-            $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
-            $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
-            $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
             AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
                 "province" => $request->input('address')['province'],
-                "province_id" => $filteredCity['ProvinceID'],
+                "province_id" => $request->input('address')['province_id'],
                 "district" => $request->input('address')['district'],
-                "district_id" => $filteredDistrict['DistrictID'],
+                "district_id" => $request->input('address')['district_id'],
                 "ward" => $request->input('address')['ward'],
-                "ward_id" => $filledWard,
+                "ward_id" => $request->input('address')['ward_id'],
                 "address" => $request->input('address')['address'],
                 "user_id" => $user->id,
-                "default" => $request->input('address')['default'] ?? null,
+                "default" => $request->input('address')['default'] ?? 0,
                 "type" => $request->input('address')['type'] ?? null,
+                "name" => $user->fullname ?? null,
+                "phone" => $user->phone ?? null,
             ]);
         }
         $dataDone = [
