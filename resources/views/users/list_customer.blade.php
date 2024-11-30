@@ -46,6 +46,8 @@
                             <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 4])}}">Seller</a>
                             <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 3])}}">Manager</a>
                             <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 2])}}">Admin</a>
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 1])}}">Đang hoạt động</a>
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 101])}}">Chưa xác thực</a>
                         </div>
                     </div>
                     <div class="card-body">

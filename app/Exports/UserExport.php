@@ -70,8 +70,8 @@ class UserExport implements FromCollection
         if ($this->request->status == 101) {
             $users = UsersModel::where('status', 101)->select('id','fullname','phone', 'email','point','genre','datebirth','rank_id','role_id','status')->get();
         }
-        if ($this->request->status == 2) {
-            $users = UsersModel::where('status', 2)->select('id','fullname','phone', 'email','point','genre','datebirth','rank_id','role_id','status')->get();
+        if ($this->request->status == 1) {
+            $users = UsersModel::where('status', 1)->select('id','fullname','phone', 'email','point','genre','datebirth','rank_id','role_id','status')->get();
         }
         if ($this->request->point >= 1000) {
             $users = UsersModel::where('point', '>=', 1000)->select('id','fullname','phone', 'email','point','genre','datebirth','rank_id','role_id','status')->get();
