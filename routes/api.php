@@ -1,6 +1,6 @@
  <?php
 
-
+use App\Events\TestEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
@@ -405,5 +405,8 @@ Route::get('/', function () {
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
 
 
-        
+        Route::get('/test-broadcast', function () {
+            broadcast(new TestEvent('This is a test message!'));
+            return 'Event has been broadcast!';
+        });
  
