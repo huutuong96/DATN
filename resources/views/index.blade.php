@@ -1163,16 +1163,11 @@
             <footer class="footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-2">
                             <script>
                                 document.write(new Date().getFullYear());
                             </script>
                             © VNshop.
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="text-sm-end d-none d-sm-block">
-                                Hệ thống được thiết kế bởi đội ngũ vnshop
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1208,7 +1203,26 @@
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
+    <script>
+        // WebSocket test
+        const socket = new WebSocket('ws://localhost:6001');
 
+        socket.addEventListener('open', function (event) {
+            console.log('WebSocket is connected.');
+        });
+
+        socket.addEventListener('message', function (event) {
+            console.log('Message from server ', event.data);
+        });
+
+        socket.addEventListener('close', function (event) {
+            console.log('WebSocket is closed.');
+        });
+
+        socket.addEventListener('error', function (event) {
+            console.error('WebSocket error observed:', event);
+        });
+    </script>
     <!-- apexcharts -->
     <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
 

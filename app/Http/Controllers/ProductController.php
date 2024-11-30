@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\AdminExport;
 use App\Exports\ImageExport;
 use App\Exports\ManagerExport;
+use App\Exports\OrderExport;
 use App\Exports\ProductsExport;
 use App\Exports\SellerExport;
 use App\Exports\ShopExport;
@@ -864,22 +865,9 @@ class ProductController extends Controller
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
-            // $shops = [];
-            // foreach ($query->get() as $product) {
-            //     $shopId = $product->shop_id;
-            //     if (!in_array($shopId, array_column($shops, 'id'))) {
-            //         $shops[] = Shop::find($shopId);
-            //     }
-            // }
             $query->with('shop');
             $products = $query->where('status', 2)->paginate($limit);
 
-        if ($products->isEmpty()) {
-            return response()->json([
-                'message' => 'Không có sản phẩm nào'
-            ], 404);
-        }
-    
         return response()->json($products);
     }
     
@@ -1448,6 +1436,9 @@ public function ProductAll(Request $request)
             }
             if ($request->data == 'users') {
                 return Excel::download(new UserExport($request), 'vnshop-customer.xlsx');
+            }
+            if ($request->data == 'orders') {
+                return Excel::download(new OrderExport($request), 'vnshop-orders.xlsx');
             }
         } catch (\Throwable $th) {
             return 'export thất bại: ' . $th->getMessage();

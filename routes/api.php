@@ -1,6 +1,6 @@
  <?php
 
-
+use App\Events\TestEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FAQController;
@@ -162,6 +162,7 @@ Route::get('/search', function () {
                 Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
 
                 Route::resource('follows', FollowToShopController::class);
+                Route::post('up_follow/{shop_id}', [FollowToShopController::class, 'follows']);
                 Route::resource('support_main', Support_mainController::class);
                 Route::resource('Comments', CommentsController::class);
                 Route::resource('Wishlists', WishlistController::class);
@@ -202,8 +203,8 @@ Route::get('/search', function () {
                     Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"])->middleware('CheckRole:Seller');
                     Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"])->middleware('CheckRole:Seller');
                     Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
-                    Route::get('shop/order/{id}/{status}', [ShopController::class, "get_order_to_shop_by_status"]);
-                    Route::put('shop/order/{id}', [ShopController::class, "update_status_order"]);
+                    Route::get('shop/order/{id}', [ShopController::class, "get_order_to_shop_by_status"]);
+                    Route::put('shop/update/order/{id}', [ShopController::class, "update_status_order"]);
                     Route::post('shop/register_ship_giao_hang_nhanh', [ShopController::class, "register_ship_giao_hang_nhanh"]);
                     // Route::post('shop/get_store_ship_giao_hang_nhanh', [ShopController::class, "get_store_ship_giao_hang_nhanh"]);
 
@@ -374,6 +375,7 @@ Route::get('/', function () {
         Route::get('shops', [ShopController::class, 'index']);
         Route::get('shops/{id}', [ShopController::class, 'show']);
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+        Route::get('shop/get_dashboard_shop/{id}', [ShopController::class, "get_dashboard_shop"]);
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
         Route::get('categoryAll', [CategoriesController::class, 'categoryAll']);
@@ -403,4 +405,8 @@ Route::get('/', function () {
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
 
 
-        
+        Route::get('/test-broadcast', function () {
+            broadcast(new TestEvent('This is a test message!'));
+            return 'Event has been broadcast!';
+        });
+ 

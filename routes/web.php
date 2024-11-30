@@ -51,6 +51,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\ClientEmbedController;
+use App\Http\Controllers\ModifierController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\webAppController;
 
@@ -130,6 +131,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/changeStatuspayment/{id}', [VnshopController::class, 'changeStatuspayment'])->name('changeStatuspayment');
     Route::delete('/destroypayment/{id}', [VnshopController::class, 'destroypayment'])->name('destroypayment');
     Route::post('products/update/handle/{id}', [VnshopController::class, 'handleUpdateProduct'])->name('handleUpdateProduct');
+
 });
 
 
@@ -156,10 +158,20 @@ Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mai
 
 
 
-
 // CLIENT EMBEDED
+Route::get('/subdomain', [ModifierController::class, 'subdomain'])->name('subdomain');
+Route::post('/create_subdomain', [ModifierController::class, 'create_subdomain'])->name('create_subdomain');
+Route::get('/delete_subdomain', [ModifierController::class, 'delete_subdomain'])->name('delete_subdomain');
+
+Route::get('/modifiers', [ModifierController::class, 'modifiers'])->name('modifiers');
+Route::get('/delete_modifier', [ModifierController::class, 'delete_modifier'])->name('delete_modifier');
+Route::post('/create_modifier', [ModifierController::class, 'create_modifier'])->name('create_modifier');
+Route::post('/update_modifier', [ModifierController::class, 'update_modifier'])->name('update_modifier');
+Route::get('/page_ctkm', [ModifierController::class, 'page_ctkm'])->name('page_ctkm');
+
 Route::get('/wallet', [ClientEmbedController::class, 'wallet'])->name('wallet');
 Route::post('/wallet/updateBank', [ClientEmbedController::class, 'updateBank'])->name('updateBank');
 Route::post('/wallet/shop_request_get_cash', [ClientEmbedController::class, 'shop_request_get_cash'])->name('shop_request_get_cash');
 Route::get('/register/shipping/view', [ClientEmbedController::class, 'register_shipping_view'])->name('register_shipping_view');
 Route::post('/register/shipping', [ClientEmbedController::class, 'register_shipping'])->name('register_shipping');
+
