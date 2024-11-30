@@ -37,20 +37,20 @@
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Tất cả sản phẩm</h4>
+                        <div class="dropdown" >
+                            <button class="btn dropdown-toggle" style="border: 1px solid #747474;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                Xuất FILE Excel
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 0])}}">Xuất sản phẩm từ chối duyệt </a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 2])}}">Xuất Sản phẩm đang hoạt động</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 3])}}">Xuất Sản phẩm chờ duyệt</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 4])}}">Xuất Sản phẩm vi phạm</a>
+                            </div>
+                        </div>
                     </div><!-- end card header -->
                     <!-- Single Button Dropdown -->
-                    <div class="dropdown" style="left: 30px;">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            Xuất FILE Excel
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 1])}}">Xuất status = 1</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 2])}}">Xuất status = 2</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 3])}}">Xuất status = 3</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 4])}}">Xuất status = 4</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 5])}}">Xuất status = 5</a>
-                        </div>
-                    </div>
+                   
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
@@ -94,7 +94,7 @@
                                                         Chưa duyệt
                                                     @elseif($product->status == 2)
                                                         Đang hoạt động
-                                                    @elseif($product->status == 5)
+                                                    @elseif($product->status == 0)
                                                         Đã từ chối
                                                     @elseif($product->status == 4)
                                                         Vi phạm
