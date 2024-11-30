@@ -513,7 +513,7 @@ class ShopController extends Controller
         $limit = $request->limit ?? 10;
         $order_status = $request->order_status ?? 0;
         $status = $request->status ?? 1;
-        $orders = OrdersModel::with('orderDetails')
+        $orders = OrdersModel::with('orderDetails', 'payment')
         ->where('shop_id', $shop->id)
         ->where('order_status', $order_status)
         ->where('status', $status)
