@@ -562,7 +562,10 @@ class ShopController extends Controller
         $limit = $request->input('limit', 10); 
         $limit = is_numeric($limit) && $limit > 0 ? (int)$limit : 10;
     
-        $query = Product::where('shop_id', $shop->id);
+        $query = Product::where('shop_id', $shop->id)->orderby('updated_at', 'desc');
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
     
         if ($request->has('status')) {
             $status = $request->status;
@@ -1224,6 +1227,7 @@ class ShopController extends Controller
     {
         $limit = $request->limit ?? 20;
         $query = CategoriesModel::query();
+        $queryPro = Product::query();
         if ($request->has('category_id')) {
             $query->where('id', $request->category_id)->where('status', 2);
         }
@@ -1298,5 +1302,14 @@ class ShopController extends Controller
             'message' => "Yêu cầu rút tiền thành công",
         ], 200);
         // return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
+    }
+
+
+    public function get_categories_for_shop(Request $request, string $id)
+    {
+        $shop = Shop::where('id', $id)->select('id')->first();
+        $products = Product::where('shop_id', $shop->id)->select('id', 'category_id')->get();
+        $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->select('id', 'title', 'slug')->get();
+        return $this->successResponse('Lấy danh sách danh mục thành công', $categories);
     }
 }

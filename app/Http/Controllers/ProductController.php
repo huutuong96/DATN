@@ -841,7 +841,11 @@ class ProductController extends Controller
                 //       ->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), 'ASC');      
             }
             if ($request->has('category_id')) {
-                $query->where('category_id', $request->category_id);
+                $categoryIds = CategoriesModel::where('parent_id', $request->category_id)
+                    ->orWhere('id', $request->category_id)
+                    ->pluck('id')
+                    ->toArray();
+                $query->whereIn('category_id', $categoryIds);
             }
             if ($request->has('updated_at')) {
                 $query->orderby('updated_at', 'desc');
@@ -862,7 +866,7 @@ class ProductController extends Controller
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
-            $query->with('shop');
+            // $query->with('shop');
             $products = $query->where('status', 2)->paginate($limit);
 
         return response()->json($products);

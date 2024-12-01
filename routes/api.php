@@ -150,7 +150,8 @@ Route::get('/search', function () {
 
                 Route::resource('notification_to_main', Notification_to_mainController::class);
                 Route::resource('notifications', NotificationController::class);
-
+                
+                
                 Route::resource('programes', ProgrameController::class)->middleware('CheckRole:Admin');
 
                 Route::resource('notification_to_shops', Notification_to_shopController::class);
@@ -353,11 +354,10 @@ Route::get('/search', function () {
             Route::post('users/register', [AuthenController::class, "register"]);
 
             Route::get('delete_notify', [NotificationController::class, "delete_notify"])->name('delete_notify');
-
-
-Route::get('/', function () {
-    return response()->json(['message' => 'Đây là API VNSHOP']);
-});
+            Route::get('get_notification_for_shop', [NotificationController::class, "get_notification_for_shop"])->name('get_notification_for_shop');
+            Route::get('/', function () {
+                return response()->json(['message' => 'Đây là API VNSHOP']);
+            });
 
 
 
@@ -375,6 +375,7 @@ Route::get('/', function () {
         Route::get('shops', [ShopController::class, 'index']);
         Route::get('shops/{id}', [ShopController::class, 'show']);
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
+        Route::get('shop/get_categories_for_shop/{id}', [ShopController::class, "get_categories_for_shop"]);
         Route::get('shop/get_dashboard_shop/{id}', [ShopController::class, "get_dashboard_shop"]);
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
@@ -403,10 +404,5 @@ Route::get('/', function () {
 
         Route::post('import/products', [ProductController::class, "importProducts"])->name('importProducts');
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
-
-
-        Route::get('/test-broadcast', function () {
-            broadcast(new TestEvent('This is a test message!'));
-            return 'Event has been broadcast!';
-        });
+        Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
  
