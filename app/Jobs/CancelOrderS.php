@@ -11,17 +11,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class CancelOrderS implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     */
+
     public function __construct()
     {
-        //
+
     }
 
     /**
@@ -29,22 +28,38 @@ class CancelOrderS implements ShouldQueue
      */
     public function handle(): void
     {
-        $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(1))->get();
+        DB::table('log_jobs')->insert([
+            'log' => 'CancelOrderS ',
+        ]);
+        $ordersPrepareCancel = OrdersModel::where('order_status', 10)->where('created_at', '<', Carbon::now()->subDays(1))->get();
         $shopsHasOrderPrepareCancel = Shop::whereIn('id', $ordersPrepareCancel->pluck('shop_id'))->get();
-        $orders = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(1))->get();
+        $orders = OrdersModel::where('order_status', 10)->where('created_at', '<', Carbon::now()->subDays(1))->get();
         $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
         $users = UsersModel::whereIn('id', $orders->pluck('user_id'))->get();
         foreach ($shopsHasOrderPrepareCancel as $shop) {
-            sendNotiPrepareCancelOrderForSeller::dispatch($shopsHasOrderPrepareCancel);
+            sendNotiPrepareCancelOrderForSeller::dispatch($shop->owner_id);
+            DB::table('log_jobs')->insert([
+                'log' => 'sendNotiPrepareCancelOrderForSeller ',
+            ]);
         }
         foreach ($users as $user) {
             sendNotiWhenCanceledOrder::dispatch($user->id, $user->email);
+            DB::table('log_jobs')->insert([
+                'log' => 'sendNotiWhenCanceledOrder ',
+            ]);
         }
         foreach ($shops as $shop) {
             sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
+            DB::table('log_jobs')->insert([
+                'log' => 'sendNotiWhenCanceledOrderForSeller ',
+            ]);
         }
+ 
         foreach ($orders as $order) {
             autoCancelOrder::dispatch($order);
+            DB::table('log_jobs')->insert([
+                'log' => 'autoCancelOrder ',
+            ]);
         }
     }
 }
