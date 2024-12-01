@@ -380,6 +380,8 @@ Route::get('/search', function () {
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
         Route::get('categoryAll', [CategoriesController::class, 'categoryAll']);
+        Route::get('order_cancellation_system', [OrdersController::class, 'order_cancellation_system']);
+        
 
         Route::get('search', [ProductController::class, 'search']);
         Route::get('/products/slug/{slug}', [ProductController::class, 'getProductToSlug']);
