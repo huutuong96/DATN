@@ -1233,12 +1233,10 @@ class ShopController extends Controller
             $nestedCategories = CategoriesModel::where('parent_id', $category->id)
             ->get(['id', 'title', 'slug'])
             ->map(function ($nestedCategory) {
-                $products = Product::where('category_id', $nestedCategory->id)->where('status', 2)->select('id','name','slug','show_price','sold_count','view_count', 'image', 'category_id', 'shop_id', 'quantity')->get();
                 return [
                 'id' => $nestedCategory->id,
                 'title' => $nestedCategory->title,
                 'slug' => $nestedCategory->slug,
-                'products' => $products,
                 ];
             });
             return [

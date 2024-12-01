@@ -845,6 +845,8 @@ class ProductController extends Controller
             }
             if ($request->has('category_id')) {
                 $query->where('category_id', $request->category_id);
+                $categoriesId = CategoriesModel::where('parent_id', $request->category_id)->pluck('id');
+                $query->orWhereIn('category_id', $categoriesId);
             }
             if ($request->has('updated_at')) {
                 $query->orderby('updated_at', 'desc');
