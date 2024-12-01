@@ -512,6 +512,14 @@ class ShopController extends Controller
         }
         $limit = $request->limit ?? 10;
         $order_status = $request->order_status ?? 0;
+        // $status = $request->status ?? 1;
+        // $orders = OrdersModel::with('orderDetails', 'payment')
+        // ->where('shop_id', $shop->id)
+        // ->where('order_status', $order_status)
+        // ->where('status', $status)
+        // ->orderBy('updated_at', 'desc')
+        // ->paginate($limit);
+
         $query = OrdersModel::query();
         if ($request->order_status) {
             $query->where('order_status', $order_status);
@@ -519,7 +527,10 @@ class ShopController extends Controller
         if ($request->status) {
             $query->where('status', $request->status);
         }
-        $orders = $query->where('shop_id', $shop->id)->where('order_status', $order_status)->orderBy('updated_at', 'desc')->paginate($limit);
+        $orders = $query->with('orderDetails', 'payment')->where('shop_id', $shop->id)->where('order_status', $order_status)->orderBy('updated_at', 'desc')->paginate($limit);
+
+
+
         foreach ($orders as $order) {
             foreach ($order->orderDetails as $orderDetail) {
                 if ($orderDetail->variant != null) {
