@@ -562,7 +562,7 @@ class ShopController extends Controller
         $limit = $request->input('limit', 10); 
         $limit = is_numeric($limit) && $limit > 0 ? (int)$limit : 10;
     
-        $query = Product::where('shop_id', $shop->id);
+        $query = Product::where('shop_id', $shop->id)->orderby('updated_at', 'desc');
     
         if ($request->has('status')) {
             $status = $request->status;
