@@ -787,19 +787,15 @@ class ProductController extends Controller
     {
         try {
             $product = Product::find($id);
-
+    
             if (!$product) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'product không tồn tại',
+                    'message' => 'Product không tồn tại',
                 ], 404);
             }
-
-            Image::where("product_id", $product->id)->delete();
-            // $product->delete();
-
-            // $product->update(['status' => 101]);
-
+            $product->update(['status' => 5]);
+    
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa sản phẩm thành công',
@@ -812,6 +808,7 @@ class ProductController extends Controller
             ]);
         }
     }
+    
 
     public function search(Request $request)
     {
