@@ -222,7 +222,7 @@ Route::get('/search', function () {
 
                 Route::resource('orders', OrdersController::class);
                 Route::get('orders/cancelOrder/{id}', [OrdersController::class, "cancelOrder"]);
-                Route::post('orders/update', [OrdersController::class, "update"]);
+                Route::post('orders/update/{id}', [OrdersController::class, "update"]);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
                 Route::get('order/user/detail/{id}', [OrdersController::class, "OrderToUserDetail"]);
