@@ -12,9 +12,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('queue:work --stop-when-empty')
-        ->everyMinute()
-        ->withoutOverlapping();
+        // $schedule->command('queue:work --stop-when-empty')
+        // ->everyMinute()
+        // ->withoutOverlapping();
+
+        // Add this method to your Kernel.php file to schedule the cancel_order_auto method to run every minute
+        $schedule->call(function () {
+            app(\App\Http\Controllers\OrdersController::class)->cancel_order_auto();
+        })->everyMinute();
     }
 
     /**

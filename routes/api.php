@@ -226,7 +226,7 @@ Route::get('/search', function () {
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
                 Route::get('order/user/detail/{id}', [OrdersController::class, "OrderToUserDetail"]);
-                
+                Route::get('order/shop/detail/{id}', [OrdersController::class, "OrderToShopDetail"]);
                 Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);
                 
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
@@ -405,4 +405,6 @@ Route::get('/search', function () {
         Route::post('import/products', [ProductController::class, "importProducts"])->name('importProducts');
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
         Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
+
+        Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
  

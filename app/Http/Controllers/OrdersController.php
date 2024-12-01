@@ -6,6 +6,13 @@ use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Product;
+use App\Jobs\autoCancelOrder;
+use App\Jobs\CancelOrderS;
+use App\Jobs\sendNotiPrepareCancelOrderForSeller;
+use App\Jobs\sendNotiWhenCanceledOrder;
+use App\Jobs\sendNotiWhenCanceledOrderForSeller;
+use App\Models\Shop;
+use App\Models\UsersModel;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -104,6 +111,34 @@ class OrdersController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment']) // Eager load 'product' qua 'orderDetails'
             ->where('user_id', $user->id)
+            ->where('id', $id)
+            ->get();
+            foreach ($orders as $order) {
+                foreach ($order->orderDetails as $orderDetail) {
+                    if($orderDetail->variant!=null){
+                        $variant = $orderDetail->variant;  
+                    }else{
+                        $product = $orderDetail->product;  
+                    }
+                  
+                }
+            }
+            foreach ($orders as $key => $order) {
+                foreach ($order->orderDetails as $orderDetail  ) {
+                    if( $orderDetail->variant){
+                       $orderDetail['product']  = $orderDetail->variant->product;
+                       unset($orderDetail->variant['product']);
+                    }
+                }
+            }
+        return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
+    }
+
+    public function OrderToShopDetail(Request $request, $id)
+    {
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment']) // Eager load 'product' qua 'orderDetails'
             ->where('id', $id)
             ->get();
             foreach ($orders as $order) {
@@ -228,4 +263,31 @@ class OrdersController extends Controller
             'error' => $error
         ], $status);
     }
+
+    public function cancel_order_auto()
+    {
+        // $ordersPrepareCancel = OrdersModel::where('order_status', 10)->where('created_at', '<', Carbon::now()->subDays(1))->select('id','shop_id')->get();
+        // $shopsHasOrderPrepareCancel = Shop::whereIn('id', $ordersPrepareCancel->pluck('shop_id'))->get();
+        // $orders = OrdersModel::where('order_status', 10)->where('created_at', '<', Carbon::now()->subDays(1))->get();
+        // $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
+        // $users = UsersModel::whereIn('id', $orders->pluck('user_id'))->get();
+        // foreach ($shopsHasOrderPrepareCancel as $shop) {
+        //     sendNotiPrepareCancelOrderForSeller::dispatch($shopsHasOrderPrepareCancel);
+        // }
+        // foreach ($users as $user) {
+        //     sendNotiWhenCanceledOrder::dispatch($user->id, $user->email);
+        // }
+        // foreach ($shops as $shop) {
+        //     sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
+        // }
+        // foreach ($orders as $order) {
+        //     autoCancelOrder::dispatch($order);
+        // }
+        CancelOrderS::dispatch();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã hủy đơn hàng tự động'
+        ], 200);
+    }
+
 }
