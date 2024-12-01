@@ -31,9 +31,9 @@ class CancelOrderS implements ShouldQueue
         DB::table('log_jobs')->insert([
             'log' => 'CancelOrderS ',
         ]);
-        $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(1))->get();
+        $ordersPrepareCancel = OrdersModel::where('order_status', 10)->where('created_at', '<', Carbon::now()->subDays(1))->get();
         $shopsHasOrderPrepareCancel = Shop::whereIn('id', $ordersPrepareCancel->pluck('shop_id'))->get();
-        $orders = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(1))->get();
+        $orders = OrdersModel::where('order_status', 10)->where('created_at', '<', Carbon::now()->subDays(1))->get();
         $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
         $users = UsersModel::whereIn('id', $orders->pluck('user_id'))->get();
         foreach ($shopsHasOrderPrepareCancel as $shop) {
