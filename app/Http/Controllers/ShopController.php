@@ -1300,4 +1300,13 @@ class ShopController extends Controller
         ], 200);
         // return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
     }
+
+
+    public function get_categories_for_shop(Request $request, string $id)
+    {
+        $shop = Shop::where('id', $id)->select('id')->first();
+        $products = Product::where('shop_id', $shop->id)->select('id', 'category_id')->get();
+        $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->select('id', 'title', 'slug')->get();
+        return $this->successResponse('Lấy danh sách danh mục thành công', $categories);
+    }
 }
