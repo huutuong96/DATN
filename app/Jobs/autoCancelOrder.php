@@ -24,7 +24,7 @@ class autoCancelOrder implements ShouldQueue
     {
             $order = OrdersModel::find($this->order->id);
             if ($order) {
-                $order->update(['order_status' => 3]);
+                $order->update(['order_status' => 10]);
             }
     }
 }
