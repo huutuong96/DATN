@@ -1,20 +1,26 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Jobs\SendMailEvent;
+use App\Jobs\SendNotiEvent;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\Notification_to_shop;
 use App\Models\Notification_to_mainModel;
+use App\Models\UsersModel;
 
 class NotificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $userId = auth()->user()->id;
-        $notifications = Notification::where('user_id', $userId)->paginate(10);
-        return response()->json($notifications);
+        $limit = $request->limit ?? 10;
+        $notifications = Notification::where('user_id', $userId)->pluck('id_notification');
+        $notificationToMain = Notification_to_mainModel::whereIn('id', $notifications)->paginate($limit);
+        return response()->json($notificationToMain);
     }
     public function get_noti_admin (Request $request){
         $user = JWTAuth::parseToken()->authenticate();
@@ -113,4 +119,16 @@ class NotificationController extends Controller
             'message' => 'xóa thành công'
         ], 200);
     }
+
+    public function send_mail_event(Request $request)
+    {
+        $users = UsersModel::where('status', 2)->select('email')->get();
+        SendMailEvent::dispatch($users);
+        // SendNotiEvent::dispatch($users);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Gửi mail Event thành công'
+        ], 200);
+    }
+
 }
