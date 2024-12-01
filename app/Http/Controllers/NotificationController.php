@@ -123,6 +123,27 @@ class NotificationController extends Controller
     public function send_mail_event(Request $request)
     {
         $users = UsersModel::where('status', 2)->select('email')->get();
+        $today = date('d-m');
+        $eventTitle = null;
+        $events = [
+            '01-01' => 'Chúc mừng năm mới! Năm ' . date('Y') . ' VNShop xin gửi tặng bạn Voucher nhân dịp năm mới.',
+            '03-02' => 'Kỷ niệm ngày thành lập Đảng Cộng sản Việt Nam! VNShop xin gửi tặng bạn Voucher.',
+            '14-02' => 'Chúc mừng ngày Valentine! VNShop xin gửi tặng bạn Voucher nhân dịp lễ tình nhân.',
+            '08-03' => 'Chúc mừng ngày Quốc tế Phụ nữ 8-3! VNShop xin gửi tặng bạn Voucher đặc biệt.',
+            '30-04' => 'Chào mừng ngày Giải phóng miền Nam 30-4! VNShop xin gửi tặng bạn Voucher.',
+            '01-05' => 'Chào mừng ngày Quốc tế Lao động 1-5! VNShop xin gửi tặng bạn Voucher.',
+            '01-06' => 'Chúc mừng ngày Quốc tế Thiếu nhi 1-6! VNShop xin gửi tặng bạn Voucher.',
+            '28-06' => 'Chúc mừng ngày Gia đình Việt Nam 28-6! VNShop xin gửi tặng bạn Voucher.',
+            '02-09' => 'Chúc mừng ngày Quốc khánh Việt Nam 2-9! VNShop xin gửi tặng bạn Voucher.',
+            '20-10' => 'Chúc mừng ngày Phụ nữ Việt Nam 20-10! VNShop xin gửi tặng bạn Voucher đặc biệt.',
+            '20-11' => 'Chúc mừng ngày Nhà giáo Việt Nam 20-11! VNShop xin gửi tặng bạn Voucher tri ân thầy cô.',
+            '24-12' => 'Chúc mừng Giáng sinh 24-12! VNShop xin gửi tặng bạn Voucher.',
+            '31-12' => 'Chào đón đêm giao thừa 31-12! VNShop xin gửi tặng bạn Voucher chào năm mới.',
+        ];
+        if (array_key_exists($today, $events)) {
+            $eventTitle = $events[$today];
+        }
+
         SendMailEvent::dispatch($users);
         // SendNotiEvent::dispatch($users);
         return response()->json([
