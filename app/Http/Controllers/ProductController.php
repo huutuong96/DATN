@@ -1270,7 +1270,7 @@ public function ProductAll(Request $request)
     $allProducts = Product::with(['images', 'variants'])->get();
 
     // $allUpdateProducts = update_product::with(['variants'])->get();
-// $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
+    // $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
     $allUpdateProducts = update_product::orderBy("updated_at", "desc")
     ->get()
     ->groupBy("product_id")
@@ -1451,8 +1451,14 @@ public function ProductAll(Request $request)
             if ($request->data == 'orders') {
                 return Excel::download(new OrderExport($request), 'vnshop-orders.xlsx');
             }
+            if ($request->data == 'transaction_history') {
+                dd($request);
+                return Excel::download(new Transaction_history($request), 'vnshop-transaction_history.xlsx');
+            }
         } catch (\Throwable $th) {
             return 'export thất bại: ' . $th->getMessage();
         }
-   }
+    
+    }
 }
+

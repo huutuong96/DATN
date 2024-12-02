@@ -30,10 +30,11 @@ class CancelOrderS implements ShouldQueue
     {
         DB::table('log_jobs')->insert([
             'log' => 'CancelOrderS ',
+            'date' => Carbon::now(),
         ]);
-        $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(1))->get();
+        $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(4))->get();
         $shopsHasOrderPrepareCancel = Shop::whereIn('id', $ordersPrepareCancel->pluck('shop_id'))->get();
-        $orders = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(1))->get();
+        $orders = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(5))->get();
         $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
         $users = UsersModel::whereIn('id', $orders->pluck('user_id'))->get();
         foreach ($shopsHasOrderPrepareCancel as $shop) {
@@ -43,15 +44,18 @@ class CancelOrderS implements ShouldQueue
             ]);
         }
         foreach ($users as $user) {
+            dd($user->email);
             sendNotiWhenCanceledOrder::dispatch($user->id, $user->email);
             DB::table('log_jobs')->insert([
                 'log' => 'sendNotiWhenCanceledOrder ',
+                'date' => Carbon::now(),
             ]);
         }
         foreach ($shops as $shop) {
             sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
             DB::table('log_jobs')->insert([
                 'log' => 'sendNotiWhenCanceledOrderForSeller ',
+                'date' => Carbon::now(),
             ]);
         }
  
@@ -59,6 +63,7 @@ class CancelOrderS implements ShouldQueue
             autoCancelOrder::dispatch($order);
             DB::table('log_jobs')->insert([
                 'log' => 'autoCancelOrder ',
+                'date' => Carbon::now(),
             ]);
         }
     }

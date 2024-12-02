@@ -16,7 +16,7 @@ class NotificationController extends Controller
 {
     public function index(Request $request)
     {
-        $userId = auth()->user()->id;
+        $userId = JWTAuth::parseToken()->authenticate();
         $limit = $request->limit ?? 10;
         $notifications = Notification::where('user_id', $userId)->pluck('id_notification');
         $notificationToMain = Notification_to_mainModel::whereIn('id', $notifications)->paginate($limit);
@@ -122,8 +122,9 @@ class NotificationController extends Controller
 
     public function send_mail_event(Request $request)
     {
-        $users = UsersModel::where('status', 2)->select('email')->get();
-        $today = date('d-m');
+        $users = UsersModel::where('status', 1)->pluck('email');
+      
+        $today = $request->date ?? date('d-m');
         $eventTitle = null;
         $events = [
             '01-01' => 'Chúc mừng năm mới! Năm ' . date('Y') . ' VNShop xin gửi tặng bạn Voucher nhân dịp năm mới.',
@@ -143,8 +144,10 @@ class NotificationController extends Controller
         if (array_key_exists($today, $events)) {
             $eventTitle = $events[$today];
         }
-
-        SendMailEvent::dispatch($users);
+        if ($eventTitle === null) {
+            $eventTitle = 'VNSHOP có ưu đãi hấp dẫn sắp diễn ra, hãy kiểm tra ngay!';
+        }
+        SendMailEvent::dispatch($users, $eventTitle);
         // SendNotiEvent::dispatch($users);
         return response()->json([
             'status' => 'success',
