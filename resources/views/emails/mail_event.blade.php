@@ -3,5 +3,5 @@
 </h1>
 
 <h1>
-    {{ $event->title }}
+    {{ $eventTitle }}
 </h1>
