@@ -23,7 +23,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             app(\App\Http\Controllers\NotificationController::class)->send_mail_event();
-        })->everyMinute();
+        })->daily();
 
         
     }
