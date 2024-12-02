@@ -895,13 +895,17 @@ class ProductController extends Controller
         }
 
         $user = JWTAuth::parseToken()->authenticate();
-        // $images = 
 
+            if($request->name != $product->name){
+                $slug = Str::slug($request->name);
+            }else{
+                $slug = $product->slug
+            }
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
             'sku' => $request->sku ?? null,
-            'slug' => $request->filled('slug') ?? $request->slug,
+            'slug' => $slug,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation ,
             'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0

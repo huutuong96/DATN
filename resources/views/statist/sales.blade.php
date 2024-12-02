@@ -454,6 +454,81 @@
             <div class="card">
             <h5 class="m-3">Thống kê lượt bán trong tháng</h5>
                 <div class="card-body">
+                <div class="row"  style="float: right;">
+                    <div class="dropdown card-header-dropdown">
+                        <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="text-muted" id="dropdownDisplay">
+                                Tháng {{ \Carbon\Carbon::now()->format('m') }}
+                                <i class="mdi mdi-chevron-down ms-1"></i>
+                            </span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="#" onclick="updateDropdown('Tháng', {{ \Carbon\Carbon::now()->format('m') }})">
+                                Tháng {{ \Carbon\Carbon::now()->format('m') }}
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="updateDropdown('Năm', {{ \Carbon\Carbon::now()->format('Y') }})">
+                                Năm {{ \Carbon\Carbon::now()->format('Y') }}
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="updateDropdown('Các năm gần đây', '')">
+                                Các năm gần đây
+                            </a>
+                        </div>
+                    </div>
+
+                    <script>
+                        // Hàm để cập nhật nội dung hiển thị của dropdown
+                        function updateDropdown(type, value) {
+                            const displayElement = document.getElementById('dropdownDisplay');
+                            displayElement.innerHTML = `${type} ${value || ''} <i class="mdi mdi-chevron-down ms-1"></i>`; 
+
+                            const now = new Date();
+                            const year = now.getFullYear(); // Năm hiện tại
+                            const month = now.getMonth() + 1; // Tháng hiện tại (getMonth trả về giá trị từ 0-11)
+
+                            // Hàm để lấy số ngày trong tháng
+                            function getDaysInMonth(year, month) {
+                                return new Date(year, month, 0).getDate(); // Lấy ngày cuối cùng của tháng
+                            }
+
+                            let xValues1 = [];
+                            switch (type) {
+                                case 'Tháng':
+                                    // Lấy số ngày trong tháng hiện tại
+                                    xValues1 = Array.from({ length: getDaysInMonth(year, month) }, (_, i) => i + 1);
+                                    mychart.data.labels = xValues1;
+                                    // mychart.data.datasets[0].data = newRedData; // Cập nhật dữ liệu dataset 1
+                                    // mychart.data.datasets[1].data = newGreenData; // Dataset 2
+                                    mychart.data.datasets[2].data = @json($doanhthuJson ?? []);
+                                    mychart.update();
+                                    break;
+                                case 'Năm':
+                                    // Lấy các tháng trong năm (1-12)
+                                    xValues1 = Array.from({ length: 12 }, (_, i) => i + 1);
+                                    mychart.data.labels = xValues1;
+                                    mychart.data.datasets[0].data = []; // Cập nhật dữ liệu dataset 1
+                                    mychart.data.datasets[1].data =  [];  // Dataset 2
+                                    mychart.data.datasets[2].data = @json($doanhthunamJson ?? []);// Dataset 3
+                                    mychart.update();
+                                    break;
+                                default:
+                                    // Mảng rỗng cho trường hợp không xác định
+                                    const currentYear = new Date().getFullYear();
+
+                                    // Tạo mảng các năm gần đây (bao gồm năm hiện tại)
+                                    const xValues1 = Array.from({ length: 5 }, (_, i) => currentYear - (4 - i));
+                                    // xValues1 = ['2020', '2021', '2022', '2023', year];
+                                    mychart.data.labels = xValues1;
+                                    mychart.data.datasets[2].data =@json($doanhthucacnamJson1 ?? []);// Dataset 3
+                                    mychart.update();
+                                    break;
+                            }
+
+                            // Log ra mảng xValues1 để kiểm tra
+                            console.log('xValues1:', xValues1);
+                        }
+                    </script>
+
+                </div>
                     <canvas id="myChart"   style="height: 100px !important";></canvas>
                 </div><!-- end card-body -->
                 <div class="card-footer">

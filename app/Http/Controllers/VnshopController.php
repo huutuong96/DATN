@@ -945,21 +945,82 @@ public function statistByQuantity(Request $request)
 }
 public function statistByRevenue(Request $request)
 {   
+    // Lấy doanh thu theo ngày trong tháng hiện tại
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
-        ->get();
-        
-        $doanhthu = array_fill(1, Carbon::now()->day, 0);
-        foreach ($monthlyRevenueOrder as $order) {
-            $day = $order->created_at->day; 
-            if ($day <= Carbon::now()->day) { 
-                if($order->status == 2){
-                    $doanhthu[$day] += ($order->total_amount  );     
-                }
-            }else{
-                break;
-            }
+    ->whereYear('created_at', Carbon::now()->year) // Thêm điều kiện cho năm
+    ->get();
+
+    // Mảng doanh thu cho từng ngày trong tháng
+    $doanhthu = array_fill(1, Carbon::now()->day, 0);
+
+    // Lặp qua tất cả các đơn hàng trong tháng này
+    foreach ($monthlyRevenueOrder as $order) {
+    $day = $order->created_at->day;
+    // Chỉ tính doanh thu của các ngày nhỏ hơn hoặc bằng ngày hiện tại
+    if ($day <= Carbon::now()->day) { 
+        if ($order->status == 2) { // Kiểm tra nếu đơn hàng có trạng thái đã hoàn thành (status == 2)
+            $doanhthu[$day] += $order->total_amount; // Cộng doanh thu vào ngày tương ứng
         }
-        $doanhthuJson = array_values($doanhthu);
+    }
+    }
+
+    // Chuyển mảng doanh thu thành mảng giá trị mà không có chỉ mục
+    $doanhthuJson = array_values($doanhthu);
+
+    // Doanh thu năm hiện tại (tính tổng doanh thu theo tháng)
+    $doanhthunam = array_fill(1, Carbon::now()->month, 0);
+
+    // Lặp qua các đơn hàng trong năm này và tính doanh thu theo tháng
+    $monthlyRevenueYear = OrdersModel::whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2) // Lọc chỉ những đơn hàng đã hoàn thành
+    ->get();
+
+    // Tính doanh thu cho từng tháng trong năm hiện tại
+    foreach ($monthlyRevenueYear as $order) {
+    $month = $order->created_at->month;
+    $doanhthunam[$month] += $order->total_amount; // Cộng doanh thu vào tháng tương ứng
+    }
+
+    // Chuyển mảng doanh thu thành mảng giá trị cho doanh thu theo tháng
+    $doanhthunamJson = array_values($doanhthunam);
+
+    // Dữ liệu doanh thu của các năm gần đây
+    // $doanhthucacnam = ['2020', '2021', '2022', '2023', '2024'];
+    $currentYear = Carbon::now()->year;
+
+    // Tạo mảng 5 năm gần đây
+    $doanhthucacnam = [];
+    for ($i = 4; $i >= 0; $i--) {
+        $doanhthucacnam[] = $currentYear - $i;
+    }
+
+    $doanhthucacnamJson = [];
+
+    foreach ($doanhthucacnam as $year) {
+    // Tính tổng doanh thu của năm đã chọn
+    $yearRevenue = OrdersModel::whereYear('created_at', $year)
+        ->where('status', 2)
+        ->sum('total_amount');
+    $doanhthucacnamJson[$year] = $yearRevenue; // Lưu doanh thu của năm vào mảng
+    }
+    $doanhthucacnamJson1 = array_values($doanhthucacnamJson);
+    // $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+    //     ->get();
+        
+    //     $doanhthu = array_fill(1, Carbon::now()->day, 0);
+    //     foreach ($monthlyRevenueOrder as $order) {
+    //         $day = $order->created_at->day; 
+    //         if ($day <= Carbon::now()->day) { 
+    //             if($order->status == 2){
+    //                 $doanhthu[$day] += ($order->total_amount  );     
+    //             }
+    //         }else{
+    //             break;
+    //         }
+    //     }
+    //     $doanhthuJson = array_values($doanhthu);
+    //     $doanhthunam = array_fill(1, Carbon::now()->month, 0);
+    //     $doanhthucacnam = ['2020', '2021', '2022', '2023', '2024'];
         $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
         $listShop = [];
         foreach ($listShopId as $idKey => $shopId) {
@@ -982,7 +1043,10 @@ public function statistByRevenue(Request $request)
         });
 
         // $feedBack;
-        return view('statist.revenue',compact('doanhthuJson',
+        // dd($doanhthucacnamJson1);
+        return view('statist.revenue',compact(  'doanhthuJson',
+                                                'doanhthunamJson',
+                                                'doanhthucacnamJson1',
                                                 'listShop'
                                              )
                     );
