@@ -16,7 +16,7 @@ class NotificationController extends Controller
 {
     public function index(Request $request)
     {
-        $userId = auth()->user()->id;
+        $userId = JWTAuth::parseToken()->authenticate();
         $limit = $request->limit ?? 10;
         $notifications = Notification::where('user_id', $userId)->pluck('id_notification');
         $notificationToMain = Notification_to_mainModel::whereIn('id', $notifications)->paginate($limit);
@@ -140,13 +140,13 @@ class NotificationController extends Controller
             '20-11' => 'Chúc mừng ngày Nhà giáo Việt Nam 20-11! VNShop xin gửi tặng bạn Voucher tri ân thầy cô.',
             '24-12' => 'Chúc mừng Giáng sinh 24-12! VNShop xin gửi tặng bạn Voucher.',
             '31-12' => 'Chào đón đêm giao thừa 31-12! VNShop xin gửi tặng bạn Voucher chào năm mới.',
-            '02-12' => 'Chào đón đêm giao thừa 31-12! VNShop xin gửi tặng bạn Voucher chào năm mới.',
-            
         ];
         if (array_key_exists($today, $events)) {
             $eventTitle = $events[$today];
         }
-        // dd($eventTitle);
+        if ($eventTitle === null) {
+            $eventTitle = 'VNSHOP có ưu đãi hấp dẫn sắp diễn ra, hãy kiểm tra ngay!';
+        }
         SendMailEvent::dispatch($users, $eventTitle);
         // SendNotiEvent::dispatch($users);
         return response()->json([

@@ -25,7 +25,7 @@ class mailEvent extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mừng Ngày ABC',
+            subject: $this->eventTitle,
         );
     }
 

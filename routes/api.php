@@ -355,6 +355,7 @@ Route::get('/search', function () {
 
             Route::get('delete_notify', [NotificationController::class, "delete_notify"])->name('delete_notify');
             Route::get('get_notification_for_shop', [NotificationController::class, "get_notification_for_shop"])->name('get_notification_for_shop');
+            
             Route::get('/', function () {
                 return response()->json(['message' => 'Đây là API VNSHOP']);
             });
