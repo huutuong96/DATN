@@ -316,8 +316,6 @@ class AuthenController extends Controller
         $user->refesh_token = $token;
         $user->is_login = 1;
         $user->save();
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
@@ -352,8 +350,6 @@ class AuthenController extends Controller
         $user->save();
         $user->load('role', 'address');
         $user = auth::user();
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         $notification = Notification::where('user_id', $user->id)->get();
         $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
         $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
@@ -682,8 +678,6 @@ class AuthenController extends Controller
             'refesh_token' => null,
             'is_login' => 0,
         ]);
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json([
             'status' => true,
@@ -698,8 +692,6 @@ class AuthenController extends Controller
             'refesh_token' => null,
             'is_login' => 0,
         ]);
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         JWTAuth::invalidate(JWTAuth::getToken());
         session()->forget('token');
         return redirect()->route('login');
