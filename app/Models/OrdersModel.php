@@ -170,5 +170,12 @@ public function payment()
 {
     return $this->belongsTo(PaymentsModel::class, 'payment_id')->select(['id', 'name', 'code']);
 }
+
+public function timeline()
+{
+    // return $this->belongsTo(order_timelines::class, 'order_id')->select(['id', 'order_id', 'title', 'created_at']);
+    return $this->hasMany(order_timelines::class, 'order_id')->orderBy('created_at', 'desc');
+}
+
 }
 

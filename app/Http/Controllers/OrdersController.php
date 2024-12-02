@@ -6,6 +6,14 @@ use App\Http\Requests\OrderRequest;
 use App\Models\OrdersModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Product;
+use App\Jobs\autoCancelOrder;
+use App\Jobs\CancelOrderS;
+use App\Jobs\sendNotiPrepareCancelOrderForSeller;
+use App\Jobs\sendNotiWhenCanceledOrder;
+use App\Jobs\sendNotiWhenCanceledOrderForSeller;
+use App\Models\order_timelines;
+use App\Models\Shop;
+use App\Models\UsersModel;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -127,6 +135,35 @@ class OrdersController extends Controller
         return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
     }
 
+    public function OrderToShopDetail(Request $request, $id)
+    {
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment','timeline']) // Eager load 'product' qua 'orderDetails'
+            ->where('id', $id)
+            ->get();
+            foreach ($orders as $order) {
+                foreach ($order->orderDetails as $orderDetail) {
+                    if($orderDetail->variant!=null){
+                        $variant = $orderDetail->variant;  
+                    }else{
+                        $product = $orderDetail->product;  
+                    }
+                  
+                }
+            }
+            
+            foreach ($orders as $key => $order) {
+                foreach ($order->orderDetails as $orderDetail  ) {
+                    if( $orderDetail->variant){
+                       $orderDetail['product']  = $orderDetail->variant->product;
+                       unset($orderDetail->variant['product']);
+                    }
+                }
+            }
+        return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
+    }
+
     
     public function HistoryOrderToUser()
 {
@@ -155,18 +192,42 @@ class OrdersController extends Controller
         return $this->successResponse("Lấy dữ liệu thành công", $order);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, string $id)
     {
-        $order = OrdersModel::where('id', $request->id)->first();
+        $order = OrdersModel::where('id', $id)->first();
         $user = JWTAuth::parseToken()->authenticate();
         if (!$order) {
             return $this->errorResponse("Order không tồn tại", 404);
         }
         $dataUpdate = [
-            'order_status' => $request->status ?? $order->status,
+            'order_status' => $request->order_status ?? $order->order_status,
             'updated_by' => $user->id,
             'updated_at' => Carbon::now(),
         ];
+
+        $status = $request->order_status ?? 0;
+        $events = [
+            0 => 'Đơn hàng mới',
+            1 => 'Đã xác nhận',
+            2 => 'Chuẩn bị hàng',
+            3 => 'Đã đóng gói',
+            4 => 'Đã bàn giao vận chuyển',
+            5 => 'Đã vận chuyển',
+            6 => 'Giao hàng thất bại',
+            7 => 'Đã Giao hàng',
+            8 => 'Hoàn thành ',
+            9 => 'Hoàn trả',
+            10 => 'Đã hủy',
+        ];
+        if (array_key_exists($status, $events)) {
+            $eventTitle = $events[$status];
+        }
+        order_timelines::create([
+            'order_id' => $order->id,
+            'title' => $eventTitle ?? 'Éc Éc',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
         try {
             $order->update($dataUpdate);
             return $this->successResponse("Order đã được cập nhật", $order);
@@ -228,4 +289,15 @@ class OrdersController extends Controller
             'error' => $error
         ], $status);
     }
+
+    public function cancel_order_auto()
+    {
+        CancelOrderS::dispatch();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã hủy đơn hàng tự động'
+        ], 200);
+    }
+
 }

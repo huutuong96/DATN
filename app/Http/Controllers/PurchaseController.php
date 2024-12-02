@@ -151,7 +151,7 @@ class PurchaseController extends Controller
                         }
                         $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
                         $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
-                        $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id);
+                        $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id, $cart->shop_id);
                         $height += $orderDetail->height;
                         $length += $orderDetail->length;
                         $weight += $orderDetail->weight;
@@ -550,7 +550,7 @@ class PurchaseController extends Controller
     }
 
 
-    private function createOrderDetail($order, $result, $quantity, $totalPrice, $product_id, $variant_id)
+    private function createOrderDetail($order, $result, $quantity, $totalPrice, $product_id, $variant_id, $shop_id)
     {
         if ($variant_id == null) {
             $product = Product::find($result->id);
@@ -566,6 +566,7 @@ class PurchaseController extends Controller
                 'length' => $product->length,
                 'weight' => $product->weight,
                 'width' => $product->width,
+                'shop_id' => $shop_id,
             ]);
         }else {
             $variant = product_variants::find($result->id);

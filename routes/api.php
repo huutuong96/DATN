@@ -222,11 +222,11 @@ Route::get('/search', function () {
 
                 Route::resource('orders', OrdersController::class);
                 Route::get('orders/cancelOrder/{id}', [OrdersController::class, "cancelOrder"]);
-                Route::post('orders/update', [OrdersController::class, "update"]);
+                Route::post('orders/update/{id}', [OrdersController::class, "update"]);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
                 Route::get('order/user/detail/{id}', [OrdersController::class, "OrderToUserDetail"]);
-                
+                Route::get('order/shop/detail/{id}', [OrdersController::class, "OrderToShopDetail"]);
                 Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);
                 
             Route::post('user_send/{shop_id}', [MessageController::class, "user_send"]);
@@ -380,6 +380,8 @@ Route::get('/search', function () {
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
         Route::get('categoryAll', [CategoriesController::class, 'categoryAll']);
+        Route::get('order_cancellation_system', [OrdersController::class, 'order_cancellation_system']);
+        
 
         Route::get('search', [ProductController::class, 'search']);
         Route::get('/products/slug/{slug}', [ProductController::class, 'getProductToSlug']);
@@ -405,4 +407,6 @@ Route::get('/search', function () {
         Route::post('import/products', [ProductController::class, "importProducts"])->name('importProducts');
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
         Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
+
+        Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
  
