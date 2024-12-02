@@ -36,11 +36,24 @@
                             User đã xóa
                         </a>
                     </div><!-- end card header -->
-    
+                    <!-- Single Button Dropdown -->
+                    <div class="dropdown" style="left: 30px;">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            Xuất FILE Excel
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 1])}}">Customer</a>
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 4])}}">Seller</a>
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 3])}}">Manager</a>
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 2])}}">Admin</a>
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 1])}}">Đang hoạt động</a>
+                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 101])}}">Chưa xác thực</a>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
-                                <<table class="table align-middle table-nowrap mb-0">
+                                <table class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">ID</th>

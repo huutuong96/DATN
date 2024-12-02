@@ -50,6 +50,8 @@ use App\Http\Controllers\CategoriessupportmainController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\configController;
 use App\Http\Controllers\BlogsController;
+use App\Http\Controllers\ClientEmbedController;
+use App\Http\Controllers\ModifierController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\webAppController;
 
@@ -113,19 +115,54 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
     Route::get('/list_notification', [VnshopController::class, 'list_notification'])->name('list_notification');
     Route::get('/list_app', [webAppController::class, 'index'])->name('list_app');
+    Route::get('/setting_admin', [webAppController::class, 'setting_admin'])->name('setting_admin');
+    Route::post('/delete_all', [webAppController::class, 'delete_all'])->name('delete_all');
     Route::post('/create_app', [webAppController::class, 'create'])->name('create_app');
     Route::get('/delete_app', [webAppController::class, 'delete_app'])->name('delete_app');
     Route::get('/rankall', [VnshopController::class, 'rankall'])->name('rankall');
     Route::post('/rankCreate', [VnshopController::class, 'rankCreate'])->name('rankCreate');
-    Route::get('/list_recipes', [VnshopController::class, 'list_recipes'])->name('list_recipes');
-    Route::post('/recipesCreate', [VnshopController::class, 'recipesCreate'])->name('recipesCreate');
     Route::put('/update_rank/{id}', [VnshopController::class, 'updaterank'])->name('rank.update');
     Route::get('/changeStatusRank/{id}', [VnshopController::class, 'changeStatusRank'])->name('changeStatusRank');
     Route::delete('/destroyrank/{id}', [VnshopController::class, 'destroyrank'])->name('rank.delete');
-
+    Route::get('/changeStatusBanner/{id}', [VnshopController::class, 'changeStatusBanner'])->name('changeStatusBanner');
+    Route::get('/payment_method', [VnshopController::class, 'payment_method'])->name('payment_method');
+    Route::post('/storepaymant', [VnshopController::class, 'storepaymant'])->name('storepaymant');
+    Route::put('/payment_methodupdate/{id}', [VnshopController::class, 'updatepayment'])->name('updatepayment');
+    Route::get('/changeStatuspayment/{id}', [VnshopController::class, 'changeStatuspayment'])->name('changeStatuspayment');
+    Route::delete('/destroypayment/{id}', [VnshopController::class, 'destroypayment'])->name('destroypayment');
+    Route::post('products/update/handle/{id}', [VnshopController::class, 'handleUpdateProduct'])->name('handleUpdateProduct');
 
 });
 
 
 Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mail');
+
+
+
+
+
+
+
+
+
+
+
+
+
+// CLIENT EMBEDED
+Route::get('/subdomain', [ModifierController::class, 'subdomain'])->name('subdomain');
+Route::post('/create_subdomain', [ModifierController::class, 'create_subdomain'])->name('create_subdomain');
+Route::get('/delete_subdomain', [ModifierController::class, 'delete_subdomain'])->name('delete_subdomain');
+
+Route::get('/modifiers', [ModifierController::class, 'modifiers'])->name('modifiers');
+Route::get('/delete_modifier', [ModifierController::class, 'delete_modifier'])->name('delete_modifier');
+Route::post('/create_modifier', [ModifierController::class, 'create_modifier'])->name('create_modifier');
+Route::post('/update_modifier', [ModifierController::class, 'update_modifier'])->name('update_modifier');
+Route::get('/page_ctkm', [ModifierController::class, 'page_ctkm'])->name('page_ctkm');
+
+Route::get('/wallet', [ClientEmbedController::class, 'wallet'])->name('wallet');
+Route::post('/wallet/updateBank', [ClientEmbedController::class, 'updateBank'])->name('updateBank');
+Route::post('/wallet/shop_request_get_cash', [ClientEmbedController::class, 'shop_request_get_cash'])->name('shop_request_get_cash');
+Route::get('/register/shipping/view', [ClientEmbedController::class, 'register_shipping_view'])->name('register_shipping_view');
+Route::post('/register/shipping', [ClientEmbedController::class, 'register_shipping'])->name('register_shipping');
 

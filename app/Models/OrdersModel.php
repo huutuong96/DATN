@@ -67,6 +67,13 @@ class OrdersModel extends Model
         'client_order_code',
         'order_infomation',
         'order_status',
+        'price_before_vat',
+        'price_after_vat',
+        'vat',
+        'disscount_by_rank',
+        'platform_fee',
+        'ship_fee',
+        'updated_by',
     ];
 
     protected $hidden = [
@@ -81,9 +88,8 @@ class OrdersModel extends Model
         'from_ward_name',
         'from_district_name',
         'from_province_name',
-        'to_name',
-        'to_phone',
-        'to_address',
+        // 'to_name',
+        // 'to_phone',
         'to_ward_name',
         'to_district_name',
         'to_province_name',
@@ -159,4 +165,17 @@ public function shop()
 {
     return $this->belongsTo(Shop::class, 'shop_id')->select(['id', 'shop_name', 'slug', 'image']);
 }
+
+public function payment()
+{
+    return $this->belongsTo(PaymentsModel::class, 'payment_id')->select(['id', 'name', 'code']);
 }
+
+public function timeline()
+{
+    // return $this->belongsTo(order_timelines::class, 'order_id')->select(['id', 'order_id', 'title', 'created_at']);
+    return $this->hasMany(order_timelines::class, 'order_id')->orderBy('created_at', 'desc');
+}
+
+}
+

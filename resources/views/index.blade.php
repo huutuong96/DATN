@@ -36,8 +36,11 @@
     <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-
+    
     @yield('link')
+
+
+
 </head>
 
 <body>
@@ -104,6 +107,10 @@
                             </div>
                         </div>
                     </form>
+                    <!-- 
+                        <div class="d-flex align-items-center">
+                            <span id="online-count" class="badge bg-success">{{$useronline}} ONLINE</span>
+                        </div> -->
                     <div class="d-flex align-items-center">
                         <div
                             class="dropdown d-md-none topbar-head-dropdown header-item">
@@ -128,7 +135,11 @@
                                             <h6 class="m-0 fw-semibold fs-15"> Web Apps </h6>
                                         </div>
                                         <div class="col-auto">
-                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> View All Apps
+                                            <a href="{{ route('setting_admin', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> Cài Đặt
+                                                <i class="ri-arrow-right-s-line align-middle"></i></a>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> Tất cả
                                                 <i class="ri-arrow-right-s-line align-middle"></i></a>
                                         </div>
                                     </div>
@@ -1081,55 +1092,49 @@
                             <a
                                 class="nav-link menu-link"
                                 href="{{ route('product_all', ['token' => auth()->user()->refesh_token]) }}">
-                                <i class="ri-dashboard-3-line"></i>
+                                <i class="ri-checkbox-circle-line"></i> 
                                 <span data-key="t-dashboards">Xét duyệt sản phẩm</span>
                             </a>
-
                         </li>
+                        
                         <li class="nav-item">
                             <a
-                             class="nav-link menu-link"
+                                class="nav-link menu-link"
                                 href="{{ route('voucherall', ['token' => auth()->user()->refesh_token]) }}"
-                                class="nav-link"
                                 data-key="t-crm">
-                                <i class="ri-dashboard-3-line"></i>
+                                <i class="ri-gift-line"></i> 
                                 <span data-key="t-dashboards">Quản lý voucher</span>
-                                
                             </a>
                         </li>
                         <li class="nav-item">
                             <a
-                             class="nav-link menu-link"
+                                class="nav-link menu-link"
                                 href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
-                                class="nav-link"
                                 data-key="t-projects">
-                                <i class="ri-dashboard-3-line"></i>
+                                <i class="ri-money-dollar-circle-line"></i> 
                                 <span data-key="t-dashboards">Quản lý thuế</span>
-                                
                             </a>
                         </li>
                         <li class="nav-item">
                             <a
-                             class="nav-link menu-link"
+                                class="nav-link menu-link"
                                 href="{{ route('rankall', ['token' => auth()->user()->refesh_token]) }}"
-                                class="nav-link"
                                 data-key="t-projects">
-                                <i class="ri-dashboard-3-line"></i>
-                                <span data-key="t-dashboards">QUẢN LÝ CẤP BẬC</span>
-                                
+                                <i class="ri-bar-chart-line"></i> 
+                                <span data-key="t-dashboards">Quản lý cấp bậc</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a
-                             class="nav-link menu-link"
-                                href="{{ route('list_recipes', ['token' => auth()->user()->refesh_token]) }}"
-                                class="nav-link"
+                                class="nav-link menu-link"
+                                href="{{ route('payment_method', ['token' => auth()->user()->refesh_token]) }}"
                                 data-key="t-projects">
-                                <i class="ri-dashboard-3-line"></i>
-                                <span data-key="t-dashboards">MASTER DATA</span>
-                                
+                                <i class="ri-bank-card-line"></i> 
+                                <span data-key="t-dashboards">Phương thức thanh toán</span>
                             </a>
                         </li>
+                   
+                        
                     </ul>
                 </div>
                 <!-- Sidebar -->
@@ -1165,16 +1170,11 @@
             <footer class="footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-2">
                             <script>
                                 document.write(new Date().getFullYear());
                             </script>
                             © VNshop.
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="text-sm-end d-none d-sm-block">
-                                Hệ thống được thiết kế bởi đội ngũ vnshop
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1210,7 +1210,7 @@
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
-
+   
     <!-- apexcharts -->
     <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
 

@@ -37,20 +37,32 @@
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Tất cả sản phẩm</h4>
+                        <div class="dropdown" >
+                            <button class="btn dropdown-toggle" style="border: 1px solid #747474;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                Xuất FILE Excel
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 0])}}">Xuất sản phẩm từ chối duyệt </a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 2])}}">Xuất Sản phẩm đang hoạt động</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 3])}}">Xuất Sản phẩm chờ duyệt</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 4])}}">Xuất Sản phẩm vi phạm</a>
+                            </div>
+                        </div>
                     </div><!-- end card header -->
-    
+                    <!-- Single Button Dropdown -->
+                   
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
                                 <table id="all"  class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
-                                            <th scope="col">ID Sản phẩm</th>
-                                            <th scope="col">Hình ảnh</th>
-                                            <th scope="col">Tên sản phẩm</th>
-                                            <th scope="col">Mã SKU</th>
+                                            <th scope="col-1">ID Sản phẩm</th>
+                                            <th scope="col-3">Hình ảnh</th>
+                                            <th scope="col-3">Tên sản phẩm</th>
+                                            <th scope="col-3">Mã SKU</th>
                                             <th scope="col">Giá Sản phẩm</th>
-                                            <th scope="col">Tên Shop</th> 
+                                            <th scope="col-3">Tên Shop</th> 
                                             <th scope="col">Trạng thái</th>
                                             <th scope="col">Ngày tạo</th>
                                           
@@ -76,13 +88,13 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td>{{$product->shop->shop_name ?? "vô danh"}}</td> 
                                                     <td>
                                                         @if($product->status == 3)
                                                         Chưa duyệt
                                                     @elseif($product->status == 2)
                                                         Đang hoạt động
-                                                    @elseif($product->status == 5)
+                                                    @elseif($product->status == 0)
                                                         Đã từ chối
                                                     @elseif($product->status == 4)
                                                         Vi phạm
@@ -120,7 +132,7 @@
             <div class="col-xl-12">
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm chờ duyệt</h4>
+                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm mới chờ duyệt</h4>
                     </div><!-- end card header -->
     
                     <div class="card-body">
@@ -129,15 +141,18 @@
                                 <table id="pending" class="table align-middle table-nowrap mb-0">
                                     <thead>
                                         <tr>
-                                            <th scope="col">ID Sản phẩm</th>
-                                            <th scope="col">Hình ảnh</th>
-                                            <th scope="col">Tên sản phẩm</th>
-                                            <th scope="col">Mã SKU</th>
-                                            <th scope="col">Giá Sản phẩm</th>
-                                            <th scope="col">Tên Shop</th> 
-                                            <th scope="col">Trạng thái</th>
-                                            <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Hành động</th>
+                                            <th scope="col" style="width: 10%;">ID Sản phẩm</th>
+                                            <th scope="col" style="width: 15%;">Hình ảnh</th>
+                                            <th scope="col" style="width: 20%;">Tên sản phẩm</th>
+                                            <th scope="col" style="width: 10%;">Mã SKU</th>
+                                            <th scope="col" style="width: 15%;">Giá Sản phẩm</th>
+                                            <th scope="col" style="width: 15%;">Tên Shop</th>
+                                            <th scope="col" style="width: 10%;">Trạng thái</th>
+                                            <th scope="col" style="width: 10%;">Ngày tạo</th>
+                                            <th scope="col" style="width: 10%;">Hành động</th>
+                                            
+
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -156,7 +171,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name}}</td> 
                                                     <td>
                                                         @if($product->status == 3)
                                                         Chưa duyệt
@@ -364,7 +379,7 @@
             <div class="col-xl-12">
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm chờ duyệt</h4>
+                        <h4 class="card-title mb-0 flex-grow-1">Danh sách sản phẩm cập nhật chờ duyệt</h4>
                     </div><!-- end card header -->
     
                     <div class="card-body">
@@ -389,7 +404,7 @@
                                         @else
                                             @foreach($allUpdateProducts as $product)
                                                 <tr>
-                                                    <th scope="row"><a href="" class="fw-medium">{{ $product->id }}</a></th>
+                                                    <th scope="row"><a href="" class="fw-medium">{{ $product->product_id }}</a></th>
                                                     <td>
                                                         <img src="{{ $product->image }}" alt="{{ $product->name }}" style="width: 50px; height: 50px;">
                                                         
@@ -400,14 +415,15 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name}}</td>
                                                     
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
                                                         <!-- Duyệt -->
-                                                        <form action="{{ route( 'products.approve' ,[
+                                                        <form action="{{ route( 'handleUpdateProduct' ,[
                                                                                                 'token' => auth()->user()->refesh_token,
-                                                                                                'id' => $product->id,
+                                                                                                'id' => $product->product_id,
+                                                                                                'action'=> 1,
                                                                                                 'tab'=>6,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
@@ -415,47 +431,11 @@
                                                                 <i class="ri-check-line align-middle"></i>
                                                             </button>
                                                         </form>
-                                                     
-                                                        <!-- Báo cáo vi phạm -->
-                                                        
-                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#reportModal">
-                                                                <button type="submit" class="btn btn-danger" title="Báo cáo vi phạm">
-                                                                    <i class="ri-error-warning-line align-middle"></i> 
-                                                                </button>
-                                                            </a>
-                                                        
-                        
-                                                        <!-- Modal Báo cáo vi phạm -->
-                                                        <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-                                                            <div class="modal-dialog">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="reportModalLabel">Báo cáo vi phạm</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <form action="{{ route('products.submitReport', [
-                                                                            'id' => $product->id,
-                                                                            'token' => auth()->user()->refesh_token,
-                                                                            'tab' => 6
-                                                                        ]) }}" method="POST">
-                                                                            @csrf
-                                                                            <div class="mb-3">
-                                                                                <label for="reason" class="form-label">Lý do vi phạm:</label>
-                                                                                <textarea name="reason" id="reason" class="form-control" required></textarea>
-                                                                            </div>
-                                                                            <button type="submit" class="btn btn-danger">Gửi báo cáo</button>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                        
-                                                    
                                                         <!-- Không duyệt -->
-                                                        <form action="{{ route('products.reject',[
+                                                        <form action="{{ route('handleUpdateProduct',[
                                                                                                 'token' => auth()->user()->refesh_token,
-                                                                                                'id' => $product->id,
+                                                                                                'id' => $product->product_id,
+                                                                                                'action'=> 2,
                                                                                                 'tab'=>6,
                                                                                                 ]) }}" method="POST" style="display:inline;">
                                                             @csrf
@@ -463,18 +443,18 @@
                                                                 <i class="ri-close-circle-line align-middle"></i> 
                                                             </button>
                                                         </form>
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->product_id }}">
                                                             <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
                                                                 <i class="ri-eye-line align-middle"></i>
                                                             </button>
                                                         </a>
-                                                    
                                                         <!-- Modal Chi tiết sản phẩm -->
-                                                        <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id}}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->product_id }}">Thông tin sản phẩm chi tiết</h5>
                                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                     </div>
                                                                     <div class="modal-body">
@@ -490,9 +470,11 @@
                                                                             <div class="card-body">
                                                                               <div class="mb-5 d-flex">
                                                                                     <span class="text-muted"> 
-                                                                                       @foreach ($product->images as $image)
-                                                                                           <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
-                                                                                       @endforeach
+                                                                                       @if(is_array($product->images))
+                                                                                            @foreach ($product->images as $image)
+                                                                                                <img style="width:100px; height: 100px; " src="{{ $image->url }}" alt="Product Image">
+                                                                                            @endforeach
+                                                                                       @endif
                                                                                    </span>
                                                                                   
                                                                                </div>
@@ -502,7 +484,7 @@
                                                                                     <div class="col-lg-6">
                                                                                       
                                                                                         <div class="mb-3 d-flex ">
-                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->id }}</span> 
+                                                                                            <strong>ID:</strong> <span class="text-muted me-5">{{ $product->product_id }}</span> 
                                                                                         </div>
                                                                                         <div class="mb-3 d-flex ">
                                                                                             <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>
@@ -519,7 +501,7 @@
                                                                                     <!-- Cột phải -->
                                                                                     <div class="col-lg-6">
                                                                                         <div class="mb-3">
-                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Vô danh"}}</span>
                                                                                         </div>
                                                                                         <div class="mb-3">
                                                                                            
@@ -542,25 +524,28 @@
                                                                                         <th>Tên biến thể</th>
                                                                                         <th>Hình ảnh</th>
                                                                                         <th>Mã Sku</th>
+                                                                                        <th>số lượng tồn kho</th>
                                                                                         <th>Giá </th>
                 
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    @foreach ($product->variants as $variant)
-                                                                                    <tr>
-                                                                                        <td>{{ $variant->id }}</td>
-                                                                                        <td>{{ $variant->name }}</td>
-                                                                                        <td>
-                                                                                           
-                                                                                                <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
-                                                                        
-                                                                                        </td>
-                                                                                        <td>{{ $variant->sku }}</td>
-                                                                                        <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
-                                                                                    </tr>
-                                                                                    @endforeach
-                                                                                    
+                                                                                    @if(is_array(json_decode($product->change_of)))
+                                                                                        @foreach (json_decode($product->change_of) as $variant)
+                                                                                        <tr>
+                                                                                            <td>{{ $variant->id }}</td>
+                                                                                            <td>{{ $variant->name ?? "chưa nhập" }}</td>
+                                                                                            <td>
+                                                                                            
+                                                                                                    <img src="{{ $variant->images }}" alt="Product Image" style="width: 50px; height: 50px; margin-right: 5px;">
+                                                                            
+                                                                                            </td>
+                                                                                            <td>{{ $variant->sku }}</td>
+                                                                                            <td>{{ $variant->stock }}</td>
+                                                                                            <td>{{ number_format($variant->price, 0, ',', '.') }} VNĐ</td>
+                                                                                        </tr>
+                                                                                        @endforeach
+                                                                                    @endif
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>
@@ -665,7 +650,7 @@
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <form action="{{ route('products.submitReport', ['id' => $product->id, 'token' => auth()->user()->refresh_token, 'tab' => 3]) }}" method="POST">
+                                                                    <form action="{{ route('products.submitReport', ['id' => $product->id, 'token' => auth()->user()->refesh_token, 'tab' => 3]) }}" method="POST">
                                                                         @csrf
                                                                         <div class="mb-3">
                                                                             <label for="reason-{{ $product->id }}" class="form-label">Lý do vi phạm:</label>

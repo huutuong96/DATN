@@ -5,7 +5,9 @@
 <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet"> -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
 <!-- include summernote css/js -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
@@ -37,8 +39,8 @@
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <div class="mb-3">
-                                                            <label for="title" class="form-label">Title</label>
-                                                            <input type="text" class="form-control" placeholder="Enter post title" id="title" name="title" required>
+                                                            <label for="title" class="form-label">Tiêu đề</label>
+                                                            <input type="text" class="form-control" placeholder="Tiêu đề" id="title" name="title" required>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
                                             
@@ -55,7 +57,7 @@
                                                     </div><!--end col-->
                                                     <div class="col-12">
                                                         <div class="mb-3">
-                                                            <label for="image" class="form-label">Image</label>
+                                                            <label for="image" class="form-label">Hình ảnh</label>
                                                             <input type="file" class="form-control" id="image" name="image" accept="image/*">
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
@@ -63,7 +65,7 @@
                                             
                                                     <div class="col-12">
                                                         <div class="mb-3">
-                                                            <label for="content" class="form-label">Content</label>
+                                                            <label for="content" class="form-label">Nội dung</label>
                                                             <textarea class="form-control" placeholder="Enter post content" id="summernote" name="content" rows="4" required></textarea>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
@@ -71,7 +73,7 @@
                                                    
                                                     <div class="col-lg-12">
                                                         <div class="text-end">
-                                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                                            <button type="submit" class="btn btn-primary">Thêm</button>
                                                         </div><!--end text-end-->
                                                     </div><!--end col-->
                                                 </div><!--end row-->
@@ -95,7 +97,7 @@
                         <div class="card-body">
                             <div class="live-preview">
                                 <div class="table-responsive">
-                                    <table class="table align-middle table-nowrap mb-0">
+                                    <table id="postalll" class="table align-middle table-nowrap mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">ID</th>
@@ -247,7 +249,16 @@
                                 </div>
                             </div>
                             <div class="mt-3">
-                                {{ $Posts->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                <script>
+                                    new DataTable('#postalll', {
+                                        language: {   
+                                            lengthMenu: "Hiển thị _MENU_ Doanh mục bài viết",
+                                            search: "Tìm kiếm:"
+                                        },
+                                       
+                                    });
+                                </script>
+                                
                                 </div>
                         </div><!-- end card-body -->
                        
@@ -265,7 +276,7 @@
                         <div class="card-body">
                             <div class="live-preview">
                                 <div class="table-responsive">
-                                    <table class="table align-middle table-nowrap mb-0">
+                                    <table id="postallldelete" class="table align-middle table-nowrap mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">ID</th>
@@ -317,7 +328,15 @@
                                 </div>
                             </div>
                             <div class="mt-3">
-                                {{ $deletedPost->appends(['token' => auth()->user()->refesh_token])->links() }}
+                                <script>
+                                    new DataTable('#postallldelete', {
+                                        language: {   
+                                            lengthMenu: "Hiển thị _MENU_ Doanh mục bài viết",
+                                            search: "Tìm kiếm:"
+                                        },
+                                       
+                                    });
+                                </script>
                                 </div>
                         </div><!-- end card-body -->
                     </div><!-- end card -->

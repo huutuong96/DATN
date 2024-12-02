@@ -36,4 +36,9 @@ class OrderDetailsModel extends Model
     {
         return $this->belongsTo(product_variants::class, 'variant_id');
     }
+    // Mối quan hệ: OrderDetailsModel thuộc về OrdersModel
+    public function order()
+    {
+        return $this->belongsTo(OrdersModel::class, 'order_id', 'id');
+    }
 }

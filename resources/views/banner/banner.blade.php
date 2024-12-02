@@ -238,6 +238,21 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <li class="list-inline-item">
+                                                                    <a 
+                                                                        href="{{ route('changeStatusBanner', [
+                                                                                                            'token' => auth()->user()->refesh_token,
+                                                                                                            'id' => $banner->id,
+                                                                                                            'status' => 3,
+                                                                                                            'tab'=>1
+                                                                                                            ]) }}"
+                                                                    >
+                                                                        <button type="button" class="btn btn-warning waves-effect waves-light" title="tắt">
+                                                                            <i class="ri-lock-line align-middle"></i>
+                                                                        </button>
+                                                                    </a>
+                                                                </li>
+                                                                
                                                             
                                                                
                                                             </td>
@@ -305,8 +320,8 @@
                                                         <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             <img src="{{ $banner->image }}" alt="Post Image" style="max-width: 50%; height: auto;">
                                                         </td>
-                                                        <td style="max-width: 100px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                             {{ $banner->URL }}
+                                                         <td style="max-width: 200px; height: 100px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
+                                                            {{ \Illuminate\Support\Str::limit($banner->URL, 150, '...') }}
                                                         </td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
@@ -343,21 +358,26 @@
                                                                             <div class="modal-body">
                                                                                 <form action="{{ route('banner.update', ['token' => auth()->user()->refesh_token, 'id' => $banner->id,'tab'=>2]) }}" method="POST" enctype="multipart/form-data">
                                                                                     @csrf
-                                                                                    @method('PUT') 
+                                                                                    @method('PUT') <!-- Sử dụng phương thức PUT để cập nhật -->
                                                                                     
                                                                                     <div class="row">
+                                                                                        <!-- Title Field -->
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="title" class="form-label">Tiêu đề</label>
                                                                                                 <input type="text" class="form-control" placeholder="Tiêu đề" id="title" name="title" value="{{ old('title', $banner->title) }}" required>
                                                                                             </div>
                                                                                         </div>
+                                                                                        
+                                                                                        <!-- Content Field -->
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="content" class="form-label">Nội dung</label>
                                                                                                 <textarea class="form-control" placeholder="Nội dung" id="content" name="content" rows="2" required>{{ old('content', $banner->content) }}</textarea>
                                                                                             </div>
                                                                                         </div>
+                                                                                
+                                                                                        <!-- Image Upload Field (Optional) -->
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="image" class="form-label">Hình ảnh</label>
@@ -369,28 +389,32 @@
                                                                                         </div>
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
-                                                                                                <label for="image" class="form-label">Đường dẫn</label>
-                                                                                                <input type="file" class="form-control" id="image" name="image">
-                                                                                                @if ($banner->URL)
-                                                                                                    <img src="{{ $banner->URL }}" alt="Banner Image" style="max-width: 100px; margin-top: 10px;">
-                                                                                                @endif
+                                                                                                <label for="URL" class="form-label">Đường dẫn</label>
+                                                                                                <input type="text" class="form-control" id="URL" value="{{ $banner->URL ?? ''}}" name="URL">
+
                                                                                             </div>
                                                                                         </div>
+                                                                                
+                                                                                        <!-- Status Field -->
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="status" class="form-label">Trạng thái</label>
-                                                                                                <select style="width: 130px" class="form-control" id="status" name="status" required>
+                                                                                                <select style="width: 507px;left: 2rem;" class="form-control" id="status" name="status" required>
                                                                                                     <option value="2" {{ $banner->status == 2 ? 'selected' : '' }}>Active</option>
                                                                                                     <option value="3" {{ $banner->status == 3 ? 'selected' : '' }}>Inactive</option>
                                                                                                 </select>
                                                                                             </div>
                                                                                         </div>
+                                                                                
+                                                                                        <!-- Index Field -->
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="index" class="form-label">Thứ tự</label>
                                                                                                 <input type="number" class="form-control" id="index" name="index" placeholder="Thứ tự hiển thị" value="{{ old('index', $banner->index) }}" required>
                                                                                             </div>
                                                                                         </div>
+                                                                                
+                                                                                        <!-- Submit Button -->
                                                                                         <div class="col-lg-12">
                                                                                             <div class="text-end">
                                                                                                 <button type="submit" class="btn btn-primary">Cập nhật</button>
@@ -402,6 +426,18 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <a 
+                                                                href="{{ route('changeStatusBanner', [
+                                                                    'token' => auth()->user()->refesh_token,
+                                                                    'id' => $banner->id,
+                                                                    'status' => 2,
+                                                                    'tab'=>2
+                                                                    ]) }}"
+                                                                >
+                                                                <button type="button" class="btn btn-success" title="Bật">
+                                                                    <i class="ri-check-line align-middle"></i>
+                                                                </button>
+                                                                </a>
                                                             
                                                                
                                                             </td>

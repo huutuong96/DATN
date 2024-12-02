@@ -31,19 +31,20 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Categori_shopsModel;
 use App\Models\Learning_sellerModel;
 use App\Models\AddressModel;
+use App\Models\history_get_cash_shops;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
 use App\Models\UsersModel;
 use Illuminate\Support\Facades\Http;
-
+use Carbon\Carbon;
 
 class ShopController extends Controller
 {
     public function __construct()
     {
         $this->middleware('SendNotification');
-        $this->middleware('CheckShop')->except('store', 'done_learning_seller', 'revenueReport', 'orderReport', 'bestSellingProducts', 'create_refund_order', 'index', 'show');
+        $this->middleware('CheckShop')->except('store', 'done_learning_seller', 'revenueReport', 'orderReport', 'bestSellingProducts', 'create_refund_order', 'index', 'show','getShopByCategory');
     }
 
     private function successResponse($message, $data = null, $status = 200)
@@ -148,6 +149,10 @@ class ShopController extends Controller
                 'district_id' => $request->district_id,
                 'ward' => $request->ward ?? null,
                 'ward_id' => $request->ward_id,
+                'vnp_TmnCode' => $request->vnp_TmnCode ?? null,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'tax_id' => 5 ?? null,
             ];
 
             if ($request->hasFile('image')) {
@@ -253,16 +258,23 @@ class ShopController extends Controller
 
     public function show(string $id)
     {
-        $Shop = Shop::where('id', $id)->where('status', 1)->first();
-        $tax = Tax::where('id', $Shop->tax_id)->where('status', 1)->get();
-        $bannerShop = BannerShop::where('shop_id', $Shop->id)->where('status', 1)->get();
-        $VoucherToShop = VoucherToShop::where('shop_id', $Shop->id)->where('status', 1)->get();
-        $Programtoshop = ProgramtoshopModel::where('shop_id', $Shop->id)->get();
-        foreach ($Programtoshop as $program_id) {
-            $Programme_detail = Programme_detail::where('id', $program_id->program_id)->where('status', 1)->get();
+        $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        $Shop->visits = $Shop->visits + 1;
+        $Shop->save();
+        $limit = $request->limit ?? 20;
+        $tax = Tax::where('id', $Shop->tax_id)->where('status', 2)->get();
+        $bannerShop = BannerShop::where('shop_id', $Shop->id)->where('status', 2)->get();
+        $VoucherToShop = VoucherToShop::where('shop_id', $Shop->id)->where('status', 2)->get();
+        $productsQuery = Product::where('shop_id', $Shop->id)
+                                ->where('status', 2);
+        $category = [];
+        foreach ($productsQuery->get() as $product) {
+            $categoryId = $product->category_id;
+            if (!in_array($categoryId, array_column($category, 'id'))) {
+                $category[] = CategoriesModel::find($categoryId);
+            }
         }
-        $Follow_to_shop = Follow_to_shop::where('shop_id', $Shop->id)->get();
-        $Categori_shops = Categori_shopsModel::where('shop_id', $Shop->id)->where('status', 1)->get();
+        $products = $productsQuery->paginate($limit);
         if (!$Shop) {
             return $this->errorResponse("Không tồn tại Shop nào");
         }
@@ -271,10 +283,8 @@ class ShopController extends Controller
             'tax' => $tax,
             'banner' => $bannerShop,
             'Vouchers' => $VoucherToShop,
-            'Programtoshop' => $Programtoshop,
-            'Programme_detail' => $Programme_detail ?? null,
-            'Follow_to_shop' => $Follow_to_shop,
-            'Categori_shops' => $Categori_shops
+            // 'products' => $products,
+            'categories' => $category,
         ]);
     }
 
@@ -494,16 +504,50 @@ class ShopController extends Controller
         return $this->successResponse("Lấy đơn hàng thành công", $order);
     }
 
-    public function get_order_to_shop_by_status(string $id, string $status)
+    public function get_order_to_shop_by_status(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
-        $orders = OrdersModel::with('orderDetails')
-        ->where('shop_id', $shop->id)
-        ->where('status', $status)
-        ->get();
+        $limit = $request->limit ?? 10;
+        $order_status = $request->order_status ?? 0;
+        // $status = $request->status ?? 1;
+        // $orders = OrdersModel::with('orderDetails', 'payment')
+        // ->where('shop_id', $shop->id)
+        // ->where('order_status', $order_status)
+        // ->where('status', $status)
+        // ->orderBy('updated_at', 'desc')
+        // ->paginate($limit);
+
+        $query = OrdersModel::query();
+        if ($request->order_status) {
+            $query->where('order_status', $order_status);
+        }
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        $orders = $query->with('orderDetails', 'payment')->where('shop_id', $shop->id)->where('order_status', $order_status)->orderBy('updated_at', 'desc')->paginate($limit);
+
+
+
+        foreach ($orders as $order) {
+            foreach ($order->orderDetails as $orderDetail) {
+                if ($orderDetail->variant != null) {
+                    $variant = $orderDetail->variant;
+                } else {
+                    $product = $orderDetail->product;
+                }
+            }
+        }
+        foreach ($orders as $key => $order) {
+            foreach ($order->orderDetails as $orderDetail) {
+                if ($orderDetail->variant) {
+                    $orderDetail['product'] = $orderDetail->variant->product;
+                    unset($orderDetail->variant['product']);
+                }
+            }
+        }
         return $this->successResponse("Lấy đơn hàng thành công", $orders);
     }
 
@@ -527,25 +571,82 @@ class ShopController extends Controller
                 'message' => 'Shop không tồn tại',
             ], 404);
         }
-        
-        if ($request->status) {
+        $limit = $request->input('limit', 10); 
+        $limit = is_numeric($limit) && $limit > 0 ? (int)$limit : 10;
+    
+        $query = Product::where('shop_id', $shop->id)->orderby('updated_at', 'desc');
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+    
+        if ($request->has('status')) {
             $status = $request->status;
-            $product = Product::where('shop_id', $shop->id)
-                              ->where('status', $status)
-                            //   ->where('status', '!=', 5)
-                              ->paginate(20);
-            $product->appends(['status' => $status]);
+    
+            if ($status == 1) {
+                $query->where('status', '!=', 5);
+            } else {
+                $query->where('status', $status);
+            }
         }
-        if ($request->status == 1) {
-            $product = Product::where('shop_id', $shop->id)->where('status', '!=', 5)->paginate(20);
+    
+        $product = $query->paginate($limit);
+        if ($request->has('status')) {
+            $product->appends(['status' => $request->status]);
         }
-
-        $product->load('variants', 'attributes' );
+    
+        $product->load('variants', 'attributes');
+    
         return response()->json([
             'status' => true,
             'message' => 'Lấy sản phẩm thành công',
             'data' => $product,
         ], 200);
+    }
+    
+
+    public function get_dashboard_shop(string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        }
+        $orders_wait_confirm = OrdersModel::where('shop_id', $shop->id)->where('order_status', 0)->count();
+        $orders_confirmed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 1)->count();
+        $orders_prepare = OrdersModel::where('shop_id', $shop->id)->where('order_status', 2)->count();
+        $orders_packed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 3)->count();
+        $orders_handed_over = OrdersModel::where('shop_id', $shop->id)->where('order_status', 4)->count();
+        $orders_shipping = OrdersModel::where('shop_id', $shop->id)->where('order_status', 5)->count();
+        $orders_delivery_failed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 6)->count();
+        $orders_delivered = OrdersModel::where('shop_id', $shop->id)->where('order_status', 7)->count();
+        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
+        $orders_refund = OrdersModel::where('shop_id', $shop->id)->where('order_status', 9)->count();
+        $orders_canceled = OrdersModel::where('shop_id', $shop->id)->where('order_status', 10)->count();
+
+        $totalOrder = OrdersModel::where('shop_id', $shop->id)->count();
+        $totalProduct = Product::where('shop_id', $shop->id)->count();
+        $totalRevenue = OrdersModel::where('shop_id', $shop->id)->sum('net_amount');
+        $totalFollow = Follow_to_shop::where('shop_id', $shop->id)->count();
+        $totalView = $shop->visits;
+        $totalRating = $shop->rating;
+        return $this->successResponse("Lấy dữ liệu thành công", [
+            'total_order' => $totalOrder,
+            'total_product' => $totalProduct,
+            'total_revenue' => $totalRevenue,
+            'total_follow' => $totalFollow,
+            'total_view' => $totalView,
+            'total_rating' => $totalRating,
+            'orders_wait_confirm' => $orders_wait_confirm,
+            'orders_confirmed' => $orders_confirmed,
+            'orders_prepare' => $orders_prepare,
+            'orders_packed' => $orders_packed,
+            'orders_handed_over' => $orders_handed_over,
+            'orders_shipping' => $orders_shipping,
+            'orders_delivery_failed' => $orders_delivery_failed,
+            'orders_delivered' => $orders_delivered,
+            'orders_complete' => $orders_complete,
+            'orders_refund' => $orders_refund,
+            'orders_canceled' => $orders_canceled,
+        ]);
     }
 
     public function get_voucher_to_shop(string $id)
@@ -1057,5 +1158,170 @@ class ShopController extends Controller
             'status' => true,
             'message' => 'Xóa sản phẩm thành công',
         ], 200);
+    }
+
+    public function wallet(Request $request)
+    {
+        $shop = Shop::where('id', $request->shop_id)->select('id','shop_name', 'wallet' ,'account_number', 'bank_name' , 'owner_bank')->first();
+        $history = history_get_cash_shops::where('shop_id', $shop->id)->select('id', 'cash', 'date')->paginate(10);
+        if (!$shop) {
+            return $this->errorResponse('Shop không tồn tại', 404);
+        }
+        $data = [
+            'shop' => $shop,
+            'history' => $history,
+        ];
+        return $this->successResponse('Lấy thông tin ví thành công', $data);
+    }
+
+    public function history_get_cash(Request $request)
+    {
+        $shop = Shop::where('id', $request->shop_id)->select('id', 'wallet')->first();
+        if (!$shop) {
+            return $this->errorResponse('Shop không tồn tại', 404);
+        }
+        $startDate = Carbon::now()->subWeek()->format('Y-m-d');
+        $startDateMonth = Carbon::now()->subMonth()->format('Y-m-d');
+        $startDate = Carbon::now()->subWeek()->format('Y-m-d');
+        $endDate = Carbon::now()->format('Y-m-d');
+        $totalWeek = (int) history_get_cash_shops::where('shop_id', $shop->id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('cash');
+
+        $totalMonth = (int) history_get_cash_shops::where('shop_id', $shop->id)
+            ->whereBetween('date', [$startDateMonth, $endDate])
+            ->sum('cash');
+
+        $totalCash = (int) history_get_cash_shops::where('shop_id', $shop->id)
+            ->sum('cash');
+        $history = [
+            'total_week' => $totalWeek,
+            'total_month' => $totalMonth,
+            'total_cash' => $totalCash,
+            'not_paid_yet' => $shop->wallet ?? 0,
+        ];
+        return $this->successResponse('Lịch sử rút tiền', $history);
+    }
+
+    public function number_of_withdrawals(Request $request)
+    {
+        $shop = Shop::where('id', $request->shop_id)->select('id')->first();
+        if (!$shop) {
+            return $this->errorResponse('Shop không tồn tại', 404);
+        }
+        $history = history_get_cash_shops::where('shop_id', $shop->id)->get();
+        return $this->successResponse('Lịch sử các lần rút tiền', $history);
+    }
+
+    public function filterShops(Request $request)
+    {
+        $limit = $request->limit ?? 20;
+        $query = Shop::query();
+           
+            if ($request->has('created_at')) {
+                $query->orderby('created_at', 'desc');
+            }
+            if ($request->has('view_count')) {
+                $query->orderby('visits', 'desc');
+            }
+            $shops = $query->paginate($limit);
+
+        if ($shops->isEmpty()) {
+            return response()->json([
+                'message' => 'Không có sản phẩm nào'
+            ], 404);
+        }
+    
+        return response()->json($shops);
+    }
+
+    public function getShopByCategory(Request $request)
+    {
+        $limit = $request->limit ?? 20;
+        $query = CategoriesModel::query();
+        $queryPro = Product::query();
+        if ($request->has('category_id')) {
+            $query->where('id', $request->category_id)->where('status', 2);
+        }
+        $categories = $query->get();
+        $result = $categories->map(function ($category) {
+            $nestedCategories = CategoriesModel::where('parent_id', $category->id)
+            ->get(['id', 'title', 'slug'])
+            ->map(function ($nestedCategory) {
+                return [
+                'id' => $nestedCategory->id,
+                'title' => $nestedCategory->title,
+                'slug' => $nestedCategory->slug,
+                ];
+            });
+            return [
+            'id' => $category->id,
+            'name' => $category->title,
+            'slug' => $category->slug,
+            'nest' => $nestedCategories,
+            ];
+        });
+
+        if ($result->isEmpty()) {
+            return response()->json([
+            'message' => 'Không có danh mục nào'
+            ], 404);
+        }
+
+        return response()->json($result->first());
+    }
+
+
+    public function shop_request_get_cash(Request $request)
+    {
+    //    $user = $request->user;
+    //    $user = UsersModel::where('email', $user)->select('id')->first();
+    //     if (!$user) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => "Token không đúng",
+    //         ], 401);
+    //     }
+        $shop = Shop::where('id', $request->shop_id)->first();
+        // if (!$user) {
+        //     return redirect()->back()->with('error', 'Vui lòng đăng nhập');
+        // }
+        // if ($shop->wallet < $request->get_cash) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => "Số dư trong ví không đủ",
+        //     ], 401);
+        // }
+        // $cash = $shop->wallet - $request->get_cash;
+        
+        
+        history_get_cash_shops::create([
+            'shop_id' => $shop->id ?? null,
+            'user_id' =>  $user ?? null,
+            'cash' => $shop->wallet ?? null,
+            'date' => Carbon::now() ?? null,
+            'account_number' => $shop->account_number ?? null,
+            'bank_name' => $shop->bank_name ?? null,
+            'owner_bank' => $shop->owner_bank ?? null,
+        ]);
+
+        $shop->update([
+            'wallet' => 0,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => "Yêu cầu rút tiền thành công",
+        ], 200);
+        // return redirect()->back()->with('success', 'Yêu cầu rút tiền thành công');
+    }
+
+
+    public function get_categories_for_shop(Request $request, string $id)
+    {
+        $shop = Shop::where('id', $id)->select('id')->first();
+        $products = Product::where('shop_id', $shop->id)->select('id', 'category_id')->get();
+        $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->select('id', 'title', 'slug')->get();
+        return $this->successResponse('Lấy danh sách danh mục thành công', $categories);
     }
 }

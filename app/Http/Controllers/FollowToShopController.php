@@ -37,15 +37,23 @@ class FollowToShopController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function follows(Request $request, string $shop_id)
     {
         $user = JWTAuth::parseToken()->authenticate();
-        // dd($user);
+        $follow = Follow_to_shop::where('user_id', $user->id)->where('shop_id', $shop_id)->first();
+        if($follow){
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "bạn đã follow shop này",
+                ]
+            );
+        }
         $dataInsert = [
             'user_id'=> $user->id,
-            'shop_id' => $request->shop_id,
+            'shop_id' => $shop_id,
         ];
-           $follow = Follow_to_shop::create($dataInsert);
+        $follow = Follow_to_shop::create($dataInsert);
         $dataDone = [
             'status' => true,
             'message' => "follow Đã được lưu",

@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\Shop;
 use App\Models\variantattribute;
 use App\Models\AddressModel;
+use App\Models\Tax;
+use App\Models\tax_category;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Http;
@@ -204,6 +206,10 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
+        
+        $tax_category = tax_category::where('category_id', $product->category_id)->first();
+        $taxes = Tax::find($tax_category->tax_id);
+        // $taxAmount = $request->price * $taxes->rate;
         if ($request->variant_id) {
             $productVariant = product_variants::where('id', $request->variant_id)->first();
             if (!$productVariant) {
@@ -229,12 +235,13 @@ class CartController extends Controller
                }
             }else {
                 // dd($productVariant->images);
+                $price_after_tax = $productVariant->price * ($taxes->rate + 1);
                 $product_to_cart = ProducttocartModel::create([
                      'cart_id' => $cart_to_users->id,
                      'quantity' => $request->quantity ?? 1,
                      'variant_id' => $productVariant->id ?? null,
                      'variant_name' => $productVariant->name,
-                     'variant_price' => $productVariant->price,
+                     'variant_price' => $price_after_tax ?? $productVariant->price,
                      'variant_image' => $productVariant->images,
                         'product_id' => $productVariant->product_id,
                      'product_name' => $product->name,
@@ -272,12 +279,13 @@ class CartController extends Controller
                         'product' => $product_to_cart,
                     ], 200);
             }
+            $price_after_tax = $product->price * ($taxes->rate + 1);
             $product_to_cart = ProducttocartModel::create([
                 'cart_id' => $cart_to_users->id,
                 'product_id' => $product->id,
                 'product_name' => $product->name,
                 'product_slug' => $product->slug,
-                'product_price' => $product->price,
+                'product_price' => $price_after_tax ?? $product->price,
                 'product_image' => $product->image ?? null,
                 'quantity' => $request->quantity ?? 1,
                 'shop_id' => $request->shop_id,

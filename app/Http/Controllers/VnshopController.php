@@ -38,6 +38,26 @@ use App\Models\Notification_to_mainModel;
 use App\Models\RanksModel;
 use App\Models\recipes;
 use App\Http\Requests\RankRequest;
+use App\Models\PaymentsModel;
+use App\Http\Requests\PaymentRequest;
+
+use App\Models\Image;
+use App\Http\Requests\ProductRequest;
+;
+use App\Models\ColorsModel;
+use App\Models\variantattribute;
+use App\Models\attributevalue;
+use App\Models\product_variants;
+use App\Models\Attribute;
+
+use App\Services\ImageUploadService;
+use App\Jobs\UploadImageJob;
+use App\Jobs\UploadImagesJob;
+use App\Jobs\UpdateStockAllVariant;
+use App\Jobs\UpdatePriceAllVariant;
+use App\Jobs\UpdateImageAllVariant;
+
+use App\Models\update_product;
 
 class VnshopController extends Controller
 {
@@ -93,13 +113,14 @@ class VnshopController extends Controller
         $doanhthuJson = array_values($doanhthu);
         $luongtrahangJson = array_values($luongtrahang);
         $luotmuaJson = array_values($luotmua);
-        $listCategory =( CategoriesModel::where("parent_id", null)->get());
+        $listCategory =( CategoriesModel::where("parent_id", 0)->get());
 
         $listCategoryJson = array_column($listCategory->toArray(), 'title');
         
         $listCategoryID = array_column($listCategory->toArray(), 'id');
         // $categoryId = 1;
-        $listCategorydoanhthu = array_fill(1, count($listCategoryJson) -1, 0);
+        // $listCategorydoanhthu = array_fill(1, count($listCategoryJson) -1, 0);
+        $listCategorydoanhthu = array_fill(1, max(count($listCategoryJson) - 1, 1), 0);
         foreach ($listCategoryID as $key => $id) {
             $totalRevenue = $this->calculateSubtotalByCategory($id);
             // dd($totalRevenue);
@@ -158,13 +179,10 @@ class VnshopController extends Controller
         return view('products.list_product');
     }
     function getAllCategoryIds($categoryId) {
-        // Lấy tất cả danh mục con của $categoryId
         $categories = CategoriesModel::where('parent_id', $categoryId)->get();
     
-        $categoryIds = [$categoryId]; // Bắt đầu từ ID của danh mục cha
-    
+        $categoryIds = [$categoryId]; 
         foreach ($categories as $category) {
-            // Đệ quy để lấy danh mục con
             $categoryIds = array_merge($categoryIds, $this->getAllCategoryIds($category->id));
         }
     
@@ -179,14 +197,48 @@ class VnshopController extends Controller
     
         return $totalSubtotal;
     }
-    public function list_category($limit = 5){
-        $categories = CategoriesModel::orderBy('created_at', 'desc')->whereIn("status", [1, 2])->paginate($limit);
-        $taxes = Tax::where('status',2)->get();
+    public function list_category($limit = 5)
+    {
+        $categories = CategoriesModel::orderBy('created_at', 'desc')
+        ->whereIn("status", [1,2])
+        ->get();  
+        $category = CategoriesModel::orderBy('created_at', 'desc')
+        ->whereIn("status", [2])
+        ->get();  
+        $categoryTree = $this->buildTree($category);
+
+        $taxes = Tax::where('status', 2)->get();
         $tax_category = tax_category::all();
-        return view('categories.list_category',compact(
-            'categories', 'taxes', 'tax_category'
+    
+        return view('categories.list_category', compact(
+            'categoryTree', 'taxes', 'tax_category', 'categories',
         ));
     }
+
+
+    /**
+     * Hàm đệ quy xây dựng cấu trúc cây danh mục
+     */
+    private function buildTree($categories, $parentId = 0)
+    {
+        $tree = [];
+    
+        foreach ($categories as $category) {
+           
+            if ($category->parent_id == $parentId) { 
+                $children = $this->buildTree($categories, $category->id);
+                if ($children->isNotEmpty()) {
+                    $category->children = $children;
+                }
+                $tree[] = $category;
+            }
+        }
+    
+        return collect($tree);
+    }
+    
+    
+    
     public function trash_category($limit = 5){
         $categories = CategoriesModel::orderBy('updated_at', 'desc')->where('status', "=", 5 )->paginate($limit);
         return view('categories.trash',compact(
@@ -212,7 +264,7 @@ class VnshopController extends Controller
                 'slug' => $request->slug ?? Str::slug($request->title, '-'),
                 'index' => $request->index ?? 1,
                 'status' => $request->status ?? 1,
-                'parent_id' => $request->parent_id ?? null,
+                'parent_id' => $request->parent_id2,
                 'create_by' => $user->id,
                 'image' => $dataInsert['image'] ?? null,
                 'tax_id' => $request->tax_id
@@ -284,18 +336,57 @@ class VnshopController extends Controller
             'shops'
         ));
     }
-    public function changeCategory(Request $rqt){
+    // public function changeCategory(Request $rqt){
        
+    //     $category = CategoriesModel::find($rqt->id);
+    //     // if($rqt->status == ){
+
+    //     // }
+    //     $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)->where("status", 2)->get();
+    //     if ($category) {
+    //         if($chillrenCategory){
+    //             return Back()->with('message', 'Cập nhật không thành công vì có danh mục con đang hoạt động!');
+    //         }else{
+    //             $category->status =$rqt->status; 
+    //             $category->save(); 
+    //             return Back()->with('message', 'Cập nhật thành công!');
+    //         }
+           
+    //     }
+    //     return Back()->with('message', 'Không có sản phẩm nào!');
+    // }
+    public function changeCategory(Request $rqt)
+    {
         $category = CategoriesModel::find($rqt->id);
-        if ($category) {
-            $category->status =$rqt->status; 
-            $category->save(); 
-            return Back()->with('message', 'Cập nhật thành công!');
+        if (!$category) {
+            return Back()->with('message', 'Không tìm thấy danh mục!');
         }
+        if ($category->parent_id === null || $category->parent_id == 0) {
+            $chillrenCategory = CategoriesModel::where("parent_id", $category->id)
+                                                ->where("status", 2) 
+                                                ->get();
+            if ($chillrenCategory->isNotEmpty()) {
+                return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục con đang hoạt động!');
+            }
+            foreach ($chillrenCategory as $child) {
+                $grandchildren = CategoriesModel::where("parent_id", $child->id)
+                                                 ->where("status", 2) 
+                                                 ->get();
+                if ($grandchildren->isNotEmpty()) {
+                    return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục cháu đang hoạt động!');
+                }
+            }
+        }
+        $category->status = $rqt->status;  
+        $category->save(); 
+    
+        return Back()->with('message', 'Cập nhật thành công!');
     }
+    
     
     public function updateCategory(Request $request){
         $user = JWTAuth::parseToken()->authenticate();
+        // dd($request);
         try {
             $categories = CategoriesModel::find($request->id);
 
@@ -328,7 +419,7 @@ class VnshopController extends Controller
                 'category_id' => $categories->id,
                 'tax_id' => $request->tax_id,
             ]);
-            return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Tạo thành công!');
+            return redirect()->route('list_category', ['token' => auth()->user()->refesh_token])->with('message', 'Cập nhật thành công!');
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -451,6 +542,7 @@ class VnshopController extends Controller
             $voucherMain->description = $request->description ?? $voucherMain->description;
             $voucherMain->quantity = $request->quantity ?? $voucherMain->quantity;
             $voucherMain->limitValue = $request->limitValue ?? $voucherMain->limitValue;
+            $voucherMain->min = $request->min_order ?? $voucherMain->min;
             $voucherMain->ratio = $request->ratio ?? $voucherMain->ratio;
             $voucherMain->code = $request->code ?? $voucherMain->code;
             $voucherMain->status = $request->status ?? $voucherMain->status;
@@ -794,80 +886,152 @@ public function updatebanner(BannerRequest $request, $id)
 
 public function statistByQuantity(Request $request)
 {
+    // 1. Tính số lượng sản phẩm bán ra theo ngày trong tháng hiện tại
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->where('status', 2) // Chỉ lấy đơn hàng hoàn thành
         ->get();
-        
-        // $soluong = array_fill(1, Carbon::now()->day, 0);
-        // foreach ($monthlyRevenueOrder as $order) {
-        //     $day = $order->created_at->day; 
-        //     if ($day <= Carbon::now()->day) { 
 
-        //         $soluong[$day] += OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
-        //     }else{
-        //         break;
-        //     }
-        // }
-        $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
-        $tong = 0;
-        foreach ($monthlyRevenueOrder as $order) {
-            $day = $order->created_at->day; // Lấy ngày của order
-            if ($day <= Carbon::now()->day) { 
-                // Tổng số lượng của các sản phẩm trong đơn hàng cho ngày tương ứng
-                if($order->status == 2){
-                    
-                    $soluong[$day] = OrderDetailsModel::where('order_id', $order->id)->whereDay('created_at', $day)
-                        ->sum('quantity'); 
-                    $tong += OrderDetailsModel::where('order_id', $order->id)
-                    ->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year)
-                    ->sum('quantity');
-                }
-            } else {
-                break;
-            }
-        }
-        $soluongJson = array_values($soluong);
+    $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
+    $tong = 0;
 
-        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
-        $listShop = [];
+    foreach ($monthlyRevenueOrder as $order) {
+        $day = $order->created_at->day;
 
-        foreach ($listShopId as $idKey => $shopId) {
-            $shop = Shop::where("id", $shopId)->with('user')->first();
-            $soluong = OrderDetailsModel::where("shop_id", $shopId)->whereMonth('created_at', Carbon::now()->month)->get()->sum("quantity"); 
+        // Tổng số lượng sản phẩm trong ngày tương ứng
+        $dailyQuantity = OrderDetailsModel::where('order_id', $order->id)
+            ->whereDay('created_at', $day)
+            ->sum('quantity');
 
-            $shop["soluong"] = $soluong ;
-            $listShop[] = $shop;
-        }
-        // dd($listShop);
-        usort($listShop, function($a, $b) {
-            return $b->soluong <=> $a->soluong; 
+        $soluong[$day] += $dailyQuantity;
+        $tong += $dailyQuantity;
+    }
 
-        });
-         
-        return view('statist.quantity_sold',compact('soluongJson',
-                                                'listShop',
-                                                'tong'
-                                             )
-                    );
-    // return view('statist.quantity_sold'); 
+    $soluongJson = array_values($soluong); // Mảng số lượng sản phẩm theo ngày
+
+    // 2. Tính số lượng sản phẩm bán ra theo từng tháng trong năm hiện tại
+    $soluongnam = array_fill(1, 12, 0); // Mỗi phần tử đại diện cho một tháng
+
+    $monthlyRevenueYear = OrderDetailsModel::whereHas('order', function ($query) {
+        $query->whereYear('created_at', Carbon::now()->year)
+              ->where('status', 2); // Chỉ lấy đơn hàng hoàn thành
+    })->get();
+
+    foreach ($monthlyRevenueYear as $orderDetail) {
+        $month = $orderDetail->created_at->month;
+        $soluongnam[$month] += $orderDetail->quantity; // Cộng số lượng vào tháng tương ứng
+    }
+
+    $soluongnamJson = array_values($soluongnam); // Mảng số lượng theo tháng
+
+    // 3. Tính số lượng sản phẩm bán ra theo từng năm trong 5 năm gần đây
+    $currentYear = Carbon::now()->year;
+    $soluongcacnam = [];
+    $soluongcacnamJson = [];
+
+    for ($i = 4; $i >= 0; $i--) {
+        $year = $currentYear - $i;
+
+        $yearQuantity = OrderDetailsModel::whereHas('order', function ($query) use ($year) {
+            $query->whereYear('created_at', $year)
+                  ->where('status', 2); // Chỉ lấy đơn hàng hoàn thành
+        })->sum('quantity');
+
+        $soluongcacnam[$year] = $yearQuantity;
+    }
+
+    $soluongcacnamJson = array_values($soluongcacnam); // Mảng số lượng theo năm
+
+    // 4. Lấy danh sách các cửa hàng và số lượng sản phẩm bán ra
+    $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+    $listShop = [];
+
+    foreach ($listShopId as $shopId) {
+        $shop = Shop::where('id', $shopId)->with('user')->first();
+        $shopQuantity = OrderDetailsModel::where('shop_id', $shopId)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->sum('quantity');
+
+        $shop['soluong'] = $shopQuantity; // Gắn thêm trường số lượng vào thông tin cửa hàng
+        $listShop[] = $shop;
+    }
+
+    // Sắp xếp các cửa hàng theo số lượng bán ra (giảm dần)
+    usort($listShop, function ($a, $b) {
+        return $b['soluong'] <=> $a['soluong'];
+    });
+    // 5. Trả về view với dữ liệu đã tính toán
+    return view('statist.quantity_sold', compact(
+        'soluongJson',
+        'soluongnamJson',
+        'soluongcacnamJson',
+        'listShop',
+        'tong'
+    ));
 }
+
 public function statistByRevenue(Request $request)
 {   
+    // Lấy doanh thu theo ngày trong tháng hiện tại
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
-        ->get();
-        
-        $doanhthu = array_fill(1, Carbon::now()->day, 0);
-        foreach ($monthlyRevenueOrder as $order) {
-            $day = $order->created_at->day; 
-            if ($day <= Carbon::now()->day) { 
-                if($order->status == 2){
-                    $doanhthu[$day] += ($order->total_amount  );     
-                }
-            }else{
-                break;
-            }
+    ->whereYear('created_at', Carbon::now()->year) // Thêm điều kiện cho năm
+    ->get();
+
+    // Mảng doanh thu cho từng ngày trong tháng
+    $doanhthu = array_fill(1, Carbon::now()->day, 0);
+
+    // Lặp qua tất cả các đơn hàng trong tháng này
+    foreach ($monthlyRevenueOrder as $order) {
+    $day = $order->created_at->day;
+    // Chỉ tính doanh thu của các ngày nhỏ hơn hoặc bằng ngày hiện tại
+    if ($day <= Carbon::now()->day) { 
+        if ($order->status == 2) { // Kiểm tra nếu đơn hàng có trạng thái đã hoàn thành (status == 2)
+            $doanhthu[$day] += $order->total_amount; // Cộng doanh thu vào ngày tương ứng
         }
-        $doanhthuJson = array_values($doanhthu);
+    }
+    }
+
+    // Chuyển mảng doanh thu thành mảng giá trị mà không có chỉ mục
+    $doanhthuJson = array_values($doanhthu);
+
+    // Doanh thu năm hiện tại (tính tổng doanh thu theo tháng)
+    $doanhthunam = array_fill(1, Carbon::now()->month, 0);
+
+    // Lặp qua các đơn hàng trong năm này và tính doanh thu theo tháng
+    $monthlyRevenueYear = OrdersModel::whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2) // Lọc chỉ những đơn hàng đã hoàn thành
+    ->get();
+
+    // Tính doanh thu cho từng tháng trong năm hiện tại
+    foreach ($monthlyRevenueYear as $order) {
+    $month = $order->created_at->month;
+    $doanhthunam[$month] += $order->total_amount; // Cộng doanh thu vào tháng tương ứng
+    }
+
+    // Chuyển mảng doanh thu thành mảng giá trị cho doanh thu theo tháng
+    $doanhthunamJson = array_values($doanhthunam);
+
+    // Dữ liệu doanh thu của các năm gần đây
+    // $doanhthucacnam = ['2020', '2021', '2022', '2023', '2024'];
+    $currentYear = Carbon::now()->year;
+
+    // Tạo mảng 5 năm gần đây
+    $doanhthucacnam = [];
+    for ($i = 4; $i >= 0; $i--) {
+        $doanhthucacnam[] = $currentYear - $i;
+    }
+
+    $doanhthucacnamJson = [];
+
+    foreach ($doanhthucacnam as $year) {
+    // Tính tổng doanh thu của năm đã chọn
+    $yearRevenue = OrdersModel::whereYear('created_at', $year)
+        ->where('status', 2)
+        ->sum('total_amount');
+    $doanhthucacnamJson[$year] = $yearRevenue; // Lưu doanh thu của năm vào mảng
+    }
+    $doanhthucacnamJson1 = array_values($doanhthucacnamJson);
+
         $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
         $listShop = [];
         foreach ($listShopId as $idKey => $shopId) {
@@ -884,19 +1048,20 @@ public function statistByRevenue(Request $request)
             $shop["doanhthu"] = $doanhthu ;
             $listShop[] = $shop;
         }
-        // dd($listShop);
+
         usort($listShop, function($a, $b) {
             return $b->doanhthu <=> $a->doanhthu;
         });
 
-        // $feedBack;
-        return view('statist.revenue',compact('doanhthuJson',
+        return view('statist.revenue',compact(  'doanhthuJson',
+                                                'doanhthunamJson',
+                                                'doanhthucacnamJson1',
                                                 'listShop'
                                              )
                     );
     }
-public function statistBySales(Request $request)
-{
+    public function statistBySales(Request $request)
+    {
     $TongSoLuongBanRa = OrdersModel::count();
     $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->count();
     $DoiTra = OrdersModel::whereIn("order_status", [9])->count();
@@ -907,11 +1072,84 @@ public function statistBySales(Request $request)
     $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->count();
 
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
-    ->get();
+        ->whereYear('created_at', Carbon::now()->year)
+        ->where('status', 2) // Chỉ lấy đơn hàng hoàn thành
+        ->get();
+    //-------------
     $luongtrahang = array_fill(1, Carbon::now()->day, 0);
     $luotmua = array_fill(1, Carbon::now()->day, 0);
     $bihuy = array_fill(1, Carbon::now()->day, 0);
     $loi = array_fill(1, Carbon::now()->day, 0);
+    //-------------
+    $luongtrahangnam = array_fill(1, 12, 0);
+    $luotmuanam = array_fill(1, 12, 0);
+    $bihuynam = array_fill(1, 12, 0);
+    $loinam = array_fill(1, 12, 0);
+
+    // Lấy dữ liệu đơn hàng trong năm hiện tại
+    $ordersCurrentYear = OrdersModel::whereYear('created_at', Carbon::now()->year)->where('status', 2)->get();
+
+    // Xử lý dữ liệu theo từng tháng trong năm
+    foreach ($ordersCurrentYear as $order) {
+        $month = $order->created_at->month; // Tháng tạo đơn hàng
+        $luotmuanam[$month] += 1; // Mỗi đơn hàng tăng lượt mua
+        switch ($order->status) {
+            case 5: // Đơn hàng trả hàng
+                $luongtrahangnam[$month] += 1;
+                break;
+            case 6: // Đơn hàng bị hủy
+                $bihuynam[$month] += 1;
+                break;
+            case 7: // Đơn hàng lỗi
+                $loinam[$month] += 1;
+                break;
+        }
+    }
+
+    // Chuyển đổi mảng thành JSON cho thống kê theo tháng
+    $luongtrahangThangJson = array_values($luongtrahangnam);
+    $luotmuaThangJson = array_values($luotmuanam);
+    $bihuyThangJson = array_values($bihuynam);
+    $loiThangJson = array_values($loinam);
+
+    //-------------
+    $currentYear = Carbon::now()->year;
+    $yearsRange = range($currentYear - 4, $currentYear); // 5 năm gần nhất
+    $luongtrahangcacnam = array_fill_keys($yearsRange, 0);
+    $luotmuacacnam = array_fill_keys($yearsRange, 0);
+    $bihuycacnam = array_fill_keys($yearsRange, 0);
+    $loicacnam = array_fill_keys($yearsRange, 0);
+
+    // Lấy dữ liệu đơn hàng của 5 năm gần nhất
+    $ordersLastFiveYears = OrdersModel::whereYear('created_at', '>=', $currentYear - 4)->where('status', 2)
+    ->get();
+
+    // Xử lý dữ liệu theo năm
+    foreach ($ordersLastFiveYears as $order) {
+    $year = $order->created_at->year; // Năm tạo đơn hàng
+    if (in_array($year, $yearsRange)) {
+        $luotmuacacnam[$year] += 1; // Mỗi đơn hàng tăng lượt mua
+        switch ($order->status) {
+            case 5: // Đơn hàng trả hàng
+                $luongtrahangcacnam[$year] += 1;
+                break;
+            case 6: // Đơn hàng bị hủy
+                $bihuycacnam[$year] += 1;
+                break;
+            case 7: // Đơn hàng lỗi
+                $loicacnam[$year] += 1;
+                break;
+        }
+    }
+    }
+
+    // Chuyển đổi mảng thành JSON cho thống kê theo năm
+    $luongtrahangCacNamJson = array_values($luongtrahangcacnam);
+    $luotmuaCacNamJson = array_values($luotmuacacnam);
+    $bihuyCacNamJson = array_values($bihuycacnam);
+    $loiCacNamJson = array_values($loicacnam);
+
+    //---------------------------------
 
     foreach ($monthlyRevenueOrder as $order) {
         $day = $order->created_at->day; 
@@ -954,6 +1192,17 @@ public function statistBySales(Request $request)
         'luotmuaJson',
         'bihuyJson',
         'loiJson',
+
+        'luongtrahangThangJson',
+        'luotmuaThangJson',
+        'bihuyThangJson',
+        'loiThangJson',
+
+        'luongtrahangCacNamJson',
+        'luotmuaCacNamJson',
+        'bihuyCacNamJson',
+        'loiCacNamJson',
+        
         'TongSoLuongBanRa',
         'listShop',
         'DangGiao',
@@ -1025,31 +1274,6 @@ public function rankCreate(Request $request)
 
 }
 
-    public function list_recipes(Request $request){
-
-        $limit = 10;
-        $recipes = recipes::all();
-        return view('recipes.recipes',compact(
-            'recipes'
-        ));
-
-    }
-
-    public function recipesCreate(Request $request){
-        $token = $request->query('token');
-        recipes::create([
-            'is_active' => $request->status ?? 2,
-            'code' => $request->code ?? null,
-            'title' => $request->title ?? null,
-            'description' => $request->description ?? null,
-            'type' => $request->type ?? null,
-            'json' => json_encode($request->json),
-        ]);
-        return redirect()->route('list_recipes', [
-            'token' => $token,
-        ])->with('message', 'Thêm thành công!');
-    }
-    
     
 public function updaterank(RankRequest $request, $id)
 {
@@ -1102,6 +1326,25 @@ public function changeStatusRank(Request $request, string $id)
     }
 }
 
+public function changeStatusBanner(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $banner = Banner::findOrFail($id);
+        $banner->status = $request->status;
+        $banner->save();
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('bannerall', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
 public function destroyrank(Request $request, string $id)
 {
     try {
@@ -1120,6 +1363,189 @@ public function destroyrank(Request $request, string $id)
         ])->with('message', 'Xóa Rank không thành công!');
     }
 }
+
+public function payment_method(Request $request)
+{
+    $tab = $request->input('tab', 1); 
+    $payment_method = PaymentsModel::where('status',1)->paginate(10);
+    $payment_method0ff = PaymentsModel::where('status',0)->paginate(10);
+
+    return view('payment_method.payment_method_list', compact('payment_method', 'payment_method0ff', 'tab'));  
+
+}
+public function storepaymant(PaymentRequest $request)
+{
+
+    $token = $request->query('token');
+    $tab = $request->input('tab', 1); 
+    $dataInsert = [
+        "name" => $request->name,
+        "code" => $request->code,
+        "description" => $request->description,
+        "status" => $request->status,
+    ];
+
+    try {
+        PaymentsModel::create($dataInsert);
+        return redirect()
+            ->route('payment_method' , [
+                'token' => $token,
+                'tab' => $tab,
+            ]) 
+            ->with('success', 'Thêm phương thức thanh toán thành công');
+    } catch (\Throwable $th) {
+        return redirect()
+            ->back()
+            ->with('error', 'Thêm phương thức thanh toán không thành công: ' . $th->getMessage())
+            ->withInput(); 
+    }
+}
+
+public function updatepayment(PaymentRequest $request, $id)
+{
+    $payment = PaymentsModel::findOrFail($id);
+    
+    $token = $request->token;
+    $tab = $request->tab;
+    $dataUpdate = [
+        "name" => $request->name,
+        "code" => $request->code,
+        "description" => $request->description,
+        "status" => $request->status,
+    ];
+
+    try {
+        $payment->update($dataUpdate);
+
+        return redirect()
+        ->route('payment_method' , [
+            'token' => $token,
+            'tab' => $tab,
+        ]) ->with('success', 'Cập nhật phương thức thanh toán thành công');
+    } catch (\Throwable $th) {
+        return redirect()
+            ->back()
+            ->with('error', 'Cập nhật phương thức thanh toán không thành công: ' . $th->getMessage())
+            ->withInput();
+    }
+}
+
+public function changeStatuspayment(Request $request, string $id)
+{
+    try {
+        $token = $request->token;
+        $tab = $request->tab;
+        $payment = PaymentsModel::findOrFail($id);
+        $payment->status = $request->status;
+        $payment->save();
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+
+public function destroypayment(Request $request, string $id)
+{
+    try {
+        $token = $request->token; 
+        $tab = $request->tab; 
+        $payment = PaymentsModel::findOrFail($id);
+        $payment->delete();
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa payment_method thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('payment_method', [
+            'token' => $token,
+            'tab' => $tab,
+        ])->with('message', 'Xóa payment_method không thành công!');
+    }
+}
+
+public function handleUpdateProduct(Request $request, string $id)
+// ProductRequest
+{
+    $tab = $request->tab;
+    try {
+        if ($request->action == 1) {
+            $newDT = DB::table("update_product")->orderBy("updated_at", "desc")->where("product_id", $id)->first();
+            $ollDT = DB::table("products")->where("id", $id)->first();
+            $ollData = (array) $ollDT;
+            $newData = (array) $newDT;
+            DB::table('products_old')->insert($ollData);
+            $change_of = $data = json_decode($newData["change_of"], true);
+            unset($newData["change_of"]);
+            $newData["created_at"] = $newData["updated_at"];
+            $newData["id"] = $newData["product_id"];
+            unset($newData["product_id"]);
+            DB::table('products')->where('id', $id)->update($newData);
+            DB::table('update_product')->where('product_id', $newDT->product_id)->delete();
+    
+            if (json_decode($newDT->change_of) != 0) {
+                foreach (json_decode($newDT->change_of) as $data) {
+                    $variant = product_variants::find($data->id);
+                    if (!$variant) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Không tồn tại biến thể nào",
+                        ], 404);
+                    }
+    
+                    $variant->update([
+                        'sku' => $data->sku,
+                        'stock' => $data->stock,
+                        'price' => $data->price,
+                        'images' => $data->images,
+                    ]);
+                }
+            }
+    
+            $product = Product::find($id);
+            $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
+            $highest_price = $product_variants_get_price->max('price');
+            $lowest_price = $product_variants_get_price->min('price');
+    
+            if ($highest_price == $lowest_price) {
+                $product->update([
+                    'show_price' => $highest_price,
+                ]);
+            }
+            if ($highest_price != $lowest_price) {
+                $product->update([
+                    'show_price' => $lowest_price . " - " . $highest_price,
+                ]);
+            }
+    
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => $tab
+            ])->with('message', 'Đã cập nhật sản phẩm.');
+    
+        } else {
+            DB::table('update_product')->where('product_id', $id)->delete();
+    
+            return redirect()->route('product_all', [
+                'token' => auth()->user()->refesh_token,
+                'tab' => $tab
+            ])->with('error', 'Từ chối cập nhật.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->route('product_all', [
+            'token' => auth()->user()->refesh_token,
+            'tab' => $tab
+        ])->with('error', 'Đã xảy ra lỗi không mong muốn: ' . $e->getMessage());
+    }
+    
+}
+
+
 
 
 }
