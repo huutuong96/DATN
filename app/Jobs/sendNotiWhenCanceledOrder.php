@@ -18,34 +18,36 @@ class sendNotiWhenCanceledOrder implements ShouldQueue
 
     protected $user_id;
     protected $email;
-
-    public function __construct($user_id, $email)
+    protected $order; // Chỉ một đơn hàng
+    
+    public function __construct($user_id, $email, $order)
     {
         $this->user_id = $user_id;
         $this->email = $email;
+        $this->order = $order; 
     }
-
-    /**
-     * Execute the job.
-     */
+    
     public function handle(): void
     {
+        
         $notificationData = [
             'type' => 'main',
             'title' => 'Đơn hàng đã bị hủy',
-            'description' => 'Đơn hàng đã bị hủy tự động vì cửa hàng không xác nhận đơn hàng trong thời gian quy định, số tiền sẽ được hoàn lại trong vòng 5 ngày làm việc',
+            'description' => 'Đơn hàng #' . $this->order->id . ' đã bị hủy tự động...',
             'user_id' => $this->user_id,
             'image' => 'Hình chưa thiết kế',
         ];
+    
         $notification = Notification_to_mainModel::create($notificationData);
-        // dd($notification->id);
+    
         Notification::create([
             'type' => 'main',
             'user_id' => $this->user_id,
             'id_notification' => $notification->id,
         ]);
-
-        Mail::to($this->email)->send(new sendMailWhenOrderCanceledForUser());
-
+        $this->order->load('orderDetails.product');
+       dd(  $this->email);
+        Mail::to('hoangtlvps31622@gmail.com')->send(new sendMailWhenOrderCanceledForUser($this->order));
     }
+    
 }
