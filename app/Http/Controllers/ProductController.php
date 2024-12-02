@@ -1452,7 +1452,6 @@ public function ProductAll(Request $request)
                 return Excel::download(new OrderExport($request), 'vnshop-orders.xlsx');
             }
             if ($request->data == 'transaction_history') {
-                dd($request);
                 return Excel::download(new Transaction_history($request), 'vnshop-transaction_history.xlsx');
             }
         } catch (\Throwable $th) {

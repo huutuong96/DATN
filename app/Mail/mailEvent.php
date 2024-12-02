@@ -14,9 +14,13 @@ class mailEvent extends Mailable
     use Queueable, SerializesModels;
 
     protected $eventTitle;
-    public function __construct($eventTitle)
+    protected $code;
+    protected $user;
+    public function __construct($eventTitle, $code, $user)
     {
         $this->eventTitle = $eventTitle;
+        $this->code = $code;
+        $this->user = $user;
     }
 
     /**
@@ -38,6 +42,8 @@ class mailEvent extends Mailable
             view: 'emails.mail_event',
             with: [
                 'eventTitle' => $this->eventTitle,
+                'code' => $this->code,
+                'user' => $this->user,
             ],
         );
     }

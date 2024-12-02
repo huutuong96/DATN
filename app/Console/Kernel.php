@@ -21,6 +21,10 @@ class Kernel extends ConsoleKernel
             app(\App\Http\Controllers\OrdersController::class)->cancel_order_auto();
         })->daily();
 
+        $schedule->call(function () {
+            app(\App\Http\Controllers\NotificationController::class)->send_mail_event();
+        })->everyMinute();
+
         
     }
 

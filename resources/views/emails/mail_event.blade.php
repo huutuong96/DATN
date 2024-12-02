@@ -73,16 +73,11 @@
 
         <!-- Content Section -->
         <div class="content">
-            <h2>Dear [đổ dữ liệu sau],</h2>
+            <h2>Dear {{$user->fullname ?? "Bạn"}},</h2>
             <p>
-                We are thrilled to welcome you to our grand celebration! This momentous occasion
-                wouldn't be the same without your presence.
+                MÃ VOUCHER : {{$code}}
             </p>
-            <p>
-                Join us as we commemorate this incredible milestone with exciting activities, special
-                announcements, and much more.
-            </p>
-            <a href="#" class="cta-button">Discover More</a>
+            <a href="#" class="cta-button">Xem ngay</a>
         </div>
 
         <!-- Footer Section -->
