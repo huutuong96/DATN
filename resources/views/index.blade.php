@@ -107,12 +107,10 @@
                             </div>
                         </div>
                     </form>
-
-                    <div class="d-flex align-items-center">
-
-                            <span id="online-count" class="badge bg-success">.</span>
-
-                    </div>
+                    <!-- 
+                        <div class="d-flex align-items-center">
+                            <span id="online-count" class="badge bg-success">{{$useronline}} ONLINE</span>
+                        </div> -->
 
 
 

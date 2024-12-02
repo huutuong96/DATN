@@ -997,7 +997,5 @@ class AuthenController extends Controller
         $user->load('role', 'address');
         return view('profile.profile', ['user' => $user]);
 
-    }
-
-    
+    }   
 }
