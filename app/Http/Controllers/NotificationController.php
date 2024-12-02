@@ -122,7 +122,7 @@ class NotificationController extends Controller
 
     public function send_mail_event(Request $request)
     {
-        $users = UsersModel::where('status', 2)->select('email')->get();
+        $users = UsersModel::where('status', 2)->pluck('email')->get();
         $today = date('d-m');
         $eventTitle = null;
         $events = [
@@ -144,7 +144,7 @@ class NotificationController extends Controller
             $eventTitle = $events[$today];
         }
 
-        SendMailEvent::dispatch($users);
+        SendMailEvent::dispatch($users, $eventTitle);
         // SendNotiEvent::dispatch($users);
         return response()->json([
             'status' => 'success',

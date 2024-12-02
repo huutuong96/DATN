@@ -16,8 +16,9 @@ class SendMailEvent implements ShouldQueue
 
    
     protected $users;
+    protected $eventTitle;
 
-    public function __construct($users)
+    public function __construct($users, $eventTitle)
     {
         $this->users = $users;
     }

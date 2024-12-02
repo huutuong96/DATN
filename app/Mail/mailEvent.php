@@ -27,7 +27,7 @@ class mailEvent extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mail Event',
+            subject: 'Mừng Ngày ABC',
         );
     }
 
