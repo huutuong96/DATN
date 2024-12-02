@@ -36,8 +36,11 @@
     <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-
+    
     @yield('link')
+
+   @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
 </head>
 
 <body>
@@ -104,6 +107,15 @@
                             </div>
                         </div>
                     </form>
+
+                    <div class="d-flex align-items-center">
+
+                            <span id="online-count" class="badge bg-success">.</span>
+
+                    </div>
+
+
+
                     <div class="d-flex align-items-center">
                         <div
                             class="dropdown d-md-none topbar-head-dropdown header-item">
@@ -1203,26 +1215,7 @@
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
-    <script>
-        // WebSocket test
-        const socket = new WebSocket('ws://localhost:6001');
-
-        socket.addEventListener('open', function (event) {
-            console.log('WebSocket is connected.');
-        });
-
-        socket.addEventListener('message', function (event) {
-            console.log('Message from server ', event.data);
-        });
-
-        socket.addEventListener('close', function (event) {
-            console.log('WebSocket is closed.');
-        });
-
-        socket.addEventListener('error', function (event) {
-            console.error('WebSocket error observed:', event);
-        });
-    </script>
+   
     <!-- apexcharts -->
     <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
 

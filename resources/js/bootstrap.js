@@ -32,15 +32,35 @@
 // // });
 
 
-import Echo from 'laravel-echo';
-window.Pusher = require('pusher-js');
+// import Echo from 'laravel-echo';
+// window.Pusher = require('pusher-js');
 
-window.Echo = new Echo({
+// window.Echo = new Echo({
+//     broadcaster: 'pusher',
+//     key: 'local',
+//     cluster: 'mt1',
+//     wsHost: window.location.hostname,
+//     wsPort: 6001,
+//     forceTLS: false,
+//     disableStats: true,
+// });
+
+
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+const echo = new Echo({
     broadcaster: 'pusher',
-    key: 'local',
-    cluster: 'mt1',
+    key: "4001aa49838fcbc98ecb",
+    cluster: 'ap1',
+    encrypted: false,
     wsHost: window.location.hostname,
     wsPort: 6001,
     forceTLS: false,
     disableStats: true,
 });
+
+echo.channel('your-channel')
+    .listen('YourEvent', (event) => {
+        console.log(event);
+    });
