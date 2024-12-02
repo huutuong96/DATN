@@ -886,80 +886,152 @@ public function updatebanner(BannerRequest $request, $id)
 
 public function statistByQuantity(Request $request)
 {
+    // 1. Tính số lượng sản phẩm bán ra theo ngày trong tháng hiện tại
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->where('status', 2) // Chỉ lấy đơn hàng hoàn thành
         ->get();
-        
-        // $soluong = array_fill(1, Carbon::now()->day, 0);
-        // foreach ($monthlyRevenueOrder as $order) {
-        //     $day = $order->created_at->day; 
-        //     if ($day <= Carbon::now()->day) { 
 
-        //         $soluong[$day] += OrderDetailsModel::whereDay('created_at', Carbon::now()->day)->get()->sum("quantity"); 
-        //     }else{
-        //         break;
-        //     }
-        // }
-        $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
-        $tong = 0;
-        foreach ($monthlyRevenueOrder as $order) {
-            $day = $order->created_at->day; // Lấy ngày của order
-            if ($day <= Carbon::now()->day) { 
-                // Tổng số lượng của các sản phẩm trong đơn hàng cho ngày tương ứng
-                if($order->status == 2){
-                    
-                    $soluong[$day] = OrderDetailsModel::where('order_id', $order->id)->whereDay('created_at', $day)
-                        ->sum('quantity'); 
-                    $tong += OrderDetailsModel::where('order_id', $order->id)
-                    ->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year)
-                    ->sum('quantity');
-                }
-            } else {
-                break;
-            }
-        }
-        $soluongJson = array_values($soluong);
+    $soluong = array_fill(1, Carbon::now()->day, 0); // Khởi tạo mảng với giá trị 0
+    $tong = 0;
 
-        $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
-        $listShop = [];
+    foreach ($monthlyRevenueOrder as $order) {
+        $day = $order->created_at->day;
 
-        foreach ($listShopId as $idKey => $shopId) {
-            $shop = Shop::where("id", $shopId)->with('user')->first();
-            $soluong = OrderDetailsModel::where("shop_id", $shopId)->whereMonth('created_at', Carbon::now()->month)->get()->sum("quantity"); 
+        // Tổng số lượng sản phẩm trong ngày tương ứng
+        $dailyQuantity = OrderDetailsModel::where('order_id', $order->id)
+            ->whereDay('created_at', $day)
+            ->sum('quantity');
 
-            $shop["soluong"] = $soluong ;
-            $listShop[] = $shop;
-        }
-        // dd($listShop);
-        usort($listShop, function($a, $b) {
-            return $b->soluong <=> $a->soluong; 
+        $soluong[$day] += $dailyQuantity;
+        $tong += $dailyQuantity;
+    }
 
-        });
-         
-        return view('statist.quantity_sold',compact('soluongJson',
-                                                'listShop',
-                                                'tong'
-                                             )
-                    );
-    // return view('statist.quantity_sold'); 
+    $soluongJson = array_values($soluong); // Mảng số lượng sản phẩm theo ngày
+
+    // 2. Tính số lượng sản phẩm bán ra theo từng tháng trong năm hiện tại
+    $soluongnam = array_fill(1, 12, 0); // Mỗi phần tử đại diện cho một tháng
+
+    $monthlyRevenueYear = OrderDetailsModel::whereHas('order', function ($query) {
+        $query->whereYear('created_at', Carbon::now()->year)
+              ->where('status', 2); // Chỉ lấy đơn hàng hoàn thành
+    })->get();
+
+    foreach ($monthlyRevenueYear as $orderDetail) {
+        $month = $orderDetail->created_at->month;
+        $soluongnam[$month] += $orderDetail->quantity; // Cộng số lượng vào tháng tương ứng
+    }
+
+    $soluongnamJson = array_values($soluongnam); // Mảng số lượng theo tháng
+
+    // 3. Tính số lượng sản phẩm bán ra theo từng năm trong 5 năm gần đây
+    $currentYear = Carbon::now()->year;
+    $soluongcacnam = [];
+    $soluongcacnamJson = [];
+
+    for ($i = 4; $i >= 0; $i--) {
+        $year = $currentYear - $i;
+
+        $yearQuantity = OrderDetailsModel::whereHas('order', function ($query) use ($year) {
+            $query->whereYear('created_at', $year)
+                  ->where('status', 2); // Chỉ lấy đơn hàng hoàn thành
+        })->sum('quantity');
+
+        $soluongcacnam[$year] = $yearQuantity;
+    }
+
+    $soluongcacnamJson = array_values($soluongcacnam); // Mảng số lượng theo năm
+
+    // 4. Lấy danh sách các cửa hàng và số lượng sản phẩm bán ra
+    $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
+    $listShop = [];
+
+    foreach ($listShopId as $shopId) {
+        $shop = Shop::where('id', $shopId)->with('user')->first();
+        $shopQuantity = OrderDetailsModel::where('shop_id', $shopId)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->sum('quantity');
+
+        $shop['soluong'] = $shopQuantity; // Gắn thêm trường số lượng vào thông tin cửa hàng
+        $listShop[] = $shop;
+    }
+
+    // Sắp xếp các cửa hàng theo số lượng bán ra (giảm dần)
+    usort($listShop, function ($a, $b) {
+        return $b['soluong'] <=> $a['soluong'];
+    });
+    // 5. Trả về view với dữ liệu đã tính toán
+    return view('statist.quantity_sold', compact(
+        'soluongJson',
+        'soluongnamJson',
+        'soluongcacnamJson',
+        'listShop',
+        'tong'
+    ));
 }
+
 public function statistByRevenue(Request $request)
 {   
+    // Lấy doanh thu theo ngày trong tháng hiện tại
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
-        ->get();
-        
-        $doanhthu = array_fill(1, Carbon::now()->day, 0);
-        foreach ($monthlyRevenueOrder as $order) {
-            $day = $order->created_at->day; 
-            if ($day <= Carbon::now()->day) { 
-                if($order->status == 2){
-                    $doanhthu[$day] += ($order->total_amount  );     
-                }
-            }else{
-                break;
-            }
+    ->whereYear('created_at', Carbon::now()->year) // Thêm điều kiện cho năm
+    ->get();
+
+    // Mảng doanh thu cho từng ngày trong tháng
+    $doanhthu = array_fill(1, Carbon::now()->day, 0);
+
+    // Lặp qua tất cả các đơn hàng trong tháng này
+    foreach ($monthlyRevenueOrder as $order) {
+    $day = $order->created_at->day;
+    // Chỉ tính doanh thu của các ngày nhỏ hơn hoặc bằng ngày hiện tại
+    if ($day <= Carbon::now()->day) { 
+        if ($order->status == 2) { // Kiểm tra nếu đơn hàng có trạng thái đã hoàn thành (status == 2)
+            $doanhthu[$day] += $order->total_amount; // Cộng doanh thu vào ngày tương ứng
         }
-        $doanhthuJson = array_values($doanhthu);
+    }
+    }
+
+    // Chuyển mảng doanh thu thành mảng giá trị mà không có chỉ mục
+    $doanhthuJson = array_values($doanhthu);
+
+    // Doanh thu năm hiện tại (tính tổng doanh thu theo tháng)
+    $doanhthunam = array_fill(1, Carbon::now()->month, 0);
+
+    // Lặp qua các đơn hàng trong năm này và tính doanh thu theo tháng
+    $monthlyRevenueYear = OrdersModel::whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2) // Lọc chỉ những đơn hàng đã hoàn thành
+    ->get();
+
+    // Tính doanh thu cho từng tháng trong năm hiện tại
+    foreach ($monthlyRevenueYear as $order) {
+    $month = $order->created_at->month;
+    $doanhthunam[$month] += $order->total_amount; // Cộng doanh thu vào tháng tương ứng
+    }
+
+    // Chuyển mảng doanh thu thành mảng giá trị cho doanh thu theo tháng
+    $doanhthunamJson = array_values($doanhthunam);
+
+    // Dữ liệu doanh thu của các năm gần đây
+    // $doanhthucacnam = ['2020', '2021', '2022', '2023', '2024'];
+    $currentYear = Carbon::now()->year;
+
+    // Tạo mảng 5 năm gần đây
+    $doanhthucacnam = [];
+    for ($i = 4; $i >= 0; $i--) {
+        $doanhthucacnam[] = $currentYear - $i;
+    }
+
+    $doanhthucacnamJson = [];
+
+    foreach ($doanhthucacnam as $year) {
+    // Tính tổng doanh thu của năm đã chọn
+    $yearRevenue = OrdersModel::whereYear('created_at', $year)
+        ->where('status', 2)
+        ->sum('total_amount');
+    $doanhthucacnamJson[$year] = $yearRevenue; // Lưu doanh thu của năm vào mảng
+    }
+    $doanhthucacnamJson1 = array_values($doanhthucacnamJson);
+
         $listShopId = array_unique(array_column($monthlyRevenueOrder->toArray(), 'shop_id'));
         $listShop = [];
         foreach ($listShopId as $idKey => $shopId) {
@@ -976,19 +1048,20 @@ public function statistByRevenue(Request $request)
             $shop["doanhthu"] = $doanhthu ;
             $listShop[] = $shop;
         }
-        // dd($listShop);
+
         usort($listShop, function($a, $b) {
             return $b->doanhthu <=> $a->doanhthu;
         });
 
-        // $feedBack;
-        return view('statist.revenue',compact('doanhthuJson',
+        return view('statist.revenue',compact(  'doanhthuJson',
+                                                'doanhthunamJson',
+                                                'doanhthucacnamJson1',
                                                 'listShop'
                                              )
                     );
     }
-public function statistBySales(Request $request)
-{
+    public function statistBySales(Request $request)
+    {
     $TongSoLuongBanRa = OrdersModel::count();
     $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->count();
     $DoiTra = OrdersModel::whereIn("order_status", [9])->count();
@@ -999,11 +1072,84 @@ public function statistBySales(Request $request)
     $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->count();
 
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
-    ->get();
+        ->whereYear('created_at', Carbon::now()->year)
+        ->where('status', 2) // Chỉ lấy đơn hàng hoàn thành
+        ->get();
+    //-------------
     $luongtrahang = array_fill(1, Carbon::now()->day, 0);
     $luotmua = array_fill(1, Carbon::now()->day, 0);
     $bihuy = array_fill(1, Carbon::now()->day, 0);
     $loi = array_fill(1, Carbon::now()->day, 0);
+    //-------------
+    $luongtrahangnam = array_fill(1, 12, 0);
+    $luotmuanam = array_fill(1, 12, 0);
+    $bihuynam = array_fill(1, 12, 0);
+    $loinam = array_fill(1, 12, 0);
+
+    // Lấy dữ liệu đơn hàng trong năm hiện tại
+    $ordersCurrentYear = OrdersModel::whereYear('created_at', Carbon::now()->year)->where('status', 2)->get();
+
+    // Xử lý dữ liệu theo từng tháng trong năm
+    foreach ($ordersCurrentYear as $order) {
+        $month = $order->created_at->month; // Tháng tạo đơn hàng
+        $luotmuanam[$month] += 1; // Mỗi đơn hàng tăng lượt mua
+        switch ($order->status) {
+            case 5: // Đơn hàng trả hàng
+                $luongtrahangnam[$month] += 1;
+                break;
+            case 6: // Đơn hàng bị hủy
+                $bihuynam[$month] += 1;
+                break;
+            case 7: // Đơn hàng lỗi
+                $loinam[$month] += 1;
+                break;
+        }
+    }
+
+    // Chuyển đổi mảng thành JSON cho thống kê theo tháng
+    $luongtrahangThangJson = array_values($luongtrahangnam);
+    $luotmuaThangJson = array_values($luotmuanam);
+    $bihuyThangJson = array_values($bihuynam);
+    $loiThangJson = array_values($loinam);
+
+    //-------------
+    $currentYear = Carbon::now()->year;
+    $yearsRange = range($currentYear - 4, $currentYear); // 5 năm gần nhất
+    $luongtrahangcacnam = array_fill_keys($yearsRange, 0);
+    $luotmuacacnam = array_fill_keys($yearsRange, 0);
+    $bihuycacnam = array_fill_keys($yearsRange, 0);
+    $loicacnam = array_fill_keys($yearsRange, 0);
+
+    // Lấy dữ liệu đơn hàng của 5 năm gần nhất
+    $ordersLastFiveYears = OrdersModel::whereYear('created_at', '>=', $currentYear - 4)->where('status', 2)
+    ->get();
+
+    // Xử lý dữ liệu theo năm
+    foreach ($ordersLastFiveYears as $order) {
+    $year = $order->created_at->year; // Năm tạo đơn hàng
+    if (in_array($year, $yearsRange)) {
+        $luotmuacacnam[$year] += 1; // Mỗi đơn hàng tăng lượt mua
+        switch ($order->status) {
+            case 5: // Đơn hàng trả hàng
+                $luongtrahangcacnam[$year] += 1;
+                break;
+            case 6: // Đơn hàng bị hủy
+                $bihuycacnam[$year] += 1;
+                break;
+            case 7: // Đơn hàng lỗi
+                $loicacnam[$year] += 1;
+                break;
+        }
+    }
+    }
+
+    // Chuyển đổi mảng thành JSON cho thống kê theo năm
+    $luongtrahangCacNamJson = array_values($luongtrahangcacnam);
+    $luotmuaCacNamJson = array_values($luotmuacacnam);
+    $bihuyCacNamJson = array_values($bihuycacnam);
+    $loiCacNamJson = array_values($loicacnam);
+
+    //---------------------------------
 
     foreach ($monthlyRevenueOrder as $order) {
         $day = $order->created_at->day; 
@@ -1046,6 +1192,17 @@ public function statistBySales(Request $request)
         'luotmuaJson',
         'bihuyJson',
         'loiJson',
+
+        'luongtrahangThangJson',
+        'luotmuaThangJson',
+        'bihuyThangJson',
+        'loiThangJson',
+
+        'luongtrahangCacNamJson',
+        'luotmuaCacNamJson',
+        'bihuyCacNamJson',
+        'loiCacNamJson',
+        
         'TongSoLuongBanRa',
         'listShop',
         'DangGiao',

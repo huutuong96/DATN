@@ -895,12 +895,18 @@ class ProductController extends Controller
         }
 
         $user = JWTAuth::parseToken()->authenticate();
+
         if($request->name != $product->name){
             $slug = Str::slug($request->name);
         }else{
             $slug = $product->slug;
         }
 
+            if($request->name != $product->name){
+                $slug = Str::slug($request->name);
+            }else{
+                $slug = $product->slug
+            }
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
