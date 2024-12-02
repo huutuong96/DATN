@@ -905,7 +905,7 @@ class ProductController extends Controller
             if($request->name != $product->name){
                 $slug = Str::slug($request->name);
             }else{
-                $slug = $product->slug
+                $slug = $product->slug;
             }
         $dataInsert = [
             'product_id' => $product->id,
