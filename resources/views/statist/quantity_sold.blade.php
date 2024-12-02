@@ -13,7 +13,7 @@
 
     <div class="row">
     <div style="display: flex; justify-content: space-between;">
-        <h5>Thống kê số lượng bán ra Tháng {{ \Carbon\Carbon::now()->format('m') }}</h5>
+        <h5>Thống kê số lượng bán ra </h5>
         <h5 class="me-4">Top 10 cửa hàng theo lượng bán ra</h5>
     </div>   
         <div class="col-xl-9">
@@ -54,25 +54,26 @@
                             function getDaysInMonth(year, month) {
                                 return new Date(year, month, 0).getDate(); // Lấy ngày cuối cùng của tháng
                             }
-
-                            let xValues1 = [];
+                            
                             switch (type) {
-                                case 'Tháng':
+                                case 'Tháng': 
                                     // Lấy số ngày trong tháng hiện tại
-                                    xValues1 = Array.from({ length: getDaysInMonth(year, month) }, (_, i) => i + 1);
-                                    mychart.data.labels = xValues1;
-                                    // mychart.data.datasets[0].data = newRedData; // Cập nhật dữ liệu dataset 1
-                                    // mychart.data.datasets[1].data = newGreenData; // Dataset 2
-                                    mychart.data.datasets[2].data = @json($doanhthuJson ?? []);
+                                    let end = getDaysInMonth(year, month)
+                                    let xValues2 = Array.from({ length: end }, (_, i) => i + 1);
+                                    mychart.data.labels = xValues2;
+                                    mychart.data.datasets[1].data = @json($soluongJson ?? []);
                                     mychart.update();
                                     break;
                                 case 'Năm':
                                     // Lấy các tháng trong năm (1-12)
-                                    xValues1 = Array.from({ length: 12 }, (_, i) => i + 1);
-                                    mychart.data.labels = xValues1;
-                                    mychart.data.datasets[0].data = []; // Cập nhật dữ liệu dataset 1
-                                    mychart.data.datasets[1].data =  [];  // Dataset 2
-                                    mychart.data.datasets[2].data = @json($doanhthunamJson ?? []);// Dataset 3
+                                    let xValues3 = Array.from({ length: 12 }, (_, i) => i + 1);
+                                    // xValues1 = []
+                                    // for (let index = 0; index < 12; index++) {
+                                    //     const element = array[index];
+                                        
+                                    // }
+                                    mychart.data.labels = xValues3;
+                                    mychart.data.datasets[1].data = @json($soluongnamJson ?? []);// Dataset 3
                                     mychart.update();
                                     break;
                                 default:
@@ -80,10 +81,10 @@
                                     const currentYear = new Date().getFullYear();
 
                                     // Tạo mảng các năm gần đây (bao gồm năm hiện tại)
-                                    const xValues1 = Array.from({ length: 5 }, (_, i) => currentYear - (4 - i));
+                                    let xValues4 = Array.from({ length: 5 }, (_, i) => currentYear - (4 - i));
                                     // xValues1 = ['2020', '2021', '2022', '2023', year];
-                                    mychart.data.labels = xValues1;
-                                    mychart.data.datasets[2].data =@json($doanhthucacnamJson1 ?? []);// Dataset 3
+                                    mychart.data.labels = xValues4;
+                                    mychart.data.datasets[1].data =@json($soluongcacnamJson ?? []);// Dataset 3
                                     mychart.update();
                                     break;
                             }
@@ -201,41 +202,49 @@
     </div><!-- end row -->
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-
 <script>
-const xValues1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+    // Lấy số ngày trong tháng hiện tại
+    const now = new Date();
+    const year = now.getFullYear(); // Năm hiện tại
+    const month = now.getMonth() + 1; // Tháng hiện tại (getMonth trả về giá trị từ 0-11)
+    // Hàm để lấy số ngày trong tháng
+    function getDaysInMonth(year, month) {
+        return new Date(year, month, 0).getDate(); // Lấy ngày cuối cùng của tháng
+    }
+    const xValues1 = Array.from({ length: getDaysInMonth(year, month) }, (_, i) => i + 1);
 
-// Lấy dữ liệu từ PHP cho biểu đồ màu xanh
-var red_data = @json($luongtrahangJson ?? []);
-var green_data = @json($soluongJson ?? []);
-var blue_data = @json($soluongJsond ?? []);
 
-new Chart("myChart", {
-  type: "line",
-  data: {
-    labels: xValues1,
-    datasets: [
-      { 
-        data: red_data,
-        borderColor: "red",
-        fill: false
-      }, 
-      { 
-        data: green_data,
-        borderColor: "green",
-        fill: false
-      },
-      { 
-        data: blue_data,
-        borderColor: "blue",
-        fill: false
-      }
-    ]
-  },
-  options: {
-    legend: { display: false }
-  }
-});
+    // Lấy dữ liệu từ PHP cho biểu đồ màu xanh
+    var red_data = @json($luongtrahangJson ?? []);
+    var green_data = @json($soluongJson ?? []);
+    var blue_data = @json($doanhthuJson ?? []);
+
+    var mychart = new Chart("myChart", {
+    type: "line",
+    data: {
+        labels: xValues1,
+        datasets: [
+        { 
+            data: red_data,
+            borderColor: "red",
+            fill: false
+        }, 
+        { 
+            data: green_data,
+            borderColor: "green",
+            fill: false
+        },
+        { 
+            data: blue_data,
+            borderColor: "blue",
+            fill: false
+        }
+        ]
+    },
+    options: {
+        legend: { display: false }
+    }
+    });
 </script>
 
 <script>
