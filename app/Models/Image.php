@@ -14,8 +14,9 @@ class Image extends Model
         'product_variant_id',
         'url',
         'status',
-        'create_at',
-        'update_at',
+        'updated_at',
+        'updated_at',
+        'update_version',
     ];
 
     protected $hidden = [

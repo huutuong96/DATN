@@ -37,8 +37,20 @@
                 <div class="card">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title mb-0 flex-grow-1">Tất cả sản phẩm</h4>
+                        <div class="dropdown" >
+                            <button class="btn dropdown-toggle" style="border: 1px solid #747474;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                Xuất FILE Excel
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 0])}}">Xuất sản phẩm từ chối duyệt </a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 2])}}">Xuất Sản phẩm đang hoạt động</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 3])}}">Xuất Sản phẩm chờ duyệt</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'products', 'status' => 4])}}">Xuất Sản phẩm vi phạm</a>
+                            </div>
+                        </div>
                     </div><!-- end card header -->
-    
+                    <!-- Single Button Dropdown -->
+                   
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
@@ -82,7 +94,7 @@
                                                         Chưa duyệt
                                                     @elseif($product->status == 2)
                                                         Đang hoạt động
-                                                    @elseif($product->status == 5)
+                                                    @elseif($product->status == 0)
                                                         Đã từ chối
                                                     @elseif($product->status == 4)
                                                         Vi phạm
@@ -403,7 +415,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name ?? "Vô danh"}}</td> 
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name}}</td>
                                                     
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
@@ -431,18 +443,18 @@
                                                                 <i class="ri-close-circle-line align-middle"></i> 
                                                             </button>
                                                         </form>
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->id }}">
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $product->product_id }}">
                                                             <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
                                                                 <i class="ri-eye-line align-middle"></i>
                                                             </button>
                                                         </a>
-                                                    
                                                         <!-- Modal Chi tiết sản phẩm -->
-                                                        <div class="modal fade" id="detailsModal-{{ $product->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->id }}" aria-hidden="true">
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id}}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
+                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->id }}">Thông tin sản phẩm chi tiết</h5>
+                                                                        <h5 class="modal-title" id="detailsModalLabel-{{ $product->product_id }}">Thông tin sản phẩm chi tiết</h5>
                                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                     </div>
                                                                     <div class="modal-body">
@@ -638,7 +650,7 @@
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <form action="{{ route('products.submitReport', ['id' => $product->id, 'token' => auth()->user()->refresh_token, 'tab' => 3]) }}" method="POST">
+                                                                    <form action="{{ route('products.submitReport', ['id' => $product->id, 'token' => auth()->user()->refesh_token, 'tab' => 3]) }}" method="POST">
                                                                         @csrf
                                                                         <div class="mb-3">
                                                                             <label for="reason-{{ $product->id }}" class="form-label">Lý do vi phạm:</label>

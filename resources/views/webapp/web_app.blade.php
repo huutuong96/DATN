@@ -10,48 +10,49 @@
 <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">Danh sách web app</h5>
-                                </div>
-                                <div class="col-2 p-3">
-                                    <button type="button" class="btn btn-secondary btn-animation waves-effect waves-light col-12" data-bs-toggle="modal" data-bs-target="#myModal">Thêm mới</button>
-                                </div>
-
-                                <div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-                                    <div class="modal-dialog modal-xl">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="myModalLabel">Thêm web app</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                            <form class="row g-3" action="{{route('create_app', ['token' => auth()->user()->refesh_token])}}" method="post" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="col-md-4">
-                                                    <label for="validationDefault01" class="form-label">Tên</label>
-                                                    <input name="name_app" type="text" class="form-control" id="validationDefault01" value="Tên app" required>
+                                <div class="card-header align-items-center d-flex">
+                                    <h5 class="card-title mb-0 flex-grow-1">Danh sách web app</h5>
+                                    <div class="col-2 p-3">
+                                        <button type="button" class="btn btn-primary btn-animation waves-effect waves-light col-12" data-bs-toggle="modal" data-bs-target="#myModal">Thêm mới</button>
+                                    </div>
+    
+                                    <div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+                                        <div class="modal-dialog modal-xl">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="myModalLabel">Thêm web app</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <label for="validationDefault02" class="form-label">Icon</label>
-                                                    <input name="icon_app" type="file" class="form-control" id="validationDefault02" required>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label for="validationDefaultUsername" class="form-label">Đường dẫn</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text" id="inputGroupPrepend2">URL</span>
-                                                        <input type="text" class="form-control" name="url_app"
-                                                            required>
+                                                <div class="modal-body">
+                                                <form class="row g-3" action="{{route('create_app', ['token' => auth()->user()->refesh_token])}}" method="post" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <div class="col-md-4">
+                                                        <label for="validationDefault01" class="form-label">Tên</label>
+                                                        <input name="name_app" type="text" class="form-control" id="validationDefault01" value="Tên app" required>
                                                     </div>
+                                                    <div class="col-md-4">
+                                                        <label for="validationDefault02" class="form-label">Icon</label>
+                                                        <input name="icon_app" type="file" class="form-control" id="validationDefault02" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="validationDefaultUsername" class="form-label">Đường dẫn</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text" id="inputGroupPrepend2">URL</span>
+                                                            <input type="text" class="form-control" name="url_app"
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                                                    <button type="submit" class="btn btn-primary ">Thêm mới</button>
                                                 </div>
-                                                <div class="modal-footer">
-                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
-                                                <button type="submit" class="btn btn-primary ">Thêm mới</button>
-                                            </div>
-                                            </form>
-                                            </div>
-                                        </div><!-- /.modal-content -->
-                                    </div><!-- /.modal-dialog -->
-                                </div><!-- /.modal -->
+                                                </form>
+                                                </div>
+                                            </div><!-- /.modal-content -->
+                                        </div><!-- /.modal-dialog -->
+                                    </div><!-- /.modal -->
+                                </div>
+                               
                                 <div class="card-body">
                                     <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                         <thead>

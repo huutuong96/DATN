@@ -16,7 +16,6 @@ class checkShip
      */
     public function handle(Request $request, Closure $next): Response
     {
-
         $shopId = $request->shop_id;
         $shop = Shop::where('id', $shopId)->select('id', 'shopid_GHN')->first();
         if ($shop->shopid_GHN == null) {
@@ -24,7 +23,7 @@ class checkShip
                 'status' => false,
                 'message' => 'Vui lòng cập nhật thiết lập đơn vị vận chuyển',
                 'url' => 'https://vnshop.top/register/shipping/view'
-            ], 400);
+            ], 408);
         }
         return $next($request);
     }

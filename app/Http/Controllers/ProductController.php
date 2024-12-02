@@ -1,11 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Exports\AdminExport;
+use App\Exports\ImageExport;
+use App\Exports\ManagerExport;
+use App\Exports\OrderExport;
+use App\Exports\ProductsExport;
+use App\Exports\SellerExport;
+use App\Exports\ShopExport;
+use App\Exports\UserExport;
 use App\Models\CategoriesModel;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Image;
 use App\Http\Requests\ProductRequest;
+use App\Imports\imagesProductImport;
+use App\Imports\MultiSheetImport;
+use App\Imports\ProductExport;
+use App\Imports\ProductImport;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
@@ -28,6 +41,8 @@ use App\Models\tax_category;
 use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Imports\UsersImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 use Illuminate\Support\Facades\DB;
@@ -683,9 +698,17 @@ class ProductController extends Controller
         } else {
             $mainImageUrl = $product->image;
         }
+        $checkSlug = Product::where("slug", $request->slug ?? Str::slug($request->name))->first();
+        if($checkSlug){
+            $slug = $checkSlug->slug;
+            $slug .= '-' . rand(1000, 9999);
+        }else{
+            $slug = $request->slug ?? Str::slug($request->name);
+        }
         $dataInsert = [
             'name' => $request->name ?? $product->name,
-            'slug' => $request->filled('slug') ? $request->slug : Str::slug($request->name ?? $product->name),
+            'slug' => $slug,
+            'sku' => $request->sku ?? $product->sku,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation,
             'price' => $request->price ?? $product->price,
@@ -764,19 +787,15 @@ class ProductController extends Controller
     {
         try {
             $product = Product::find($id);
-
+    
             if (!$product) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'product không tồn tại',
+                    'message' => 'Product không tồn tại',
                 ], 404);
             }
-
-            Image::where("product_id", $product->id)->delete();
-            // $product->delete();
-
-            // $product->update(['status' => 101]);
-
+            $product->update(['status' => 5]);
+    
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa sản phẩm thành công',
@@ -789,6 +808,7 @@ class ProductController extends Controller
             ]);
         }
     }
+    
 
     public function search(Request $request)
     {
@@ -821,7 +841,11 @@ class ProductController extends Controller
                 //       ->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), 'ASC');      
             }
             if ($request->has('category_id')) {
-                $query->where('category_id', $request->category_id);
+                $categoryIds = CategoriesModel::where('parent_id', $request->category_id)
+                    ->orWhere('id', $request->category_id)
+                    ->pluck('id')
+                    ->toArray();
+                $query->whereIn('category_id', $categoryIds);
             }
             if ($request->has('updated_at')) {
                 $query->orderby('updated_at', 'desc');
@@ -842,22 +866,9 @@ class ProductController extends Controller
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
-            // $shops = [];
-            // foreach ($query->get() as $product) {
-            //     $shopId = $product->shop_id;
-            //     if (!in_array($shopId, array_column($shops, 'id'))) {
-            //         $shops[] = Shop::find($shopId);
-            //     }
-            // }
-            $query->with('shop');
+            // $query->with('shop');
             $products = $query->where('status', 2)->paginate($limit);
 
-        if ($products->isEmpty()) {
-            return response()->json([
-                'message' => 'Không có sản phẩm nào'
-            ], 404);
-        }
-    
         return response()->json($products);
     }
     
@@ -884,35 +895,38 @@ class ProductController extends Controller
         }
 
         $user = JWTAuth::parseToken()->authenticate();
-        $cloudinary = new Cloudinary();
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $mainImageUrl = $uploadedImage['secure_url']; 
-        } else {
-            $mainImageUrl = $product->image;
+        if($request->name != $product->name){
+            $slug = Str::slug($request->name);
+        }else{
+            $slug = $product->slug;
         }
 
+            if($request->name != $product->name){
+                $slug = Str::slug($request->name);
+            }else{
+                $slug = $product->slug
+            }
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
-            'sku' => $product->sku,
-            'slug' => $request->filled('slug') ?? $request->slug,
+            'sku' => $request->sku ?? null,
+            'slug' => $slug,
             'description' => $request->description ?? $product->description,
             'infomation' => $request->infomation ?? $product->infomation ,
             'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0
             'sale_price' => $request->sale_price ?? $product->sale_price,
-            'image' => $mainImageUrl,
-            'quantity' => $request->quantity ?? $product->quantity,
+            'image' => $product->image,
+            'quantity' => $request->stock ?? $product->quantity,
             'parent_id' => $request->parent_id ?? $product->parent_id,
             'update_by' => $user->id,
-            'category_id' => $request->category_id ?? $product->category_id,
+            'category_id' => $request->category ?? $product->category_id,
             'shop_id' => $request->shop_id ?? $product->shop_id,
             'height' => $request->height ?? $product->height,
             'length' => $request->length ?? $product->length,
             'weight' => $request->weight ?? $product->weight,
             'width' => $request->width ?? $product->width,
+            'status' =>  $product->status,
             'created_at' => $product->created_at,
             'show_price' => $request->show_price ?? $product->show_price,
             'brand' => $request->brand ?? $product->brand,
@@ -1416,6 +1430,29 @@ public function ProductAll(Request $request)
 //     return $combinations;
 // }
 
-
-
+       public function importProducts(Request $request){
+            try {
+                Excel::import(new ProductImport, $request->file('file'));
+                $products = Product::latest()->take($request->file('file')->getSize())->select('id')->get();
+                return 'Import thành công';
+            } catch (\Throwable $th) {
+            
+            }
+       }
+      
+       public function exportdata(Request $request){
+        try {
+            if ($request->data == 'products') {
+                return Excel::download(new ProductsExport($request), 'vnshop-products.xlsx');
+            }
+            if ($request->data == 'users') {
+                return Excel::download(new UserExport($request), 'vnshop-customer.xlsx');
+            }
+            if ($request->data == 'orders') {
+                return Excel::download(new OrderExport($request), 'vnshop-orders.xlsx');
+            }
+        } catch (\Throwable $th) {
+            return 'export thất bại: ' . $th->getMessage();
+        }
+   }
 }

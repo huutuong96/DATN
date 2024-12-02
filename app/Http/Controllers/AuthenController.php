@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserLoggedIn;
+use App\Events\UserLoggedOut;
 use App\Http\Requests\UserRequest;
 use App\Models\UsersModel;
 use App\Models\RolesModel;
@@ -208,7 +210,7 @@ class AuthenController extends Controller
             "fullname" => $request->fullname,
             "password" => Hash::make($request->password),
             "email" => $request->email,
-            "rank_id" => $request->rank_id ?? null,
+            "rank_id" => $request->rank_id ?? 1,
             "role_id" => 1,
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
@@ -242,7 +244,7 @@ class AuthenController extends Controller
 
             $cart_to_users = Cart_to_usersModel::create([
                 'user_id' => $user->id,
-                'status' => 1,
+                'status' => 2,
             ]);
             $activeDone = [
                 'status' => true,
@@ -292,45 +294,6 @@ class AuthenController extends Controller
         }
     }
 
-/**
- * @OA\Post(
- *     path="api/login",
- *     summary="User login",
- *     description="Logs in a user and returns a JWT token.",
- *     tags={"Authentication"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"email", "password"},
- *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *             @OA\Property(property="password", type="string", example="password123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Login successful",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đăng nhập thành công"),
- *             @OA\Property(property="token", type="string", example="jwt_token_here")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid credentials",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Tài khoản hoặc mật khẩu không đúng")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Token creation failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Không thể tạo token")
- *         )
- *     )
- * )
- */
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -350,7 +313,10 @@ class AuthenController extends Controller
         }
 
         $user->refesh_token = $token;
+        $user->is_login = 1;
         $user->save();
+        $countOnline = UsersModel::where('is_login', 1)->count();
+        event(new UserLoggedIn($countOnline));
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
@@ -381,10 +347,12 @@ class AuthenController extends Controller
         }
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
+        $user->is_login = 1;
         $user->save();
         $user->load('role', 'address');
         $user = auth::user();
-        // dd(auth()->user()->refesh_token);
+        $countOnline = UsersModel::where('is_login', 1)->count();
+        event(new UserLoggedIn($countOnline));
         $notification = Notification::where('user_id', $user->id)->get();
         $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
         $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
@@ -449,37 +417,6 @@ class AuthenController extends Controller
         }
     }
 
-    /**
- * @OA\Put(
- *     path="api/users/{id}",
- *     summary="Update user status",
- *     description="Updates the status of a user to 103 (account locked).",
- *     tags={"Users"},
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         required=true,
- *         @OA\Schema(type="string"),
- *         description="The ID of the user"
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Account locked successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Tài khoản đã bị khóa")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="User not found or inactive",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="User not found or inactive")
- *         )
- *     )
- * )
- */
     public function update(Request $request, string $id)
     {
         $user = UsersModel::where('id', $id)->where('status', 1)->first();
@@ -500,41 +437,39 @@ class AuthenController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         $cloudinary = new Cloudinary();
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
-            $uploadedavatar = $cloudinary->uploadApi()->upload($avatar->getRealPath());
-            $avatarUrl = $uploadedavatar['secure_url'];
-        }
+        // if ($request->hasFile('avatar')) {
+        //     $avatar = $request->file('avatar');
+        //     $uploadedavatar = $cloudinary->uploadApi()->upload($avatar->getRealPath());
+        //     $avatarUrl = $uploadedavatar['secure_url'];
+        // }
         $dataUpdate = [
             "fullname" => $request->fullname ?? $user->fullname,
             "phone" => $request->phone ?? $user->phone,
             "email" => $request->email ?? $user->email,
-            "description" => $request->description ?? $user->description,
-            "genre" => $request->genre ?? $user->genre,
-            "datebirth" => $request->datebirth ?? $user->datebirth,
+            "genre" => $request->genre ?? 1,
+            "datebirth" => $request->datebirth ? date('Y-m-d', strtotime($request->datebirth)) : null,
             "updated_at" => now(),
-            "avatar" => $avatarUrl ?? $user->avatar,
+            "avatar" => $request->avatar ?? $user->avatar,
             "description" => $request->description ?? $user->description,
         ];
         UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
         if($request->input('address')){
             if ($request->input('address')['default'] == 1) {
-                AddressModel::where('default', 1)->update(['default' => null]);
+                AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
             }
-            $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
-            $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
-            $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
             AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
                 "province" => $request->input('address')['province'],
-                "province_id" => $filteredCity['ProvinceID'],
+                "province_id" => $request->input('address')['province_id'],
                 "district" => $request->input('address')['district'],
-                "district_id" => $filteredDistrict['DistrictID'],
+                "district_id" => $request->input('address')['district_id'],
                 "ward" => $request->input('address')['ward'],
-                "ward_id" => $filledWard,
+                "ward_id" => $request->input('address')['ward_id'],
                 "address" => $request->input('address')['address'],
                 "user_id" => $user->id,
-                "default" => $request->input('address')['default'] ?? null,
+                "default" => $request->input('address')['default'] ?? 0,
                 "type" => $request->input('address')['type'] ?? null,
+                "name" => $user->fullname ?? null,
+                "phone" => $user->phone ?? null,
             ]);
         }
         $dataDone = [
@@ -738,37 +673,16 @@ class AuthenController extends Controller
         }
     }
 
-    /**
- * @OA\Post(
- *     path="api/logout",
- *     summary="User logout",
- *     description="Logs out the authenticated user and invalidates the JWT token.",
- *     tags={"Authentication"},
- *     @OA\Response(
- *         response=200,
- *         description="Logout successful",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đăng xuất thành công")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid or missing token",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Token không hợp lệ hoặc không tồn tại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
+   
     public function logout()
     {
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
+            'is_login' => 0,
         ]);
+        $countOnline = UsersModel::where('is_login', 1)->count();
+        event(new UserLoggedIn($countOnline));
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json([
             'status' => true,
@@ -781,7 +695,10 @@ class AuthenController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
+            'is_login' => 0,
         ]);
+        $countOnline = UsersModel::where('is_login', 1)->count();
+        event(new UserLoggedIn($countOnline));
         JWTAuth::invalidate(JWTAuth::getToken());
         session()->forget('token');
         return redirect()->route('login');

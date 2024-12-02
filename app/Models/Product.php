@@ -73,7 +73,7 @@ class Product extends Model
     }
     public function shop()
     {
-        return $this->belongsTo(Shop::class, 'shop_id')->select('id','province');
+        return $this->belongsTo(Shop::class);
     }
     public function category()
     {

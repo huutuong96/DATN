@@ -11,18 +11,18 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/images/favicon.ico">
+    <link rel="shortcut icon" href="{{env('URL_CSS_PRODUCTION')}}assets/images/favicon.ico">
 
     <!-- Layout config Js -->
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/js/layout.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/js/layout.js"></script>
     <!-- Bootstrap Css -->
-    <link href="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{env('URL_CSS_PRODUCTION')}}assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
-    <link href="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{env('URL_CSS_PRODUCTION')}}assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <!-- App Css-->
-    <link href="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{env('URL_CSS_PRODUCTION')}}assets/css/app.min.css" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
-    <link href="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{env('URL_CSS_PRODUCTION')}}assets/css/custom.min.css" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -81,20 +81,20 @@
     <!-- end auth-page-wrapper -->
 
     <!-- JAVASCRIPT -->
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/libs/simplebar/simplebar.min.js"></script>
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/libs/node-waves/waves.min.js"></script>
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/libs/feather-icons/feather.min.js"></script>
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/js/plugins.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/libs/node-waves/waves.min.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/libs/feather-icons/feather.min.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/js/plugins.js"></script>
 
     <!-- particles js -->
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/libs/particles.js/particles.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/libs/particles.js/particles.js"></script>
     <!-- particles app js -->
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/js/pages/particles.app.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/js/pages/particles.app.js"></script>
 
     <!-- Countdown js -->
-    <script src="{{env('URL_CSS') ?? env('URL_CSS_PRODUCTION')}}assets/js/pages/coming-soon.init.js"></script>
+    <script src="{{env('URL_CSS_PRODUCTION')}}assets/js/pages/coming-soon.init.js"></script>
 
 </body>
 

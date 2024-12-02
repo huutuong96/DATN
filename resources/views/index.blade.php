@@ -36,8 +36,11 @@
     <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-
+    
     @yield('link')
+
+
+
 </head>
 
 <body>
@@ -104,6 +107,15 @@
                             </div>
                         </div>
                     </form>
+
+                    <div class="d-flex align-items-center">
+
+                            <span id="online-count" class="badge bg-success">.</span>
+
+                    </div>
+
+
+
                     <div class="d-flex align-items-center">
                         <div
                             class="dropdown d-md-none topbar-head-dropdown header-item">
@@ -128,7 +140,11 @@
                                             <h6 class="m-0 fw-semibold fs-15"> Web Apps </h6>
                                         </div>
                                         <div class="col-auto">
-                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> View All Apps
+                                            <a href="{{ route('setting_admin', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> Cài Đặt
+                                                <i class="ri-arrow-right-s-line align-middle"></i></a>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a href="{{ route('list_app', ['token' => auth()->user()->refesh_token]) }}" class="btn btn-sm btn-soft-info"> Tất cả
                                                 <i class="ri-arrow-right-s-line align-middle"></i></a>
                                         </div>
                                     </div>
@@ -1159,16 +1175,11 @@
             <footer class="footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-2">
                             <script>
                                 document.write(new Date().getFullYear());
                             </script>
                             © VNshop.
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="text-sm-end d-none d-sm-block">
-                                Hệ thống được thiết kế bởi đội ngũ vnshop
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1204,7 +1215,7 @@
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
-
+   
     <!-- apexcharts -->
     <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
 
