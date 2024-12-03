@@ -23,9 +23,6 @@
                 <h2 class="text-center mb-4 fs-5 fs-md-4 fs-lg-3">
                     Cảm ơn bạn đã mua sắm tại Shop!
                 </h2>
-                <?php 
-                $subTotal = 0;
-                ?>
                 @foreach($orders as $order)
                 
                 <!-- Order Info -->
@@ -39,31 +36,42 @@
                 <div class="border-top pt-3">
                     <h4 class="fs-6 fs-md-5">Chi tiết sản phẩm</h4>
                     <ul class="list-group list-group-flush">
-                        @foreach($carts as $cart)
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>{{$cart->product_name  ?? null}}
-                                x
-                                 <?php 
-                                $cartQuantity = $cart->quantity;
-                                ?>
-                                {{$cart->quantity ?? 1}}
-                            </span>
-                            <span>
-                                @if($cart->variant_id != null)
-                               {{number_format($subTotal += $cartQuantity * $cart->variant_price)}}đ
-                            @else
-                               {{number_format($subTotal += $cartQuantity * $cart->product_price)}}đ
+                        @foreach($orderDetails as $orderDetail)
+                        @if($orderDetail->order_id == $order->id)
+                            @if($orderDetail->variant_id == null)
+                                @foreach($products as $product)
+                                    @if($orderDetail->product_id == $product->id)
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>
+                                                <img style="padding: 5px;width: 110px; height: 80px;" src="{{$product->image ?? null}}" alt="" >
+                                                {{$product->name ?? null}}X{{$orderDetail->quantity ?? null}}</span>
+                                            <span class="pt-5">
+                                                {{$orderDetail->subtotal ?? null}}
+                                            </span>
+                                        </li>
+                                    @endif 
+                                @endforeach
+                            @elseif($orderDetail->variant_id != null)
+                                @foreach($variants as $variant)
+                                        @if($orderDetail->variant_id == $variant->id)
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>
+                                                <img style="padding: 5px;width: 110px; height: 80px;" src="{{$product->image ?? null}}" alt="" >
+                                                {{$$variant->name ?? null}}X{{$orderDetail->quantity ?? null}}</span>
+                                            <span class="pt-5">
+                                                {{$orderDetail->subtotal ?? null}}
+                                            </span>
+                                        </li>
+                                        @endif 
+                                @endforeach
                             @endif
-                            </span>
-                        </li>
-                        @endforeach
+                        @endif
+                        @endforeach    
                     </ul>
-                </div>
-               
                 <!-- Summary -->
                 <div class="border-top pt-3">
                     <p class="mb-1">Tổng tiền hàng:
-                        <span class="  fs-6 fs-md-5 fs-lg-4">{{number_format($subTotal ?? $order->total_amount)}}đ</span>
+                        <span class="  fs-6 fs-md-5 fs-lg-4">  {{number_format($order->vat ?? null)}}đ</span>
                     </p>
                     <p class="mb-1">VAT:
                         <span class=" fs-6 fs-md-5 fs-lg-4">{{number_format($subTotal ?? $order->total_amount)}}đ</span>
@@ -73,17 +81,17 @@
                         <span class="  fs-6 fs-md-5 fs-lg-4">{{number_format($shipFee) ?? 0}}đ</span>
                     </p>
                     <p class="mb-1">Giảm giá thành viên:
-                        <span class="  fs-6 fs-md-5 fs-lg-4">{{number_format($subTotal ?? $order->total_amount)}}đ</span>
+                        <span class="  fs-6 fs-md-5 fs-lg-4">{{$order->disscount_by_rank ?? null}}đ</span>
                     </p>
                     <p class="mb-1">Mã giảm giá cửa hàng
-                        <span class="  fs-6 fs-md-5 fs-lg-4">{{number_format($subTotal ?? $order->total_amount)}}đ</span>
+                        <span class="  fs-6 fs-md-5 fs-lg-4">{{$order->voucher_shop_disscount ?? null}}đ</span>
                     </p>
                     <p class="mb-1">Mã giảm giá VNSHOP
-                        <span class="  fs-6 fs-md-5 fs-lg-4">{{number_format($subTotal ?? $order->total_amount)}}đ</span>
+                        <span class="  fs-6 fs-md-5 fs-lg-4"> {{$order->voucher_main_disscount ?? null}}đ</span>
                     </p>
                    
                     <p class="mb-1"><strong>Tổng tiền:</strong> 
-                        <span class="text-danger fw-bold fs-6 fs-md-5 fs-lg-4"> {{number_format($order->total_amount) ?? 0}}đ</span>
+                        <span class="text-danger fw-bold fs-6 fs-md-5 fs-lg-4">  {{$order->total_amount ?? null}}đ</span>
                     </p>
                 </div>
             </div>
