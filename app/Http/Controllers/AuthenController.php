@@ -314,7 +314,7 @@ class AuthenController extends Controller
         }
 
         $user->refesh_token = $token;
-        $user->is_login = 1;
+        // $user->is_login = 1;
         $user->save();
         return response()->json([
             'status' => true,
@@ -346,7 +346,7 @@ class AuthenController extends Controller
         }
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
-        $user->is_login = 1;
+        // $user->is_login = 1;
         $user->save();
         $user->load('role', 'address');
         $user = auth::user();
@@ -676,7 +676,7 @@ class AuthenController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
-            'is_login' => 0,
+            // 'is_login' => 0,
         ]);
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json([
@@ -690,7 +690,7 @@ class AuthenController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
-            'is_login' => 0,
+            // 'is_login' => 0,
         ]);
         JWTAuth::invalidate(JWTAuth::getToken());
         session()->forget('token');

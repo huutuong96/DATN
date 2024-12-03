@@ -44,6 +44,7 @@ class CancelOrderS implements ShouldQueue
             ]);
         }
         foreach ($users as $user) {
+            dd($user->email);
             sendNotiWhenCanceledOrder::dispatch($user->id, $user->email);
             DB::table('log_jobs')->insert([
                 'log' => 'sendNotiWhenCanceledOrder ',
