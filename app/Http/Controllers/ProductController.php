@@ -1464,16 +1464,5 @@ public function ProductAll(Request $request)
     
     }
 
-
-
-
-    // public function fullTextSearch(Request $request)
-    // {
-    //     $query = Product::query();
-    //     $query->explain();
-
-
-
-    // }
 }
 
