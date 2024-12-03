@@ -107,10 +107,7 @@
                             </div>
                         </div>
                     </form>
-                    <!-- 
-                        <div class="d-flex align-items-center">
-                            <span id="online-count" class="badge bg-success">{{$useronline}} ONLINE</span>
-                        </div> -->
+              
                     <div class="d-flex align-items-center">
                         <div
                             class="dropdown d-md-none topbar-head-dropdown header-item">
