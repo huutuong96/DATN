@@ -9,6 +9,7 @@ use App\Exports\OrderExport;
 use App\Exports\ProductsExport;
 use App\Exports\SellerExport;
 use App\Exports\ShopExport;
+use App\Exports\Transaction_history;
 use App\Exports\UserExport;
 use App\Models\CategoriesModel;
 use Illuminate\Http\Request;
@@ -1452,13 +1453,16 @@ public function ProductAll(Request $request)
                 return Excel::download(new OrderExport($request), 'vnshop-orders.xlsx');
             }
             if ($request->data == 'transaction_history') {
-                dd($request);
                 return Excel::download(new Transaction_history($request), 'vnshop-transaction_history.xlsx');
+            }
+            if ($request->data == 'order_details') {
+                return Excel::download(new Transaction_history($request), 'vnshop-order_details.xlsx');
             }
         } catch (\Throwable $th) {
             return 'export thất bại: ' . $th->getMessage();
         }
     
     }
+
 }
 

@@ -10,18 +10,17 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class SendMailEvent implements ShouldQueue
+class sendMailBirthDay implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-   
-    protected $users;
+    protected $userMail;
     protected $eventTitle;
     protected $code;
 
-    public function __construct($users, $eventTitle, $code)
+    public function __construct($userMail, $eventTitle, $code)
     {
-        $this->users = $users;
+        $this->userMail = $userMail;
         $this->eventTitle = $eventTitle;
         $this->code = $code;
     }
@@ -31,8 +30,8 @@ class SendMailEvent implements ShouldQueue
      */
     public function handle(): void
     {
-        foreach ($this->users as $user) {
-            Mail::to($user)->send(new mailEvent($this->eventTitle, $this->code, $user));
-        }
+        
+            Mail::to($this->userMail)->send(new mailEvent($this->eventTitle, $this->code, "Bạn"));
+       
     }
 }
