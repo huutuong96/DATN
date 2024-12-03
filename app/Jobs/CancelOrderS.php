@@ -30,8 +30,9 @@ class CancelOrderS implements ShouldQueue
     {
         DB::table('log_jobs')->insert([
             'log' => 'CancelOrderS ',
+            'date' => Carbon::now(),
         ]);
-        $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(5))->get();
+        $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(4))->get();
         $shopsHasOrderPrepareCancel = Shop::whereIn('id', $ordersPrepareCancel->pluck('shop_id'))->get();
         $orders = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(5))->get();
         $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
@@ -42,27 +43,26 @@ class CancelOrderS implements ShouldQueue
                 'log' => 'sendNotiPrepareCancelOrderForSeller ',
             ]);
         }
+        foreach ($users as $user) {
+            sendNotiWhenCanceledOrder::dispatch($user->id, $user->email);
+            DB::table('log_jobs')->insert([
+                'log' => 'sendNotiWhenCanceledOrder ',
+                'date' => Carbon::now(),
+            ]);
+        }
+        foreach ($shops as $shop) {
+            sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
+            DB::table('log_jobs')->insert([
+                'log' => 'sendNotiWhenCanceledOrderForSeller ',
+                'date' => Carbon::now(),
+            ]);
+        }
+ 
         foreach ($orders as $order) {
-            $user = $users->firstWhere('id', $order->user_id);
-            // dd(  $user) ;
-            if ($user) {
-                sendNotiWhenCanceledOrder::dispatch($user->id, $user->email, $order);
-                // dd($user->id);
-                DB::table('log_jobs')->insert([
-                    'log' => 'sendNotiWhenCanceledOrder for order ID: ' . $order->id,
-                ]);
-            }
-
-            $shop = $shops->firstWhere('id', $order->shop_id); 
-            if ($shop) {
-                sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
-                DB::table('log_jobs')->insert([
-                    'log' => 'sendNotiWhenCanceledOrderForSeller for shop ID: ' . $shop->id,
-                ]);
-            }
             autoCancelOrder::dispatch($order);
             DB::table('log_jobs')->insert([
-                'log' => 'autoCancelOrder for order ID: ' . $order->id,
+                'log' => 'autoCancelOrder ',
+                'date' => Carbon::now(),
             ]);
         }
         

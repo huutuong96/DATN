@@ -149,15 +149,6 @@ Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mai
 
 
 
-
-
-
-
-
-
-
-
-
 // CLIENT EMBEDED
 Route::get('/subdomain', [ModifierController::class, 'subdomain'])->name('subdomain');
 Route::post('/create_subdomain', [ModifierController::class, 'create_subdomain'])->name('create_subdomain');

@@ -122,8 +122,9 @@ class NotificationController extends Controller
 
     public function send_mail_event(Request $request)
     {
-        $users = UsersModel::where('status', 2)->select('email')->get();
-        $today = date('d-m');
+        $users = UsersModel::where('status', 1)->pluck('email');
+      
+        $today = $request->date ?? date('d-m');
         $eventTitle = null;
         $events = [
             '01-01' => 'Chúc mừng năm mới! Năm ' . date('Y') . ' VNShop xin gửi tặng bạn Voucher nhân dịp năm mới.',
@@ -139,12 +140,14 @@ class NotificationController extends Controller
             '20-11' => 'Chúc mừng ngày Nhà giáo Việt Nam 20-11! VNShop xin gửi tặng bạn Voucher tri ân thầy cô.',
             '24-12' => 'Chúc mừng Giáng sinh 24-12! VNShop xin gửi tặng bạn Voucher.',
             '31-12' => 'Chào đón đêm giao thừa 31-12! VNShop xin gửi tặng bạn Voucher chào năm mới.',
+            '02-12' => 'Chào đón đêm giao thừa 31-12! VNShop xin gửi tặng bạn Voucher chào năm mới.',
+            
         ];
         if (array_key_exists($today, $events)) {
             $eventTitle = $events[$today];
         }
-
-        SendMailEvent::dispatch($users);
+        // dd($eventTitle);
+        SendMailEvent::dispatch($users, $eventTitle);
         // SendNotiEvent::dispatch($users);
         return response()->json([
             'status' => 'success',

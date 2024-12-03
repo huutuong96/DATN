@@ -409,4 +409,5 @@ Route::get('/search', function () {
         Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
 
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
- 
+        
+

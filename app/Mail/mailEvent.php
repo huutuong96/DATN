@@ -13,12 +13,10 @@ class mailEvent extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
+    protected $eventTitle;
+    public function __construct($eventTitle)
     {
-        //
+        $this->eventTitle = $eventTitle;
     }
 
     /**
@@ -27,7 +25,7 @@ class mailEvent extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mail Event',
+            subject: 'Mừng Ngày ABC',
         );
     }
 
@@ -37,7 +35,10 @@ class mailEvent extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.mail_event',
+            with: [
+                'eventTitle' => $this->eventTitle,
+            ],
         );
     }
 

@@ -148,7 +148,7 @@
                                             class="fs-22 fw-semibold ff-secondary mb-4"
                                         >
                                         <span >
-                                        {{ $DoiTra ?? 0}} vnđ
+                                        {{ $DoiTra ?? 0}}
                                         </span>
                                         </h4>
                                         <a
@@ -452,8 +452,87 @@
     <div class="row">  
         <div class="col-xl-9">
             <div class="card">
-            <h5 class="m-3">Thống kê lượt bán trong tháng</h5>
+            <h5 class="m-3">Thống kê lượt bán </h5>
                 <div class="card-body">
+                <div class="row"  style="float: right;">
+                    <div class="dropdown card-header-dropdown">
+                        <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="text-muted" id="dropdownDisplay">
+                                Tháng {{ \Carbon\Carbon::now()->format('m') }}
+                                <i class="mdi mdi-chevron-down ms-1"></i>
+                            </span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="#" onclick="updateDropdown('Tháng', {{ \Carbon\Carbon::now()->format('m') }})">
+                                Tháng {{ \Carbon\Carbon::now()->format('m') }}
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="updateDropdown('Năm', {{ \Carbon\Carbon::now()->format('Y') }})">
+                                Năm {{ \Carbon\Carbon::now()->format('Y') }}
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="updateDropdown('Các năm gần đây', '')">
+                                Các năm gần đây
+                            </a>
+                        </div>
+                    </div>
+
+                    <script>
+                        // Hàm để cập nhật nội dung hiển thị của dropdown
+                        function updateDropdown(type, value) {
+                            const displayElement = document.getElementById('dropdownDisplay');
+                            displayElement.innerHTML = `${type} ${value || ''} <i class="mdi mdi-chevron-down ms-1"></i>`; 
+
+                            const now = new Date();
+                            const year = now.getFullYear(); // Năm hiện tại
+                            const month = now.getMonth() + 1; // Tháng hiện tại (getMonth trả về giá trị từ 0-11)
+
+                            // Hàm để lấy số ngày trong tháng
+                            function getDaysInMonth(year, month) {
+                                return new Date(year, month, 0).getDate(); // Lấy ngày cuối cùng của tháng
+                            }
+                            
+                            switch (type) {
+                                case 'Tháng': 
+                                    // Lấy số ngày trong tháng hiện tại
+                                    let end = getDaysInMonth(year, month)
+                                    let xValues2 = Array.from({ length: end }, (_, i) => i + 1);
+                                    mychart.data.labels = xValues2;
+                                    mychart.data.datasets[0].data = @json($luongtrahangJson ?? []);
+                                    mychart.data.datasets[1].data = @json($luotmuaJson ?? []);
+                                    mychart.data.datasets[2].data = @json($bihuyJson ?? []);
+                                    mychart.data.datasets[3].data = @json($loiJson ?? []);
+                                    mychart.update();
+                                    break;
+                                case 'Năm':
+                                    let xValues3 = Array.from({ length: 12 }, (_, i) => i + 1);
+                                    mychart.data.labels = xValues3;
+                                    mychart.data.datasets[0].data = @json($luongtrahangThangJson ?? []);
+                                    mychart.data.datasets[1].data = @json($luotmuaThangJson ?? []);
+                                    mychart.data.datasets[2].data = @json($bihuyThangJson ?? []);
+                                    mychart.data.datasets[3].data = @json($loiThangJson ?? []);
+                                    mychart.update();
+                                    break;
+                                default:
+                                    // Mảng rỗng cho trường hợp không xác định
+                                    const currentYear = new Date().getFullYear();
+
+                                    // Tạo mảng các năm gần đây (bao gồm năm hiện tại)
+                                    let xValues4 = Array.from({ length: 5 }, (_, i) => currentYear - (4 - i));
+                                    // xValues1 = ['2020', '2021', '2022', '2023', year];
+                                    mychart.data.labels = xValues4;
+                                    mychart.data.datasets[0].data = @json($luongtrahangCacNamJson ?? []);
+                                    mychart.data.datasets[1].data = @json($luotmuaCacNamJson ?? []);
+                                    mychart.data.datasets[2].data = @json($bihuyCacNamJson ?? []);
+                                    mychart.data.datasets[3].data = @json($loiCacNamJson ?? []);
+                                    mychart.update();
+                                    break;
+                            }
+
+                            // Log ra mảng xValues1 để kiểm tra
+                            console.log('xValues1:', xValues1);
+                        }
+                    </script>
+
+                </div>
                     <canvas id="myChart"   style="height: 100px !important";></canvas>
                 </div><!-- end card-body -->
                 <div class="card-footer">
@@ -569,15 +648,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
 <script>
-const xValues1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+    // Lấy số ngày trong tháng hiện tại
+    const now = new Date();
+    const year = now.getFullYear(); // Năm hiện tại
+    const month = now.getMonth() + 1; // Tháng hiện tại (getMonth trả về giá trị từ 0-11)
+    // Hàm để lấy số ngày trong tháng
+    function getDaysInMonth(year, month) {
+        return new Date(year, month, 0).getDate(); // Lấy ngày cuối cùng của tháng
+    }
+    const xValues1 = Array.from({ length: getDaysInMonth(year, month) }, (_, i) => i + 1);
+    // Lấy dữ liệu từ PHP cho biểu đồ màu xanh
+    var red_data = @json($luongtrahangJson);
+    var green_data = @json($luotmuaJson);
+    var blue_data = @json($bihuyJson);
+    var yellow_data = @json($loiJson);
 
-// Lấy dữ liệu từ PHP cho biểu đồ màu xanh
-var red_data = @json($luongtrahangJson);
-var green_data = @json($luotmuaJson);
-var blue_data = @json($bihuyJson);
-var yellow_data = @json($loiJson);
-
-new Chart("myChart", {
+    var mychart = new Chart("myChart", {
   type: "line",
   data: {
     labels: xValues1,

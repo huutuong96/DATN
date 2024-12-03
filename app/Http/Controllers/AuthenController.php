@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserLoggedIn;
+use App\Events\UserLoggedOut;
 use App\Http\Requests\UserRequest;
 use App\Models\UsersModel;
 use App\Models\RolesModel;
@@ -209,6 +211,7 @@ class AuthenController extends Controller
             "password" => Hash::make($request->password),
             "email" => $request->email,
             "rank_id" => $request->rank_id ?? 1,
+            "phone" => $request->phone ?? null,
             "role_id" => 1,
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
@@ -311,6 +314,7 @@ class AuthenController extends Controller
         }
 
         $user->refesh_token = $token;
+        $user->is_login = 1;
         $user->save();
         return response()->json([
             'status' => true,
@@ -342,10 +346,10 @@ class AuthenController extends Controller
         }
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
+        $user->is_login = 1;
         $user->save();
         $user->load('role', 'address');
         $user = auth::user();
-        // dd(auth()->user()->refesh_token);
         $notification = Notification::where('user_id', $user->id)->get();
         $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
         $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
@@ -666,36 +670,13 @@ class AuthenController extends Controller
         }
     }
 
-    /**
- * @OA\Post(
- *     path="api/logout",
- *     summary="User logout",
- *     description="Logs out the authenticated user and invalidates the JWT token.",
- *     tags={"Authentication"},
- *     @OA\Response(
- *         response=200,
- *         description="Logout successful",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đăng xuất thành công")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid or missing token",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Token không hợp lệ hoặc không tồn tại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
+   
     public function logout()
     {
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
+            'is_login' => 0,
         ]);
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json([
@@ -709,6 +690,7 @@ class AuthenController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
+            'is_login' => 0,
         ]);
         JWTAuth::invalidate(JWTAuth::getToken());
         session()->forget('token');
@@ -1008,7 +990,5 @@ class AuthenController extends Controller
         $user->load('role', 'address');
         return view('profile.profile', ['user' => $user]);
 
-    }
-
-    
+    }   
 }
