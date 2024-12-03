@@ -24,8 +24,10 @@ class WebAppProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             $apps = web_app::all(); 
-            $useronline = UsersModel::where('is_login', 1)->count();
-            $view->with('apps', $apps)->with('useronline', $useronline);
+            // $useronline = UsersModel::where('is_login', 1)->count();
+            // $view->with('apps', $apps)->with('useronline', $useronline);
+            $view->with('apps', $apps);
+
         });
     }
 }
