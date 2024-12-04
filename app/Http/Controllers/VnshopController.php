@@ -1063,14 +1063,30 @@ public function statistByRevenue(Request $request)
     }
     public function statistBySales(Request $request)
     {
-    $TongSoLuongBanRa = OrdersModel::count();
-    $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->count();
-    $DoiTra = OrdersModel::whereIn("order_status", [9])->count();
-    $Huy = OrdersModel::whereIn("order_status", [10])->count();
-    $HoanThanh = OrdersModel::whereIn("order_status", [7,8])->count();
-    $ThatBai = OrdersModel::whereIn("order_status", [6])->count();
-    $ChoDuyet = OrdersModel::whereIn("order_status", [0,1,2,3])->count();
-    $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->count();
+    $TongSoLuongBanRa = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->count();
+    $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $DoiTra = OrdersModel::whereIn("order_status", [9])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $Huy = OrdersModel::whereIn("order_status", [10])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $HoanThanh = OrdersModel::whereIn("order_status", [7,8])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $ThatBai = OrdersModel::whereIn("order_status", [6])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $ChoDuyet = OrdersModel::whereIn("order_status", [0,1,2,3])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
 
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
         ->whereYear('created_at', Carbon::now()->year)
@@ -1094,14 +1110,14 @@ public function statistByRevenue(Request $request)
     foreach ($ordersCurrentYear as $order) {
         $month = $order->created_at->month; // Tháng tạo đơn hàng
         $luotmuanam[$month] += 1; // Mỗi đơn hàng tăng lượt mua
-        switch ($order->status) {
-            case 5: // Đơn hàng trả hàng
+        switch ($order->order_status) {
+            case 9: // Đơn hàng trả hàng
                 $luongtrahangnam[$month] += 1;
                 break;
-            case 6: // Đơn hàng bị hủy
+            case 10: // Đơn hàng bị hủy
                 $bihuynam[$month] += 1;
                 break;
-            case 7: // Đơn hàng lỗi
+            case 6: // Đơn hàng lỗi
                 $loinam[$month] += 1;
                 break;
         }
@@ -1130,14 +1146,14 @@ public function statistByRevenue(Request $request)
     $year = $order->created_at->year; // Năm tạo đơn hàng
     if (in_array($year, $yearsRange)) {
         $luotmuacacnam[$year] += 1; // Mỗi đơn hàng tăng lượt mua
-        switch ($order->status) {
-            case 5: // Đơn hàng trả hàng
+        switch ($order->order_status) {
+            case 10: // Đơn hàng trả hàng
                 $luongtrahangcacnam[$year] += 1;
                 break;
-            case 6: // Đơn hàng bị hủy
+            case 9: // Đơn hàng bị hủy
                 $bihuycacnam[$year] += 1;
                 break;
-            case 7: // Đơn hàng lỗi
+            case 6: // Đơn hàng lỗi
                 $loicacnam[$year] += 1;
                 break;
         }
@@ -1156,13 +1172,13 @@ public function statistByRevenue(Request $request)
         $day = $order->created_at->day; 
         if ($day <= Carbon::now()->day) { 
             if($order->status == 2){
-                if($order->status == 5){
+                if($order->order_status == 10){
                     $luongtrahang[$day] += 1;
                 }
-                if($order->status == 5){
+                if($order->order_status == 9){
                     $bihuy[$day] += 1;
                 }
-                if($order->status == 5){
+                if($order->order_status == 6){
                     $loi[$day] += 1;
                 }
                 $luotmua[$day] += 1;
@@ -1181,7 +1197,9 @@ public function statistByRevenue(Request $request)
     $listShop = [];
     foreach ($listShopId as $idKey => $shopId) {
         $shop = Shop::where("id", $shopId)->with('user')->first();
-        $shop["luotban"] = OrdersModel::where("shop_id", $shopId)->count();
+        $shop["luotban"] = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->where("shop_id", $shopId)->count();
         $listShop[] = $shop;
     }
     // dd($listShop);
