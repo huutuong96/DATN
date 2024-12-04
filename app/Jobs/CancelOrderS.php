@@ -35,37 +35,30 @@ class CancelOrderS implements ShouldQueue
         $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(4))->get();
         $shopsHasOrderPrepareCancel = Shop::whereIn('id', $ordersPrepareCancel->pluck('shop_id'))->get();
         $orders = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(5))->get();
-        $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
+        // $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
         $users = UsersModel::whereIn('id', $orders->pluck('user_id'))->get();
         foreach ($shopsHasOrderPrepareCancel as $shop) {
             sendNotiPrepareCancelOrderForSeller::dispatch($shop->owner_id);
-            DB::table('log_jobs')->insert([
-                'log' => 'sendNotiPrepareCancelOrderForSeller ',
-            ]);
+           
         }
+       
         foreach ($users as $user) {
-            dd($user->email);
-            sendNotiWhenCanceledOrder::dispatch($user->id, $user->email);
-            DB::table('log_jobs')->insert([
-                'log' => 'sendNotiWhenCanceledOrder ',
-                'date' => Carbon::now(),
-            ]);
+            foreach ($orders->where('user_id', $user->id) as $order) {
+                sendNotiWhenCanceledOrder::dispatch($user->id, $user->email, $order->id);
+            }
+           
         }
-        foreach ($shops as $shop) {
-            sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
-            DB::table('log_jobs')->insert([
-                'log' => 'sendNotiWhenCanceledOrderForSeller ',
-                'date' => Carbon::now(),
-            ]);
-        }
+        
+
+        // foreach ($shops as $shop) {
+        //     sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
+           
+        // }
  
-        foreach ($orders as $order) {
-            autoCancelOrder::dispatch($order);
-            DB::table('log_jobs')->insert([
-                'log' => 'autoCancelOrder ',
-                'date' => Carbon::now(),
-            ]);
-        }
+        // foreach ($orders as $order) {
+        //     autoCancelOrder::dispatch($order);
+           
+        // }
         
  
     }
