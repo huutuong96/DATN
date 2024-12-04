@@ -19,9 +19,10 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .header {
-            background: linear-gradient(90deg, #ff7e5f, #feb47b);
+            background: linear-gradient(90deg, #1369fe, #6d93d3);
             color: white;
             text-align: center;
             padding: 20px;
@@ -33,9 +34,10 @@
         .content {
             padding: 20px;
             line-height: 1.6;
+            min-height: 300px;
         }
         .content h2 {
-            color: #ff7e5f;
+            color: #1369fe;
             font-size: 20px;
             margin-bottom: 10px;
         }
@@ -45,7 +47,7 @@
         .cta-button {
             display: inline-block;
             padding: 12px 20px;
-            background: #ff7e5f;
+            background: #1369fe;
             color: #ffffff;
             text-decoration: none;
             font-weight: bold;
@@ -62,21 +64,35 @@
             font-size: 12px;
             color: #666;
         }
+        .anh1{
+            position: absolute;
+            top: -198px;
+            right: -179px;
+        }
+        .anh2{
+            position: absolute;
+            top: 65px;
+            right: -30px;
+        }
     </style>
 </head>
 <body>
-    <div class="email-container">
+    <div class="email-container" >
         <!-- Header Section -->
         <div class="header">
             <h1>{{$eventTitle ?? null}}</h1>
+              <!-- <h1>chào mừng xuân 2025</h1> -->
         </div>
 
         <!-- Content Section -->
         <div class="content">
-            <h2>Dear {{$user->fullname ?? "Bạn"}},</h2>
+            <h2>Dear {{$user->fullname ?? "Bạn"}}</h2>
             <p>
                 MÃ VOUCHER : {{$code}}
             </p>
+            <img class="anh1" src="../assets/images/1.png" alt="">
+            <!-- <img src="../assets/images/1.png" alt=""> -->
+            <img class="anh2" src="../assets/images/2.png" alt="" width="400px">
             <a href="#" class="cta-button">Xem ngay</a>
         </div>
 

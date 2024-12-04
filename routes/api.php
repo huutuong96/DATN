@@ -52,6 +52,8 @@ use App\Http\Controllers\configController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\VnshopController;
+use App\Http\Controllers\EventController;
+
 
 Route::get('/search', function () {
     return "API - VNSHOP";
@@ -383,6 +385,8 @@ Route::get('/search', function () {
         Route::get('categoryAll', [CategoriesController::class, 'categoryAll']);
         Route::get('order_cancellation_system', [OrdersController::class, 'order_cancellation_system']);
         
+        Route::resource('events', EventController::class);
+
 
         Route::get('search', [ProductController::class, 'search']);
         Route::get('/products/slug/{slug}', [ProductController::class, 'getProductToSlug']);
