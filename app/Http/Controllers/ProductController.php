@@ -1436,15 +1436,15 @@ public function ProductAll(Request $request)
 
        public function importProducts(Request $request){
             $user = JWTAuth::parseToken()->authenticate();
-            try {
-                Excel::import(new ProductImport($user, $request), $request->file('product_import'));
-                // if ($request->hasFile('variant_import')) {
-                //     Excel::import(new ProductVariantImport, $request->file('variant_import'));
-                // }
+            // try {
+                // Excel::import(new ProductImport($user, $request), $request->file('product_import'));
+                if ($request->hasFile('variant_import')) {
+                    Excel::import(new ProductVariantImport, $request->file('variant_import'));
+                }
                 return 'Import thành công';
-            } catch (\Throwable $th) {
-            
-            }
+            // } catch (\Throwable $th) {
+            //     return 'Import thất bại: ' . $th->getMessage();
+            // }
        }
       
        public function exportdata(Request $request){

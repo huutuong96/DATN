@@ -18,16 +18,28 @@ class ProductVariantImport implements ToModel
     */
     public function model(array $row)
     {
-        $product = Product::where('sku', $row[1])->first();
+        // $product = Product::where('sku', $row[1])->first();
+    
+        $string = str_replace(['[', ']'], '', $row[5]);
+        $attributes = explode(', ', $string);
+        dd($attributes);
+        foreach ($attributes as $attri) {
+            dd($attri);
+        }
         $attribute = Attribute::create([
-            'name' => $row[10],
-            'display_name' => strtoupper($row[10]),
-            'image' => $row[11],
+            'name' => $row[5],
+            'display_name' => strtoupper($row[5]),
         ]);
+        dd($attribute);
+
+
+
+
+
         $attributevalue = new attributevalue([
-            'value' => $row[12],
+            'value' => $row[6],
             'attribute_id' => $attribute->id,
-            'image' => $row[13],
+            'image' => $row[7],
         ]);
 
         $variants = new product_variants([
@@ -37,11 +49,8 @@ class ProductVariantImport implements ToModel
             'stock' => $row[2],
             'price' => $row[3],
             'images' => $row[4],
-            'deleted_at' => $row[5],
-            'deleted_by' => $row[6],
-            'is_deleted' => $row[7],
-            'created_at' => $row[8],
-            'updated_at' => $row[9],
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
             'attribute_id' => $attribute->id,
             'value_id' =>  $attributevalue->id,
             'id_fe' => Str::random(10).'-'.$product->id.'-'.$row[1],
