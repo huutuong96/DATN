@@ -20,12 +20,7 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        \App\Events\UserLoggedIn::class => [
-            \App\Listeners\UpdateUserCount::class,
-        ],
-        \App\Events\UserLoggedOut::class => [
-            \App\Listeners\UpdateUserCountOnLogout::class,
-        ],
+       
     ];
 
     /**

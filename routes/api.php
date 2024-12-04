@@ -409,7 +409,7 @@ Route::get('/search', function () {
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
 
-        Route::post('import/products', [ProductController::class, "importProducts"])->name('importProducts');
+        Route::post('import/data', [ProductController::class, "importProducts"])->name('importProducts');
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
         Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
 
