@@ -141,7 +141,9 @@ Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mai
 
 
 
-
+Route::get('/template', function () {
+    return view('bill.bill_template');
+});
 
 
 
