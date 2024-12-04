@@ -31,23 +31,22 @@ class ProductImport implements ToModel
         $category_id = CategoriesModel::where('id', $this->request->category_id)->first()->id;
         $tax_category = tax_category::where('category_id', $category_id)->first();
         $tax = Tax::where('id', $tax_category->tax_id)->first();
-        $priceAfterTax = ($row[3] * $tax->rate / 100);
-        dd('ok');
+        $priceAfterTax = $row[3] + ($row[3] * $tax->rate);
         $shop_id = Shop::where('id', $this->request->shop_id)->first()->id;
         $product = new Product([
             'name' => $row[0],
             'slug' => Str::slug($row[0]),
             'description' => $row[1] ?? null,
             'infomation' => $row[2] ?? null,
-            'price' => $row[3] ?? null,
+            'price' => $priceAfterTax ?? null,
             'image' => $row[4] ?? null,
             'quantity' => $row[5] ?? 0,
             'sold_count' => 0,
             'view_count' => 0,
             'create_by' =>  $this->user->id,
             'update_by' =>  $this->user->id,
-            'create_at' => $created_at,
-            'update_at' => $updated_at,
+            'created_at' => $created_at,
+            'updated_at' => $updated_at,
             'category_id' => $category_id,
             'shop_id' => $shop_id,
             'sku' => $row[6],
