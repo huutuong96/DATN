@@ -15,6 +15,7 @@ class Transaction_history implements FromCollection
     }
     public function collection()
     {
+        
         return history_get_cash_shops::where('shop_id', $this->request->shop_id)->get();
     }
 }

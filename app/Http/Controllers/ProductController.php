@@ -115,6 +115,7 @@ class ProductController extends Controller
     }
 
     public function getProductToSlug($slug) {
+        
         if (empty($slug)) {
             return response()->json([
                 'status' => 'error',
@@ -1434,18 +1435,18 @@ public function ProductAll(Request $request)
 //     return $combinations;
 // }
 
-       public function importProducts(Request $request){
-            $user = JWTAuth::parseToken()->authenticate();
-            // try {
-                // Excel::import(new ProductImport($user, $request), $request->file('product_import'));
-                if ($request->hasFile('variant_import')) {
-                    Excel::import(new ProductVariantImport, $request->file('variant_import'));
-                }
-                return 'Import thành công';
-            // } catch (\Throwable $th) {
-            //     return 'Import thất bại: ' . $th->getMessage();
-            // }
-       }
+    //    public function importProducts(Request $request){
+    //         $user = JWTAuth::parseToken()->authenticate();
+    //         // try {
+    //             Excel::import(new ProductImport($user, $request), $request->file('product_import'));
+    //             if ($request->hasFile('variant_import')) {
+    //                 Excel::import(new ProductVariantImport, $request->file('variant_import'));
+    //             }
+    //             return 'Import thành công';
+    //         // } catch (\Throwable $th) {
+    //         //     return 'Import thất bại: ' . $th->getMessage();
+    //         // }
+    //    }
       
        public function exportdata(Request $request){
         try {
