@@ -1566,6 +1566,7 @@ public function handleUpdateProduct(Request $request, string $id)
 //events -------------------------------------------------------------------------------------
 public function listEvent(Request $request)
 {
+    $token = $request->token; 
     try {
         $events = Event::where('status', 2)->paginate(10);
         return view('events.list_event',compact('events'));
