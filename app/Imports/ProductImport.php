@@ -26,6 +26,10 @@ class ProductImport implements ToModel
     }
     public function model(array $row)
     {
+        $proexist = Product::where('sku', $row[6])->first();
+        if ($proexist) {
+            return $proexist;
+        }
         $created_at = Carbon::now();
         $updated_at = Carbon::now();
         $category_id = CategoriesModel::where('id', $this->request->category_id)->first()->id;

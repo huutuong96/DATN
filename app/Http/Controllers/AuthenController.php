@@ -480,47 +480,6 @@ class AuthenController extends Controller
         return response()->json($dataDone, 200);
     }
 
- /**
- * @OA\Post(
- *     path="api/change_password",
- *     summary="Change user password",
- *     description="Changes the password of the authenticated user.",
- *     tags={"Users"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"password", "new_password"},
- *             @OA\Property(property="password", type="string", example="current_password"),
- *             @OA\Property(property="new_password", type="string", example="new_password123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Password changed successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Mật khẩu đã được thay đổi thành công")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid credentials",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Tài khoản không tồn tại"),
- *             @OA\Property(property="error_detail", type="string", example="Mật khẩu không đúng")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Password change failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Cập nhật thất bại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
     public function change_password(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -548,37 +507,7 @@ class AuthenController extends Controller
         return response()->json($dataDone, 200);
     }
 
-    /**
- * @OA\Post(
- *     path="api/fogot_password",
- *     summary="Forgot password",
- *     description="Sends a password reset token to the user's email.",
- *     tags={"Authentication"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"email"},
- *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Password reset token sent",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đã gửi mã xác nhận đến email"),
- *             @OA\Property(property="user", type="string", example="john.doe@example.com")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="User not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Tài khoản không tồn tại")
- *         )
- *     )
- * )
- */
+    
     public function fogot_password(Request $request)
     {
         $user = UsersModel::where('email', $request->email)->first();

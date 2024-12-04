@@ -56,8 +56,8 @@ class AddressController extends Controller
             "default"=> $request->default ?? 0,
             "status"=> $request->status ?? 1,
             "user_id" => $user->id,
-            "name"=> $request->status ?? null,
-            "phone" => $request->status ?? null,
+            "name"=> $request->name ?? null,
+            "phone" => $request->phone ?? null,
         ];
         AddressModel::create($Address);
         $dataDone = [
