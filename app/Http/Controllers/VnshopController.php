@@ -1568,7 +1568,7 @@ public function listEvent(Request $request)
 {
     $token = $request->token; 
     try {
-        $events = Event::where('status', 2)->paginate(10);
+        $events = Event::whereIn('status', [1, 2])->paginate(10);
         return view('events.list_event',compact('events'));
     } catch (\Throwable $th) {
         return redirect()->route('events', [
@@ -1576,19 +1576,22 @@ public function listEvent(Request $request)
         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
     }
 }
-// public function changeStatuspayment(Request $request, string $id)
-// {
-//     try {
-        
-//         return redirect()->route('events', [
-//             'token' => $token
-//         ])->with('message', 'Cập nhật trạng thái thành công!');
-//     } catch (\Throwable $th) {
-//         return redirect()->route('events', [
-//             'token' => $token
-//         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
-//     }
-// }
+
+public function changeStatusEvent(Request $request)
+{  
+    // dd($request->status);
+    try {
+        $event =Event::find($request->id);
+        // $event = PaymentsModel::findOrFail($id);
+        $event->status = $request->status;
+        $event->save();
+        return back()->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('events', [
+            'token' => $request->token
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
 // public function changeStatuspayment(Request $request, string $id)
 // {
 //     try {

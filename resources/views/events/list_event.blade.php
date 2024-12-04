@@ -18,7 +18,7 @@
                                         <tr>
                                             <th scope="col">ID</th>
                                             <th scope="col">Tên event</th>
-                                            <th scope="col">Đk áp dụng/th>
+                                            <th scope="col">Đk áp dụng</th>
                                             <th scope="col">Thông tin thêm</th>
                                             <th scope="col">Hành động</th>
                                         </tr>
@@ -103,19 +103,19 @@
                 <!-- Event Day -->
                 <div class="col-md-6">
                     <label for="event_day" class="form-label">Event Day</label>
-                    <input type="number" class="form-control" id="event_day" name="event_day" min="1" max="31" value="{{ old('event_day', $event->event_day ?? '') }}">
+                    <input type="number" class="form-control" id="event_day" name="event_day" min="1" max="31" value="{{ old('event_day', $event->event_day ?? '') }}" required>
                 </div>
 
                 <!-- Event Month -->
                 <div class="col-md-6">
                     <label for="event_month" class="form-label">Event Month</label>
-                    <input type="number" class="form-control" id="event_month" name="event_month" min="1" max="12" value="{{ old('event_month', $event->event_month ?? '') }}">
+                    <input type="number" class="form-control" id="event_month" name="event_month" min="1" max="12" value="{{ old('event_month', $event->event_month ?? '') }}" required>
                 </div>
 
                 <!-- Event Year -->
                 <div class="col-md-6">
                     <label for="event_year" class="form-label">Event Year</label>
-                    <input type="number" class="form-control" id="event_year" name="event_year" min="1900" max="2100" value="{{ old('event_year', $event->event_year ?? '') }}">
+                    <input type="number" class="form-control" id="event_year" name="event_year" min="1900" max="2100" value="{{ old('event_year', $event->event_year ?? '') }}" required>
                 </div>
 
                 <!-- Qualifier -->
@@ -126,10 +126,8 @@
 
                 <!-- Voucher Apply -->
                 <div class="col-md-6">
-                    <div class="form-check mt-4">
-                        <input type="checkbox" class="form-check-input" id="voucher_apply" name="voucher_apply" value="1" {{ old('voucher_apply', $event->voucher_apply ?? 0) ? 'checked' : '' }}>
-                        <label for="voucher_apply" class="form-check-label">Apply Voucher</label>
-                    </div>
+                    <label for="voucher_apply" class="form-label">Voucher Apply</label>
+                    <input type="text" class="form-control" id="voucher_apply" name="voucher_apply" value="{{ old('voucher_apply', $event->voucher_apply ?? '') }}">
                 </div>
 
                 <!-- Is Mail -->
@@ -165,7 +163,7 @@
                 <!-- Where Order -->
                 <div class="col-md-6">
                     <label for="where_order" class="form-label">Order Location</label>
-                    <input type="text" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', $event->where_order ?? '') }}">
+                    <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', $event->where_order ?? 0) }}">
                 </div>
 
                 <!-- Where Price -->
@@ -182,22 +180,22 @@
 
                 <!-- From -->
                 <div class="col-md-6">
-                    <label for="from" class="form-label">From Time</label>
-                    <input type="time" class="form-control" id="from" name="from" value="{{ old('from', $event->from ?? '') }}">
+                    <label for="from" class="form-label">From</label>
+                    <input type="datetime-local" class="form-control" id="from" name="from" value="{{ old('from', $event->from ?? '') }}">
                 </div>
 
                 <!-- To -->
                 <div class="col-md-6">
-                    <label for="to" class="form-label">To Time</label>
-                    <input type="time" class="form-control" id="to" name="to" value="{{ old('to', $event->to ?? '') }}">
+                    <label for="to" class="form-label">To</label>
+                    <input type="datetime-local" class="form-control" id="to" name="to" value="{{ old('to', $event->to ?? '') }}">
                 </div>
 
                 <!-- Status -->
                 <div class="col-md-6">
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" id="status" name="status">
-                        <option value="1" {{ old('status', $event->status ?? 1) == 1 ? 'selected' : '' }}>Active</option>
-                        <option value="0" {{ old('status', $event->status ?? 1) == 0 ? 'selected' : '' }}>Inactive</option>
+                        <option value="1" {{ $event->status == 2 ? 'selected' : '' }}>Active</option>
+                        <option value="2" {{ $event->status  == 1 ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
 
@@ -223,10 +221,10 @@
                                                                     href="{{ route('change_status_events', [
                                                                                                         'token' => auth()->user()->refesh_token,
                                                                                                         'id' => $event->id,
-                                                                                                        'status' => 4,
+                                                                                                        'status' => 5,
                                                                                                         ]) }}"
                                                                 >
-                                                                <button type="button" class="btn btn-warning" title="vi pham"> <i class=" ri-close-line align-middle"></i></button>
+                                                                <button type="button" class="btn btn-danger" title="xóa"> <i class=" ri-close-line align-middle"></i></button>
                                                             </li>  
                                                         </ul>
                                                         
