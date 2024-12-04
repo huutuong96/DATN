@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Barryvdh\DomPDF\Facade\PDF;
 use App\Exports\AdminExport;
 use App\Exports\ImageExport;
 use App\Exports\ManagerExport;
+use App\Exports\OrderDetailExport;
 use App\Exports\OrderExport;
 use App\Exports\ProductsExport;
 use App\Exports\SellerExport;
@@ -20,6 +21,7 @@ use App\Imports\imagesProductImport;
 use App\Imports\MultiSheetImport;
 use App\Imports\ProductExport;
 use App\Imports\ProductImport;
+use App\Imports\ProductVariantImport;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
@@ -43,6 +45,7 @@ use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Imports\UsersImport;
+use App\Models\OrdersModel;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -1432,9 +1435,12 @@ public function ProductAll(Request $request)
 // }
 
        public function importProducts(Request $request){
+            $user = JWTAuth::parseToken()->authenticate();
             try {
-                Excel::import(new ProductImport, $request->file('file'));
-                $products = Product::latest()->take($request->file('file')->getSize())->select('id')->get();
+                Excel::import(new ProductImport($user, $request), $request->file('product_import'));
+                // if ($request->hasFile('variant_import')) {
+                //     Excel::import(new ProductVariantImport, $request->file('variant_import'));
+                // }
                 return 'Import thành công';
             } catch (\Throwable $th) {
             
@@ -1456,7 +1462,31 @@ public function ProductAll(Request $request)
                 return Excel::download(new Transaction_history($request), 'vnshop-transaction_history.xlsx');
             }
             if ($request->data == 'order_details') {
-                return Excel::download(new Transaction_history($request), 'vnshop-order_details.xlsx');
+                return Excel::download(new OrderDetailExport($request), 'vnshop-order_details.xlsx');
+            }
+            if ($request->data == 'bills') {
+                    $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment','timeline']) // Eager load 'product' qua 'orderDetails'
+                    ->where('id', $request->order_id)
+                    ->get();
+                    foreach ($orders as $order) {
+                        foreach ($order->orderDetails as $orderDetail) {
+                            if($orderDetail->variant!=null){
+                                $variant = $orderDetail->variant;  
+                            }else{
+                                $product = $orderDetail->product;  
+                            }
+                        }
+                    }
+                    foreach ($orders as $key => $order) {
+                        foreach ($order->orderDetails as $orderDetail  ) {
+                            if( $orderDetail->variant){
+                            $orderDetail['product']  = $orderDetail->variant->product;
+                            unset($orderDetail->variant['product']);
+                            }
+                        }
+                    }
+                    $pdf = PDF::loadView('bill.bill_template', compact('orders'));
+                    return $pdf->download('vnshop-bills.pdf');
             }
         } catch (\Throwable $th) {
             return 'export thất bại: ' . $th->getMessage();
