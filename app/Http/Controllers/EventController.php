@@ -8,7 +8,8 @@ class EventController extends Controller
 {
     // 1. Lấy danh sách tất cả các sự kiện
     public function index()
-    {
+    {   
+        
         return response()->json([
             'status' => true,
             'message' => 'Lấy dữ liệu thành công',

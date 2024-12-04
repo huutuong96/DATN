@@ -58,6 +58,7 @@ use App\Jobs\UpdatePriceAllVariant;
 use App\Jobs\UpdateImageAllVariant;
 
 use App\Models\update_product;
+use App\Models\Event;
 
 class VnshopController extends Controller
 {
@@ -1544,6 +1545,58 @@ public function handleUpdateProduct(Request $request, string $id)
     }
     
 }
+//events -------------------------------------------------------------------------------------
+public function listEvent(Request $request)
+{
+    try {
+        $events = Event::where('status', 2)->paginate(10);
+        return view('events.list_event',compact('events'));
+    } catch (\Throwable $th) {
+        return redirect()->route('events', [
+            'token' => $token
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+// public function changeStatuspayment(Request $request, string $id)
+// {
+//     try {
+        
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('message', 'Cập nhật trạng thái thành công!');
+//     } catch (\Throwable $th) {
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+//     }
+// }
+// public function changeStatuspayment(Request $request, string $id)
+// {
+//     try {
+        
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('message', 'Cập nhật trạng thái thành công!');
+//     } catch (\Throwable $th) {
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+//     }
+// }
+// public function changeStatuspayment(Request $request, string $id)
+// {
+//     try {
+        
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('message', 'Cập nhật trạng thái thành công!');
+//     } catch (\Throwable $th) {
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+//     }
+// }
+
 
 
 

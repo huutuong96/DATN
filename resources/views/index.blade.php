@@ -1106,6 +1106,15 @@
                         <li class="nav-item">
                             <a
                                 class="nav-link menu-link"
+                                href="{{ route('events', ['token' => auth()->user()->refesh_token]) }}"
+                                data-key="t-crm">
+                                <i class="ri-gift-line"></i> 
+                                <span data-key="t-dashboards">Quản lý events</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link menu-link"
                                 href="{{ route('taxall', ['token' => auth()->user()->refesh_token]) }}"
                                 data-key="t-projects">
                                 <i class="ri-money-dollar-circle-line"></i> 
