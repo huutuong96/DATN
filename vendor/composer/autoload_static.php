@@ -857,6 +857,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'App\\Http\\Resources\\UserResource' => __DIR__ . '/../..' . '/app/Http/Resources/UserResource.php',
         'App\\Imports\\MultiSheetImport' => __DIR__ . '/../..' . '/app/Imports/MultiSheetImport.php',
         'App\\Imports\\ProductImport' => __DIR__ . '/../..' . '/app/Imports/ProductImport.php',
+        'App\\Imports\\ProductVariantImport' => __DIR__ . '/../..' . '/app/Imports/ProductVariantImport.php',
         'App\\Imports\\imagesProductImport' => __DIR__ . '/../..' . '/app/Imports/imagesProductImport.php',
         'App\\Jobs\\AddPointUser' => __DIR__ . '/../..' . '/app/Jobs/AddPointUser.php',
         'App\\Jobs\\CancelOrderS' => __DIR__ . '/../..' . '/app/Jobs/CancelOrderS.php',

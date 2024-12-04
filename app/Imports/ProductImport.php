@@ -6,6 +6,8 @@ use App\Models\CategoriesModel;
 use App\Models\Product;
 use App\Models\product_variants;
 use App\Models\Shop;
+use App\Models\Tax;
+use App\Models\tax_category;
 use Brick\Math\BigInteger;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -27,7 +29,10 @@ class ProductImport implements ToModel
         $created_at = Carbon::now();
         $updated_at = Carbon::now();
         $category_id = CategoriesModel::where('id', $this->request->category_id)->first()->id;
-        $tax_category = 
+        $tax_category = tax_category::where('category_id', $category_id)->first();
+        $tax = Tax::where('id', $tax_category->tax_id)->first();
+        $priceAfterTax = ($row[3] * $tax->rate / 100);
+        dd('ok');
         $shop_id = Shop::where('id', $this->request->shop_id)->first()->id;
         $product = new Product([
             'name' => $row[0],
@@ -50,8 +55,8 @@ class ProductImport implements ToModel
             'length' => $row[8],
             'weight' => $row[9],
             'width' => $row[10],
-            'show_price' => $row[11],
-            'status' => $row[12],
+            'show_price' => $priceAfterTax,
+            'status' => 0,
             'json_variants' => null,
          ]);
          return $product;

@@ -133,6 +133,7 @@ return array(
     'App\\Http\\Resources\\UserResource' => $baseDir . '/app/Http/Resources/UserResource.php',
     'App\\Imports\\MultiSheetImport' => $baseDir . '/app/Imports/MultiSheetImport.php',
     'App\\Imports\\ProductImport' => $baseDir . '/app/Imports/ProductImport.php',
+    'App\\Imports\\ProductVariantImport' => $baseDir . '/app/Imports/ProductVariantImport.php',
     'App\\Imports\\imagesProductImport' => $baseDir . '/app/Imports/imagesProductImport.php',
     'App\\Jobs\\AddPointUser' => $baseDir . '/app/Jobs/AddPointUser.php',
     'App\\Jobs\\CancelOrderS' => $baseDir . '/app/Jobs/CancelOrderS.php',
