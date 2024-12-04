@@ -135,7 +135,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/events', [VnshopController::class, 'listEvent'])->name('events');
     Route::post('/events', [VnshopController::class, 'index'])->name('add_events');
     Route::put('/events', [VnshopController::class, 'index'])->name('update_events');
-    Route::delete('/events', [VnshopController::class, 'index'])->name('change_status_events');
+    Route::get('/events-status', [VnshopController::class, 'changeStatusEvent'])->name('change_status_events');
 });
 
 
