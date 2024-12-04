@@ -28,7 +28,7 @@ class sendMailWhenOrderCanceledForUser extends Mailable
      */ public function build()
     {
         return $this->subject('Thông báo: Đơn hàng bị hủy')
-                    ->view('emails.order-canceled')
+                    ->view('emails.order_canceled')
                     ->with(['order' => $this->order]);
     }
 

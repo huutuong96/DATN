@@ -30,35 +30,31 @@ class CancelOrderS implements ShouldQueue
     {
         DB::table('log_jobs')->insert([
             'log' => 'CancelOrderS ',
-            'date' => Carbon::now(),
         ]);
-        $ordersPrepareCancel = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(4))->get();
-        $shopsHasOrderPrepareCancel = Shop::whereIn('id', $ordersPrepareCancel->pluck('shop_id'))->get();
         $orders = OrdersModel::where('order_status', 0)->where('created_at', '<', Carbon::now()->subDays(5))->get();
-        // $shops = Shop::whereIn('id', $orders->pluck('shop_id'))->get();
-        $users = UsersModel::whereIn('id', $orders->pluck('user_id'))->get();
-        foreach ($shopsHasOrderPrepareCancel as $shop) {
-            sendNotiPrepareCancelOrderForSeller::dispatch($shop->owner_id);
-           
-        }
-       
-        foreach ($users as $user) {
-            foreach ($orders->where('user_id', $user->id) as $order) {
-                sendNotiWhenCanceledOrder::dispatch($user->id, $user->email, $order->id);
+
+        foreach ($orders as $order) {
+            $user = UsersModel::find($order->user_id);
+            if ($user) {
+                sendNotiWhenCanceledOrder::dispatch($user->id, $user->email, $order->id); 
+                DB::table('log_jobs')->insert([
+                    'log' => 'sendNotiWhenCanceledOrder for Order ID: '
+                ]);
             }
-           
+        
+            $shop = Shop::find($order->shop_id); 
+            if ($shop) {
+                sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id, $order->id); 
+                DB::table('log_jobs')->insert([
+                    'log' => 'sendNotiWhenCanceledOrderForSeller for Order  '
+                ]);
+            }
+            autoCancelOrder::dispatch($order);
+            DB::table('log_jobs')->insert([
+                'log' => 'autoCancelOrder for Order ID:'
+            ]);
         }
         
-
-        // foreach ($shops as $shop) {
-        //     sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id);
-           
-        // }
- 
-        // foreach ($orders as $order) {
-        //     autoCancelOrder::dispatch($order);
-           
-        // }
         
  
     }

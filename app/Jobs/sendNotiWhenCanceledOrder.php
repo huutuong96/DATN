@@ -41,7 +41,7 @@ class sendNotiWhenCanceledOrder implements ShouldQueue
     public function handle(): void
     {
         $order = OrdersModel::find($this->order_id);
-
+        // dd($order);
         if ($order) {
             $notificationData = [
                 'type' => 'main',
@@ -56,7 +56,7 @@ class sendNotiWhenCanceledOrder implements ShouldQueue
                 'user_id' => $this->user_id,
                 'id_notification' => $notification->id,
             ]);
-            dd($this->email);
+           
             Mail::to($this->email)->send(new sendMailWhenOrderCanceledForUser($order));
         }
     }
