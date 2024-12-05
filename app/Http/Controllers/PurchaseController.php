@@ -95,7 +95,12 @@ class PurchaseController extends Controller
                 $grandTotalPrice = 0;
                 $totalQuantity = 0;
                 $total_amount = 0;
-                $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+                if ($request->address_id) {
+                    $addressUser = AddressModel::where('id', $request->address_id)->first();
+                }else {
+                    $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+                }
+                
                 if (!$addressUser) {
                     return response()->json([
                         'status' => 400,

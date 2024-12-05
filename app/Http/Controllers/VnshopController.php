@@ -1632,8 +1632,8 @@ public function store_events(Request $request)
         $event->where_order = $request->where_order ?? null;
         $event->where_price = $request->where_price ?? null;
         // $event->date = $request->event_title ?? null;
-        $event->from = $request->from ?? null;
-        $event->to = $request->to ?? null;
+        $event->from = Carbon::createFromFormat('Y-m-d H:i:s', $request->from) ?? null;
+        $event->to = Carbon::createFromFormat('Y-m-d H:i:s', $request->to) ?? null;
         $event->status = $request->status ?? null;
         $event->description = $request->description ?? null;
         $event->save();

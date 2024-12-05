@@ -99,11 +99,11 @@
                                   </div> -->
                                   <div class="col-md-3">
                                       <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
-                                      <input type="datetime-local" class="form-control" id="from" name="from" value="{{ old('from') }}">
+                                      <input type="date" class="form-control" id="from" name="from" value="{{ old('from') }}">
                                   </div>
                                   <div class="col-md-3">
                                       <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
-                                      <input type="datetime-local" class="form-control" id="to" name="to" value="{{ old('to') }}">
+                                      <input type="date" class="form-control" id="to" name="to" value="{{ old('to') }}">
                                   </div>
                                   <div class="col-md-6">
                                       <label for="status" class="form-label">Trạng thái</label>
