@@ -1608,7 +1608,7 @@ public function changeStatusEvent(Request $request)
 public function store_events(Request $request)
 {
     $token = $request->token; 
-    // try {
+    // // try {
         $voucher_apply = [
             'voucher_title' => $request->voucher_apply ?? null,
             'voucher_description' => $request->voucher_description ?? null,
@@ -1623,7 +1623,7 @@ public function store_events(Request $request)
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
         $event->qualifier = $request->input('qualifier', $event->qualifier);
-        $event->voucher_apply = $request->input('voucher_apply', $event->voucher_apply);
+        $event->voucher_apply = json_encode($voucher_apply);
         $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
         $event->is_share_facebook = $request->has('is_share_facebook') ? $request->input('is_share_facebook') : $event->is_share_facebook;
