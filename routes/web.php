@@ -174,10 +174,8 @@ Route::post('/wallet/shop_request_get_cash', [ClientEmbedController::class, 'sho
 Route::get('/register/shipping/view', [ClientEmbedController::class, 'register_shipping_view'])->name('register_shipping_view');
 Route::post('/register/shipping', [ClientEmbedController::class, 'register_shipping'])->name('register_shipping');
 
-// Route::get('auth/google', function () {
-//     return Socialite::driver('google')->redirect();
-// })->name('google_login');
+Route::get('auth/google', function () {
+    return Socialite::driver('google')->redirect();
+})->name('google_login');
 
-
-Route::get('auth/google', [AuthenController::class, 'google_login'])->name('google_login');
-Route::get('callback', [AuthenController::class, 'handleGoogleCallback']);
+Route::get('/callback', [AuthenController::class, 'handleGoogleCallback']);

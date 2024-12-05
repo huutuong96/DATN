@@ -31,6 +31,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
 use Laravel\Socialite\Facades\Socialite;
@@ -924,11 +925,6 @@ class AuthenController extends Controller
 
     }   
 
-    public function google_login () {
-        return Socialite::driver('google')->redirect();
-    }
-
-
     public function handleGoogleCallback(Request $request){
         $googleUser = Socialite::driver('google')->user();
 
@@ -943,7 +939,9 @@ class AuthenController extends Controller
                 'email' => $googleUser->email,
                 'google_id' => $googleUser->id,
                 'avatar' => $googleUser->avatar,
-                'password' => bcrypt(Str::random(20)), // Tạo mật khẩu ngẫu nhiên
+                'password' => bcrypt(Str::random(20)),
+                'login_at' => Carbon::now(),
+                'google_id' => $googleUser->id,
             ]);
     
             Auth::login($user);
@@ -952,6 +950,6 @@ class AuthenController extends Controller
         $user->refesh_token = $token;
         $user->save();
     
-        return redirect()->intended('/');
+        return $user;
     }
 }
