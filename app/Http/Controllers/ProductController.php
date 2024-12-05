@@ -888,87 +888,82 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
     public function updateProduct(Request $request, string $id)
-        {
-            $product = Product::find($id);
-            if (!$product) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "Sản phẩm không tồn tại",
-                ], 404);
+{
+    $product = Product::find($id);
+    if (!$product) {
+        return response()->json([
+            'status' => false,
+            'message' => "Sản phẩm không tồn tại",
+        ], 404);
+    }
+
+    $user = JWTAuth::parseToken()->authenticate();
+    $cloudinary = new Cloudinary();
+
+    $slug = $request->name != $product->name ? Str::slug($request->name) : $product->slug;
+
+    $dataInsert = [
+        'product_id' => $product->id,
+        'name' => $request->name ?? $product->name,
+        'sku' => $request->sku ?? null,
+        'slug' => $slug,
+        'description' => $request->description ?? $product->description,
+        'infomation' => $request->infomation ?? $product->infomation,
+        'price' => $request->variantMode ? 0 : $request->price,
+        'sale_price' => $request->sale_price ?? $product->sale_price,
+        'image' => $request->images[0] ?? $product->image,
+        'quantity' => $request->stock ?? $product->quantity,
+        'parent_id' => $request->parent_id ?? $product->parent_id,
+        'update_by' => $user->id,
+        'category_id' => $request->category ?? $product->category_id,
+        'shop_id' => $request->shop_id ?? $product->shop_id,
+        'height' => $request->height ?? $product->height,
+        'length' => $request->length ?? $product->length,
+        'weight' => $request->weight ?? $product->weight,
+        'width' => $request->width ?? $product->width,
+        'status' => $product->status,
+        'created_at' => $product->created_at,
+        'show_price' => $request->show_price ?? $product->show_price,
+        'brand' => $request->brand ?? $product->brand,
+        'json_variants' => $product->json_variants,
+        'admin_note' => $request->admin_note ?? $product->admin_note,
+        'is_delete' => $request->is_delete ?? $product->is_delete,
+        'updated_at' => now(),
+        'update_version' => $product->update_version + 1,
+        'change_of' => $request->variantMode === true ? json_encode($request->variant) : json_encode(0),
+    ];
+
+    try {
+        DB::table('update_product')->insert($dataInsert);
+
+        if ($request->has('images') && is_array($request->images)) {
+            $oldImages = Image::where('product_id', $product->id)->get();
+            foreach ($oldImages as $oldImage) {
+                $oldImage->delete();
+            }
+            foreach ($request->images as $image) {
+                Image::create([
+                    'product_id' => $product->id,
+                    'url' => $image,
+                    'status' => 1,
+                ]);
             }
 
-            $user = JWTAuth::parseToken()->authenticate();
-            $cloudinary = new Cloudinary();
-
-            $slug = $request->name != $product->name ? Str::slug($request->name) : $product->slug;
-
-            $dataInsert = [
-                'product_id' => $product->id,
-                'name' => $request->name ?? $product->name,
-                'sku' => $request->sku ?? null,
-                'slug' => $slug,
-                'description' => $request->description ?? $product->description,
-                'infomation' => $request->infomation ?? $product->infomation,
-                'price' => $request->variantMode ? 0 : $request->price,
-                'sale_price' => $request->sale_price ?? $product->sale_price,
-                'image' => $product->image ?? $request->images[0],
-                'quantity' => $request->stock ?? $product->quantity,
-                'parent_id' => $request->parent_id ?? $product->parent_id,
-                'update_by' => $user->id,
-                'category_id' => $request->category ?? $product->category_id,
-                'shop_id' => $request->shop_id ?? $product->shop_id,
-                'height' => $request->height ?? $product->height,
-                'length' => $request->length ?? $product->length,
-                'weight' => $request->weight ?? $product->weight,
-                'width' => $request->width ?? $product->width,
-                'status' => $product->status,
-                'created_at' => $product->created_at,
-                'show_price' => $request->show_price ?? $product->show_price,
-                'brand' => $request->brand ?? $product->brand,
-                'json_variants' => $product->json_variants,
-                'admin_note' => $request->admin_note ?? $product->admin_note,
-                'is_delete' => $request->is_delete ?? $product->is_delete,
-                'updated_at' => now(),
-                'update_version' => $product->update_version + 1,
-                'change_of' => $request->variantMode === true ? json_encode($request->variant) : json_encode(0),
-            ];
-
-            try {
-                DB::table('update_product')->insert($dataInsert);
-
-                if ($request->hasFile('images')) {
-                    $oldImages = $product->images;
-                    foreach ($oldImages as $oldImage) {
-                        $cloudinary->uploadApi()->destroy($oldImage->url);
-                        $oldImage->delete();
-                    }
-
-                    foreach ($request->file('images') as $image) {
-                        $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                        $imageUrl = $uploadedImage['secure_url'];
-
-                        Image::create([
-                            'product_id' => $product->id,
-                            'url' => $imageUrl,
-                            'status' => 1,
-                        ]);
-                    }
-
-                    $dataInsert['image'] = Image::where('product_id', $product->id)->first()->url;
-                }
-
-                return response()->json([
-                    'status' => true,
-                    'message' => "Yêu cầu của bạn đã được gửi, vui lòng chờ xét duyệt",
-                ], 200);
-            } catch (\Throwable $th) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "Yêu cầu cập nhật không thành công",
-                    'error' => $th->getMessage(),
-                ], 500);
-            }
+            $dataInsert['image'] = Image::where('product_id', $product->id)->first()->url;
         }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Yêu cầu của bạn đã được gửi, vui lòng chờ xét duyệt",
+        ], 200);
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => "Yêu cầu cập nhật không thành công",
+            'error' => $th->getMessage(),
+        ], 500);
+    }
+}
 
     
     // public function handleUpdateProduct(Request $request, string $id)
