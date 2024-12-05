@@ -43,16 +43,20 @@ class Shop extends Model
         'account_number',
         'bank_name',
         'owner_bank',
+        'owner_id'
     ];
     public function learns()
     {
         return $this->belongsToMany(LearnModel::class, 'Learning_seller', 'shop_id', 'learn_id');
     }
+    // public function user()
+    // {
+    //     return $this->belongsToMany(User::class, 'shop_managers', 'shop_id', 'user_id');
+    // }
     public function user()
     {
-        return $this->belongsToMany(User::class, 'shop_managers', 'shop_id', 'user_id');
+        return $this->hasMany(User::class, 'id', 'owner_id');
     }
-
     public function messages()
     {
         return $this->hasMany(Message::class, 'shop_id', 'id');
