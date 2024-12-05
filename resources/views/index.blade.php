@@ -13,7 +13,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Admin VNSHOP as</title>
+    <title>Admin VNSHOP aaaa</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -1101,6 +1101,15 @@
                                 data-key="t-crm">
                                 <i class="ri-gift-line"></i> 
                                 <span data-key="t-dashboards">Quản lý voucher</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link menu-link"
+                                href="{{ route('events', ['token' => auth()->user()->refesh_token]) }}"
+                                data-key="t-crm">
+                                <i class="ri-gift-line"></i> 
+                                <span data-key="t-dashboards">Quản lý events</span>
                             </a>
                         </li>
                         <li class="nav-item">

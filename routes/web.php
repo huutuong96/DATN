@@ -54,6 +54,7 @@ use App\Http\Controllers\ClientEmbedController;
 use App\Http\Controllers\ModifierController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\webAppController;
+use App\Http\Controllers\EventController;
 
 Route::get('/', [VnshopController::class, 'login'])->name('login');
 Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
@@ -131,7 +132,11 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/changeStatuspayment/{id}', [VnshopController::class, 'changeStatuspayment'])->name('changeStatuspayment');
     Route::delete('/destroypayment/{id}', [VnshopController::class, 'destroypayment'])->name('destroypayment');
     Route::post('products/update/handle/{id}', [VnshopController::class, 'handleUpdateProduct'])->name('handleUpdateProduct');
-
+    Route::get('/events', [VnshopController::class, 'listEvent'])->name('events');
+    Route::post('/events', [VnshopController::class, 'store_events'])->name('store_events');
+    Route::put('/events/{id}', [VnshopController::class, 'update_events'])->name('update_events');
+    Route::get('/events-status', [VnshopController::class, 'changeStatusEvent'])->name('change_status_events');
+    Route::get('/trash-events', [VnshopController::class, 'listEvent_trash'])->name('trash_events');
 });
 
 
