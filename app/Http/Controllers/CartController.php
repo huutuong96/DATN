@@ -371,6 +371,9 @@ class CartController extends Controller
         foreach ($inputArray as $input) {
             $shopData = Shop::where('id', $input['shop_id'])->first();
             $addressUser = AddressModel::where('user_id', $user->id)->first();
+            if (isset($input['address_id'])) {
+                $addressUser = AddressModel::where('id', $input['address_id'])->first();
+            }
             $response = Http::withHeaders([
                 'token' => $token, // Gắn token vào header
             ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services', [

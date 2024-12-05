@@ -1618,23 +1618,23 @@ public function store_events(Request $request)
             'voucher_code' => $request->voucher_code ?? null,
         ];
         $event = new Event();
-        $event->event_title = $request->input('event_title', $event->event_title);
-        $event->event_day = $request->input('event_day', $event->event_day);
-        $event->event_month = $request->input('event_month', $event->event_month);
-        $event->event_year = $request->input('event_year', $event->event_year);
-        $event->qualifier = $request->input('qualifier', $event->qualifier);
-        $event->voucher_apply = $request->input('voucher_apply', $event->voucher_apply);
-        $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
-        $event->point = $request->input('point', $event->point);
-        $event->is_share_facebook = $request->has('is_share_facebook') ? $request->input('is_share_facebook') : $event->is_share_facebook;
-        $event->is_share_zalo = $request->has('is_share_zalo') ? $request->input('is_share_zalo') : $event->is_share_zalo;
-        $event->where_order = $request->input('where_order', $event->where_order);
-        $event->where_price = $request->input('where_price', $event->where_price);
-        $event->date = $request->input('date', $event->date);
-        $event->from = $request->input('from', $event->from);
-        $event->to = $request->input('to', $event->to);
-        $event->status = $request->input('status', $event->status);
-        $event->description = $request->input('description', $event->description);
+        $event->event_title = $request->event_title ?? null;
+        $event->event_day = $request->event_day ?? Carbon::now()->day;
+        $event->event_month = $request->event_month ?? Carbon::now()->month;
+        $event->event_year = $request->event_year ?? Carbon::now()->year;
+        $event->qualifier = null;
+        $event->voucher_apply = json_encode($voucher_apply) ?? null;
+        $event->is_mail = $request->event_title ?? null;
+        $event->point = $request->event_title ?? null;
+        $event->is_share_facebook = $request->is_share_facebook ?? null;
+        $event->is_share_zalo = $request->is_share_zalo ?? null;
+        $event->where_order = $request->where_order ?? null;
+        $event->where_price = $request->where_price ?? null;
+        // $event->date = $request->event_title ?? null;
+        $event->from = $request->from ?? null;
+        $event->to = $request->to ?? null;
+        $event->status = $request->status ?? null;
+        $event->description = $request->description ?? null;
         $event->save();
         return redirect()
             ->route('events',[
