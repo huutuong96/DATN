@@ -417,3 +417,6 @@ Route::get('/search', function () {
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
         
 
+        
+        Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
+

@@ -932,14 +932,21 @@ class AuthenController extends Controller
         
         if ($user) {
             Auth::login($user);
-            return $user;
+            return response()->json([
+                'status' => true,
+                'message' => 'Đăng nhập thành công',
+                'data' => [
+                    'token' => $user->refesh_token,
+                    // 'user' => $user,
+                ],
+            ], 200);
         } else {
             $user = UsersModel::create([
                 'fullname' => $googleUser->name,
                 'email' => $googleUser->email,
                 'google_id' => $googleUser->id,
                 'avatar' => $googleUser->avatar,
-                'password' => bcrypt(Str::random(20)),
+                'password' => Hash::make($googleUser->id),
                 'login_at' => Carbon::now(),
                 'google_id' => $googleUser->id,
             ]);
@@ -954,6 +961,18 @@ class AuthenController extends Controller
             'message' => 'Đăng nhập thành công',
             'data' => [
                 'token' => $user->refesh_token,
+                // 'user' => $user,
+            ],
+        ], 200);
+    }
+
+    public function login_with_token($token){
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'data' => [
+                'token' => $token,
+                // 'user' => $user,
             ],
         ], 200);
     }
