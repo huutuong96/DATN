@@ -75,7 +75,7 @@ class VnshopController extends Controller
         $checkShop = Shop::where("status", 3)
         ->get()
         ->count();
-        $shopAC = Shop::where("status", 1)
+        $shopAC = Shop::where("status", 2)
         ->get()
         ->count();
         $checkProduct = Product::where("status", 3)
@@ -84,12 +84,15 @@ class VnshopController extends Controller
                                 ->count();
         $monthlyRevenue = order_fee_details::
         whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
         ->sum('amount');
+        // dd($monthlyRevenue);
         $tax_vnshop = Tax::where("type" , 'san')
                            ->sum("rate");
 
         // $monthlyRevenue = $monthlyRevenue ;
         $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
         ->get();
         
         $doanhthu = array_fill(1, Carbon::now()->day, 0);
@@ -100,7 +103,7 @@ class VnshopController extends Controller
             if ($day <= Carbon::now()->day) { 
                 if($order->status == 2){
                     $doanhthu[$day] += ($order->total_amount / 1000000 );
-                    if($order->status == 5){
+                    if($order->status == 9){
                         $luongtrahang[$day] += 1;
                     }
                     $luotmua[$day] += 1;

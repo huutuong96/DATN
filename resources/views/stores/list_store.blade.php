@@ -99,7 +99,6 @@
                                                                     <i class="ri-eye-line align-middle"></i>
                                                                 </button>
                                                             </a>
-                                                        
                                                             <!-- Modal Chi tiết sản phẩm -->
                                                             <div class="modal fade" id="detailsModal-{{ $shop->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $shop->id }}" aria-hidden="true">
                                                                 <div class="modal-dialog modal-lg">
@@ -137,7 +136,7 @@
                                                                                                 <strong>Số Điện Thoại:</strong> <span class="text-muted">{{$shop->contact_number ?? "chưa nhập"}}</span>
                                                                                             </div>
                                                                                             <div class="mb-3">
-                                                                                                <strong>Người Đại Diện:</strong> <span class="text-muted">{{$shop->user[0]->fullname ?? "chưa nhập"}}</span>
+                                                                                                <strong>Người Đại Diện:</strong> <span class="text-muted">{{$shop->user[0]->fullname ?? "chưa nhập" }}</span>
                                                                                             </div>
                                                                                         </div>
                                                                                         <!-- Cột phải -->
