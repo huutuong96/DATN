@@ -230,19 +230,19 @@
                                                                                             @endforeach 
                                                                                             
                                                                                         @endif
-                                                                                    @foreach ($categoryTree as $category)
+                                                                                    @foreach ($categoryTree as $categori)
                                                                                         
-                                                                                        <option value="{{ $category->id }}" {{ old('parent_id', $category->parent_id) == $category->id ? 'selected' : '' }}>
-                                                                                            {{ $category->title }}
+                                                                                        <option value="{{ $categori->id }}" {{ old('parent_id', $categori->parent_id) == $categori->id ? 'selected' : '' }}>
+                                                                                            {{ $categori->title }}
                                                                                         </option>
-                                                                                        @if ($category->children && $category->children->isNotEmpty())
-                                                                                            @foreach ($category->children as $child)
-                                                                                                <option value="{{ $child->id }}" {{ old('parent_id', $category->parent_id) == $child->id ? 'selected' : '' }}>
+                                                                                        @if ($categori->children && $categori->children->isNotEmpty())
+                                                                                            @foreach ($categori->children as $child)
+                                                                                                <option value="{{ $child->id }}" {{ old('parent_id', $categori->parent_id) == $child->id ? 'selected' : '' }}>
                                                                                                     -- {{ $child->title }}
                                                                                                 </option>
                                                                                                 @if ($child->children && $child->children->isNotEmpty())
                                                                                                     @foreach ($child->children as $grandchild)
-                                                                                                        <option value="{{ $grandchild->id }}" {{ old('parent_id', $category->parent_id) == $grandchild->id ? 'selected' : '' }}>
+                                                                                                        <option value="{{ $grandchild->id }}" {{ old('parent_id', $categori->parent_id) == $grandchild->id ? 'selected' : '' }}>
                                                                                                             --- {{ $grandchild->title }}
                                                                                                         </option>
                                                                                                     @endforeach
