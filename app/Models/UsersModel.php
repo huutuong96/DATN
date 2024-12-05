@@ -31,6 +31,7 @@ class UsersModel extends Authenticatable implements JWTSubject {
         'role_id',
         'status',
         'verify_code',
+        'google_id',
     ];
 
     protected $hidden = [
@@ -39,6 +40,7 @@ class UsersModel extends Authenticatable implements JWTSubject {
         'created_at',
         'updated_at',
         'update_version',
+        'google_id',
     ];
 
      public function getJWTIdentifier()

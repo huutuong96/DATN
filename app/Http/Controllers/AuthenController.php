@@ -33,6 +33,9 @@ use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
+
 /**
  * Paginate a collection.
  *
@@ -450,25 +453,25 @@ class AuthenController extends Controller
             "description" => $request->description ?? $user->description,
         ];
         UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
-        if($request->input('address')){
-            if ($request->input('address')['default'] == 1) {
-                AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
-            }
-            AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
-                "province" => $request->input('address')['province'],
-                "province_id" => $request->input('address')['province_id'],
-                "district" => $request->input('address')['district'],
-                "district_id" => $request->input('address')['district_id'],
-                "ward" => $request->input('address')['ward'],
-                "ward_id" => $request->input('address')['ward_id'],
-                "address" => $request->input('address')['address'],
-                "user_id" => $user->id,
-                "default" => $request->input('address')['default'] ?? 0,
-                "type" => $request->input('address')['type'] ?? null,
-                "name" => $request->name ?? $user->fullname,
-                "phone" => $request->phone ?? $user->phone,
-            ]);
-        }
+        // if($request->input('address')){
+        //     if ($request->input('address')['default'] == 1) {
+        //         AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
+        //     }
+        //     AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
+        //         "province" => $request->input('address')['province'],
+        //         "province_id" => $request->input('address')['province_id'],
+        //         "district" => $request->input('address')['district'],
+        //         "district_id" => $request->input('address')['district_id'],
+        //         "ward" => $request->input('address')['ward'],
+        //         "ward_id" => $request->input('address')['ward_id'],
+        //         "address" => $request->input('address')['address'],
+        //         "user_id" => $user->id,
+        //         "default" => $request->input('address')['default'] ?? 0,
+        //         "type" => $request->input('address')['type'] ?? null,
+        //         "name" => $request->name ?? $user->fullname,
+        //         "phone" => $request->phone ?? $user->phone,
+        //     ]);
+        // }
         $dataDone = [
             'status' => true,
             'message' => "Cập nhật thành công!",
@@ -920,4 +923,35 @@ class AuthenController extends Controller
         return view('profile.profile', ['user' => $user]);
 
     }   
+
+    public function google_login () {
+        return Socialite::driver('google')->redirect();
+    }
+
+
+    public function handleGoogleCallback(Request $request){
+        $googleUser = Socialite::driver('google')->user();
+
+        $user = UsersModel::where('google_id', $googleUser->id)->first();
+        
+        if ($user) {
+            Auth::login($user);
+            return $user;
+        } else {
+            $user = UsersModel::create([
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->avatar,
+                'password' => bcrypt(Str::random(20)), // Tạo mật khẩu ngẫu nhiên
+            ]);
+    
+            Auth::login($user);
+        }
+        $token = JWTAuth::fromUser($user);
+        $user->refesh_token = $token;
+        $user->save();
+    
+        return redirect()->intended('/');
+    }
 }

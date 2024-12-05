@@ -100,7 +100,7 @@ class AddressController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update_address(Request $request, string $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
         AddressModel::where('user_id', $user->id)->update(['default' => 0]);
@@ -117,8 +117,8 @@ class AddressController extends Controller
             "default"=> $request->default ?? 0,
             "status"=> $request->status ?? 1,
             "user_id" => $user->id,
-            "name"=> $request->status ?? null,
-            "phone" => $request->status ?? null,
+            "name"=> $request->name ?? $user->name,
+            "phone" => $request->phone ?? $user->phone,
         ]);
 
         $dataDone = [
