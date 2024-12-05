@@ -465,8 +465,8 @@ class AuthenController extends Controller
                 "user_id" => $user->id,
                 "default" => $request->input('address')['default'] ?? 0,
                 "type" => $request->input('address')['type'] ?? null,
-                "name" => $user->fullname ?? null,
-                "phone" => $user->phone ?? null,
+                "name" => $request->name ?? $user->fullname,
+                "phone" => $request->phone ?? $user->phone,
             ]);
         }
         $dataDone = [
