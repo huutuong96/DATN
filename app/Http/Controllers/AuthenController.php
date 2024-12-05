@@ -939,7 +939,7 @@ class AuthenController extends Controller
             return $user;
         } else {
             $user = UsersModel::create([
-                'name' => $googleUser->name,
+                'fullname' => $googleUser->name,
                 'email' => $googleUser->email,
                 'google_id' => $googleUser->id,
                 'avatar' => $googleUser->avatar,
