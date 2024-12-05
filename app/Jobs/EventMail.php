@@ -35,7 +35,6 @@ class EventMail implements ShouldQueue
         DB::beginTransaction();
         DB::table('log_jobs')->insert([
             'log' => 'EventMail ',
-            'date' => Carbon::now(),
         ]);
         $events = events::where('event_day', date('d'))->where('event_month', date('m'))->first();
         $queryUser = UsersModel::query();

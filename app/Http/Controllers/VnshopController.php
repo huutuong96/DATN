@@ -1609,9 +1609,34 @@ public function store_events(Request $request)
 {
     $token = $request->token; 
     try {
+        $voucher_apply = [
+            'voucher_title' => $request->voucher_apply ?? null,
+            'voucher_description' => $request->voucher_description ?? null,
+            'voucher_quantity' => $request->voucher_quantity ?? null,
+            'voucher_limit' => $request->voucher_limit ?? null,
+            'voucher_ratio' => $request->voucher_ratio ?? null,
+            'voucher_code' => $request->voucher_code ?? null,
+        ];
 
-        
-        $event = Event::create($request->all());
+        $event = new Event();
+        $event->event_title = $request->event_title ?? null;
+        $event->event_day = $request->event_day ?? Carbon::now()->day;
+        $event->event_month = $request->event_month ?? Carbon::now()->month;
+        $event->event_year = $request->event_year ?? Carbon::now()->year;
+        $event->qualifier = null;
+        $event->voucher_apply = json_encode($voucher_apply) ?? null;
+        $event->is_mail = $request->event_title ?? null;
+        $event->point = $request->event_title ?? null;
+        $event->is_share_facebook = $request->is_share_facebook ?? null;
+        $event->is_share_zalo = $request->is_share_zalo ?? null;
+        $event->where_order = $request->where_order ?? null;
+        $event->where_price = $request->where_price ?? null;
+        // $event->date = $request->event_title ?? null;
+        $event->from = $request->from ?? null;
+        $event->to = $request->to ?? null;
+        $event->status = $request->status ?? null;
+        $event->description = $request->description ?? null;
+        $event->save();
         return redirect()
             ->route('events',[
                 'token' => $token

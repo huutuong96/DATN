@@ -26,15 +26,15 @@
                                       <label for="event_title" class="form-label">Tiêu đề sự kiện</label>
                                       <input type="text" class="form-control" id="event_title" name="event_title" value="{{ old('event_title') }}" required>
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-2">
                                       <label for="event_day" class="form-label">Ngày</label>
                                       <input type="number" class="form-control" id="event_day" name="event_day" min="1" max="31" value="{{ old('event_day') }}" required>
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-2">
                                       <label for="event_month" class="form-label">Tháng</label>
                                       <input type="number" class="form-control" id="event_month" name="event_month" min="1" max="12" value="{{ old('event_month') }}" required>
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-2">
                                       <label for="event_year" class="form-label">Năm</label>
                                       <input type="number" class="form-control" id="event_year" name="event_year" min="1900" max="2100" value="{{ old('event_year') }}" required>
                                   </div>
@@ -43,10 +43,30 @@
                                       <input type="text" class="form-control" id="qualifier" name="qualifier" value="{{ old('qualifier') }}">
                                   </div>
                                   <div class="col-md-6">
-                                      <label for="voucher_apply" class="form-label">Áp dụng mã giảm giá</label>
+                                      <label for="voucher_apply" class="form-label">Tiêu Đề Mã Giảm Giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_apply" value="{{ old('voucher_apply') }}">
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-4">
+                                      <label for="voucher_apply" class="form-label">Mô Tả Cho Giảm Giá</label>
+                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_description" value="{{ old('voucher_apply') }}">
+                                  </div>
+                                  <div class="col-md-2">
+                                      <label for="voucher_apply" class="form-label">Số lượng mã giảm giá</label>
+                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_quantity" value="{{ old('voucher_apply') }}">
+                                  </div>
+                                  <div class="col-md-2">
+                                      <label for="voucher_apply" class="form-label">Số tiền giới hạn</label>
+                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_limit" value="{{ old('voucher_apply') }}">
+                                  </div>
+                                  <div class="col-md-2">
+                                      <label for="voucher_apply" class="form-label">% Giảm giá</label>
+                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_ratio" value="{{ old('voucher_apply') }}">
+                                  </div>
+                                  <div class="col-md-2">
+                                      <label for="voucher_apply" class="form-label">Mã Giảm Giá</label>
+                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_code" value="{{ old('voucher_apply') }}" required>
+                                  </div>
+                                  <div class="col-md-3">
                                     <div class="form-check mt-4">
                                         <input type="checkbox" class="form-check-input" id="is_share_facebook" name="is_share_facebook" value="1" {{ old('is_share_facebook') ? 'checked' : '' }}>
                                         <label for="is_share_facebook" class="form-check-label">Chia sẻ Facebook</label>
@@ -60,29 +80,29 @@
                                       <label for="is_mail" class="form-check-label">Gửi email</label>
                                   </div>
                                 </div>
-                                  <div class="col-md-6">
-                                      <label for="point" class="form-label">Điểm</label>
+                                  <div class="col-md-3">
+                                      <label for="point" class="form-label">Áp dụng theo điểm</label>
                                       <input type="number" class="form-control" id="point" name="point" value="{{ old('point', 0) }}">
                                   </div>
                                 
-                                  <div class="col-md-6">
-                                      <label for="where_order" class="form-label">Vị trí đặt </label>
+                                  <div class="col-md-3">
+                                      <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
                                       <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', 0) }}">
                                   </div>
-                                  <div class="col-md-6">
-                                      <label for="where_price" class="form-label">Giá đơn hàng</label>
+                                  <div class="col-md-3">
+                                      <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
                                       <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" value="{{ old('where_price', 0) }}">
                                   </div>
-                                  <div class="col-md-6">
+                                  <!-- <div class="col-md-6">
                                       <label for="date" class="form-label">Ngày</label>
                                       <input type="date" class="form-control" id="date" name="date" value="{{ old('date') }}">
-                                  </div>
-                                  <div class="col-md-6">
-                                      <label for="from" class="form-label">Từ</label>
+                                  </div> -->
+                                  <div class="col-md-3">
+                                      <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
                                       <input type="datetime-local" class="form-control" id="from" name="from" value="{{ old('from') }}">
                                   </div>
-                                  <div class="col-md-6">
-                                      <label for="to" class="form-label">Đến</label>
+                                  <div class="col-md-3">
+                                      <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
                                       <input type="datetime-local" class="form-control" id="to" name="to" value="{{ old('to') }}">
                                   </div>
                                   <div class="col-md-6">
