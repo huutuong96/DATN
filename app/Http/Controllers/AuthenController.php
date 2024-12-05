@@ -928,7 +928,7 @@ class AuthenController extends Controller
     public function handleGoogleCallback(Request $request){
         $googleUser = Socialite::driver('google')->user();
 
-        $user = UsersModel::where('google_id', $googleUser->id)->first();
+        $user = UsersModel::where('email', $googleUser->email)->first();
         
         if ($user) {
             Auth::login($user);
@@ -949,7 +949,12 @@ class AuthenController extends Controller
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
         $user->save();
-    
-        return $user;
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'data' => [
+                'token' => $token,
+            ],
+        ], 200);
     }
 }
