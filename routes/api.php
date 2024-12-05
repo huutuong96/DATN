@@ -86,6 +86,7 @@ Route::get('/search', function () {
 
 
                 Route::resource('address', AddressController::class);
+                Route::post('update_address/{id}', [AddressController::class, 'update_address']);
 
                 // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckRole:OWNER');

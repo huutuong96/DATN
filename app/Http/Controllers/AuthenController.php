@@ -31,8 +31,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
+
 /**
  * Paginate a collection.
  *
@@ -450,25 +454,25 @@ class AuthenController extends Controller
             "description" => $request->description ?? $user->description,
         ];
         UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
-        if($request->input('address')){
-            if ($request->input('address')['default'] == 1) {
-                AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
-            }
-            AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
-                "province" => $request->input('address')['province'],
-                "province_id" => $request->input('address')['province_id'],
-                "district" => $request->input('address')['district'],
-                "district_id" => $request->input('address')['district_id'],
-                "ward" => $request->input('address')['ward'],
-                "ward_id" => $request->input('address')['ward_id'],
-                "address" => $request->input('address')['address'],
-                "user_id" => $user->id,
-                "default" => $request->input('address')['default'] ?? 0,
-                "type" => $request->input('address')['type'] ?? null,
-                "name" => $user->fullname ?? null,
-                "phone" => $user->phone ?? null,
-            ]);
-        }
+        // if($request->input('address')){
+        //     if ($request->input('address')['default'] == 1) {
+        //         AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
+        //     }
+        //     AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
+        //         "province" => $request->input('address')['province'],
+        //         "province_id" => $request->input('address')['province_id'],
+        //         "district" => $request->input('address')['district'],
+        //         "district_id" => $request->input('address')['district_id'],
+        //         "ward" => $request->input('address')['ward'],
+        //         "ward_id" => $request->input('address')['ward_id'],
+        //         "address" => $request->input('address')['address'],
+        //         "user_id" => $user->id,
+        //         "default" => $request->input('address')['default'] ?? 0,
+        //         "type" => $request->input('address')['type'] ?? null,
+        //         "name" => $request->name ?? $user->fullname,
+        //         "phone" => $request->phone ?? $user->phone,
+        //     ]);
+        // }
         $dataDone = [
             'status' => true,
             'message' => "Cập nhật thành công!",
@@ -920,4 +924,37 @@ class AuthenController extends Controller
         return view('profile.profile', ['user' => $user]);
 
     }   
+
+    public function handleGoogleCallback(Request $request){
+        $googleUser = Socialite::driver('google')->user();
+
+        $user = UsersModel::where('email', $googleUser->email)->first();
+        
+        if ($user) {
+            Auth::login($user);
+            return $user;
+        } else {
+            $user = UsersModel::create([
+                'fullname' => $googleUser->name,
+                'email' => $googleUser->email,
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->avatar,
+                'password' => bcrypt(Str::random(20)),
+                'login_at' => Carbon::now(),
+                'google_id' => $googleUser->id,
+            ]);
+    
+            Auth::login($user);
+        }
+        $token = JWTAuth::fromUser($user);
+        $user->refesh_token = $token;
+        $user->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'data' => [
+                'token' => $token,
+            ],
+        ], 200);
+    }
 }

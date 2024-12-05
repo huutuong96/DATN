@@ -13,7 +13,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Admin VNSHOP aaaa</title>
+    <title>Admin VNSHOP</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -1130,6 +1130,7 @@
                                 <span data-key="t-dashboards">Quản lý cấp bậc</span>
                             </a>
                         </li>
+                        
                         <li class="nav-item">
                             <a
                                 class="nav-link menu-link"
