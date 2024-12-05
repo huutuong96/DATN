@@ -10,13 +10,13 @@ class SubdomainMiddleware
 {
     public function handle($request, Closure $next)
     {
-        $host = $request->getHost(); // Lấy host từ request
-        $subdomain = explode('.', $host)[0]; // Tách subdomain từ host
+        // $host = $request->getHost(); // Lấy host từ request
+        // $subdomain = explode('.', $host)[0]; // Tách subdomain từ host
 
-        // Xử lý logic tùy theo subdomain
-        if ($subdomain === 'api') {
-            return redirect()->route('api.home');
-        }
+        // // Xử lý logic tùy theo subdomain
+        // if ($subdomain === 'api') {
+        //     return redirect()->route('api.home');
+        // }
 
         return $next($request);
     }

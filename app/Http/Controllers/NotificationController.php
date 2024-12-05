@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\check_time_event;
 use App\Jobs\EventMail;
 use App\Jobs\sendMailBirthDay;
 use App\Jobs\SendMailEvent;
@@ -16,6 +17,7 @@ use App\Models\UsersModel;
 use App\Models\voucherToMain;
 use App\Jobs\SendNotification;
 use App\Models\Banner;
+use App\Models\Event;
 use App\Models\events;
 use App\Models\OrdersModel;
 use Carbon\Carbon;
@@ -137,5 +139,15 @@ class NotificationController extends Controller
             'message' => 'Gửi mail Event thành công'
         ], 200);
     }
+
+    public function check_time_event()
+    {
+        check_time_event::dispatch();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đang kiểm tra thời gian Event'
+        ], 200);
+    }
+
 
 }
