@@ -185,6 +185,7 @@ return [
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         L5Swagger\L5SwaggerServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
 
         // TranslateTool\Providers\TranslateServiceProvider::class,
         /*
@@ -218,6 +219,7 @@ return [
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
 
     ])->toArray(),
 

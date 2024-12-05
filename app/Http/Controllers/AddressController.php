@@ -56,14 +56,14 @@ class AddressController extends Controller
             "default"=> $request->default ?? 0,
             "status"=> $request->status ?? 1,
             "user_id" => $user->id,
-            "name"=> $request->status ?? null,
-            "phone" => $request->status ?? null,
+            "name"=> $request->name ?? $user->name,
+            "phone" => $request->phone ?? $user->phone,
         ];
-        AddressModel::create($Address);
+        $Address = AddressModel::create($Address);
         $dataDone = [
             'status' => true,
             'message' => "Địa chỉ đã được lưu",
-            'address' => AddressModel::where('user_id', auth()->user()->id)->get(),
+            'address' => $Address   ,
         ];
         return response()->json($dataDone, 200);
     }
@@ -100,7 +100,7 @@ class AddressController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update_address(Request $request, string $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
         AddressModel::where('user_id', $user->id)->update(['default' => 0]);
@@ -117,8 +117,8 @@ class AddressController extends Controller
             "default"=> $request->default ?? 0,
             "status"=> $request->status ?? 1,
             "user_id" => $user->id,
-            "name"=> $request->status ?? null,
-            "phone" => $request->status ?? null,
+            "name"=> $request->name ?? $user->name,
+            "phone" => $request->phone ?? $user->phone,
         ]);
 
         $dataDone = [

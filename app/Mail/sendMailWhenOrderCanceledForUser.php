@@ -16,29 +16,20 @@ class sendMailWhenOrderCanceledForUser extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public $order;
+
+    public function __construct($order)
     {
-        //
+        $this->order = $order;
     }
 
     /**
      * Get the message envelope.
-     */
-    public function envelope(): Envelope
+     */ public function build()
     {
-        return new Envelope(
-            subject: 'ĐƠN HÀNG ĐÃ BỊ HỦY',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.order_canceled',
-        );
+        return $this->subject('Thông báo: Đơn hàng bị hủy')
+                    ->view('emails.order_canceled')
+                    ->with(['order' => $this->order]);
     }
 
     /**

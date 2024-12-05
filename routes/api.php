@@ -52,6 +52,8 @@ use App\Http\Controllers\configController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\VnshopController;
+use App\Http\Controllers\EventController;
+
 
 Route::get('/search', function () {
     return "API - VNSHOP";
@@ -84,6 +86,7 @@ Route::get('/search', function () {
 
 
                 Route::resource('address', AddressController::class);
+                Route::post('update_address/{id}', [AddressController::class, 'update_address']);
 
                 // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
                 Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckRole:OWNER');
@@ -355,6 +358,7 @@ Route::get('/search', function () {
 
             Route::get('delete_notify', [NotificationController::class, "delete_notify"])->name('delete_notify');
             Route::get('get_notification_for_shop', [NotificationController::class, "get_notification_for_shop"])->name('get_notification_for_shop');
+            
             Route::get('/', function () {
                 return response()->json(['message' => 'Đây là API VNSHOP']);
             });
@@ -382,6 +386,8 @@ Route::get('/search', function () {
         Route::get('categoryAll', [CategoriesController::class, 'categoryAll']);
         Route::get('order_cancellation_system', [OrdersController::class, 'order_cancellation_system']);
         
+        Route::resource('events', EventController::class);
+
 
         Route::get('search', [ProductController::class, 'search']);
         Route::get('/products/slug/{slug}', [ProductController::class, 'getProductToSlug']);
@@ -404,9 +410,13 @@ Route::get('/search', function () {
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
 
-        Route::post('import/products', [ProductController::class, "importProducts"])->name('importProducts');
+        // Route::post('import/data', [ProductController::class, "importProducts"])->name('importProducts');
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
         Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
 
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
- 
+        
+
+        
+        Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
+

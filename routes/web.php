@@ -54,6 +54,8 @@ use App\Http\Controllers\ClientEmbedController;
 use App\Http\Controllers\ModifierController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\webAppController;
+use App\Http\Controllers\EventController;
+use Laravel\Socialite\Facades\Socialite;
 
 Route::get('/', [VnshopController::class, 'login'])->name('login');
 Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
@@ -131,7 +133,11 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/changeStatuspayment/{id}', [VnshopController::class, 'changeStatuspayment'])->name('changeStatuspayment');
     Route::delete('/destroypayment/{id}', [VnshopController::class, 'destroypayment'])->name('destroypayment');
     Route::post('products/update/handle/{id}', [VnshopController::class, 'handleUpdateProduct'])->name('handleUpdateProduct');
-
+    Route::get('/events', [VnshopController::class, 'listEvent'])->name('events');
+    Route::post('/events', [VnshopController::class, 'store_events'])->name('store_events');
+    Route::put('/events/{id}', [VnshopController::class, 'update_events'])->name('update_events');
+    Route::get('/events-status', [VnshopController::class, 'changeStatusEvent'])->name('change_status_events');
+    Route::get('/trash-events', [VnshopController::class, 'listEvent_trash'])->name('trash_events');
 });
 
 
@@ -141,7 +147,9 @@ Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mai
 
 
 
-
+Route::get('/template', function () {
+    return view('bill.bill_template');
+});
 
 
 
@@ -166,3 +174,9 @@ Route::post('/wallet/shop_request_get_cash', [ClientEmbedController::class, 'sho
 Route::get('/register/shipping/view', [ClientEmbedController::class, 'register_shipping_view'])->name('register_shipping_view');
 Route::post('/register/shipping', [ClientEmbedController::class, 'register_shipping'])->name('register_shipping');
 
+Route::get('auth/google', function () {
+    
+    return Socialite::driver('google')->redirect();
+})->name('google_login');
+
+Route::get('/callback', [AuthenController::class, 'handleGoogleCallback']);

@@ -13,9 +13,9 @@ class ConfirmMailChangePassword extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
+    public $user;
+    public $token;
+
     public function __construct($user, $token)
     {
         $this->user = $user;

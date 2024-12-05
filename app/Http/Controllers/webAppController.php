@@ -119,7 +119,7 @@ public function delete_all(Request $request)
     ]);
         // Xóa tất cả dữ liệu từ tất cả các bảng
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        $tablesToExclude = ['roles','ranks','premissions','role_premissions','taxs','users','web_apps','payments','log_deletes','jobs','failed_jobs','history_get_cash_shops','platform_fees','config_main'];
+        $tablesToExclude = ['roles','ranks','premissions','role_premissions','taxs','users','web_apps','payments','log_deletes','jobs','failed_jobs','history_get_cash_shops','platform_fees','config_main','cart_to_users'];
         foreach (DB::select('SHOW TABLES') as $table) {
             $table_array = get_object_vars($table);
             $tableName = $table_array[key($table_array)];

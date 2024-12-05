@@ -16,10 +16,14 @@ class SendMailEvent implements ShouldQueue
 
    
     protected $users;
+    protected $eventTitle;
+    protected $code;
 
-    public function __construct($users)
+    public function __construct($users, $eventTitle, $code)
     {
         $this->users = $users;
+        $this->eventTitle = $eventTitle;
+        $this->code = $code;
     }
 
     /**
@@ -28,7 +32,7 @@ class SendMailEvent implements ShouldQueue
     public function handle(): void
     {
         foreach ($this->users as $user) {
-            Mail::to($user)->send(new mailEvent());
+            Mail::to($user)->send(new mailEvent($this->eventTitle, $this->code, $user));
         }
     }
 }

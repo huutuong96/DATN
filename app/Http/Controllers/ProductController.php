@@ -1,14 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Barryvdh\DomPDF\Facade\PDF;
 use App\Exports\AdminExport;
 use App\Exports\ImageExport;
 use App\Exports\ManagerExport;
+use App\Exports\OrderDetailExport;
 use App\Exports\OrderExport;
 use App\Exports\ProductsExport;
 use App\Exports\SellerExport;
 use App\Exports\ShopExport;
+use App\Exports\Transaction_history;
 use App\Exports\UserExport;
 use App\Models\CategoriesModel;
 use Illuminate\Http\Request;
@@ -19,6 +21,7 @@ use App\Imports\imagesProductImport;
 use App\Imports\MultiSheetImport;
 use App\Imports\ProductExport;
 use App\Imports\ProductImport;
+use App\Imports\ProductVariantImport;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Cloudinary\Cloudinary;
@@ -42,6 +45,7 @@ use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Imports\UsersImport;
+use App\Models\OrdersModel;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -111,6 +115,7 @@ class ProductController extends Controller
     }
 
     public function getProductToSlug($slug) {
+        
         if (empty($slug)) {
             return response()->json([
                 'status' => 'error',
@@ -905,7 +910,7 @@ class ProductController extends Controller
             if($request->name != $product->name){
                 $slug = Str::slug($request->name);
             }else{
-                $slug = $product->slug
+                $slug = $product->slug;
             }
         $dataInsert = [
             'product_id' => $product->id,
@@ -1270,7 +1275,7 @@ public function ProductAll(Request $request)
     $allProducts = Product::with(['images', 'variants'])->get();
 
     // $allUpdateProducts = update_product::with(['variants'])->get();
-// $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
+    // $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
     $allUpdateProducts = update_product::orderBy("updated_at", "desc")
     ->get()
     ->groupBy("product_id")
@@ -1430,15 +1435,18 @@ public function ProductAll(Request $request)
 //     return $combinations;
 // }
 
-       public function importProducts(Request $request){
-            try {
-                Excel::import(new ProductImport, $request->file('file'));
-                $products = Product::latest()->take($request->file('file')->getSize())->select('id')->get();
-                return 'Import thành công';
-            } catch (\Throwable $th) {
-            
-            }
-       }
+    //    public function importProducts(Request $request){
+    //         $user = JWTAuth::parseToken()->authenticate();
+    //         // try {
+    //             Excel::import(new ProductImport($user, $request), $request->file('product_import'));
+    //             if ($request->hasFile('variant_import')) {
+    //                 Excel::import(new ProductVariantImport, $request->file('variant_import'));
+    //             }
+    //             return 'Import thành công';
+    //         // } catch (\Throwable $th) {
+    //         //     return 'Import thất bại: ' . $th->getMessage();
+    //         // }
+    //    }
       
        public function exportdata(Request $request){
         try {
@@ -1451,8 +1459,41 @@ public function ProductAll(Request $request)
             if ($request->data == 'orders') {
                 return Excel::download(new OrderExport($request), 'vnshop-orders.xlsx');
             }
+            if ($request->data == 'transaction_history') {
+                return Excel::download(new Transaction_history($request), 'vnshop-transaction_history.xlsx');
+            }
+            if ($request->data == 'order_details') {
+                return Excel::download(new OrderDetailExport($request), 'vnshop-order_details.xlsx');
+            }
+            if ($request->data == 'bills') {
+                    $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment','timeline']) // Eager load 'product' qua 'orderDetails'
+                    ->where('id', $request->order_id)
+                    ->get();
+                    foreach ($orders as $order) {
+                        foreach ($order->orderDetails as $orderDetail) {
+                            if($orderDetail->variant!=null){
+                                $variant = $orderDetail->variant;  
+                            }else{
+                                $product = $orderDetail->product;  
+                            }
+                        }
+                    }
+                    foreach ($orders as $key => $order) {
+                        foreach ($order->orderDetails as $orderDetail  ) {
+                            if( $orderDetail->variant){
+                            $orderDetail['product']  = $orderDetail->variant->product;
+                            unset($orderDetail->variant['product']);
+                            }
+                        }
+                    }
+                    $pdf = PDF::loadView('bill.bill_template', compact('orders'));
+                    return $pdf->download('vnshop-bills.pdf');
+            }
         } catch (\Throwable $th) {
             return 'export thất bại: ' . $th->getMessage();
         }
-   }
+    
+    }
+
 }
+

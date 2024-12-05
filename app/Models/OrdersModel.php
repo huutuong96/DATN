@@ -176,6 +176,9 @@ public function timeline()
     // return $this->belongsTo(order_timelines::class, 'order_id')->select(['id', 'order_id', 'title', 'created_at']);
     return $this->hasMany(order_timelines::class, 'order_id')->orderBy('created_at', 'desc');
 }
-
+public function user()
+{
+    return $this->belongsTo(User::class, 'user_id'); // `user_id` là khóa ngoại trong bảng `orders`
+}
 }
 

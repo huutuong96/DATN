@@ -258,7 +258,7 @@ class PurchaseController extends Controller
                 $total_amount = ($grandTotalPrice + $shipFee) - $discountMainVoucher;
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-                ProducttocartModel::whereIn('id', $request->carts)->delete();
+                // ProducttocartModel::whereIn('id', $request->carts)->delete();
                 // deleteProductToCart::dispatch($request->carts);   
                 return response()->json([
                     'status' => true,
@@ -616,7 +616,7 @@ class PurchaseController extends Controller
     {
         $product = Product::find($product_id);
         $tax_category = tax_category::where('category_id', $product->category_id)->first();
-        $taxes = Tax::find($tax_category->tax_id);
+        $taxes = Tax::where('status', 2)->where('id', $tax_category->tax_id)->first();
         $totalTaxAmount = 0;
         $taxAmount = $totalPriceOfShop * $taxes->rate;
         $totalTaxAmount += $taxAmount;
@@ -627,7 +627,7 @@ class PurchaseController extends Controller
     {
         $product = Product::find($product_id);
         $tax_category = tax_category::where('category_id', $product->category_id)->first();
-        $taxes = Tax::find($tax_category->tax_id);
+        $taxes = Tax::where('status', 2)->where('id', $tax_category->tax_id)->first();
         order_tax_details::create([
             'order_id' => $order->id,
             'tax_id' => $taxes->id,

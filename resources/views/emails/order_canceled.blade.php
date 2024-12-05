@@ -1,4 +1,15 @@
-<div>
-    <h1>hello world</h1>
-    <h3>Đơn hàng của bạn đã bị hủy vì người bán không xác nhận đơn hàng đúng thời gian quy định, Số tiền đã thanh toán sẽ hoàn lại trong 5 ngày làm việc</h3>
-</div>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo: Đơn hàng đã bị hủy</title>
+</head>
+<body>
+    <h1>Đơn hàng của bạn đã bị hủy</h1>
+    <p>Đơn hàng <b>{{ $order->id }}</b> đã bị hủy vì cửa hàng không xác nhận đơn hàng trong thời gian quy định.</p>
+    <p>Số tiền sẽ được hoàn lại trong vòng 5 ngày làm việc.</p>
+    <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+</body>
+</html>
+

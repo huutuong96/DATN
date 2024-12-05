@@ -61,11 +61,13 @@
                                             <button class="btn btn-success w-100" type="submit">Đăng nhập</button>
                                         </div>
                                     </form>
+                                    
                                 </div>
                             </div>
                             <!-- end card body -->
                         </div>
                         <!-- end card -->
+                        <a href="{{route('google_login')}}">GOOGLE</a>
                     </div>
                 </div>
                 <!-- end row -->

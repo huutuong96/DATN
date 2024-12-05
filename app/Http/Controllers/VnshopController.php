@@ -58,6 +58,7 @@ use App\Jobs\UpdatePriceAllVariant;
 use App\Jobs\UpdateImageAllVariant;
 
 use App\Models\update_product;
+use App\Models\Event;
 
 class VnshopController extends Controller
 {
@@ -74,7 +75,7 @@ class VnshopController extends Controller
         $checkShop = Shop::where("status", 3)
         ->get()
         ->count();
-        $shopAC = Shop::where("status", 1)
+        $shopAC = Shop::where("status", 2)
         ->get()
         ->count();
         $checkProduct = Product::where("status", 3)
@@ -83,12 +84,15 @@ class VnshopController extends Controller
                                 ->count();
         $monthlyRevenue = order_fee_details::
         whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
         ->sum('amount');
+        // dd($monthlyRevenue);
         $tax_vnshop = Tax::where("type" , 'san')
                            ->sum("rate");
 
         // $monthlyRevenue = $monthlyRevenue ;
         $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
         ->get();
         
         $doanhthu = array_fill(1, Carbon::now()->day, 0);
@@ -99,7 +103,7 @@ class VnshopController extends Controller
             if ($day <= Carbon::now()->day) { 
                 if($order->status == 2){
                     $doanhthu[$day] += ($order->total_amount / 1000000 );
-                    if($order->status == 5){
+                    if($order->status == 9){
                         $luongtrahang[$day] += 1;
                     }
                     $luotmua[$day] += 1;
@@ -356,25 +360,19 @@ class VnshopController extends Controller
     //     return Back()->with('message', 'Không có sản phẩm nào!');
     // }
     public function changeCategory(Request $rqt)
-    {
+    { 
+        // dd($rqt);
         $category = CategoriesModel::find($rqt->id);
         if (!$category) {
             return Back()->with('message', 'Không tìm thấy danh mục!');
         }
-        if ($category->parent_id === null || $category->parent_id == 0) {
-            $chillrenCategory = CategoriesModel::where("parent_id", $category->id)
+        if ($rqt->status === 0 || $rqt->status == 5) {
+            $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)
                                                 ->where("status", 2) 
                                                 ->get();
+                                                // dd($chillrenCategory);
             if ($chillrenCategory->isNotEmpty()) {
                 return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục con đang hoạt động!');
-            }
-            foreach ($chillrenCategory as $child) {
-                $grandchildren = CategoriesModel::where("parent_id", $child->id)
-                                                 ->where("status", 2) 
-                                                 ->get();
-                if ($grandchildren->isNotEmpty()) {
-                    return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục cháu đang hoạt động!');
-                }
             }
         }
         $category->status = $rqt->status;  
@@ -1062,14 +1060,30 @@ public function statistByRevenue(Request $request)
     }
     public function statistBySales(Request $request)
     {
-    $TongSoLuongBanRa = OrdersModel::count();
-    $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->count();
-    $DoiTra = OrdersModel::whereIn("order_status", [9])->count();
-    $Huy = OrdersModel::whereIn("order_status", [10])->count();
-    $HoanThanh = OrdersModel::whereIn("order_status", [7,8])->count();
-    $ThatBai = OrdersModel::whereIn("order_status", [6])->count();
-    $ChoDuyet = OrdersModel::whereIn("order_status", [0,1,2,3])->count();
-    $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->count();
+    $TongSoLuongBanRa = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->count();
+    $DangGiao = OrdersModel::whereIn("order_status", [4, 5])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $DoiTra = OrdersModel::whereIn("order_status", [9])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $Huy = OrdersModel::whereIn("order_status", [10])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $HoanThanh = OrdersModel::whereIn("order_status", [7,8])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $ThatBai = OrdersModel::whereIn("order_status", [6])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $ChoDuyet = OrdersModel::whereIn("order_status", [0,1,2,3])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
+    $ChuaThanhToan = OrdersModel::whereIn("order_status", [11])->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->where('status', 2)->count();
 
     $monthlyRevenueOrder = OrdersModel::whereMonth('created_at', Carbon::now()->month)
         ->whereYear('created_at', Carbon::now()->year)
@@ -1093,14 +1107,14 @@ public function statistByRevenue(Request $request)
     foreach ($ordersCurrentYear as $order) {
         $month = $order->created_at->month; // Tháng tạo đơn hàng
         $luotmuanam[$month] += 1; // Mỗi đơn hàng tăng lượt mua
-        switch ($order->status) {
-            case 5: // Đơn hàng trả hàng
+        switch ($order->order_status) {
+            case 9: // Đơn hàng trả hàng
                 $luongtrahangnam[$month] += 1;
                 break;
-            case 6: // Đơn hàng bị hủy
+            case 10: // Đơn hàng bị hủy
                 $bihuynam[$month] += 1;
                 break;
-            case 7: // Đơn hàng lỗi
+            case 6: // Đơn hàng lỗi
                 $loinam[$month] += 1;
                 break;
         }
@@ -1129,14 +1143,14 @@ public function statistByRevenue(Request $request)
     $year = $order->created_at->year; // Năm tạo đơn hàng
     if (in_array($year, $yearsRange)) {
         $luotmuacacnam[$year] += 1; // Mỗi đơn hàng tăng lượt mua
-        switch ($order->status) {
-            case 5: // Đơn hàng trả hàng
+        switch ($order->order_status) {
+            case 10: // Đơn hàng trả hàng
                 $luongtrahangcacnam[$year] += 1;
                 break;
-            case 6: // Đơn hàng bị hủy
+            case 9: // Đơn hàng bị hủy
                 $bihuycacnam[$year] += 1;
                 break;
-            case 7: // Đơn hàng lỗi
+            case 6: // Đơn hàng lỗi
                 $loicacnam[$year] += 1;
                 break;
         }
@@ -1155,13 +1169,13 @@ public function statistByRevenue(Request $request)
         $day = $order->created_at->day; 
         if ($day <= Carbon::now()->day) { 
             if($order->status == 2){
-                if($order->status == 5){
+                if($order->order_status == 10){
                     $luongtrahang[$day] += 1;
                 }
-                if($order->status == 5){
+                if($order->order_status == 9){
                     $bihuy[$day] += 1;
                 }
-                if($order->status == 5){
+                if($order->order_status == 6){
                     $loi[$day] += 1;
                 }
                 $luotmua[$day] += 1;
@@ -1180,7 +1194,9 @@ public function statistByRevenue(Request $request)
     $listShop = [];
     foreach ($listShopId as $idKey => $shopId) {
         $shop = Shop::where("id", $shopId)->with('user')->first();
-        $shop["luotban"] = OrdersModel::where("shop_id", $shopId)->count();
+        $shop["luotban"] = OrdersModel::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->where("shop_id", $shopId)->count();
         $listShop[] = $shop;
     }
     // dd($listShop);
@@ -1544,6 +1560,137 @@ public function handleUpdateProduct(Request $request, string $id)
     }
     
 }
+//events -------------------------------------------------------------------------------------
+public function listEvent(Request $request)
+{
+    $token = $request->token; 
+    try {
+        $events = Event::whereIn('status', [1, 2])->paginate(10);
+       
+        return view('events.list_event',compact('events'));
+    } catch (\Throwable $th) {
+        return redirect()->route('events', [
+            'token' => $token
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+
+public function listEvent_trash(Request $request)
+{
+    $token = $request->token; 
+    try {
+      
+        $trash_events = Event::whereIn('status', [5])->paginate(10);
+        return view('events.trash_event',compact('trash_events'));
+    } catch (\Throwable $th) {
+        return redirect()->route('trash_events', [
+            'token' => $token
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+
+
+public function changeStatusEvent(Request $request)
+{  
+    // dd($request->status);
+    try {
+        $event =Event::find($request->id);
+        // $event = PaymentsModel::findOrFail($id);
+        $event->status = $request->status;
+        $event->save();
+        return back()->with('message', 'Cập nhật trạng thái thành công!');
+    } catch (\Throwable $th) {
+        return redirect()->route('events', [
+            'token' => $request->token
+        ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+    }
+}
+public function store_events(Request $request)
+{
+    $token = $request->token; 
+    try {
+
+        
+        $event = Event::create($request->all());
+        return redirect()
+            ->route('events',[
+                'token' => $token
+                
+            ]) 
+            ->with('success', 'Thêm sự kiện thành công!');
+    } catch (\Throwable $th) {
+        
+        return redirect()
+            ->back() 
+            ->with('error', 'Thêm sự kiện không thành công: ' . $th->getMessage());
+    }
+}
+
+public function update_events(Request $request, $id)
+{
+    $token = $request->token; 
+    $event = Event::find($id);
+
+    if (!$event) {
+        return redirect()->back()->with('error', 'Không tìm thấy sự kiện.');
+    }
+
+    try {
+        $event->event_title = $request->input('event_title', $event->event_title);
+        $event->event_day = $request->input('event_day', $event->event_day);
+        $event->event_month = $request->input('event_month', $event->event_month);
+        $event->event_year = $request->input('event_year', $event->event_year);
+        $event->qualifier = $request->input('qualifier', $event->qualifier);
+        $event->voucher_apply = $request->input('voucher_apply', $event->voucher_apply);
+        $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
+        $event->point = $request->input('point', $event->point);
+        $event->is_share_facebook = $request->has('is_share_facebook') ? $request->input('is_share_facebook') : $event->is_share_facebook;
+        $event->is_share_zalo = $request->has('is_share_zalo') ? $request->input('is_share_zalo') : $event->is_share_zalo;
+        $event->where_order = $request->input('where_order', $event->where_order);
+        $event->where_price = $request->input('where_price', $event->where_price);
+        $event->date = $request->input('date', $event->date);
+        $event->from = $request->input('from', $event->from);
+        $event->to = $request->input('to', $event->to);
+        $event->status = $request->input('status', $event->status);
+        $event->description = $request->input('description', $event->description);
+        $event->save();
+        return redirect()
+        ->route('events',[
+            'token' => $token
+        ]) ->with('success', 'Cập nhật sự kiện thành công.');
+
+    } catch (\Throwable $th) {
+        return redirect()->back()->with('error', 'Cập nhật sự kiện không thành công: ' . $th->getMessage());
+    }
+}
+
+// public function changeStatuspayment(Request $request, string $id)
+// {
+//     try {
+        
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('message', 'Cập nhật trạng thái thành công!');
+//     } catch (\Throwable $th) {
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+//     }
+// }
+// public function changeStatuspayment(Request $request, string $id)
+// {
+//     try {
+        
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('message', 'Cập nhật trạng thái thành công!');
+//     } catch (\Throwable $th) {
+//         return redirect()->route('events', [
+//             'token' => $token
+//         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
+//     }
+// }
+
 
 
 

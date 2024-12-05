@@ -31,8 +31,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
+
 /**
  * Paginate a collection.
  *
@@ -211,6 +215,7 @@ class AuthenController extends Controller
             "password" => Hash::make($request->password),
             "email" => $request->email,
             "rank_id" => $request->rank_id ?? 1,
+            "phone" => $request->phone ?? null,
             "role_id" => 1,
             "status" => 101, // 101 là tài khoản chưa được kích hoạt
             "login_at" => now(),
@@ -313,10 +318,8 @@ class AuthenController extends Controller
         }
 
         $user->refesh_token = $token;
-        $user->is_login = 1;
+        // $user->is_login = 1;
         $user->save();
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
@@ -347,12 +350,10 @@ class AuthenController extends Controller
         }
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
-        $user->is_login = 1;
+        // $user->is_login = 1;
         $user->save();
         $user->load('role', 'address');
         $user = auth::user();
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         $notification = Notification::where('user_id', $user->id)->get();
         $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
         $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
@@ -453,25 +454,25 @@ class AuthenController extends Controller
             "description" => $request->description ?? $user->description,
         ];
         UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
-        if($request->input('address')){
-            if ($request->input('address')['default'] == 1) {
-                AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
-            }
-            AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
-                "province" => $request->input('address')['province'],
-                "province_id" => $request->input('address')['province_id'],
-                "district" => $request->input('address')['district'],
-                "district_id" => $request->input('address')['district_id'],
-                "ward" => $request->input('address')['ward'],
-                "ward_id" => $request->input('address')['ward_id'],
-                "address" => $request->input('address')['address'],
-                "user_id" => $user->id,
-                "default" => $request->input('address')['default'] ?? 0,
-                "type" => $request->input('address')['type'] ?? null,
-                "name" => $user->fullname ?? null,
-                "phone" => $user->phone ?? null,
-            ]);
-        }
+        // if($request->input('address')){
+        //     if ($request->input('address')['default'] == 1) {
+        //         AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
+        //     }
+        //     AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
+        //         "province" => $request->input('address')['province'],
+        //         "province_id" => $request->input('address')['province_id'],
+        //         "district" => $request->input('address')['district'],
+        //         "district_id" => $request->input('address')['district_id'],
+        //         "ward" => $request->input('address')['ward'],
+        //         "ward_id" => $request->input('address')['ward_id'],
+        //         "address" => $request->input('address')['address'],
+        //         "user_id" => $user->id,
+        //         "default" => $request->input('address')['default'] ?? 0,
+        //         "type" => $request->input('address')['type'] ?? null,
+        //         "name" => $request->name ?? $user->fullname,
+        //         "phone" => $request->phone ?? $user->phone,
+        //     ]);
+        // }
         $dataDone = [
             'status' => true,
             'message' => "Cập nhật thành công!",
@@ -483,47 +484,6 @@ class AuthenController extends Controller
         return response()->json($dataDone, 200);
     }
 
- /**
- * @OA\Post(
- *     path="api/change_password",
- *     summary="Change user password",
- *     description="Changes the password of the authenticated user.",
- *     tags={"Users"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"password", "new_password"},
- *             @OA\Property(property="password", type="string", example="current_password"),
- *             @OA\Property(property="new_password", type="string", example="new_password123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Password changed successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Mật khẩu đã được thay đổi thành công")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Invalid credentials",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Tài khoản không tồn tại"),
- *             @OA\Property(property="error_detail", type="string", example="Mật khẩu không đúng")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Password change failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Cập nhật thất bại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
     public function change_password(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -551,37 +511,7 @@ class AuthenController extends Controller
         return response()->json($dataDone, 200);
     }
 
-    /**
- * @OA\Post(
- *     path="api/fogot_password",
- *     summary="Forgot password",
- *     description="Sends a password reset token to the user's email.",
- *     tags={"Authentication"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"email"},
- *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Password reset token sent",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đã gửi mã xác nhận đến email"),
- *             @OA\Property(property="user", type="string", example="john.doe@example.com")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="User not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="error", type="string", example="Tài khoản không tồn tại")
- *         )
- *     )
- * )
- */
+    
     public function fogot_password(Request $request)
     {
         $user = UsersModel::where('email', $request->email)->first();
@@ -679,10 +609,8 @@ class AuthenController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
-            'is_login' => 0,
+            // 'is_login' => 0,
         ]);
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json([
             'status' => true,
@@ -695,10 +623,8 @@ class AuthenController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $user->update([
             'refesh_token' => null,
-            'is_login' => 0,
+            // 'is_login' => 0,
         ]);
-        $countOnline = UsersModel::where('is_login', 1)->count();
-        event(new UserLoggedIn($countOnline));
         JWTAuth::invalidate(JWTAuth::getToken());
         session()->forget('token');
         return redirect()->route('login');
@@ -997,7 +923,57 @@ class AuthenController extends Controller
         $user->load('role', 'address');
         return view('profile.profile', ['user' => $user]);
 
+    }   
+
+    public function handleGoogleCallback(Request $request){
+        $googleUser = Socialite::driver('google')->user();
+
+        $user = UsersModel::where('email', $googleUser->email)->first();
+        
+        if ($user) {
+            Auth::login($user);
+            return response()->json([
+                'status' => true,
+                'message' => 'Đăng nhập thành công',
+                'data' => [
+                    'token' => $user->refesh_token,
+                    // 'user' => $user,
+                ],
+            ], 200);
+        } else {
+            $user = UsersModel::create([
+                'fullname' => $googleUser->name,
+                'email' => $googleUser->email,
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->avatar,
+                'password' => Hash::make($googleUser->id),
+                'login_at' => Carbon::now(),
+                'google_id' => $googleUser->id,
+            ]);
+    
+            Auth::login($user);
+        }
+        $token = JWTAuth::fromUser($user);
+        $user->refesh_token = $token;
+        $user->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'data' => [
+                'token' => $user->refesh_token,
+                // 'user' => $user,
+            ],
+        ], 200);
     }
 
-    
+    public function login_with_token($token){
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'data' => [
+                'token' => $token,
+                // 'user' => $user,
+            ],
+        ], 200);
+    }
 }

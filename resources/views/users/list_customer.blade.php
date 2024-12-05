@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-xl-12">
         <div class="card">
-                    <div class="card-header align-items-center d-flex">
+                    <div class="card-header align-items-center d-flex" style="position: relative;">
                         <h4 class="card-title mb-0 flex-grow-1">Danh sách tài khoản khách hàng</h4>
                         <a
                             href="{{ route('costomer', ['token' => auth()->user()->refesh_token]) }}"
@@ -35,21 +35,21 @@
                         >
                             User đã xóa
                         </a>
-                    </div><!-- end card header -->
-                    <!-- Single Button Dropdown -->
-                    <div class="dropdown" style="left: 30px;">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            Xuất FILE Excel
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 1])}}">Customer</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 4])}}">Seller</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 3])}}">Manager</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 2])}}">Admin</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 1])}}">Đang hoạt động</a>
-                            <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 101])}}">Chưa xác thực</a>
+                        <div class="dropdown ms-5" style="top: 63px; position: absolute; right: 7px;">
+                            <button class="btn dropdown-toggle" style="border: 1px solid #747474;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                Xuất FILE Excel
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 1])}}">Customer</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 4])}}">Seller</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 3])}}">Manager</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'role' => 2])}}">Admin</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 1])}}">Đang hoạt động</a>
+                                <a class="dropdown-item" href="{{route('exportdata', ['data' => 'users', 'status' => 101])}}">Chưa xác thực</a>
+                            </div>
                         </div>
-                    </div>
+                    </div><!-- end card header -->
+                   
                     <div class="card-body">
                         <div class="live-preview">
                             <div class="table-responsive">
