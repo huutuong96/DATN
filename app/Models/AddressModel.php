@@ -25,7 +25,9 @@ class AddressModel extends Model
         'status',
         'create_by',
         'update_by',
-        'user_id'
+        'user_id',
+        'name',
+        'phone',
     ];
 
     // Các trường không được gán hàng loạt

@@ -59,11 +59,11 @@ class AddressController extends Controller
             "name"=> $request->name ?? $user->name,
             "phone" => $request->phone ?? $user->phone,
         ];
-        AddressModel::create($Address);
+        $Address = AddressModel::create($Address);
         $dataDone = [
             'status' => true,
             'message' => "Địa chỉ đã được lưu",
-            'address' => AddressModel::where('user_id', auth()->user()->id)->get(),
+            'address' => $Address   ,
         ];
         return response()->json($dataDone, 200);
     }

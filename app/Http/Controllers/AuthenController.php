@@ -953,7 +953,7 @@ class AuthenController extends Controller
             'status' => true,
             'message' => 'Đăng nhập thành công',
             'data' => [
-                'token' => $token,
+                'token' => $user->refesh_token,
             ],
         ], 200);
     }
