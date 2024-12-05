@@ -360,25 +360,19 @@ class VnshopController extends Controller
     //     return Back()->with('message', 'Không có sản phẩm nào!');
     // }
     public function changeCategory(Request $rqt)
-    {
+    { 
+        // dd($rqt);
         $category = CategoriesModel::find($rqt->id);
         if (!$category) {
             return Back()->with('message', 'Không tìm thấy danh mục!');
         }
-        if ($category->parent_id === null || $category->parent_id == 0) {
-            $chillrenCategory = CategoriesModel::where("parent_id", $category->id)
+        if ($rqt->status === 0 || $rqt->status == 5) {
+            $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)
                                                 ->where("status", 2) 
                                                 ->get();
+                                                // dd($chillrenCategory);
             if ($chillrenCategory->isNotEmpty()) {
                 return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục con đang hoạt động!');
-            }
-            foreach ($chillrenCategory as $child) {
-                $grandchildren = CategoriesModel::where("parent_id", $child->id)
-                                                 ->where("status", 2) 
-                                                 ->get();
-                if ($grandchildren->isNotEmpty()) {
-                    return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục cháu đang hoạt động!');
-                }
             }
         }
         $category->status = $rqt->status;  
