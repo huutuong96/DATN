@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use App\Models\ConfigModel;
-
+use App\Services\TelegramService;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -16,6 +16,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
+        $this->app->singleton(TelegramService::class, function ($app) {
+            return new TelegramService();
+        });
     }
 
     /**
