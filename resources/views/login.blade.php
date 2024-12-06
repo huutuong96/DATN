@@ -35,9 +35,13 @@
                 <div class="row justify-content-center">
                     <div class="col-md-8 col-lg-6 col-xl-5">
                         <div class="card mt-4 card-bg-fill">
-
                             <div class="card-body p-4">
                                 <div class="p-2 mt-4">
+                                    @if(session('error'))
+                                        <div class="alert alert-danger">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
                                     <form action="/api/admin/login" method="POST">
                                         @csrf
                                         @if(isset($error))

@@ -19,7 +19,7 @@
                              <div class="modal-body text-center p-5">
                                 <form id="addBlogForm" 
                                 action="{{ route('store_events', ['token' => auth()->user()->refesh_token]) }}" 
-                                method="POST">
+                                method="POST" enctype="multipart/form-data">
                               @csrf
                               <div class="row g-3">
                                   <div class="col-md-6">
@@ -113,9 +113,13 @@
                                           <option value="3">Không hoạt động</option>
                                       </select>
                                   </div>
-                                  <div class="col-md-12">
+                                  <div class="col-md-6">
                                       <label for="description" class="form-label">Mô tả</label>
                                       <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                                  </div>
+                                  <div class="col-md-6">
+                                      <label for="from" class="form-label">Hình ảnh</label>
+                                      <input type="file" class="form-control" id="from" name="event_image[]" multiple>
                                   </div>
                                   <div class="col-md-12 ">
                                       <button type="submit" class="btn btn-primary mt-3">Thêm sự kiện</button>
