@@ -2,16 +2,17 @@
 
 namespace App\Exceptions;
 
+use App\Services\TelegramService;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
 class Handler extends ExceptionHandler
-{
-    /**
-     * A list of exception types with their corresponding custom log levels.
-     *
-     * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
-     */
+{ protected $telegramService;
+
+    public function __construct(TelegramService $telegramService)
+    {
+        $this->telegramService = $telegramService;
+    }
     protected $levels = [
         //
     ];
@@ -36,6 +37,25 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
+    public function report(Throwable $exception)
+    {
+        
+        
+        $message = $exception->getMessage();
+        $this->telegramService->sendMessage($message);
+
+        parent::report($exception);
+    }
+
+
+    protected function formatExceptionMessage(\Throwable $exception)
+    {
+        return "⚠️ <b>Exception occurred:</b>\n" .
+               "Message: {$exception->getMessage()}\n" .
+               "File: {$exception->getFile()}\n" .
+               "Line: {$exception->getLine()}\n" .
+               "Trace: {$exception->getTraceAsString()}";
+    }
     /**
      * Register the exception handling callbacks for the application.
      */
@@ -45,4 +65,6 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    
 }
