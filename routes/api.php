@@ -68,7 +68,7 @@ Route::get('/search', function () {
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
 
-    Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
+    Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole']], function () {
 
 
                 Route::post('categories', [CategoriesController::class, 'store']);
@@ -165,6 +165,11 @@ Route::get('/search', function () {
                 Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
                 Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
 
+                Route::get('get_voucher_to_shop/{id}', [ShopController::class, 'get_voucher_to_shop']);
+                Route::post('update_voucher_to_shop/{id}', [ShopController::class, 'UpdateVoucherToShop']);
+                
+                
+
                 Route::resource('follows', FollowToShopController::class);
                 Route::post('up_follow/{shop_id}', [FollowToShopController::class, 'follows']);
                 Route::resource('support_main', Support_mainController::class);
@@ -238,7 +243,11 @@ Route::get('/search', function () {
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
-            Route::post('products', action: [ProductController::class, 'store']);
+            Route::middleware('CheckPremission:create_products')->group(function () {
+                Route::post('products', action: [ProductController::class, 'store']);
+            });
+
+            
 
             Route::post('products/{id}', [ProductController::class, 'update']);
             Route::post('product/upload', [ProductController::class, 'upload']);

@@ -26,5 +26,6 @@ class VoucherToShop extends Model
         'created_at',
         'updated_at',
         'min',
+        'price',
     ];
 }
