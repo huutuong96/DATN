@@ -90,9 +90,9 @@
             <p>
                 MÃ VOUCHER : {{$code}}
             </p>
-            <img class="anh1" src="../assets/images/1.png" alt="">
+            <img class="anh1" src="../../../public/assets/images/1.png" alt="">
             <!-- <img src="../assets/images/1.png" alt=""> -->
-            <img class="anh2" src="../assets/images/2.png" alt="" width="400px">
+            <img class="anh2" src="../../../public/assets/images/2.png" alt="" width="400px">
             <a href="#" class="cta-button">Xem ngay</a>
         </div>
 
