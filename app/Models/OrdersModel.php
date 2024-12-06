@@ -12,10 +12,7 @@ class OrdersModel extends Model
     protected $table = 'orders';
 
     // Define the relationship with OrderDetailsModel
-    public function orderDetails()
-    {
-        return $this->hasMany(OrderDetailsModel::class, 'order_id');
-    }
+   
 
     protected $fillable = [
         'payment_id',
@@ -142,6 +139,7 @@ class OrdersModel extends Model
             self::STATUS_PAID_PENDING_PICKUP => 'Đã thanh toán chờ lấy hàng',
         ];
     }
+// Trong OrdersModel
 
     public function getStatusLabelAttribute()
     {
@@ -179,6 +177,10 @@ public function timeline()
 public function user()
 {
     return $this->belongsTo(User::class, 'user_id'); // `user_id` là khóa ngoại trong bảng `orders`
+}
+public function orderDetails()
+{
+    return $this->hasMany(OrderDetailsModel::class, 'order_id');
 }
 }
 

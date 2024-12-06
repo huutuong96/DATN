@@ -6,17 +6,17 @@
 <div class="container-fluid">
                  
                     <div class="row">
-                        <div class="col-xl-10">
+                        <div class="col-xl-10 col-lg-10 col-md-10">
                             <div class="card">
-                                <div class="card-header">
-                                    <h4 class="card-title mb-0">Đăng ký đơn vị vận chuyển</h4>
+                                <div class="card-header" style="background-color: rgb(64, 104, 223)">
+                                    <h4 class="card-title mb-0 text-center" style="color: white">Đăng ký đơn vị vận chuyển</h4>
                                 </div><!-- end card header -->
                                 <div class="card-body">
                                     <form action="{{route('register_shipping')}}" class="form-steps" autocomplete="off" method="post">
                                         @csrf 
                                         <div class="text-center pt-3 pb-4 mb-1 d-flex justify-content-center">
-                                            <img src="assets/images/logo-dark.png" class="card-logo card-logo-dark" alt="logo dark" height="17">
-                                            <img src="assets/images/logo-light.png" class="card-logo card-logo-light" alt="logo light" height="17">
+                                            <img src="https://res.cloudinary.com/dg5xvqt5i/image/upload/v1733471799/ibwsxovp4bnfz24eyqg7.png"  alt="" height="90px">
+                                           
                                         </div>
                                         <div class="step-arrow-nav mb-4">
 
@@ -58,7 +58,7 @@
                                                     </div>
                                                                                                     </div>
                                                 <div class="d-flex align-items-start gap-3 mt-4">
-                                                    <button type="submit" class="btn btn-success btn-label right ms-auto nexttab nexttab" data-nexttab="steparrow-description-info-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Đăng ký</button>
+                                                    <button type="submit" style="background-color: rgb(64, 104, 223); color: white" class="btn btn-label right ms-auto nexttab nexttab" data-nexttab="steparrow-description-info-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Đăng ký</button>
                                                 </div>
                                             </div>
                                             <!-- end tab pane -->
