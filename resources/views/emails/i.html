@@ -1,85 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Bills</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Email</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9fafb;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
-        .container {
-            max-width: 800px;
+        .email-container {
+            max-width: 600px;
             margin: 30px auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border: 1px solid #e1e4e8;
-            border-radius: 10px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .header {
-            background-color: #007bff;
-            color: #ffffff;
+            background: linear-gradient(90deg, #1369fe, #6d93d3);
+            color: white;
             text-align: center;
-            padding: 15px;
-            border-radius: 8px 8px 0 0;
+            padding: 20px;
         }
         .header h1 {
             margin: 0;
             font-size: 24px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .content {
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 300px;
+        }
+        .content h2 {
+            color: #1369fe;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .content p {
+            margin: 10px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #1369fe;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
             margin-top: 20px;
         }
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e1e4e8;
+        .cta-button:hover {
+            background: #feb47b;
         }
-        th {
-            background-color: #f4f6f8;
-            color: #333;
-            text-transform: uppercase;
+        .footer {
+            background: #f4f4f4;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #666;
         }
-        tr:nth-child(even) {
-            background-color: #f9fafb;
+        .anh1{
+            position: absolute;
+            top: -198px;
+            right: -179px;
         }
-        tr:hover {
-            background-color: #eef2f7;
-        }
-        td {
-            color: #555;
+        .anh2{
+            position: absolute;
+            top: 65px;
+            right: -30px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="email-container" >
+        <!-- Header Section -->
         <div class="header">
-            <h1>Danh sách hóa đơn</h1>
+            <h1>{{$eventTitle ?? null}}</h1>
+              <!-- <h1>chào mừng xuân 2025</h1> -->
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Sản phẩm</th>
-                    <th>Số lượng</th>
-                    <th>Giá</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($orders as $order)
-                <tr>
-                    <td>{{ $order->id }}</td>
-                    <td>{{ $order->product_name }}</td>
-                    <td>{{ $order->quantity }}</td>
-                    <td>{{ $order->price }}</td>
-                </tr>
-               @endforeach
-            </tbody>
-        </table>
+
+        <!-- Content Section -->
+        <div class="content">
+            <h2>Dear {{$user->fullname ?? "Bạn"}}</h2>
+            <p>
+                MÃ VOUCHER : {{$code}}
+            </p>
+            <img class="anh1" src="https://res.cloudinary.com/dg5xvqt5i/image/upload/v1733478499/b8eotfzk2jja0ctw0xrn.png" alt="">
+            <!-- <img src="../assets/images/1.png" alt=""> -->
+            <img class="anh2" src="https://res.cloudinary.com/dg5xvqt5i/image/upload/v1733478553/hs6iqnsloarvevgyltv7.png" alt="" width="400px">
+            <a href="#" class="cta-button">Xem ngay</a>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            &copy; 2024 Your Company Name. All rights reserved. | <a href="#">Unsubscribe</a>
+        </div>
     </div>
 </body>
 </html>
