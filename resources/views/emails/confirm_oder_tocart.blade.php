@@ -71,10 +71,10 @@
                 <!-- Summary -->
                 <div class="border-top pt-3">
                     <p class="mb-1">Tổng tiền hàng:
-                        <span class="  fs-6 fs-md-5 fs-lg-4">  {{number_format($order->vat ?? null)}}đ</span>
+                        <span class="  fs-6 fs-md-5 fs-lg-4">{{number_format($subTotal ?? $order->total_amount)}}  đ</span>
                     </p>
                     <p class="mb-1">VAT:
-                        <span class=" fs-6 fs-md-5 fs-lg-4">{{number_format($subTotal ?? $order->total_amount)}}đ</span>
+                        <span class=" fs-6 fs-md-5 fs-lg-4">{{number_format($order->vat ?? null)}}đ</span>
                     </p>
                    
                     <p class="mb-1">Phí vận chuyển:

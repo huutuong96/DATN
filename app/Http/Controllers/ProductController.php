@@ -1482,8 +1482,10 @@ public function ProductAll(Request $request)
                             }
                         }
                     }
-                    return $orders;
-                    $pdf = PDF::loadView('bill.bill_template', compact('orders'));
+                //    return $order;
+                    $pdf = PDF::loadView('bill.bill_template', compact('orders'))
+                    ->setPaper('a4')
+                    ->setOptions(['defaultFont' => 'DejaVuSans']); 
                     return $pdf->download('vnshop-bills.pdf');
             }
         } catch (\Throwable $th) {
