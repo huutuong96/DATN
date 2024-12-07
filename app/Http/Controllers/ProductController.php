@@ -898,6 +898,7 @@ class ProductController extends Controller
                 'message' => "Sản phẩm không tồn tại",
             ], 404);
         }
+
         $user = JWTAuth::parseToken()->authenticate();
 
         if($request->name != $product->name){
@@ -1485,7 +1486,10 @@ public function ProductAll(Request $request)
                             }
                         }
                     }
-                    $pdf = PDF::loadView('bill.bill_template', compact('orders'));
+                //    return $order;
+                    $pdf = PDF::loadView('bill.bill_template', compact('orders'))
+                    ->setPaper('a4')
+                    ->setOptions(['defaultFont' => 'DejaVuSans']); 
                     return $pdf->download('vnshop-bills.pdf');
             }
         } catch (\Throwable $th) {

@@ -68,7 +68,6 @@ class PremissionsController extends Controller
             return redirect()->route('list_permission', ['token' => auth()->user()->refesh_token, 'has_permissions' => $has_permissions,'id' => $role->id])->with('message', 'Vai trò không tồn tại!');
 
         }
-        // Kiểm tra xem quyền đã tồn tại cho role chưa
         
         $permissionExist = role_premissionModel::where([
             ['role_id', '=', $request->role_id],
@@ -76,7 +75,7 @@ class PremissionsController extends Controller
         ])->get();
         
         foreach ($request->permissions as $permission) {
-            $role_premissionModelExist = role_premissionModel::where('premission_id', $permission)->first();
+            $role_premissionModelExist = role_premissionModel::where('premission_id', $permission)->where('role_id', $request->role_id)->first();
             if ($role_premissionModelExist) {
                 continue;
             }

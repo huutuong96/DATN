@@ -678,13 +678,34 @@ class ShopController extends Controller
             'image' => $request->image,
             'quantity' => $request->quantity,
             'limitValue' => $request->limitValue,
-            'ratio' => $request->ratio,
             'code' => $request->code,
             'shop_id' => $shop_id,
             'status' => $request->status ?? 1,
+            'ratio' => $request->ratio ?? null,
+            'price' => $request->ratio ? null : ($request->price ?? null),
         ];
         $VoucherToShop = VoucherToShop::create($dataInsert);
         return $this->successResponse("Tạo Voucher thành công", $VoucherToShop);
+    }
+
+
+    public function UpdateVoucherToShop(Request $request, $voucher_id)
+    {
+        $VoucherToShop = VoucherToShop::where('id', $voucher_id)->first();
+        $dataInsert = [
+            'title' => $request->title ?? $VoucherToShop->title,
+            'description' => $request->description ?? $VoucherToShop->description,
+            'image' => $request->image ?? $VoucherToShop->image,
+            'quantity' => $request->quantity ?? $VoucherToShop->quantity,
+            'limitValue' => $request->limitValue ?? $VoucherToShop->limitValue,
+            'code' => $request->code ?? $VoucherToShop->code,
+            'shop_id' => $VoucherToShop->shop_id,
+            'status' => $request->status ?? 1,
+            'ratio' => $request->ratio ?? null,
+            'price' => $request->ratio ? null : ($request->price ?? null),
+        ];
+        $VoucherToShop = VoucherToShop::create($dataInsert);
+        return $this->successResponse("cập nhật Voucher thành công", $VoucherToShop);
     }
 
 

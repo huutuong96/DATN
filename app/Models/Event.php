@@ -28,6 +28,7 @@ class Event extends Model
         'to',
         'status',
         'description',
+        'images',
     ];
     public $timestamps = false;
 }

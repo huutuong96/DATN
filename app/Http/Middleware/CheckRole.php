@@ -28,13 +28,13 @@ class CheckRole
                     return $next($request);
                 }
             } catch (TokenExpiredException $e) {
-                return redirect()->route('login')->with('message', 'Bạn không có quyền vào trang này');
+                return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
 
             } catch (JWTException $e) {
-                return redirect()->route('login')->with('message', 'Bạn không có quyền vào trang này');
+                return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
 
             } catch (\Exception $e) {
-                return redirect()->route('login')->with('message', 'Bạn không có quyền vào trang này');
+                return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
             }
         }
         if (!$user) {
@@ -47,6 +47,9 @@ class CheckRole
         
         if ($role->title == 'OWNER' || $role->title == 'MANAGER') {
             return $next($request);
+        }
+        if ($request->token) {
+            return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
         }
        
         return response()->json([
