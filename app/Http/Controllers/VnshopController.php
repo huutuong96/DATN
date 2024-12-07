@@ -1567,7 +1567,9 @@ public function listEvent(Request $request)
     $token = $request->token; 
     try {
         $events = Event::whereIn('status', [1, 2])->paginate(10);
-       
+        foreach ($events as &$event) {
+            $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
+        }
         return view('events.list_event',compact('events'));
     } catch (\Throwable $th) {
         return redirect()->route('events', [
@@ -1667,24 +1669,36 @@ public function store_events(Request $request)
 
 public function update_events(Request $request, $id)
 {
-    $token = $request->token; 
+    $token = $request->input('token'); 
     $event = Event::find($id);
-
+   
     if (!$event) {
         return redirect()->back()->with('error', 'Không tìm thấy sự kiện.');
     }
+    $voucher_apply = [
+        'voucher_title' => $request->input('voucher_title'),
+        'voucher_description' => $request->input('voucher_description'),
+        'voucher_quantity' => $request->input('voucher_quantity'),
+        'voucher_limit' => $request->input('voucher_limit'),
+        'voucher_ratio' => $request->input('voucher_ratio'),
+        'voucher_code' => $request->input('voucher_code'),
+    ];
+    $voucher_apply = array_filter($voucher_apply, function ($value) {
+        return !is_null($value);
+    });
 
     try {
+
         $event->event_title = $request->input('event_title', $event->event_title);
         $event->event_day = $request->input('event_day', $event->event_day);
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
         $event->qualifier = $request->input('qualifier', $event->qualifier);
-        $event->voucher_apply = $request->input('voucher_apply', $event->voucher_apply);
-        $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
+        $event->voucher_apply = !empty($voucher_apply) ? json_encode($voucher_apply) : $event->voucher_apply;
+        $event->is_mail = $request->has('is_mail') ? $request->boolean('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
-        $event->is_share_facebook = $request->has('is_share_facebook') ? $request->input('is_share_facebook') : $event->is_share_facebook;
-        $event->is_share_zalo = $request->has('is_share_zalo') ? $request->input('is_share_zalo') : $event->is_share_zalo;
+        $event->is_share_facebook = $request->has('is_share_facebook') ? $request->boolean('is_share_facebook') : $event->is_share_facebook;
+        $event->is_share_zalo = $request->has('is_share_zalo') ? $request->boolean('is_share_zalo') : $event->is_share_zalo;
         $event->where_order = $request->input('where_order', $event->where_order);
         $event->where_price = $request->input('where_price', $event->where_price);
         $event->date = $request->input('date', $event->date);
@@ -1693,15 +1707,15 @@ public function update_events(Request $request, $id)
         $event->status = $request->input('status', $event->status);
         $event->description = $request->input('description', $event->description);
         $event->save();
-        return redirect()
-        ->route('events',[
-            'token' => $token
-        ]) ->with('success', 'Cập nhật sự kiện thành công.');
 
+        return redirect()
+            ->route('events', ['token' => $token])
+            ->with('success', 'Cập nhật sự kiện thành công.');
     } catch (\Throwable $th) {
         return redirect()->back()->with('error', 'Cập nhật sự kiện không thành công: ' . $th->getMessage());
     }
 }
+
 
 // public function changeStatuspayment(Request $request, string $id)
 // {

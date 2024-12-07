@@ -26,8 +26,8 @@ class CommentsRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'rate' => 'required|integer|min:1|max:5',
-            'status' => 'required',
+            'rate' => 'nullable|integer|min:1|max:5',
+            'status' => 'nullable',
             'parent_id' => 'nullable',
             'product_id' => 'required|exists:products,id',
           
@@ -41,11 +41,9 @@ class CommentsRequest extends FormRequest
             'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
             'content.required' => 'Trường nội dung là bắt buộc.',
             'content.string' => 'Nội dung phải là chuỗi ký tự.',
-            'rate.required' => 'Trường đánh giá là bắt buộc.',
             'rate.integer' => 'Đánh giá phải là một số nguyên.',
             'rate.min' => 'Đánh giá phải từ 1 đến 5.',
             'rate.max' => 'Đánh giá phải từ 1 đến 5.',
-            'status.required' => 'Trường trạng thái là bắt buộc.',
             'parent_id.exists' => 'Bình luận cha không tồn tại.',
             'product_id.required' => 'Trường sản phẩm là bắt buộc.',
             'product_id.exists' => 'Sản phẩm không tồn tại.',
