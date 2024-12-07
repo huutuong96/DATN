@@ -39,12 +39,10 @@ class Handler extends ExceptionHandler
 
     public function report(Throwable $exception)
     {
-        
-        
         $message = $exception->getMessage();
         $this->telegramService->sendMessage($message);
-
-        parent::report($exception ?? 'có lỗi xảy ra');
+        // parent::report($exception);
+        return $exception;
     }
 
 
