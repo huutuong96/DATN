@@ -1,0 +1,16 @@
+{
+  "type": "service_account",
+  "project_id": "vnshop-443803",
+  "private_key_id": "b0a4ff89c844a251b958179ffbb26ad4161af9ef",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCwP4TWFWstij6q\n7EAt6zJLXPp8K1TuqQfJ52YLDtbuS2sKmqX/fT6AQ6y6Ts5cgKFIvrMTFzlz2OIM\n5aQ2E0/+znVVnrOENzjDw79zJjfkf6OG30r+1kl3tSZnwo9PneizYCUlvxFDkq3D\nQ5opsLXnpVwZZ1h/l/FNbtj9TYr91DAJB94w5WZKvvgG2QU+su4gZjrwWas9BPuU\nAuKR+H/ckiyVH/VYk6Ju8yE8ldvmotFC72LHYvC9fENZmKE7/+o/lnN9+2BiCY0E\nBkrks0eETWEI72SV9UzhVZfYVi+nyxXQcO4GJ6JyIRzwXgIDe3SubBCJwqbr2JNu\n2jV0XxOVAgMBAAECggEAKzDRsHXsvyr46wF8w9P2jgXhw2KKDHdjN30LomuXS6uz\nNlTKF6ddVOjgsAJma0BBZfaHo0bGd0d/s9nlyTOn36FAG0SKKP0wXbb/WGxV95q4\n2/El63ffZqS/nd9Np9ziXOzThaHCTQ0ppGeRZKSPm04IWRhclV4Kjed7aO2jAUsg\nUIFpfT+EiDjLbH8ypAvtTWsuZfTGDsMk5U5HH0vZi5pC7szVGGsjw4T275UKOp08\njcpqfN1gIwSNq2Xt+Gt6eXzwD6MEw0nEXsb+YKIg+eNjbQDjd8Wv07GRWv2RED8g\nTZpXY7dzNcKkTUkDOvpxdDtPCCw81PJ9/ZKFJakM4QKBgQD3NLaVPuwQrh1RYijr\nqIaEq5Y3vXZ+nQ0q5pHJWdI7bcPsBqZ+v0zS5ufnynY+fwI4LqT4fvmuiOvUEtng\n0jXFxL4aErgtqRPFmYzhew10J1g+ds2e+NYjuhwutPMbKQ/5EwLD06nW/+Rq0zTq\nf6JgSptASjQX6xWsTqlTVAnNtQKBgQC2hJkcTYFTapEWRTKRA1NLwjOOe+z1DrtR\nAc8vdFTQh7Do/D2qhvUz+4ybHP8WnzLZOrDJBINWHbYR6KFDxuhk7wZoNcld08hX\n8WZ+Frtc338E0Aehfb/XlAxT4qTiJs+aMR/V/k50Q183fimGphB43mXbI7mxLef5\n6fmVgwzaYQKBgFPYGSU9liuCIod71402N4m/+M8m/42qDtFCKqg0Qs3NSOpAxy+u\nCoxtrLI9RSWlRkdv6pwt1NmRrwra6fMK2RoexKtrNfSmqAIZNmMzrTh8L73f5ZXJ\nqDet4+kjjmDj6Hr+K63nmG9Hk114DTaL27L1GvsPL+P84/jxJRUSJ9ERAoGAEYGa\nZfqRIv0fuXEdrocRID0aUNpWGhM1qElyI+0WjYHWWCKJj6euMTQ5gk8/sF3ItMlK\nV52VM1daNVGI1kVn2PaMOMaf7932Y2kGGaX4hqnxNvb1JGo5UmYi4JDmm8J5OyLn\nGNFxmPk1Us9JEF8xSUabom9EylfK3k+w3sRZIUECgYAOathC910ljVNxQCZ6s7Gn\nfRWSAWgdXvyGQqY1WtMoFIJnAvUXs/O5qEAofIpIFj7huqbKoN1uHteQjWcy+Tq7\njXtvbnzYS5gBDVH1WbAyzOFDB4xp3RJ1dgAA4XqhJUngPm9MgP8IN21ksKQOEUMa\nnW/Nl2p8f999dGyaq2H49A==\n-----END PRIVATE KEY-----\n",
+  "client_email": "check-product-auto@vnshop-443803.iam.gserviceaccount.com",
+  "client_id": "100905014993553120059",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/check-product-auto%40vnshop-443803.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
+
+
+

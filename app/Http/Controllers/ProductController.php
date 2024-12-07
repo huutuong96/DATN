@@ -49,8 +49,9 @@ use App\Models\OrderDetailsModel;
 use App\Models\OrdersModel;
 use App\Services\RecommendationService;
 use Maatwebsite\Excel\Facades\Excel;
-
-
+use Phpml\FeatureExtraction\CountVectorizer;
+use Phpml\FeatureExtraction\TokenCountVectorizer;
+use Phpml\Tokenization\WhitespaceTokenizer;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
 
@@ -1431,16 +1432,5 @@ public function ProductAll(Request $request)
             ]);
         }
     }
-
-    public function check_product(){
-        $products = Product::where('status', 0)->get();
-        checkProductDescription($products);
-        return response()->json([
-            'status' => true,
-            'message' => "Kiểm tra sản phẩm thành công",
-        ]);
-    }   
-    
-
 }
 

@@ -997,6 +997,7 @@ class AuthenController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
+            'url' => "http://test.vnshop.top",
             'data' => [
                 'token' => $user->refesh_token,
                 // 'user' => $user,
