@@ -156,6 +156,17 @@ class CommentsController extends Controller
     if ($request->parent_id) {
         $parent_comment = CommentsModel::find($request->parent_id);
         if ($parent_comment) {
+            $parent_user_id = $parent_comment->user_id;
+            $notificationRequest = new Request([
+                'type' => 'main',
+                'user_id' => $parent_user_id,
+                'title' => 'Có phản hồi mới từ comment của bạn',
+                'description' => $user->fullname . ' đã phản hồi comment của bạn.',
+            ]);
+            $notificationController = new NotificationController();
+            $notificationController->store($notificationRequest);
+        }
+        if ($parent_comment) {
             $level = $parent_comment->level + 1;
             if ($parent_comment->level == 3) {
                 $level = 3;
