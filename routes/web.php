@@ -176,7 +176,6 @@ Route::get('/register/shipping/view', [ClientEmbedController::class, 'register_s
 Route::post('/register/shipping', [ClientEmbedController::class, 'register_shipping'])->name('register_shipping');
 
 Route::get('auth/google', function () {
-    
     return Socialite::driver('google')->redirect();
 })->name('google_login');
 
