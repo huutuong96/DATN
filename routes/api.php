@@ -114,6 +114,7 @@ Route::get('/search', function () {
                 });
                 
                
+        Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
                 
                
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
