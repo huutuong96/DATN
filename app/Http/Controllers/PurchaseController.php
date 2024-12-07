@@ -46,239 +46,450 @@ class PurchaseController extends Controller
     {
        
     }
+    //BACKUP
+    // public function purchaseToCart(Request $request)
+    // {
+    //         $user = JWTAuth::parseToken()->authenticate();
+    //         if (!$user->phone) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Vui lòng nhập số điện thoại',
+    //             ], 400);
+    //         }
+    //         $voucherToMainCode = null;
+    //         $voucherToShopCode = null;
+
+    //         if ($request->voucherToMainCode) {
+    //             $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode, 'main');
+    //             if (!$voucherToMainCode) {
+    //                 return response()->json([
+    //                     'status' => false,
+    //                     'message' => 'Mã giảm giá này không hợp lệ',
+    //                 ], 400);
+    //             }
+    //         }
+    //         if ($request->voucherToShopCode) {
+    //             $voucherToShopCode = $this->getValidVoucherCode($request->voucherToShopCode, 'shop');
+    //             if (!$voucherToShopCode) {
+    //                 return response()->json([
+    //                     'status' => false,
+    //                     'message' => 'Mã giảm giá cửa hàng không hợp lệ',
+    //                 ], 400);
+    //             }
+    //         }
+    //         // Validate vouchers
+    //         if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
+    //             return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
+    //         }
+    //         try {
+    //             DB::beginTransaction();
+    //             $payment = PaymentsModel::where('id', $request->payment)->first();
+    //             if (!$payment) {
+    //                 return response()->json([
+    //                     'status' => false,
+    //                     'message' => 'Phương thức thanh toán không hợp lệ.',
+    //                 ], 400);
+    //             }
+    //             $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
+    
+    //             $ordersByShop = [];
+    //             $grandTotalPrice = 0;
+    //             $totalQuantity = 0;
+    //             $total_amount = 0;
+    //             if ($request->address_id) {
+    //                 $addressUser = AddressModel::where('id', $request->address_id)->first();
+    //             }else {
+    //                 $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+    //             }
+                
+    //             if (!$addressUser) {
+    //                 return response()->json([
+    //                     'status' => 400,
+    //                     'message' => 'Vui lòng cập nhật địa chỉ giao hàng',
+    //                 ], 400);
+    //             }
+    //             // Group cart items by shop
+    //             foreach ($carts as $cart) {
+    //                 $shopId = $cart->shop_id;
+    //                 if (!isset($ordersByShop[$shopId])) {
+    //                     $ordersByShop[$shopId] = [
+    //                         'items' => [],
+    //                         'totalPrice' => 0,
+    //                         'order' => null,
+    //                     ];
+    //                 }
+    //                 $ordersByShop[$shopId]['items'][] = $cart;
+    //             }
+    //             // Process each shop's order
+    //             $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
+    //             foreach ($ordersByShop as $shopId => &$shopOrder) {
+    //                 $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
+    //                 $order = $this->createOrder($request, $ship_id, $groupOrderIds, $payment);
+    //                 $order->shop_id = $shopId;
+    //                 $order->save();
+    //                 $shopOrder['order'] = $order;
+    //                 $shopOrder['orderDetails'] = [];
+    //                 $shopTotalPrice = 0;
+    //                 $height = 0;
+    //                 $length = 0;
+    //                 $weight = 0;
+    //                 $width = 0;
+    //                 $productIds = [];
+    //                 $images = [];
+    //                 foreach ($shopOrder['items'] as $cart) {
+    //                     if ($cart->variant_image != null) {
+    //                         $images[] = $cart->variant_image;
+    //                     }else {
+    //                         $images[] = $cart->product_image;
+    //                     }
+    //                     $productIds[] = $cart->product_id;
+    //                     $result = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
+    //                     if ($result == 'PRO') {
+    //                         return response()->json([
+    //                             'status' => false,
+    //                             'message' => 'Sản phẩm ' . $cart->product_name . ' đã hết hàng',
+    //                         ], 400);
+    //                     }elseif ($result == 'VAR') {
+    //                         return response()->json([
+    //                             'status' => false,
+    //                             'message' => 'Sản phẩm ' . $cart->variant_name . ' đã hết hàng',
+    //                         ], 400);
+    //                     }
+    //                     $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
+    //                     $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
+    //                     $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id, $cart->shop_id);
+    //                     $height += $orderDetail->height;
+    //                     $length += $orderDetail->length;
+    //                     $weight += $orderDetail->weight;
+    //                     $width += $orderDetail->width;
+    //                     $shopOrder['orderDetails'][] = $orderDetail;
+    //                     $shopTotalPrice += $totalPrice;
+    //                     $totalQuantity += $cart->quantity;
+    //                 }
+    //                 $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+    //                     // $shopTotalPrice += $tax;
+    //                     if (!$tax) {
+    //                         return response()->json([
+    //                             'status' => false,
+    //                             'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
+    //                         ], 400);
+    //                     }
+    //                     $this->addStateTaxToOrder($order, $tax, $cart->product_id);
+    //                 $order->vat = $tax;
+    //                 $order->price_before_vat = $shopTotalPrice;
+    //                 $order->price_after_vat = $shopTotalPrice + $tax;
+    //                 $shopTotalPrice = $shopTotalPrice + $tax;
+    //                 $order->height = $height;
+    //                 $order->length = $length;
+    //                 $order->weight = $weight;
+    //                 $order->width = $width;
+    //                 $shopOrder['totalPrice'] = $shopTotalPrice;
+    //                 $grandTotalPrice += $shopTotalPrice;
+    //                 $shopData = Shop::find($shopId);
+    //                 $service = $this->get_infomaiton_services($shopData, $addressUser);
+    //                 $productForShip = $this->getProductForShip($productIds);
+    //                 $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
+    //                 $order->ship_fee = $shipFee;
+    //                 AddPointUser::dispatch(auth()->id());
+    //                 $checkRank = $this->check_point_to_user();
+    //                 $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);
+    //                 $newtotal = $this->addOrderFeesToTotal($order, $shopTotalPrice);
+    //                 $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
+    //                 $order->disscount_by_rank = $get_discountsByRank;
+    //                 $order->total_amount = $shopTotalPrice;
+    //                 $discountShopVoucher = 0;
+    //                 $totalAdded = 0;
+    //                 if ($voucherToShopCode != null) {
+    //                     $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+    //                     $discountShopVoucher = $totalAdded;
+    //                     $shopTotalPrice -= $totalAdded;
+    //                 }
+                    
+    //                 $order->net_amount -= $totalAdded;
+    //                 $shopData->wallet = $shopData->wallet + $order->net_amount;
+    //                 $order->total_amount = $shopTotalPrice;
+    //                 $total_amount = $shopTotalPrice;
+    //                 $order->voucher_shop_disscount = $discountShopVoucher;
+    //                 $discountMainVoucher = 0;
+    //                 if ($voucherToMainCode) {
+    //                     $total_disscount_main = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
+    //                     $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
+    //                     $order->total_amount = $total_disscount_main;
+    //                     $order->save();
+    //                 }
+    //                 $order->voucher_disscount = $discountMainVoucher;
+    //                 $order->total_amount = $shipFee + $order->total_amount;
+    //                 $this->order_update_infomaion($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
+    //                 $order->save();
+    //             }
+    //             // return $ordersByShop;
+    //             // return ($grandTotalPrice + $shipFee) - $discountMainVoucher;
+    //             DB::commit();
+    //             if($payment->code == 'COD'){
+    //                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
+    //                 $order->order_infomation = $orderInfomation;
+    //                 $order->save();
+    //             }
+    //             $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
+    //             $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
+    //             $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
+    //             $variants = null;
+    //             if ($orderDetails->first()->variant_id != null) {
+    //                 $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
+    //             }
+    //             $user = jwtAuth::parseToken()->authenticate();
+    //             if ($payment->code == 'VNPAY') {
+    //                 $PaymentsController = new PaymentsController();
+    //                 $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
+    //                 $order->order_infomation = $orderInfomation;
+    //                 $order->save();
+    //                 DB::table("data_mail")->insert( [
+    //                     'groupOrderIds' => $groupOrderIds,
+    //                     'ordersByShop' => json_encode($ordersByShop),
+    //                     'total_amount' => $total_amount,
+    //                     'carts' => $carts,
+    //                     'total_quantity' => json_encode($totalQuantity),
+    //                     'ship_fee' => $shipFee,
+    //                     'email' => auth()->user()->email,
+    //                 ]);
+    //                     ProducttocartModel::whereIn('id', $request->carts)->delete();
+    //                 // deleteProductToCart::dispatch($request->carts);
+    //                 $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
+    //                 return response()->json([
+    //                     'status' => true,
+    //                     'message' => 'Vui lòng thanh toán',
+    //                     'url' => $url,
+    //                 ], 200);
+    //             }
+    //             $total_amount = ($grandTotalPrice + $shipFee) - $discountMainVoucher;
+    //             SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
+    //             SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
+    //             // ProducttocartModel::whereIn('id', $request->carts)->delete();
+    //             deleteProductToCart::dispatch($request->carts);   
+    //             return response()->json([
+    //                 'status' => true,
+    //                 'message' => 'Đặt hàng thành công',
+    //                 'data' => $groupOrderIds,
+    //             ], 200);
+        
+    //         } catch (\Exception $e) {
+    //             DB::rollBack();
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Đặt hàng thất bại',
+    //                 'error' => $e->getMessage()
+    //             ], 400);
+    //         }
+    // }
+
     public function purchaseToCart(Request $request)
     {
-            $user = JWTAuth::parseToken()->authenticate();
-            if (!$user->phone) {
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user->phone) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Vui lòng nhập số điện thoại',
+            ], 400);
+        }
+
+        $voucherToMainCode = $request->voucherToMainCode ? $this->getValidVoucherCode($request->voucherToMainCode, 'main') : null;
+        $voucherToShopCode = $request->voucherToShopCode ? $this->getValidVoucherCode($request->voucherToShopCode, 'shop') : null;
+
+        if ($request->voucherToMainCode && !$voucherToMainCode) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Mã giảm giá này không hợp lệ',
+            ], 400);
+        }
+
+        if ($request->voucherToShopCode && !$voucherToShopCode) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Mã giảm giá cửa hàng không hợp lệ',
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $payment = PaymentsModel::find($request->payment);
+            if (!$payment) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Vui lòng nhập số điện thoại',
+                    'message' => 'Phương thức thanh toán không hợp lệ.',
                 ], 400);
             }
-            $voucherToMainCode = null;
-            $voucherToShopCode = null;
 
-            if ($request->voucherToMainCode) {
-                $voucherToMainCode = $this->getValidVoucherCode($request->voucherToMainCode, 'main');
-                if (!$voucherToMainCode) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Mã giảm giá này không hợp lệ',
-                    ], 400);
-                }
-            }
-            if ($request->voucherToShopCode) {
-                $voucherToShopCode = $this->getValidVoucherCode($request->voucherToShopCode, 'shop');
-                if (!$voucherToShopCode) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Mã giảm giá cửa hàng không hợp lệ',
-                    ], 400);
-                }
-            }
-            // Validate vouchers
-            if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
-                return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
-            }
-            try {
-                DB::beginTransaction();
-                $payment = PaymentsModel::where('id', $request->payment)->first();
-                if (!$payment) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Phương thức thanh toán không hợp lệ.',
-                    ], 400);
-                }
-                $carts = ProducttocartModel::whereIn('id', $request->carts)->with('product')->with('variant')->get();
-    
-                $ordersByShop = [];
-                $grandTotalPrice = 0;
-                $totalQuantity = 0;
-                $total_amount = 0;
-                if ($request->address_id) {
-                    $addressUser = AddressModel::where('id', $request->address_id)->first();
-                }else {
-                    $addressUser = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
-                }
-                
-                if (!$addressUser) {
-                    return response()->json([
-                        'status' => 400,
-                        'message' => 'Vui lòng cập nhật địa chỉ giao hàng',
-                    ], 400);
-                }
-                // Group cart items by shop
-                foreach ($carts as $cart) {
-                    $shopId = $cart->shop_id;
-                    if (!isset($ordersByShop[$shopId])) {
-                        $ordersByShop[$shopId] = [
-                            'items' => [],
-                            'totalPrice' => 0,
-                            'order' => null,
-                        ];
-                    }
-                    $ordersByShop[$shopId]['items'][] = $cart;
-                }
-                // Process each shop's order
-                $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
-                foreach ($ordersByShop as $shopId => &$shopOrder) {
-                    $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
-                    $order = $this->createOrder($request, $ship_id, $groupOrderIds, $payment);
-                    $order->shop_id = $shopId;
-                    $order->save();
-                    $shopOrder['order'] = $order;
-                    $shopOrder['orderDetails'] = [];
-                    $shopTotalPrice = 0;
-                    $height = 0;
-                    $length = 0;
-                    $weight = 0;
-                    $width = 0;
-                    $productIds = [];
-                    $images = [];
-                    foreach ($shopOrder['items'] as $cart) {
-                        if ($cart->variant_image != null) {
-                            $images[] = $cart->variant_image;
-                        }else {
-                            $images[] = $cart->product_image;
-                        }
-                        $productIds[] = $cart->product_id;
-                        $result = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
-                        if ($result == 'PRO') {
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Sản phẩm ' . $cart->product_name . ' đã hết hàng',
-                            ], 400);
-                        }elseif ($result == 'VAR') {
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Sản phẩm ' . $cart->variant_name . ' đã hết hàng',
-                            ], 400);
-                        }
-                        $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
-                        $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
-                        $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id, $cart->shop_id);
-                        $height += $orderDetail->height;
-                        $length += $orderDetail->length;
-                        $weight += $orderDetail->weight;
-                        $width += $orderDetail->width;
-                        $shopOrder['orderDetails'][] = $orderDetail;
-                        $shopTotalPrice += $totalPrice;
-                        $totalQuantity += $cart->quantity;
-                    }
-                    $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
-                        // $shopTotalPrice += $tax;
-                        if (!$tax) {
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
-                            ], 400);
-                        }
-                        $this->addStateTaxToOrder($order, $tax, $cart->product_id);
-                    $order->vat = $tax;
-                    $order->price_before_vat = $shopTotalPrice;
-                    $order->price_after_vat = $shopTotalPrice + $tax;
-                    $shopTotalPrice = $shopTotalPrice + $tax;
-                    $order->height = $height;
-                    $order->length = $length;
-                    $order->weight = $weight;
-                    $order->width = $width;
-                    $shopOrder['totalPrice'] = $shopTotalPrice;
-                    $grandTotalPrice += $shopTotalPrice;
-                    $shopData = Shop::find($shopId);
-                    $service = $this->get_infomaiton_services($shopData, $addressUser);
-                    $productForShip = $this->getProductForShip($productIds);
-                    $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
-                    $order->ship_fee = $shipFee;
-                    AddPointUser::dispatch(auth()->id());
-                    $checkRank = $this->check_point_to_user();
-                    $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);
-                    $newtotal = $this->addOrderFeesToTotal($order, $shopTotalPrice);
-                    $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
-                    $order->disscount_by_rank = $get_discountsByRank;
-                    $order->total_amount = $shopTotalPrice;
-                    $discountShopVoucher = 0;
-                    $totalAdded = 0;
-                    if ($voucherToShopCode != null) {
-                        $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
-                        $discountShopVoucher = $totalAdded;
-                        $shopTotalPrice -= $totalAdded;
-                    }
-                    
-                    $order->net_amount -= $totalAdded;
-                    $shopData->wallet = $shopData->wallet + $order->net_amount;
-                    $order->total_amount = $shopTotalPrice;
-                    $total_amount = $shopTotalPrice;
-                    $order->voucher_shop_disscount = $discountShopVoucher;
-                    $discountMainVoucher = 0;
-                    if ($voucherToMainCode) {
-                        $total_disscount_main = $this->applyVouchersToMain($voucherToMainCode, $total_amount);
-                        $discountMainVoucher = $this->get_price_discount($voucherToMainCode, $total_amount);
-                        $order->total_amount = $total_disscount_main;
-                        $order->save();
-                    }
-                    $order->voucher_disscount = $discountMainVoucher;
-                    $order->total_amount = $shipFee + $order->total_amount;
-                    $this->order_update_infomaion($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
-                    $order->save();
-                }
-                // return $ordersByShop;
-                // return ($grandTotalPrice + $shipFee) - $discountMainVoucher;
-                DB::commit();
-                if($payment->code == 'COD'){
-                    $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
-                    $order->order_infomation = $orderInfomation;
-                    $order->save();
-                }
-                $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
-                $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
-                $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
-                $variants = null;
-                if ($orderDetails->first()->variant_id != null) {
-                    $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
-                }
-                $user = jwtAuth::parseToken()->authenticate();
-                if ($payment->code == 'VNPAY') {
-                    $PaymentsController = new PaymentsController();
-                    $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
-                    $order->order_infomation = $orderInfomation;
-                    $order->save();
-                    DB::table("data_mail")->insert( [
-                        'groupOrderIds' => $groupOrderIds,
-                        'ordersByShop' => json_encode($ordersByShop),
-                        'total_amount' => $total_amount,
-                        'carts' => $carts,
-                        'total_quantity' => json_encode($totalQuantity),
-                        'ship_fee' => $shipFee,
-                        'email' => auth()->user()->email,
-                    ]);
-                        ProducttocartModel::whereIn('id', $request->carts)->delete();
-                    // deleteProductToCart::dispatch($request->carts);
-                    $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Vui lòng thanh toán',
-                        'url' => $url,
-                    ], 200);
-                }
-                $total_amount = ($grandTotalPrice + $shipFee) - $discountMainVoucher;
-                SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
-                SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-                // ProducttocartModel::whereIn('id', $request->carts)->delete();
-                deleteProductToCart::dispatch($request->carts);   
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Đặt hàng thành công',
-                    'data' => $groupOrderIds,
-                ], 200);
-        
-            } catch (\Exception $e) {
-                DB::rollBack();
+            $carts = ProducttocartModel::whereIn('id', $request->carts)->with(['product', 'variant'])->get();
+            $addressUser = $request->address_id ? AddressModel::find($request->address_id) : AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
+
+            if (!$addressUser) {
                 return response()->json([
                     'status' => 400,
-                    'message' => 'Đặt hàng thất bại',
-                    'error' => $e->getMessage()
+                    'message' => 'Vui lòng cập nhật địa chỉ giao hàng',
                 ], 400);
             }
+
+            $ordersByShop = $this->groupCartsByShop($carts);
+            $groupOrderIds = time() . '-' . auth()->id();
+            $grandTotalPrice = 0;
+            $totalQuantity = 0;
+
+            foreach ($ordersByShop as $shopId => &$shopOrder) {
+                $ship_id = ShipsModel::where('code', $shopOrder['items'][0]->ship_code)->first();
+                $order = $this->createOrder($request, $ship_id, $groupOrderIds, $payment);
+                $order->shop_id = $shopId;
+                $order->save();
+
+                $shopOrder['order'] = $order;
+                $shopOrder['orderDetails'] = [];
+                $shopTotalPrice = 0;
+                $productIds = [];
+
+                foreach ($shopOrder['items'] as $cart) {
+                    $productIds[] = $cart->product_id;
+                    $result = $this->getProduct($cart->product_id, $cart->variant_id, $cart->quantity);
+
+                    if ($result == 'PRO' || $result == 'VAR') {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Sản phẩm ' . ($result == 'PRO' ? $cart->product_name : $cart->variant_name) . ' đã hết hàng',
+                        ], 400);
+                    }
+
+                    $this->checkProductAvailability($result, $cart->quantity, $cart->variant_id);
+                    $totalPrice = $this->calculateTotalPrice($result, $cart->quantity);
+                    $orderDetail = $this->createOrderDetail($order, $result, $cart->quantity, $totalPrice, $cart->product_id, $cart->variant_id, $cart->shop_id);
+
+                    $shopOrder['orderDetails'][] = $orderDetail;
+                    $shopTotalPrice += $totalPrice;
+                    $totalQuantity += $cart->quantity;
+                }
+
+                $tax = $this->calculateStateTax($shopTotalPrice, $cart->product_id);
+                if (!$tax) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Danh mục của sản phẩm chưa có thuế, Vui lòng liên hệ ADMIN',
+                    ], 400);
+                }
+
+                $this->addStateTaxToOrder($order, $tax, $cart->product_id);
+                $order->vat = $tax;
+                $order->price_before_vat = $shopTotalPrice;
+                $order->price_after_vat = $shopTotalPrice + $tax;
+                $shopTotalPrice += $tax;
+
+                $shopData = Shop::find($shopId);
+                $service = $this->get_infomaiton_services($shopData, $addressUser);
+                $productForShip = $this->getProductForShip($productIds);
+                $shipFee = $this->calculateOrderFees_giao_hang_nhanh($shopData, $addressUser, $service, $order, $shopTotalPrice, $result, $cart->quantity);
+
+                $order->ship_fee = $shipFee;
+                AddPointUser::dispatch(auth()->id());
+                $checkRank = $this->check_point_to_user();
+                $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);
+                $newtotal = $this->addOrderFeesToTotal($order, $shopTotalPrice);
+                $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
+
+                $order->disscount_by_rank = $get_discountsByRank;
+                $order->total_amount = $shopTotalPrice;
+
+                $discountShopVoucher = $voucherToShopCode ? $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId) : 0;
+                $shopTotalPrice -= $discountShopVoucher;
+
+                $order->net_amount -= $discountShopVoucher;
+                $shopData->wallet += $order->net_amount;
+                $order->total_amount = $shopTotalPrice;
+                $total_amount = $shopTotalPrice;
+                $order->voucher_shop_disscount = $discountShopVoucher;
+
+                $discountMainVoucher = $voucherToMainCode ? $this->applyVouchersToMain($voucherToMainCode, $total_amount) : 0;
+                $order->total_amount = $discountMainVoucher;
+                $order->voucher_disscount = $discountMainVoucher;
+                $order->total_amount += $shipFee;
+
+                $this->order_update_infomaion($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $shopOrder['orderDetails'], $total_amount);
+                $order->save();
+
+                $grandTotalPrice += $shopTotalPrice;
+            }
+
+            DB::commit();
+
+            if ($payment->code == 'COD') {
+                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $shopOrder['orderDetails'], $total_amount);
+                $order->order_infomation = $orderInfomation;
+                $order->save();
+            }
+
+            $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
+            $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->get();
+            $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->get();
+            $variants = $orderDetails->first()->variant_id ? product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get() : null;
+
+            if ($payment->code == 'VNPAY') {
+                $PaymentsController = new PaymentsController();
+                $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee, $shopOrder['orderDetails'], $total_amount);
+                $order->order_infomation = $orderInfomation;
+                $order->save();
+
+                DB::table("data_mail")->insert([
+                    'groupOrderIds' => $groupOrderIds,
+                    'ordersByShop' => json_encode($ordersByShop),
+                    'total_amount' => $total_amount,
+                    'carts' => $carts,
+                    'total_quantity' => json_encode($totalQuantity),
+                    'ship_fee' => $shipFee,
+                    'email' => auth()->user()->email,
+                ]);
+
+                ProducttocartModel::whereIn('id', $request->carts)->delete();
+                $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Vui lòng thanh toán',
+                    'url' => $url,
+                ], 200);
+            }
+
+            $total_amount = ($grandTotalPrice + $shipFee) - $discountMainVoucher;
+            SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
+            SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
+            deleteProductToCart::dispatch($request->carts);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Đặt hàng thành công',
+                'data' => $groupOrderIds,
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 400,
+                'message' => 'Đặt hàng thất bại',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    private function groupCartsByShop($carts)
+    {
+        $ordersByShop = [];
+        foreach ($carts as $cart) {
+            $shopId = $cart->shop_id;
+            if (!isset($ordersByShop[$shopId])) {
+                $ordersByShop[$shopId] = [
+                    'items' => [],
+                    'totalPrice' => 0,
+                    'order' => null,
+                ];
+            }
+            $ordersByShop[$shopId]['items'][] = $cart;
+        }
+        return $ordersByShop;
     }
 
     public function handlePaymenAndSendEmail($groupOrderIds){
