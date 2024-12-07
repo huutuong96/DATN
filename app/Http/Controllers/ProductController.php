@@ -898,7 +898,6 @@ class ProductController extends Controller
                 'message' => "Sản phẩm không tồn tại",
             ], 404);
         }
-
         $user = JWTAuth::parseToken()->authenticate();
 
         if($request->name != $product->name){

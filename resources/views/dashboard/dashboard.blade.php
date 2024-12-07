@@ -1,6 +1,11 @@
 @extends('index')
 @section('title', 'Tổng quan')
+@section('link')
+<!-- ApexCharts Library -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+
+@endsection
 @section('main')
 
 
@@ -282,12 +287,104 @@
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Thống kê tổng quát</h4>
+                    <h4 class="card-title mb-0">Line & Column Charts</h4>
                 </div><!-- end card header -->
 
                 <div class="card-body">
-                    <canvas id="myChart"></canvas>
+                    <div id="chart_line_column_chart" data-colors='["--vz-primary", "--vz-success"]' class="apex-charts" dir="ltr"></div>
                 </div><!-- end card-body -->
+                <script>
+                    // Hàm lấy màu từ thuộc tính data-colors
+                    function getChartColorsArray(chartId) {
+                        var colors = document.getElementById(chartId).getAttribute("data-colors");
+                        if (colors) {
+                            colors = JSON.parse(colors).map(function(value) {
+                                var newValue = getComputedStyle(document.documentElement).getPropertyValue(value.trim());
+                                return newValue ? newValue.trim() : value;
+                            });
+                        }
+                        return colors;
+                    }
+
+                    // Lấy màu từ data-colors
+                    var chartLineColumnColors = getChartColorsArray("chart_line_column_chart");
+
+                    // Cấu hình biểu đồ
+                    var options = {
+                        series: [
+                            {
+                                name: "Website Blog",
+                                type: "column",
+                                data: [440, 505, 414, 671, 227, 413, 201, 352, 752, 320, 257, 160],
+                            },
+                            {
+                                name: "Social Media",
+                                type: "line",
+                                data: [23, 42, 35, 27, 43, 22, 17, 31, 22, 22, 12, 16],
+                            },
+                        ],
+                        chart: {
+                            height: 350,
+                            type: "line",
+                            toolbar: { show: false },
+                        },
+                        stroke: {
+                            width: [0, 4],
+                        },
+                        title: {
+                            text: "Traffic Sources",
+                            style: { fontWeight: 500 },
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            enabledOnSeries: [1],
+                        },
+                        labels: [
+                            "01 Jan 2001",
+                            "02 Jan 2001",
+                            "03 Jan 2001",
+                            "04 Jan 2001",
+                            "05 Jan 2001",
+                            "06 Jan 2001",
+                            "07 Jan 2001",
+                            "08 Jan 2001",
+                            "09 Jan 2001",
+                            "10 Jan 2001",
+                            "11 Jan 2001",
+                            "12 Jan 2001",
+                        ],
+                        xaxis: {
+                            type: "datetime",
+                        },
+                        yaxis: [
+                            {
+                                title: {
+                                    text: "Website Blog",
+                                    style: { fontWeight: 500 },
+                                },
+                            },
+                            {
+                                opposite: true,
+                                title: {
+                                    text: "Social Media",
+                                    style: { fontWeight: 500 },
+                                },
+                            },
+                        ],
+                        colors: chartLineColumnColors,
+                    };
+
+                    // Khởi tạo biểu đồ
+                    var chart = new ApexCharts(document.querySelector("#chart_line_column_chart"), options);
+                    chart.render();
+                </script>
+
+                <!-- <div class="card-header">
+                    <h4 class="card-title mb-0">Thống kê tổng quát</h4>
+                </div> 
+                <div class="card-body">
+                    <canvas id="myChart"></canvas>
+                </div>
                 <div class="card-footer">
                     <ul style="display: flex; list-style-type: none; padding: 0; margin: 0;">
                         <li style="margin-right: 10px;">
@@ -303,7 +400,7 @@
                             Doanh thu * 1.000.000 vnd 
                         </li>
                     </ul>
-                </div>
+                </div> -->
 
             </div><!-- end card -->
         </div>
@@ -330,7 +427,7 @@
    
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-
+<!-- 
 <script>
 const xValues1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 
@@ -365,7 +462,7 @@ new Chart("myChart", {
     legend: { display: false }
   }
 });
-</script>
+</script> -->
 
 <script>
 const xValues2 = @json($listCategoryJson);
