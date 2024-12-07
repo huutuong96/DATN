@@ -1731,7 +1731,7 @@ public function update_events(Request $request, $id)
 // }
 
 
-    public function checkWebDie(Request $request)
+    public function checkWebDie()
     {
         try {
             $urlAPI = 'http://vnshop.top/';

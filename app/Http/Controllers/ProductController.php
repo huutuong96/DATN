@@ -1431,6 +1431,18 @@ public function ProductAll(Request $request)
             ]);
         }
     }
+
+    public function check_product(){
+        $products = Product::where('status', 0)->get();
+        foreach ($products as $product) {
+            $product->status = 3;
+            $product->save();
+        }
+        return response()->json([
+            'status' => true,
+            'message' => "Kiểm tra sản phẩm thành công",
+        ]);
+    }   
     
 
 }

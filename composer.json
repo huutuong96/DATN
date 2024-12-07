@@ -10,6 +10,7 @@
         "beyondcode/laravel-websockets": "^1.14",
         "cloudinary-labs/cloudinary-laravel": "^2.2",
         "darkaonline/l5-swagger": "8.6",
+        "google/cloud-vision": "*",
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
@@ -37,7 +38,8 @@
         },
         "files": [
             "app/Helpers/log.php",
-            "app/Helpers/beta.php"
+            "app/Helpers/beta.php",
+            "app/Helpers/check_pro.php"
             ]
     },
     "autoload-dev": {
