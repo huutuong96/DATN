@@ -88,7 +88,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name ?? "vô danh"}}</td> 
+                                                    <td>{{$product->shop->shop_name ?? "Không có tên"}}</td> 
                                                     <td>
                                                         @if($product->status == 3)
                                                         Chưa duyệt
@@ -171,7 +171,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name}}</td> 
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name ?? "Không có tên"}}</td> 
                                                     <td>
                                                         @if($product->status == 3)
                                                         Chưa duyệt
@@ -290,7 +290,7 @@
                                                                                     <!-- Cột phải -->
                                                                                     <div class="col-lg-6">
                                                                                         <div class="mb-3">
-                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Không có tên"}}</span>
                                                                                         </div>
                                                                                         <div class="mb-3">
                                                                                             <strong>Trạng thái:</strong> <span class="text-muted">
@@ -415,7 +415,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name}}</td>
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 50px;" >{{$product->shop->shop_name ?? "Không có tên"}}</td>
                                                     
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
@@ -501,7 +501,7 @@
                                                                                     <!-- Cột phải -->
                                                                                     <div class="col-lg-6">
                                                                                         <div class="mb-3">
-                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Vô danh"}}</span>
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Không có tên"}}</span>
                                                                                         </div>
                                                                                         <div class="mb-3">
                                                                                            
@@ -626,7 +626,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td>{{$product->shop->shop_name ?? "Không có tên"}}</td> 
                                                     <td>
                                                         @if($product->status == 2)
                                                        Đang hoạt động
@@ -718,7 +718,7 @@
                                                                                 <!-- Cột phải -->
                                                                                 <div class="col-lg-6">
                                                                                     <div class="mb-3">
-                                                                                        <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                        <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Không có tên"}}</span>
                                                                                     </div>
                                                                                     <div class="mb-3">
                                                                                         <strong>Trạng thái:</strong> <span class="text-muted">
@@ -853,7 +853,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td>{{$product->shop->shop_name ?? "Không có tên"}}</td> 
                                                     <td>
                                                         @if($product->status == 0)
                                                         từ chối duyệt
@@ -928,7 +928,7 @@
                                                                                     <!-- Cột phải -->
                                                                                     <div class="col-lg-6">
                                                                                         <div class="mb-3">
-                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Không có tên"}}</span>
                                                                                         </div>
                                                                                         <div class="mb-3">
                                                                                             <strong>Trạng thái:</strong> <span class="text-muted">
@@ -1057,7 +1057,7 @@
                                                     </td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
-                                                    <td>{{$product->shop->shop_name}}</td> 
+                                                    <td>{{$product->shop->shop_name ?? "Không có tên"}}</td> 
                                                     <td>
                                                         @if($product->status == 4)
                                                         sản phẩm vi phạm
@@ -1131,7 +1131,7 @@
                                                                                     <!-- Cột phải -->
                                                                                     <div class="col-lg-6">
                                                                                         <div class="mb-3">
-                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name}}</span>
+                                                                                            <strong>Tên Shop</strong> <span class="text-muted">{{$product->shop->shop_name ?? "Không có tên"}}</span>
                                                                                         </div>
                                                                                         <div class="mb-3">
                                                                                             <strong>Trạng thái:</strong> <span class="text-muted">
