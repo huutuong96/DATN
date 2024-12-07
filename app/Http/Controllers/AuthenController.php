@@ -994,16 +994,16 @@ class AuthenController extends Controller
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
         $user->save();
-        return redirect()->away("http://localhost:3000/auth/login?token={$token}");
-        // return response()->json([
-        //     'status' => true,
-        //     'message' => 'Đăng nhập thành công',
-        //     'url' => "http://test.vnshop.top",
-        //     'data' => [
-        //         'token' => $user->refesh_token,
-        //         // 'user' => $user,
-        //     ],
-        // ], 200);
+        // return redirect()->away("http://localhost:3000/auth/login?token={$token}");
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'url' => "http://test.vnshop.top",
+            'data' => [
+                'token' => $user->refesh_token,
+                // 'user' => $user,
+            ],
+        ], 200);
     }
 
     public function login_with_token($token){
