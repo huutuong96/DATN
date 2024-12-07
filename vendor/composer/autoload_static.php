@@ -43,6 +43,8 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'a1cfe24d14977df6878b9bf804af2d1c' => __DIR__ . '/..' . '/nunomaduro/collision/src/Adapters/Phpunit/Autoload.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '320163ac6b93aebe3dc25b60a0533d56' => __DIR__ . '/..' . '/spatie/laravel-ignition/src/helpers.php',
+        '97266e347e26a0f49e48c4ceb769bdde' => __DIR__ . '/../..' . '/app/Helpers/log.php',
+        '4eb1262a0a645b109aafb0fa32522bcd' => __DIR__ . '/../..' . '/app/Helpers/beta.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -1004,6 +1006,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'App\\Providers\\WebAppProvider' => __DIR__ . '/../..' . '/app/Providers/WebAppProvider.php',
         'App\\Services\\DistanceCalculatorService' => __DIR__ . '/../..' . '/app/Services/DistanceCalculatorService.php',
         'App\\Services\\ImageUploadService' => __DIR__ . '/../..' . '/app/Services/ImageUploadService.php',
+        'App\\Services\\RecommendationService' => __DIR__ . '/../..' . '/app/Services/RecommendationService.php',
         'App\\Services\\TelegramService' => __DIR__ . '/../..' . '/app/Services/TelegramService.php',
         'App\\swagger' => __DIR__ . '/../..' . '/app/swagger.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',

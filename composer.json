@@ -34,7 +34,11 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/"
-        }
+        },
+        "files": [
+            "app/Helpers/log.php",
+            "app/Helpers/beta.php"
+            ]
     },
     "autoload-dev": {
         "psr-4": {

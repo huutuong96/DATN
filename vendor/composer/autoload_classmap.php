@@ -241,6 +241,7 @@ return array(
     'App\\Providers\\WebAppProvider' => $baseDir . '/app/Providers/WebAppProvider.php',
     'App\\Services\\DistanceCalculatorService' => $baseDir . '/app/Services/DistanceCalculatorService.php',
     'App\\Services\\ImageUploadService' => $baseDir . '/app/Services/ImageUploadService.php',
+    'App\\Services\\RecommendationService' => $baseDir . '/app/Services/RecommendationService.php',
     'App\\Services\\TelegramService' => $baseDir . '/app/Services/TelegramService.php',
     'App\\swagger' => $baseDir . '/app/swagger.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',

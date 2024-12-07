@@ -29,7 +29,9 @@ class Kernel extends ConsoleKernel
             app(\App\Http\Controllers\NotificationController::class)->check_time_event();
         })->daily();
 
-        
+        $schedule->call(function () {
+            app(\App\Http\Controllers\VnshopController::class)->checkWebDie();
+        })->everyTenMinutes();
     }
 
     /**
