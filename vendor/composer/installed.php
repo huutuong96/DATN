@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '854d698f173435c8a1e355f5df1e4be3cb7ec66b',
+        'reference' => 'f02e4c5b381a21e17a499a872b3815f90739e56b',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -535,7 +535,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '854d698f173435c8a1e355f5df1e4be3cb7ec66b',
+            'reference' => 'f02e4c5b381a21e17a499a872b3815f90739e56b',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -852,6 +852,15 @@
             'install_path' => __DIR__ . '/../phar-io/version',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'php-ai/php-ml' => array(
+            'pretty_version' => '0.10.0',
+            'version' => '0.10.0.0',
+            'reference' => '543f11158c57bf64ef8ddecd5bab51d396d39f50',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../php-ai/php-ml',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'phpoffice/phpspreadsheet' => array(
             'pretty_version' => '1.29.5',

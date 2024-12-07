@@ -416,6 +416,8 @@ Route::get('/search', function () {
             return view('swagger');
         });
 
+        Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
+
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
 
@@ -427,3 +429,5 @@ Route::get('/search', function () {
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
         Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
 
+
+        

@@ -59,6 +59,7 @@ use App\Jobs\UpdateImageAllVariant;
 
 use App\Models\update_product;
 use App\Models\Event;
+use GuzzleHttp\Client;
 
 class VnshopController extends Controller
 {
@@ -1730,7 +1731,28 @@ public function update_events(Request $request, $id)
 // }
 
 
+    public function checkWebDie(Request $request)
+    {
+        try {
+            $urlAPI = 'http://vnshop.top/';
+            $urlClient = 'https://test.vnshop.top/';
+            $client = new Client();
+            $responseAPI = $client->request('GET', $urlAPI);
+            $responseClient = $client->request('GET', $urlClient);
+            $statusCode = $responseAPI->getStatusCode();
+            $statusCodeClient = $responseClient->getStatusCode();
+            if ($statusCode == 200 && $statusCodeClient == 200) {
+                $message = 'Cả API và Client đều hoạt động bình thường';
+                log_host($message, $statusCode, $urlAPI, $statusCodeClient, $urlClient);
+            } else {
+                $message = 'WEBSITE KHÔNG HOẠT ĐỘNG';
+                log_host($message, $statusCode, $urlAPI, $statusCodeClient, $urlClient);
+            }
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+        } 
 
+    }
 
 
 }
