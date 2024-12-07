@@ -45,7 +45,9 @@ use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Imports\UsersImport;
+use App\Models\OrderDetailsModel;
 use App\Models\OrdersModel;
+use App\Services\RecommendationService;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -1491,6 +1493,57 @@ public function ProductAll(Request $request)
         }
     
     }
+
+    public function recommendProducts()
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+    
+        // Lấy danh sách tất cả sản phẩm
+        $allProducts = Product::pluck('id')->toArray();
+    
+        // Lấy tất cả đơn hàng của người dùng
+        $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
+    
+        // Lấy chi tiết sản phẩm mà người dùng đã mua
+        $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->toArray();
+        $orderForUser = [];
+        foreach ($userPurchasedProducts as $value) {
+            if(!in_array($value, $orderForUser)){
+                $orderForUser[] = $value;
+            }
+        }
+        $userPurchasedProducts = $orderForUser;
+        // Tạo dữ liệu huấn luyện (ma trận sản phẩm của tất cả người dùng)
+        $trainingData = [];
+        $labels = []; // Nhãn tương ứng là product_id
+    
+        $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get(); // Lấy tất cả đơn hàng
+
+        foreach ($orders as $order) {
+            $products = $order->orderDetails->pluck('product_id')->toArray();
+
+            // Biến đổi danh sách sản phẩm thành vector nhị phân
+            $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
+            $trainingData[] = $vector;
+    
+            // Gắn nhãn cho từng sản phẩm mà người dùng đã mua trong đơn hàng
+            foreach ($products as $productId) {
+                $labels[] = $productId; // Gắn nhãn là product_id
+            }
+        }
+
+        // Biến đổi lịch sử mua hàng của người dùng thành vector
+        $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
+    
+        // Sử dụng RecommendationService
+        $service = new RecommendationService();
+        
+        // Dự đoán sản phẩm cho người dùng dựa trên vector lịch sử mua hàng
+        $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+
+        return response()->json(['recommendation' => $recommendation]);
+    }
+    
 
 }
 
