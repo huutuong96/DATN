@@ -1251,7 +1251,7 @@ public function ProductAll(Request $request)
     $allUpdateProductsCount = update_product::all()->count();
     $pendingProductsCount = $allUpdateProductsCount + $newProductsCount;
     
-    $allProducts = Product::all(); 
+     $allProducts = Product::all(); 
     $allUpdateProducts = update_product::all();
     $mergedProducts = $allProducts->merge($allUpdateProducts);
     $pendingProducts = Product::where('status', 3)
@@ -1268,8 +1268,8 @@ public function ProductAll(Request $request)
 
     $allProducts = Product::with(['images', 'variants'])->get();
 
-    // $allUpdateProducts = update_product::with(['variants'])->get();
-    // $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
+    // $allUpdateProducts = update_product::with(['variants'])->get();  
+    $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
     $allUpdateProducts = update_product::orderBy("updated_at", "desc")
     ->get()
     ->groupBy("product_id")
