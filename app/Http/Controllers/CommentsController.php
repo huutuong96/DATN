@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\OrdersModel;
 use Cloudinary\Cloudinary;
 use App\Http\Controllers\NotificationController;
 use App\Models\CommentsModel;
@@ -48,111 +49,212 @@ class CommentsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CommentsRequest $request)
-    {
-        $user = JWTAuth::parseToken()->authenticate();
+    // public function store(CommentsRequest $request)
+    // {
+    //     $user = JWTAuth::parseToken()->authenticate();
+    //     $level = 0;
+    //     if ($request->parent_id) {
+    //         $parent_comment = CommentsModel::find($request->parent_id);
+    //         if ($parent_comment) {
+    //             $level = $parent_comment->level + 1;
+    //             if ($parent_comment->level == 3) {
+    //                 $level = 3;
+    //             }
+    //         } else {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Parent comment not found'
+    //             ], 404);
+    //         }
+    //     }
 
-        $level = 0;
     
-        // Kiểm tra và thiết lập level của comment
+    //     $cloudinary = new Cloudinary();
+    //     $imageUrls = [];
+    
+    //     // Xử lý upload hình ảnh lên Cloudinary và lưu URL của chúng
+    //     if ($request->hasFile('images')) {
+    //         foreach ($request->file('images') as $image) {
+    //             try {
+    //                 $uploadedFileUrl =  $cloudinary->uploadApi()->upload($image->getRealPath());
+    //                 $imageUrls[] = $uploadedFileUrl['url']; // Chỉ lưu URL của hình ảnh
+    //             } catch (\Exception $e) {
+    //                 return response()->json([
+    //                     'status' => false,
+    //                     'message' => 'Failed to upload image: ' . $e->getMessage()
+    //                 ], 500);
+    //             }
+    //         }
+    //     }
+    // // dd( $imageUrls);
+    //     // Chuẩn bị dữ liệu để lưu comment
 
-        if ($request->parent_id) {
-            $parent_comment = CommentsModel::find($request->parent_id);
-            if ($parent_comment) {
-                $level = $parent_comment->level + 1;
-                if ($parent_comment->level == 3) {
-                    $level = 3;
-                }
-            } else {
+    //     $dataInsert = [
+    //         "title" => $request->title,
+    //         "content" => $request->content,
+    //         "rate" => $request->rate,
+    //         "status" => $request->status,
+    //         "images" => $imageUrls,
+    //         "parent_id" => $request->parent_id,
+    //         "level" => $level,
+    //         "product_id" => $request->product_id,
+    //         "user_id" => $user->id, // Chuyển mảng URL thành chuỗi JSON để lưu vào DB
+    //         "created_at" => now()
+    //     ];
+
+    
+    //     $comment = CommentsModel::create($dataInsert);
+    
+
+    //     // Cache cho comment cha
+    //     if (is_null($request->parent_id)) {
+    //         Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
+    //     }
+
+    
+    //     if ($request->parent_id) {
+    //         $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 60 * 60, function () use ($request) {
+    //             return CommentsModel::find($request->parent_id);
+    //         });
+    //         if ($parent_comment) {
+    //             $parent_user_id = $parent_comment->user_id;
+    //             $notificationRequest = new Request([
+    //                 'type' => 'main',
+    //                 'user_id' => $parent_user_id,
+    //                 'title' => 'Có phản hồi mới từ comment của bạn',
+    //                 'description' => $user->fullname . ' đã phản hồi comment của bạn.',
+    //             ]);
+    //             $notificationController = new NotificationController();
+    //             $notificationController->store($notificationRequest);
+    //         }
+    //     }
+    
+    //     $product = Product::find($request->product_id);
+    //     if ($product && $product->shop_id) {
+    //         $notificationRequest = new Request([
+    //             'type' => 'shop',
+    //             'user_id' => $user->id,
+    //             'title' => 'Thông báo từ Sản Phẩm',
+    //             'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
+    //             'shop_id' => $product->shop_id
+    //         ]);
+    //         $notificationController = new NotificationController();
+    //         $notificationController->store($notificationRequest);
+    //     }
+    //     $dataDone = [
+    //         'status' => true,
+    //         'message' => "Đã lưu comment",
+    //         'data' => $dataInsert,
+    //     ]; 
+    
+    //     return response()->json($dataDone, 200);
+    // }
+    public function store(CommentsRequest $request)
+{
+    $user = JWTAuth::parseToken()->authenticate();
+    $level = 0;
+    if ($request->parent_id) {
+        $parent_comment = CommentsModel::find($request->parent_id);
+        if ($parent_comment) {
+            $level = $parent_comment->level + 1;
+            if ($parent_comment->level == 3) {
+                $level = 3;
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Parent comment not found'
+            ], 404);
+        }
+    }
+    $rate = null;
+    if ($request->has('rate')) {
+        $order = OrdersModel::where('user_id', $user->id)
+            ->whereHas('orderDetails', function ($query) use ($request) {
+                $query->where('product_id', $request->product_id);
+            })
+            ->where('status', '8') 
+            ->exists();
+
+        if ($order) {
+            $rate = $request->rate; 
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bạn cần mua sản phẩm để đánh giá.'
+            ], 403);
+        }
+    }
+    $cloudinary = new Cloudinary();
+    $imageUrls = [];
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $image) {
+            try {
+                $uploadedFileUrl =  $cloudinary->uploadApi()->upload($image->getRealPath());
+                $imageUrls[] = $uploadedFileUrl['url'];
+            } catch (\Exception $e) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Parent comment not found'
-                ], 404);
+                    'message' => 'Failed to upload image: ' . $e->getMessage()
+                ], 500);
             }
         }
+    }
+    $dataInsert = [
+        "title" => $request->title,
+        "content" => $request->content,
+        "rate" => $rate, 
+        "images" => $imageUrls,
+        "parent_id" => $request->parent_id,
+        "level" => $level,
+        "product_id" => $request->product_id,
+        "user_id" => $user->id,
+        "created_at" => now()
+    ];
 
-    
-        $cloudinary = new Cloudinary();
-        $imageUrls = [];
-    
-        // Xử lý upload hình ảnh lên Cloudinary và lưu URL của chúng
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                try {
-                    $uploadedFileUrl =  $cloudinary->uploadApi()->upload($image->getRealPath());
-                    $imageUrls[] = $uploadedFileUrl['url']; // Chỉ lưu URL của hình ảnh
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Failed to upload image: ' . $e->getMessage()
-                    ], 500);
-                }
-            }
-        }
-    // dd( $imageUrls);
-        // Chuẩn bị dữ liệu để lưu comment
-
-        $dataInsert = [
-            "title" => $request->title,
-            "content" => $request->content,
-            "rate" => $request->rate,
-            "status" => $request->status,
-            "images" => $imageUrls,
-            "parent_id" => $request->parent_id,
-            "level" => $level,
-            "product_id" => $request->product_id,
-            "user_id" => $user->id, // Chuyển mảng URL thành chuỗi JSON để lưu vào DB
-            "created_at" => now()
-        ];
-
-    
-        $comment = CommentsModel::create($dataInsert);
-    
-
-        // Cache cho comment cha
-        if (is_null($request->parent_id)) {
-            Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
-        }
-
-    
-        if ($request->parent_id) {
-            $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 60 * 60, function () use ($request) {
-                return CommentsModel::find($request->parent_id);
-            });
-            if ($parent_comment) {
-                $parent_user_id = $parent_comment->user_id;
-                $notificationRequest = new Request([
-                    'type' => 'main',
-                    'user_id' => $parent_user_id,
-                    'title' => 'Có phản hồi mới từ comment của bạn',
-                    'description' => $user->fullname . ' đã phản hồi comment của bạn.',
-                ]);
-                $notificationController = new NotificationController();
-                $notificationController->store($notificationRequest);
-            }
-        }
-    
-        $product = Product::find($request->product_id);
-        if ($product && $product->shop_id) {
+    $comment = CommentsModel::create($dataInsert);
+    if (is_null($request->parent_id)) {
+        Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
+    }
+    if ($request->parent_id) {
+        $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 60 * 60, function () use ($request) {
+            return CommentsModel::find($request->parent_id);
+        });
+        if ($parent_comment) {
+            $parent_user_id = $parent_comment->user_id;
             $notificationRequest = new Request([
-                'type' => 'shop',
-                'user_id' => $user->id,
-                'title' => 'Thông báo từ Sản Phẩm',
-                'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
-                'shop_id' => $product->shop_id
+                'type' => 'main',
+                'user_id' => $parent_user_id,
+                'title' => 'Có phản hồi mới từ comment của bạn',
+                'description' => $user->fullname . ' đã phản hồi comment của bạn.',
             ]);
             $notificationController = new NotificationController();
             $notificationController->store($notificationRequest);
         }
-        $dataDone = [
-            'status' => true,
-            'message' => "Đã lưu comment",
-            'data' => $dataInsert,
-        ];
-    
-        return response()->json($dataDone, 200);
     }
-    
+
+    $product = Product::find($request->product_id);
+    if ($product && $product->shop_id) {
+        $notificationRequest = new Request([
+            'type' => 'shop',
+            'user_id' => $user->id,
+            'title' => 'Thông báo từ Sản Phẩm',
+            'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
+            'shop_id' => $product->shop_id
+        ]);
+        $notificationController = new NotificationController();
+        $notificationController->store($notificationRequest);
+    }
+
+    $dataDone = [
+        'status' => true,
+        'message' => "Đã lưu comment",
+        'data' => $dataInsert,
+    ];
+
+    return response()->json($dataDone, 200);
+}
+
 
 
 
