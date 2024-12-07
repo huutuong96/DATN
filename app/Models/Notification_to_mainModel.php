@@ -21,6 +21,7 @@ class Notification_to_mainModel extends Model
         'description',
         'image',
         'status',
+        'shop_id',
         'create_by',
         'update_by',
         'group_order_id',
