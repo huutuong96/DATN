@@ -146,6 +146,7 @@ return array(
     'App\\Jobs\\UploadImagesJob' => $baseDir . '/app/Jobs/UploadImagesJob.php',
     'App\\Jobs\\autoCancelOrder' => $baseDir . '/app/Jobs/autoCancelOrder.php',
     'App\\Jobs\\changeConfig' => $baseDir . '/app/Jobs/changeConfig.php',
+    'App\\Jobs\\checkWebDie' => $baseDir . '/app/Jobs/checkWebDie.php',
     'App\\Jobs\\check_time_event' => $baseDir . '/app/Jobs/check_time_event.php',
     'App\\Jobs\\deleteProductToCart' => $baseDir . '/app/Jobs/deleteProductToCart.php',
     'App\\Jobs\\sendMailBirthDay' => $baseDir . '/app/Jobs/sendMailBirthDay.php',

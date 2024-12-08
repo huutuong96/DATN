@@ -37,7 +37,8 @@
         },
         "files": [
             "app/Helpers/log.php",
-            "app/Helpers/beta.php"
+            "app/Helpers/beta.php",
+            "app/Helpers/alpha.php"
             ]
     },
     "autoload-dev": {

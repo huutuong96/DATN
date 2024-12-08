@@ -29,14 +29,20 @@ class check_time_event implements ShouldQueue
      */
     public function handle(): void
     {
-        $today = Carbon::now()->format('Y-m-d');
-        $events = Event::where('to', $today)->get();
-        foreach ($events as $event) {
-            $event->status = 5;
-            $event->save();
+        try {
+            $today = Carbon::now()->format('Y-m-d');
+            $events = Event::where('to', $today)->get();
+            foreach ($events as $event) {
+                $event->status = 5;
+                $event->save();
+                check_var($event->event_title. " Đã kết thúc", 201);
+            }
+            $event_is_active_banner = Banner::where('status', 2)->update(['status' => 6]);
+            $rollback_banner = Banner::where('status', 5)->update(['status' => 2]);
+            $voucher_is_active = voucherToMain::where('is_event', 1)->delete();            
+        } catch (\Throwable $th) {
+            check_var($th->getMessage(), 400);
         }
-        $event_is_active_banner = Banner::where('status', 2)->update(['status' => 6]);
-        $rollback_banner = Banner::where('status', 5)->update(['status' => 2]);
-        $voucher_is_active = voucherToMain::where('is_event', 1)->delete();
+
     }
 }

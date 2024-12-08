@@ -125,7 +125,7 @@ class NotificationController extends Controller
         EventMail::dispatch();
         return response()->json([
             'status' => 'success',
-            'message' => 'Gửi mail Event thành công'
+            'message' => 'Đang khởi tạo...'
         ], 200);
     }
 
