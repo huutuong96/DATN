@@ -208,7 +208,7 @@ class CartController extends Controller
         }
         
         $tax_category = tax_category::where('category_id', $product->category_id)->first();
-        $taxes = Tax::find($tax_category->tax_id);
+        $taxes = Tax::where('id',$tax_category->tax_id)->first();
         if (!$taxes) {
             return response()->json(['error' => 'Danh mục của sản phẩm này chưa có khai báo thuế'], 404);
         }
