@@ -80,7 +80,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/list_role', [VnshopController::class, 'list_role'])->name('list_role');
     Route::get('/product_all', [ProductController::class, 'ProductAll'])->name('product_all');
     Route::get('/product-waiting-approval', [ProductController::class, 'productWaitingApproval'])->name('product-waiting-approval');
-    Route::post('/products/{id}/approve', [ProductController::class, 'approveProduct'])->name('products.approve');
+    Route::post('/products/{id}/approve', action: [ProductController::class, 'approveProduct'])->name('products.approve');
     Route::post('/products/{id}/reject', [ProductController::class, 'rejectProduct'])->name('products.reject');
     Route::get('/products/report/{id}', [ProductController::class, 'showReportForm'])->name('products.report');
     Route::post('/products/report/{id}', [ProductController::class, 'reportProduct'])->name('products.submitReport');
@@ -176,7 +176,6 @@ Route::get('/register/shipping/view', [ClientEmbedController::class, 'register_s
 Route::post('/register/shipping', [ClientEmbedController::class, 'register_shipping'])->name('register_shipping');
 
 Route::get('auth/google', function () {
-    
     return Socialite::driver('google')->redirect();
 })->name('google_login');
 

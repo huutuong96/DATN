@@ -49,8 +49,9 @@ use App\Models\OrderDetailsModel;
 use App\Models\OrdersModel;
 use App\Services\RecommendationService;
 use Maatwebsite\Excel\Facades\Excel;
-
-
+use Phpml\FeatureExtraction\CountVectorizer;
+use Phpml\FeatureExtraction\TokenCountVectorizer;
+use Phpml\Tokenization\WhitespaceTokenizer;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
 
@@ -141,8 +142,6 @@ class ProductController extends Controller
     {
         $tax_category = tax_category::where('category_id', $request->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
-        $taxAmount = $request->price * $taxes->rate;
-        // dd($request->price);
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -155,13 +154,14 @@ class ProductController extends Controller
             }else{
                 $slug = $request->slug ?? Str::slug($request->name);
             }
+            $taxAmount = $request->price * $taxes->rate;
             $dataInsert = [
                 'name' => $request->name,
                 'sku' => $request->sku ?? $this->generateSKU(),
                 'slug' => $slug,
                 'description' => $request->description,
                 'infomation' => json_encode($request->infomation),
-                'price' => $request->price + $taxAmount,
+                'price' => $request->price + $taxAmount ?? null,
                 'sale_price' => $request->sale_price ?? null,
                 'image' => $request->images[0] ?? null,
                 'quantity' => $request->stock ?? 0,
@@ -204,12 +204,13 @@ class ProductController extends Controller
                 }
                 // $attributeValue = attributevalue::where()
                 foreach ($request->variant['variantProducts'] as $variant) {
+                    $taxAmount = $variant['price'] * $taxes->rate;
                     $product_variantsData = [
                         'product_id' => $product->id,
                         'id_fe' => $variant['id'] ?? null,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
                         'stock' => $variant['stock'] ?? $request->stock,
-                        'price' => $variant['price'] * ($taxes->rate + 1) ?? $product->price,
+                        'price' => $variant['price'] + $taxAmount ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
@@ -1158,7 +1159,7 @@ public function ProductAll(Request $request)
     $allUpdateProductsCount = update_product::all()->count();
     $pendingProductsCount = $allUpdateProductsCount + $newProductsCount;
     
-    $allProducts = Product::all(); 
+     $allProducts = Product::all(); 
     $allUpdateProducts = update_product::all();
     $mergedProducts = $allProducts->merge($allUpdateProducts);
     $pendingProducts = Product::where('status', 3)
@@ -1175,8 +1176,8 @@ public function ProductAll(Request $request)
 
     $allProducts = Product::with(['images', 'variants'])->get();
 
-    // $allUpdateProducts = update_product::with(['variants'])->get();
-    // $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
+    // $allUpdateProducts = update_product::with(['variants'])->get();  
+    $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
     $allUpdateProducts = update_product::orderBy("updated_at", "desc")
     ->get()
     ->groupBy("product_id")
@@ -1450,16 +1451,5 @@ public function ProductAll(Request $request)
             ]);
         }
     }
-
-    public function check_product(){
-        $products = Product::where('status', 0)->get();
-        checkProductDescription($products);
-        return response()->json([
-            'status' => true,
-            'message' => "Kiểm tra sản phẩm thành công",
-        ]);
-    }   
-    
-
 }
 

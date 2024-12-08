@@ -60,7 +60,6 @@ class NotificationController extends Controller
             $notificationToMain->image = $image ?? null;
             $notificationToMain->shop_id = $request->shop_id;
             $notificationToMain->save();
-
             $notification->id_notification = $notificationToMain->id;
         } elseif ($request->type === 'shop') {
             $notificationToShops = new Notification_to_shop();
