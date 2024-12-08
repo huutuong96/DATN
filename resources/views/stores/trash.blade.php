@@ -73,7 +73,7 @@
                                                             >
                                                             <button type="button" class="btn btn-info"
                                                             title="Khôi phục"
-                                                            onclick="return confirm('Bạn có chắc chắn muốn khôi phục user này?');">
+                                                            onclick="return confirm('Bạn có chắc chắn muốn khôi phục cửa hàng này này?');">
                                                             <i class="ri-refresh-line align-middle"></i>
                                                         </button>
                                                         </li>

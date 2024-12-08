@@ -589,6 +589,20 @@ class PurchaseController extends Controller
         }
     }
 
+    // private function getProduct($productId, $variantId, $quantity)
+    // {
+    //     $result = Product::with(['variants' => function ($query) use ($variantId) {
+    //         $query->where('id', $variantId);
+    //     }])
+    //         ->where('id', $productId)
+    //         ->first();
+        
+    //     $result->increment('sold_count', $quantity);
+    //     $variant = $result->variants->first();
+
+    //     return $variant;
+
+    // }
     private function getProduct($productId, $variantId, $quantity)
     {
         $product = Product::where('id', $productId)->first();
@@ -611,8 +625,19 @@ class PurchaseController extends Controller
             }
             return $result;
         }
+    
+        // Nếu có `variantId` và không có `productId`, lấy sản phẩm có biến thể
+        if ($variantId && !$productId) {
+            $variant = product_variants::where('id', $variantId)->with('product')->first();
+    
+            if ($variant) {
+                $variant->product->increment('sold_count', $quantity); // Tăng số lượng bán
+                return $variant; // Trả về biến thể
+            }
+        }
+    
+        return null; // Nếu không tìm thấy sản phẩm hoặc biến thể
     }
-
     private function getProductForShip($productId)
     {
         $result = Product::whereIn('id', $productId)->get();
@@ -901,6 +926,7 @@ class PurchaseController extends Controller
             "to_district"=> $addressUser->district_id
         ]);
         $service = $response->json();
+        dd($service);
         return $service['data'];
     }
 
