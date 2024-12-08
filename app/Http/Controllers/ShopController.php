@@ -604,11 +604,12 @@ class ShopController extends Controller
         ], 200);
     }
     public function calculatePercentage ($ids){
-        $total = $products_to_cart->count();
-        $counts = $products_to_cart->countBy();
+        $total = $ids->count();
+        $counts = $ids->countBy();
         $percentages = $counts->map(function ($count) use ($total) {
             return round(($count / $total) * 100, 2);
         });
+        return $percentages;
     }
 
     public function get_dashboard_shop(string $id)
@@ -625,19 +626,9 @@ class ShopController extends Controller
         $orders_shipping = OrdersModel::where('shop_id', $shop->id)->where('order_status', 5)->count();
         $orders_delivery_failed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 6)->count();
         $orders_delivered = OrdersModel::where('shop_id', $shop->id)->where('order_status', 7)->count();
-        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
         $orders_refund = OrdersModel::where('shop_id', $shop->id)->where('order_status', 9)->count();
+        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
         $orders_canceled = OrdersModel::where('shop_id', $shop->id)->where('order_status', 10)->count();
-        $products_to_cart = ProducttocartModel::where('shop_id', $shop->id)->pluck('product_id');
-        $total = $products_to_cart->count();
-        $counts = $products_to_cart->countBy();
-        $percentages = $counts->map(function ($count) use ($total) {
-            return round(($count / $total) * 100, 2);
-        });
-        $productNames = $percentages->map(function ($percentage, $productId) {
-            $product = Product::find($productId);
-            return $product ? ['name' => $product->name, 'percentage' => $percentage] : null;
-        })->filter()->values();
         $totalOrder = OrdersModel::where('shop_id', $shop->id)->count();
         $totalProduct = Product::where('shop_id', $shop->id)->count();
         $totalRevenue = OrdersModel::where('shop_id', $shop->id)->sum('net_amount');
@@ -651,7 +642,6 @@ class ShopController extends Controller
             'total_follow' => $totalFollow,
             'total_view' => $totalView,
             'total_rating' => $totalRating,
-            'total_product_to_cart' => $productNames,
             'orders_wait_confirm' => $orders_wait_confirm,
             'orders_confirmed' => $orders_confirmed,
             'orders_prepare' => $orders_prepare,
