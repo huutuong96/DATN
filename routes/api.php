@@ -68,9 +68,10 @@ Route::get('/search', function () {
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
 
-    Route::group(['middleware' => ['checkToken', 'CheckStatusUser', 'CheckRole']], function () {
+    Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
+        Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
-
+        });
                 Route::post('categories', [CategoriesController::class, 'store']);
                 Route::get('categories/{id}', [CategoriesController::class, 'show']);
                 Route::put('categories/{id}', [CategoriesController::class, 'update']);
