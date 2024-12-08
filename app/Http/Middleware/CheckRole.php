@@ -20,7 +20,7 @@ class CheckRole
     public function handle(Request $request, Closure $next, string $role = null): Response
     {
         $user = JWTAuth::parseToken()->authenticate();
-        dd($user);
+        // dd($user);
         if ($request->token) {
             try {
                 $user = JWTAuth::parseToken()->authenticate();
