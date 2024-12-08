@@ -180,7 +180,7 @@
                                                     <button type="button" class="btn btn-success" title="Bật">
                                                         <i class="ri-check-line align-middle"></i>
                                                     </button>
-                                                       
+                                                    </a>
                                                     </li>
                                                 @endif
                                                 <li class="list-inline-item">

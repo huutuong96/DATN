@@ -132,7 +132,7 @@ class CommentsController extends Controller
     //     $product = Product::find($request->product_id);
     //     if ($product && $product->shop_id) {
     //         $notificationRequest = new Request([
-    //             'type' => 'shop',
+    //             'type' => 'main',
     //             'user_id' => $user->id,
     //             'title' => 'Thông báo từ Sản Phẩm',
     //             'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
@@ -224,20 +224,16 @@ class CommentsController extends Controller
     ];
 
     $comment = CommentsModel::create($dataInsert);
-    if (is_null($request->parent_id)) {
-        Cache::put('parent_comment_' . $comment->id, $comment, 60 * 60);
-    }
+    
     if ($request->parent_id) {
-        $parent_comment = Cache::remember('parent_comment_' . $request->parent_id, 60 * 60, function () use ($request) {
-            return CommentsModel::find($request->parent_id);
-        });
+        $parent_comment = CommentsModel::find($request->parent_id);
         if ($parent_comment) {
             $parent_user_id = $parent_comment->user_id;
             $notificationRequest = new Request([
-                'type' => 'main',
-                'user_id' => $parent_user_id,
-                'title' => 'Có phản hồi mới từ comment của bạn',
-                'description' => $user->fullname . ' đã phản hồi comment của bạn.',
+            'type' => 'main',
+            'user_id' => $parent_user_id,
+            'title' => 'Có phản hồi mới từ comment của bạn',
+            'description' => $user->fullname . ' đã phản hồi comment của bạn.',
             ]);
             $notificationController = new NotificationController();
             $notificationController->store($notificationRequest);
@@ -247,7 +243,7 @@ class CommentsController extends Controller
     $product = Product::find($request->product_id);
     if ($product && $product->shop_id) {
         $notificationRequest = new Request([
-            'type' => 'shop',
+            'type' => 'main',
             'user_id' => $user->id,
             'title' => 'Thông báo từ Sản Phẩm',
             'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
@@ -346,7 +342,7 @@ class CommentsController extends Controller
         $product = Product::find($request->product_id);
 
         $notificationRequest = new Request([
-            'type' => 'shop',
+            'type' => 'main',
             'user_id' => $user->id,
             'title' => 'Thông báo cập nhật từ Sản Phẩm',
             'description' => $user->fullname . ' đã cập nhật một bình luận đến sản phẩm của bạn.',
