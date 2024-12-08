@@ -20,6 +20,7 @@ class CheckRole
     public function handle(Request $request, Closure $next, string $role = null): Response
     {
         $user = JWTAuth::parseToken()->authenticate();
+        dd($user);
         if ($request->token) {
             try {
                 $user = JWTAuth::parseToken()->authenticate();
@@ -28,13 +29,13 @@ class CheckRole
                     return $next($request);
                 }
             } catch (TokenExpiredException $e) {
-                return redirect()->route('login')->with('message', 'Bạn không có quyền vào trang này');
+                return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
 
             } catch (JWTException $e) {
-                return redirect()->route('login')->with('message', 'Bạn không có quyền vào trang này');
+                return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
 
             } catch (\Exception $e) {
-                return redirect()->route('login')->with('message', 'Bạn không có quyền vào trang này');
+                return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
             }
         }
         if (!$user) {
@@ -44,9 +45,12 @@ class CheckRole
             ], 401);
         }
         $role = DB::table('roles')->where('id', $user->role_id)->first();
-        
+        return $role;
         if ($role->title == 'OWNER' || $role->title == 'MANAGER') {
             return $next($request);
+        }
+        if ($request->token) {
+            return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
         }
        
         return response()->json([

@@ -44,6 +44,9 @@ class AddressController extends Controller
     public function store(AddressRequest $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
+        if ($request->default == 1) {
+            AddressModel::where('user_id', $user->id)->update(['default' => 0]);
+        }
         $Address = [
             "address"=> $request->address ?? null,
             "province" => $request->province ?? null,

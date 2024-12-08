@@ -43,6 +43,8 @@ use App\Http\Requests\PaymentRequest;
 
 use App\Models\Image;
 use App\Http\Requests\ProductRequest;
+use App\Jobs\checkWebDie;
+
 ;
 use App\Models\ColorsModel;
 use App\Models\variantattribute;
@@ -59,6 +61,7 @@ use App\Jobs\UpdateImageAllVariant;
 
 use App\Models\update_product;
 use App\Models\Event;
+use GuzzleHttp\Client;
 
 class VnshopController extends Controller
 {
@@ -1566,7 +1569,9 @@ public function listEvent(Request $request)
     $token = $request->token; 
     try {
         $events = Event::whereIn('status', [1, 2])->paginate(10);
-       
+        foreach ($events as &$event) {
+            $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
+        }
         return view('events.list_event',compact('events'));
     } catch (\Throwable $th) {
         return redirect()->route('events', [
@@ -1605,21 +1610,59 @@ public function changeStatusEvent(Request $request)
         ])->with('error', 'Cập nhật trạng thái thất bại: ' . $th->getMessage());
     }
 }
+
+
 public function store_events(Request $request)
 {
     $token = $request->token; 
-    try {
 
-        
-        $event = Event::create($request->all());
+    if (strtotime($request->from) >= strtotime($request->to)) {
+        return redirect()->back()->with('error', 'Ngày bắt đầu phải nhỏ hơn ngày kết thúc.');
+    }
+    try {
+        DB::beginTransaction();
+        $voucher_apply = [
+            'voucher_title' => $request->voucher_apply ?? null,
+            'voucher_description' => $request->voucher_description ?? null,
+            'voucher_quantity' => $request->voucher_quantity ?? null,
+            'voucher_limit' => $request->voucher_limit ?? null,
+            'voucher_ratio' => $request->voucher_ratio ?? null,
+            'voucher_code' => $request->voucher_code ?? null,
+        ];
+        if ($request->event_image) {
+            $images = [];
+            foreach ($request->event_image as $image) {
+                $images[] = $this->storeImage($image);
+            }
+        }
+        $event = new Event();
+        $event->event_title = $request->input('event_title', $event->event_title);
+        $event->event_day = str_pad($event->event_day, 2, '0', STR_PAD_LEFT);
+        $event->event_month = str_pad($event->event_month, 2, '0', STR_PAD_LEFT);;
+        $event->event_year = $request->input('event_year', $event->event_year);
+        $event->qualifier = $request->input('qualifier', $event->qualifier);
+        $event->voucher_apply = json_encode($voucher_apply);
+        $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
+        $event->point = $request->input('point', $event->point);
+        $event->is_share_facebook = $request->has('is_share_facebook') ? $request->input('is_share_facebook') : $event->is_share_facebook;
+        $event->is_share_zalo = $request->has('is_share_zalo') ? $request->input('is_share_zalo') : $event->is_share_zalo;
+        $event->where_order = $request->input('where_order', $event->where_order);
+        $event->where_price = $request->input('where_price', $event->where_price);
+        $event->date = $request->input('date', $event->date);
+        $event->from = $request->from;
+        $event->to = $request->to;
+        $event->status = $request->input('status', $event->status);
+        $event->description = $request->input('description', $event->description);
+        $event->images = json_encode($images);
+        $event->save();
+        DB::commit();
         return redirect()
             ->route('events',[
                 'token' => $token
-                
             ]) 
             ->with('success', 'Thêm sự kiện thành công!');
     } catch (\Throwable $th) {
-        
+        DB::rollBack();
         return redirect()
             ->back() 
             ->with('error', 'Thêm sự kiện không thành công: ' . $th->getMessage());
@@ -1628,24 +1671,36 @@ public function store_events(Request $request)
 
 public function update_events(Request $request, $id)
 {
-    $token = $request->token; 
+    $token = $request->input('token'); 
     $event = Event::find($id);
-
+   
     if (!$event) {
         return redirect()->back()->with('error', 'Không tìm thấy sự kiện.');
     }
+    $voucher_apply = [
+        'voucher_title' => $request->input('voucher_title'),
+        'voucher_description' => $request->input('voucher_description'),
+        'voucher_quantity' => $request->input('voucher_quantity'),
+        'voucher_limit' => $request->input('voucher_limit'),
+        'voucher_ratio' => $request->input('voucher_ratio'),
+        'voucher_code' => $request->input('voucher_code'),
+    ];
+    $voucher_apply = array_filter($voucher_apply, function ($value) {
+        return !is_null($value);
+    });
 
     try {
+
         $event->event_title = $request->input('event_title', $event->event_title);
         $event->event_day = $request->input('event_day', $event->event_day);
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
         $event->qualifier = $request->input('qualifier', $event->qualifier);
-        $event->voucher_apply = $request->input('voucher_apply', $event->voucher_apply);
-        $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
+        $event->voucher_apply = !empty($voucher_apply) ? json_encode($voucher_apply) : $event->voucher_apply;
+        $event->is_mail = $request->has('is_mail') ? $request->boolean('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
-        $event->is_share_facebook = $request->has('is_share_facebook') ? $request->input('is_share_facebook') : $event->is_share_facebook;
-        $event->is_share_zalo = $request->has('is_share_zalo') ? $request->input('is_share_zalo') : $event->is_share_zalo;
+        $event->is_share_facebook = $request->has('is_share_facebook') ? $request->boolean('is_share_facebook') : $event->is_share_facebook;
+        $event->is_share_zalo = $request->has('is_share_zalo') ? $request->boolean('is_share_zalo') : $event->is_share_zalo;
         $event->where_order = $request->input('where_order', $event->where_order);
         $event->where_price = $request->input('where_price', $event->where_price);
         $event->date = $request->input('date', $event->date);
@@ -1654,16 +1709,16 @@ public function update_events(Request $request, $id)
         $event->status = $request->input('status', $event->status);
         $event->description = $request->input('description', $event->description);
         $event->save();
-        return redirect()
-        ->route('events',[
-            'token' => $token
-        ]) ->with('success', 'Cập nhật sự kiện thành công.');
 
+        return redirect()
+            ->route('events', ['token' => $token])
+            ->with('success', 'Cập nhật sự kiện thành công.');
     } catch (\Throwable $th) {
         return redirect()->back()->with('error', 'Cập nhật sự kiện không thành công: ' . $th->getMessage());
     }
 }
 
+
 // public function changeStatuspayment(Request $request, string $id)
 // {
 //     try {
@@ -1692,7 +1747,29 @@ public function update_events(Request $request, $id)
 // }
 
 
+    public function checkWebDie()
+    {
+        checkWebDie::dispatch();
+        // try {
+        //     $urlAPI = 'http://vnshop.top/';
+        //     $urlClient = 'https://test.vnshop.top/';
+        //     $client = new Client();
+        //     $responseAPI = $client->request('GET', $urlAPI);
+        //     $responseClient = $client->request('GET', $urlClient);
+        //     $statusCode = $responseAPI->getStatusCode();
+        //     $statusCodeClient = $responseClient->getStatusCode();
+        //     if ($statusCode == 200 && $statusCodeClient == 200) {
+        //         $message = 'Cả API và Client đều hoạt động bình thường';
+        //         log_host($message, $statusCode, $urlAPI, $statusCodeClient, $urlClient);
+        //     } else {
+        //         $message = 'WEBSITE KHÔNG HOẠT ĐỘNG';
+        //         log_host($message, $statusCode, $urlAPI, $statusCodeClient, $urlClient);
+        //     }
+        // } catch (\Throwable $th) {
+        //     log_debug($th->getMessage());
+        // } 
 
+    }
 
 
 }

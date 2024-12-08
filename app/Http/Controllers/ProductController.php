@@ -45,11 +45,15 @@ use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Imports\UsersImport;
+use App\Models\OrderDetailsModel;
 use App\Models\OrdersModel;
+use App\Services\RecommendationService;
 use Maatwebsite\Excel\Facades\Excel;
-
-
+use Phpml\FeatureExtraction\CountVectorizer;
+use Phpml\FeatureExtraction\TokenCountVectorizer;
+use Phpml\Tokenization\WhitespaceTokenizer;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\TryCatch;
 
 class ProductController extends Controller
 {
@@ -57,7 +61,6 @@ class ProductController extends Controller
     {
         $this->middleware('checkShip')->only('store');
     }
-
 
     public function index(Request $request)
     {
@@ -137,18 +140,8 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // $shopId = $request->shop_id;
-        // $shop = Shop::find($shopId);
-        // if ($shop->vnp_TmnCode == null) {
-        //     return response()->json([
-        //         'status' => false,
-        //         'message' => 'CỬA HÀNG CHƯA KHAI BÁO MÃ TÀI KHOẢN NGÂN HÀNG CỦA VNPAY',
-        //     ], 400);
-        // }
         $tax_category = tax_category::where('category_id', $request->category_id)->first();
         $taxes = Tax::find($tax_category->tax_id);
-        $taxAmount = $request->price * $taxes->rate;
-        // dd($request->price);
         try {
             $user = JWTAuth::parseToken()->authenticate();
             $cloudinary = new Cloudinary();
@@ -161,13 +154,14 @@ class ProductController extends Controller
             }else{
                 $slug = $request->slug ?? Str::slug($request->name);
             }
+            $taxAmount = $request->price * $taxes->rate;
             $dataInsert = [
                 'name' => $request->name,
                 'sku' => $request->sku ?? $this->generateSKU(),
                 'slug' => $slug,
                 'description' => $request->description,
                 'infomation' => json_encode($request->infomation),
-                'price' => $request->price + $taxAmount,
+                'price' => $request->price + $taxAmount ?? null,
                 'sale_price' => $request->sale_price ?? null,
                 'image' => $request->images[0] ?? null,
                 'quantity' => $request->stock ?? 0,
@@ -210,12 +204,13 @@ class ProductController extends Controller
                 }
                 // $attributeValue = attributevalue::where()
                 foreach ($request->variant['variantProducts'] as $variant) {
+                    $taxAmount = $variant['price'] * $taxes->rate;
                     $product_variantsData = [
                         'product_id' => $product->id,
                         'id_fe' => $variant['id'] ?? null,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
                         'stock' => $variant['stock'] ?? $request->stock,
-                        'price' => $variant['price'] * ($taxes->rate + 1) ?? $product->price,
+                        'price' => $variant['price'] + $taxAmount ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
@@ -259,6 +254,7 @@ class ProductController extends Controller
             ], 200);
         } catch (\Throwable $th) {
             DB::rollBack();
+            log_debug($th->getMessage());
             return response()->json([
                 'status' => false,
                 'message' => "Thêm product không thành công",
@@ -267,118 +263,7 @@ class ProductController extends Controller
         }
     }
 
-    // public function store(Request $request)
-    // {
-    //     // dd($request->images);
-    //     // dd($request->images[0]);
-    //     try {
-    //         $user = JWTAuth::parseToken()->authenticate();
-    //         $cloudinary = new Cloudinary();
-    //         DB::beginTransaction();
-    //         $mainImageUrl = null;
-    //         $dataInsert = [
-    //             'name' => $request->name,
-    //             'sku' => $request->sku ?? $this->generateSKU(),
-    //             'slug' => $request->slug ?? Str::slug($request->name),
-    //             'description' => $request->description,
-    //             'infomation' => json_encode($request->infomation),
-    //             'price' => $request->price,
-    //             'sale_price' => $request->sale_price ?? null,
-    //             'image' => $request->images[0] ?? null,
-    //             'quantity' => $request->stock ?? 0,
-    //             'create_by' => $user->id,
-    //             'category_id' => $request->category_id,
-    //             'brand' => $request->brand ?? null,
-    //             'shop_id' => $request->shop_id,
-    //             'height' => $request->height,
-    //             'length' => $request->length,
-    //             'weight' => $request->weight,
-    //             'width' => $request->width,
-    //             'show_price' => $request->price ?? $request->sale_price,
-    //             'status' => 3,
-    //         ];
-    //         $product = Product::create($dataInsert);
-    //         foreach ($request->images as $image) {
-    //             $imageModel = Image::create([
-    //                 'product_id' => $product->id,
-    //                 'url' => $image ?? null,
-    //                 'status' => 1,
-    //             ]);
-    //         }
-    //         if($request->variant != null){
-    //             foreach ($request->variant['variantItems'] as $attribute) {
-
-    //                 $attributeData = [
-    //                     'name' => $attribute['name'],
-    //                     'display_name' => strtoupper($attribute['name']),
-    //                 ];
-    //                 $attributeId = Attribute::create($attributeData);
-                    
-    //                 foreach ($attribute['values'] as $value) {
-    //                     $attributeValueData = [
-    //                         'attribute_id' => $attributeId->id,
-    //                         'value' => $value['value'],
-    //                     ];
-    //                     $attributeValue = attributevalue::create($attributeValueData);
-    //                     foreach ($request->variant['variantProducts'] as $variant) {
-    //                         $product_variantsData = [
-    //                             'product_id' => $product->id,
-    //                             'sku' => $variant['sku'] ?? $this->generateSKU(),
-    //                             'stock' => $variant['stock'] ?? $request->stock,
-    //                             'price' => $variant['price'] ?? $product->price,
-    //                             'images' => $variant['image'] ?? $product->image,
-    //                         ];
-    //                         $product_variants = product_variants::create($product_variantsData);
-    //                         $values = [];
-    //                         foreach ($variant['variants'] as $item) {
-    //                             $values[] = $item['value'];
-    //                         }
-    //                         $concatenated_values = implode(', ', $values);
-    //                         $product_variants->update([
-    //                             'name' => $concatenated_values,
-    //                         ]);
-    //                         $variantAttributeData = [
-    //                             'variant_id' => $product_variants->id,
-    //                             'product_id' => $product->id,
-    //                             'shop_id' => $product->shop_id,
-    //                             'attribute_id' => $attributeId->id,
-    //                             'value_id' => $attributeValue->id,
-    //                         ];
-    //                         $variantattribute = variantattribute::create($variantAttributeData);
-    //                     }
-                        
-    //                 }
-    //             }
-    //             $product_variants_get_price = product_variants::where('product_id', $product->id)->get();
-    //             $highest_price = $product_variants_get_price->max('price');
-    //             $lowest_price = $product_variants_get_price->min('price');
-    //             if($highest_price == $lowest_price){
-    //                 $product->update([
-    //                     'show_price' => $highest_price,
-    //                 ]);
-    //             }
-    //             if($highest_price != $lowest_price){
-    //                 $product->update([
-    //                     'show_price' => $lowest_price . " - " . $highest_price,
-    //                 ]);
-    //             }
-    //         }
-    //         DB::commit();
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => "Sản phẩm đã được lưu",
-    //             'product' => $product->load('images', 'variants'),
-    //         ], 200);
-    //     } catch (\Throwable $th) {
-    //         DB::rollBack();
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => "Thêm product không thành công",
-    //             'error' => $th->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
+  
     private function storeProductAttribute($attributeData, $product)
     {
         $attribute = Attribute::create([
@@ -757,6 +642,7 @@ class ProductController extends Controller
                 'product' => $product,
             ], 200);
         } catch (\Throwable $th) {
+            log_debug($th->getMessage());
             return response()->json([
                 'status' => false,
                 'message' => "Cập nhật không thành công",
@@ -806,6 +692,7 @@ class ProductController extends Controller
                 'message' => 'Xóa sản phẩm thành công',
             ]);
         } catch (\Throwable $th) {
+            log_debug($th->getMessage());
             return response()->json([
                 'status' => false,
                 'message' => "Xóa sản phẩm không thành công",
@@ -888,88 +775,83 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
     }
     public function updateProduct(Request $request, string $id)
-    // ProductRequest
-    {
-        
-        $product = Product::find($id); 
-        if (!$product) {
-            return response()->json([
-                'status' => false,
-                'message' => "Sản phẩm không tồn tại",
-            ], 404);
-        }
-
-        $user = JWTAuth::parseToken()->authenticate();
-
-        if($request->name != $product->name){
-            $slug = Str::slug($request->name);
-        }else{
-            $slug = $product->slug;
-        }
-
-            if($request->name != $product->name){
-                $slug = Str::slug($request->name);
-            }else{
-                $slug = $product->slug;
-            }
-        $dataInsert = [
-            'product_id' => $product->id,
-            'name' => $request->name ?? $product->name,
-            'sku' => $request->sku ?? null,
-            'slug' => $slug,
-            'description' => $request->description ?? $product->description,
-            'infomation' => $request->infomation ?? $product->infomation ,
-            'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0
-            'sale_price' => $request->sale_price ?? $product->sale_price,
-            'image' => $product->image,
-            'quantity' => $request->stock ?? $product->quantity,
-            'parent_id' => $request->parent_id ?? $product->parent_id,
-            'update_by' => $user->id,
-            'category_id' => $request->category ?? $product->category_id,
-            'shop_id' => $request->shop_id ?? $product->shop_id,
-            'height' => $request->height ?? $product->height,
-            'length' => $request->length ?? $product->length,
-            'weight' => $request->weight ?? $product->weight,
-            'width' => $request->width ?? $product->width,
-            'status' =>  $product->status,
-            'created_at' => $product->created_at,
-            'show_price' => $request->show_price ?? $product->show_price,
-            'brand' => $request->brand ?? $product->brand,
-            'json_variants' => $product->json_variants ,
-            'admin_note' => $request->admin_note ?? $product->admin_note,
-            'is_delete' => $request->is_delete ?? $product->is_delete,
-            'updated_at' => now(),
-            
-            'update_version' => $product->update_version + 1,
-            'change_of' => $request->variantMode === true ? json_encode($request->variant) : json_encode(0) ,
-        ];
-        
-        try {
-            DB::table('update_product')->insert($dataInsert);
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                    $imageUrl = $uploadedImage['secure_url'];
-
-                    Image::create([
-                        'product_id' => $product->id,
-                        'url' => $imageUrl,
-                        'status' => 0,
-                    ]);
-                }
-            }
-            return response()->json([
-                'status' => true,
-                'message' => "Yêu cầu của bạn đã được gửi vui lòng chờ xét duyệt"
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => "Yêu cầu Cập nhật không thành công",
-                'error' => $th->getMessage(),
-            ], 500);
-        }
+{
+    $product = Product::find($id);
+    if (!$product) {
+        return response()->json([
+            'status' => false,
+            'message' => "Sản phẩm không tồn tại",
+        ], 404);
     }
+
+    $user = JWTAuth::parseToken()->authenticate();
+    $cloudinary = new Cloudinary();
+
+    $slug = $request->name != $product->name ? Str::slug($request->name) : $product->slug;
+
+    $dataInsert = [
+        'product_id' => $product->id,
+        'name' => $request->name ?? $product->name,
+        'sku' => $request->sku ?? null,
+        'slug' => $slug,
+        'description' => $request->description ?? $product->description,
+        'infomation' => $request->infomation ?? $product->infomation,
+        'price' => $request->variantMode ? 0 : $request->price,
+        'sale_price' => $request->sale_price ?? $product->sale_price,
+        'image' => $request->images[0] ?? $product->image,
+        'quantity' => $request->stock ?? $product->quantity,
+        'parent_id' => $request->parent_id ?? $product->parent_id,
+        'update_by' => $user->id,
+        'category_id' => $request->category ?? $product->category_id,
+        'shop_id' => $request->shop_id ?? $product->shop_id,
+        'height' => $request->height ?? $product->height,
+        'length' => $request->length ?? $product->length,
+        'weight' => $request->weight ?? $product->weight,
+        'width' => $request->width ?? $product->width,
+        'status' => $product->status,
+        'created_at' => $product->created_at,
+        'show_price' => $request->show_price ?? $product->show_price,
+        'brand' => $request->brand ?? $product->brand,
+        'json_variants' => $product->json_variants,
+        'admin_note' => $request->admin_note ?? $product->admin_note,
+        'is_delete' => $request->is_delete ?? $product->is_delete,
+        'updated_at' => now(),
+        'update_version' => $product->update_version + 1,
+        'change_of' => $request->variantMode === true ? json_encode($request->variant) : json_encode(0),
+    ];
+
+    try {
+        DB::table('update_product')->insert($dataInsert);
+
+        if ($request->has('images') && is_array($request->images)) {
+            $oldImages = Image::where('product_id', $product->id)->get();
+            foreach ($oldImages as $oldImage) {
+                $oldImage->delete();
+            }
+            foreach ($request->images as $image) {
+                Image::create([
+                    'product_id' => $product->id,
+                    'url' => $image,
+                    'status' => 1,
+                ]);
+            }
+
+            $dataInsert['image'] = Image::where('product_id', $product->id)->first()->url;
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Yêu cầu của bạn đã được gửi, vui lòng chờ xét duyệt",
+        ], 200);
+    } catch (\Throwable $th) {
+        log_debug($th->getMessage());
+        return response()->json([
+            'status' => false,
+            'message' => "Yêu cầu cập nhật không thành công",
+            'error' => $th->getMessage(),
+        ], 500);
+    }
+}
 
     
     // public function handleUpdateProduct(Request $request, string $id)
@@ -1089,6 +971,7 @@ class ProductController extends Controller
                 'message' => "cập nhật san phẩm thành công"
             ], 200);
         } catch (\Throwable $th) {
+            log_debug($th->getMessage());
             return response()->json([
                 'status' => false,
                 'message' => "Cập nhật không thành công",
@@ -1257,7 +1140,7 @@ public function ProductAll(Request $request)
     $allUpdateProductsCount = update_product::all()->count();
     $pendingProductsCount = $allUpdateProductsCount + $newProductsCount;
     
-    $allProducts = Product::all(); 
+     $allProducts = Product::all(); 
     $allUpdateProducts = update_product::all();
     $mergedProducts = $allProducts->merge($allUpdateProducts);
     $pendingProducts = Product::where('status', 3)
@@ -1274,8 +1157,8 @@ public function ProductAll(Request $request)
 
     $allProducts = Product::with(['images', 'variants'])->get();
 
-    // $allUpdateProducts = update_product::with(['variants'])->get();
-    // $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
+    // $allUpdateProducts = update_product::with(['variants'])->get();  
+    $allUpdateProducts = update_product::orderBy("updated_at", "desc")->get();
     $allUpdateProducts = update_product::orderBy("updated_at", "desc")
     ->get()
     ->groupBy("product_id")
@@ -1486,14 +1369,68 @@ public function ProductAll(Request $request)
                             }
                         }
                     }
-                    $pdf = PDF::loadView('bill.bill_template', compact('orders'));
+                //    return $order;
+                    $pdf = PDF::loadView('bill.bill_template', compact('orders'))
+                    ->setPaper('a4')
+                    ->setOptions(['defaultFont' => 'DejaVuSans']); 
                     return $pdf->download('vnshop-bills.pdf');
             }
         } catch (\Throwable $th) {
+            log_debug($th->getMessage());
             return 'export thất bại: ' . $th->getMessage();
         }
     
     }
 
+
+    public function recommendProducts()
+    {
+        try {
+            try {
+                $user = JWTAuth::parseToken()->authenticate();
+            } catch (\Exception $e) {
+                $user = null;
+            }
+            if ($user) {
+                $allProducts = Product::pluck('id')->toArray();
+                $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
+                $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->toArray();
+                $orderForUser = [];
+                foreach ($userPurchasedProducts as $value) {
+                    if(!in_array($value, $orderForUser)){
+                        $orderForUser[] = $value;
+                    }
+                }
+                $userPurchasedProducts = $orderForUser;
+                // matrix
+                $trainingData = [];
+                $labels = []; // nhãn matrix
+                $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
+                foreach ($orders as $order) {
+                    $products = $order->orderDetails->pluck('product_id')->toArray();
+                    $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
+                    $trainingData[] = $vector;
+                    foreach ($products as $productId) {
+                        $labels[] = $productId; // Gắn nhãn
+                    }
+                }
+                $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
+                $service = new RecommendationService();
+                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+                $products = Product::whereIn('id', $recommendation)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
+            }else {
+                $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
+            }
+            return response()->json(['release_products' => $products]);
+            
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => "Lấy dữ liệu không thành công",
+                'error' => $th->getMessage(),
+            ]);
+        }
+    }
 }
 
