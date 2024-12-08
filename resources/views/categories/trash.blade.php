@@ -51,7 +51,7 @@
                                                 >
                                                 <button type="button" class="btn btn-info"
                                                 title="Khôi phục"
-                                                onclick="return confirm('Bạn có chắc chắn muốn khôi phục doanh mục này?');">
+                                                onclick="return confirm('Bạn có chắc chắn muốn khôi phục danh mục này?');">
                                                 <i class="ri-refresh-line align-middle"></i>
                                             </button>
                                                 </a>
