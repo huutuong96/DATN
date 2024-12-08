@@ -469,10 +469,10 @@ class VnshopController extends Controller
         $Posts = Post::whereNull('deleted_at')
                     ->with('blog')
                     ->orderBy('created_at', 'desc') 
-                    ->paginate(10);
+                    ->get();
     
         $blogs = Blog::whereNull('deleted_at')->get();
-        $deletedPost = Post::onlyTrashed()->paginate(10);
+        $deletedPost = Post::onlyTrashed()->get();
     
         return view('blogs.posts', compact('Posts', 'blogs', 'deletedPost', 'tab'));
     }
