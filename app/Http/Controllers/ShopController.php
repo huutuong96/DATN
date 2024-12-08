@@ -35,6 +35,7 @@ use App\Models\history_get_cash_shops;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
+use App\Models\ProducttocartModel;
 use App\Models\UsersModel;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
@@ -602,7 +603,14 @@ class ShopController extends Controller
             'data' => $product,
         ], 200);
     }
-    
+    public function calculatePercentage ($ids){
+        $total = $ids->count();
+        $counts = $ids->countBy();
+        $percentages = $counts->map(function ($count) use ($total) {
+            return round(($count / $total) * 100, 2);
+        });
+        return $percentages;
+    }
 
     public function get_dashboard_shop(string $id)
     {
@@ -618,10 +626,9 @@ class ShopController extends Controller
         $orders_shipping = OrdersModel::where('shop_id', $shop->id)->where('order_status', 5)->count();
         $orders_delivery_failed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 6)->count();
         $orders_delivered = OrdersModel::where('shop_id', $shop->id)->where('order_status', 7)->count();
-        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
         $orders_refund = OrdersModel::where('shop_id', $shop->id)->where('order_status', 9)->count();
+        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
         $orders_canceled = OrdersModel::where('shop_id', $shop->id)->where('order_status', 10)->count();
-
         $totalOrder = OrdersModel::where('shop_id', $shop->id)->count();
         $totalProduct = Product::where('shop_id', $shop->id)->count();
         $totalRevenue = OrdersModel::where('shop_id', $shop->id)->sum('net_amount');
@@ -672,6 +679,7 @@ class ShopController extends Controller
 
     public function VoucherToShop(Request $request, $shop_id)
     {
+        
         $dataInsert = [
             'title' => $request->title,
             'description' => $request->description,
@@ -681,8 +689,9 @@ class ShopController extends Controller
             'code' => $request->code,
             'shop_id' => $shop_id,
             'status' => $request->status ?? 1,
-            'ratio' => $request->ratio ?? null,
-            'price' => $request->ratio ? null : ($request->price ?? null),
+            'ratio' => is_numeric($request->percent) ? $request->percent / 100 : null,
+            'price' => $request->percent ? null : ($request->price ?? null),
+            'type' => $request->type ?? 1,
         ];
         $VoucherToShop = VoucherToShop::create($dataInsert);
         return $this->successResponse("Tạo Voucher thành công", $VoucherToShop);

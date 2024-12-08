@@ -20,6 +20,7 @@ class CheckRole
     public function handle(Request $request, Closure $next, string $role = null): Response
     {
         $user = JWTAuth::parseToken()->authenticate();
+        dd($user);
         if ($request->token) {
             try {
                 $user = JWTAuth::parseToken()->authenticate();
@@ -44,7 +45,7 @@ class CheckRole
             ], 401);
         }
         $role = DB::table('roles')->where('id', $user->role_id)->first();
-        
+        return $role;
         if ($role->title == 'OWNER' || $role->title == 'MANAGER') {
             return $next($request);
         }
