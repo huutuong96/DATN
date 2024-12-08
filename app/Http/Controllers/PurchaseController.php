@@ -238,8 +238,7 @@ class PurchaseController extends Controller
                     $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
                 }
                 $user = jwtAuth::parseToken()->authenticate();
-                $total_amounts = OrdersModel::where('group_order_id', $groupOrderIds)->sum('total_amount');
-                $total_amount = $total_amounts + $shipFee;
+                $total_amount = OrdersModel::where('group_order_id', $groupOrderIds)->sum('total_amount');
                 if ($payment->code == 'VNPAY') {
                     $PaymentsController = new PaymentsController();
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
