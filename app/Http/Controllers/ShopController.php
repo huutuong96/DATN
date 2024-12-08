@@ -679,6 +679,7 @@ class ShopController extends Controller
 
     public function VoucherToShop(Request $request, $shop_id)
     {
+        
         $dataInsert = [
             'title' => $request->title,
             'description' => $request->description,
@@ -688,8 +689,9 @@ class ShopController extends Controller
             'code' => $request->code,
             'shop_id' => $shop_id,
             'status' => $request->status ?? 1,
-            'ratio' => $request->ratio ?? null,
-            'price' => $request->ratio ? null : ($request->price ?? null),
+            'ratio' => is_numeric($request->percent) ? $request->percent / 100 : null,
+            'price' => $request->percent ? null : ($request->price ?? null),
+            'type' => $request->type ?? 1,
         ];
         $VoucherToShop = VoucherToShop::create($dataInsert);
         return $this->successResponse("Tạo Voucher thành công", $VoucherToShop);
