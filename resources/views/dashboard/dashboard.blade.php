@@ -309,7 +309,7 @@
         </div>
         <!-- end col -->
         <div class="col-xl-6 ">
-            <div class="card">
+            <div class="card h">
                 <div class="card-header">
                     <h4 class="card-title mb-0">Thống kê doanh thu</h4>
                 </div><!-- end card header -->
