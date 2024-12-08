@@ -1637,8 +1637,8 @@ public function store_events(Request $request)
         }
         $event = new Event();
         $event->event_title = $request->input('event_title', $event->event_title);
-        $event->event_day = $event->event_day;
-        $event->event_month = $event->event_month;
+        $event->event_day = $request->input('event_day', $event->event_day);
+        $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
         $event->qualifier = $request->input('qualifier', $event->qualifier);
         $event->voucher_apply = json_encode($voucher_apply);
