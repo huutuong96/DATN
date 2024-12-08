@@ -275,6 +275,7 @@ class PurchaseController extends Controller
         
             } catch (\Exception $e) {
                 DB::rollBack();
+                log_debug($e->getMessage());
                 return response()->json([
                     'status' => 400,
                     'message' => 'Đặt hàng thất bại',
@@ -927,7 +928,6 @@ class PurchaseController extends Controller
             "to_district"=> $addressUser->district_id
         ]);
         $service = $response->json();
-        dd($service);
         return $service['data'];
     }
 
