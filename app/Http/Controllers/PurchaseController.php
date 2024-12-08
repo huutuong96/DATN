@@ -238,6 +238,8 @@ class PurchaseController extends Controller
                     $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
                 }
                 $user = jwtAuth::parseToken()->authenticate();
+                $total_amounts = OrdersModel::where('group_order_id', $groupOrderIds)->sum('total_amount');
+                $total_amount = $total_amounts + $shipFee;
                 if ($payment->code == 'VNPAY') {
                     $PaymentsController = new PaymentsController();
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
@@ -261,8 +263,7 @@ class PurchaseController extends Controller
                         'url' => $url,
                     ], 200);
                 }
-                $total_amounts = OrdersModel::where('group_order_id', $groupOrderIds)->sum('total_amount');
-                $total_amount = $total_amounts + $shipFee;
+                
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
                 // ProducttocartModel::whereIn('id', $request->carts)->delete();
