@@ -210,7 +210,7 @@ class ProductController extends Controller
                         'id_fe' => $variant['id'] ?? null,
                         'sku' => $variant['sku'] ?? $this->generateSKU(),
                         'stock' => $variant['stock'] ?? $request->stock,
-                        'price' => $variant['price'] * ($taxes->rate + 1) ?? $product->price,
+                        'price' => $variant['price'] + $$taxAmount ?? $product->price,
                         'images' => $variant['image'] ?? $product->image,
                     ];
                     $product_variants = product_variants::create($product_variantsData);
