@@ -208,7 +208,7 @@
                                                                                                         'status' => 5,
                                                                                                         ]) }}"
                                                             >
-                                                            <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
+                                                            <button type="button" class="btn btn-danger" title="Xóa"  onclick="return confirm('Bạn có chắc chắn muốn xóa cửa hàng này?');">
                                                                 <i class="ri-delete-bin-line align-middle"></i>
                                                             </button>
                                                             </a>
