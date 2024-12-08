@@ -152,11 +152,12 @@ class AuthenController extends Controller
                 'message' => 'Lấy dữ liệu thành công',
                 'data' => $list_users,
             ], 200);
-        } catch (\Exception $e) {
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Lấy dữ liệu thất bại',
-                'error' => $e->getMessage(),
+                'error' => $th->getMessage(),
             ], 500);
         }
     }
@@ -208,157 +209,182 @@ class AuthenController extends Controller
  */
     public function register(UserRequest $request)
     {
-        $existingUser = UsersModel::where('email', $request->email)->first();
+        try {
+            $existingUser = UsersModel::where('email', $request->email)->first();
 
-        $dataInsert = [
-            "fullname" => $request->fullname,
-            "password" => Hash::make($request->password),
-            "email" => $request->email,
-            "rank_id" => $request->rank_id ?? 1,
-            "phone" => $request->phone ?? null,
-            "role_id" => 1,
-            "status" => 101, // 101 là tài khoản chưa được kích hoạt
-            "login_at" => now(),
-        ];
+            $dataInsert = [
+                "fullname" => $request->fullname,
+                "password" => Hash::make($request->password),
+                "email" => $request->email,
+                "rank_id" => $request->rank_id ?? 1,
+                "phone" => $request->phone ?? null,
+                "role_id" => 1,
+                "status" => 101, // 101 là tài khoản chưa được kích hoạt
+                "login_at" => now(),
+            ];
 
-        $user = UsersModel::create($dataInsert);
-        $token = JWTAuth::fromUser($user);
-        $verifyCode = rand(10000, 99999);
-        $user->update([
-            'refesh_token' => $token,
-            'verify_code' => $verifyCode,
-        ]);
-        $dataDone = [
-            'status' => true,
-            'message' => "Đăng ký thành công, chưa kích hoạt",
-            'user' => $user,
-            'token' => $token,
-        ];
-        Mail::to($user->email)->send(new ConfirmMail($user, $token));
-        // ConfirmMailRegister::dispatch($user, $token, $verifyCode);
-        return response()->json($dataDone, 201);
+            $user = UsersModel::create($dataInsert);
+            $token = JWTAuth::fromUser($user);
+            $verifyCode = rand(10000, 99999);
+            $user->update([
+                'refesh_token' => $token,
+                'verify_code' => $verifyCode,
+            ]);
+            $dataDone = [
+                'status' => true,
+                'message' => "Đăng ký thành công, chưa kích hoạt",
+                'user' => $user,
+                'token' => $token,
+            ];
+            Mail::to($user->email)->send(new ConfirmMail($user, $token));
+            // ConfirmMailRegister::dispatch($user, $token, $verifyCode);
+            return response()->json($dataDone, 201);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
+        }
     }
 
     public function confirm(Request $request)
     {
-        $user = UsersModel::where('refesh_token', $request->token)->first();
-        if ($user) {
-            $user->update([
-                'status' => 1,
-            ]);
+        try {
+            $user = UsersModel::where('refesh_token', $request->token)->first();
+            if ($user) {
+                $user->update([
+                    'status' => 1,
+                ]);
 
-            $cart_to_users = Cart_to_usersModel::create([
-                'user_id' => $user->id,
-                'status' => 2,
-            ]);
-            $activeDone = [
-                'status' => true,
-                'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
-            ];
-            return response()->json($activeDone, 200);
-        } else {
-            $activeFail = [
-                'status' => true,
-                'message' => "Tài khoản không tồn tại, Vui lòng đăng ký lại",
-            ];
-            return response()->json($activeFail, 200);
+                $cart_to_users = Cart_to_usersModel::create([
+                    'user_id' => $user->id,
+                    'status' => 2,
+                ]);
+                $activeDone = [
+                    'status' => true,
+                    'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
+                ];
+                return response()->json($activeDone, 200);
+            } else {
+                $activeFail = [
+                    'status' => true,
+                    'message' => "Tài khoản không tồn tại, Vui lòng đăng ký lại",
+                ];
+                return response()->json($activeFail, 200);
+            }
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
         }
     }
 
     public function confirmVerifyCode(Request $request)
     {
-        if (!$request->verify_code) {
-            $activeFail = [
-                'status' => 403,
-                'message' => "Mã xác nhận không hợp lệ",
-            ];
-            return response()->json($activeFail, 404);
-        }
-        $user = UsersModel::where('verify_code', $request->verify_code)->first();
+        try {
+            if (!$request->verify_code) {
+                $activeFail = [
+                    'status' => 403,
+                    'message' => "Mã xác nhận không hợp lệ",
+                ];
+                return response()->json($activeFail, 404);
+            }
+            $user = UsersModel::where('verify_code', $request->verify_code)->first();
 
-        if ($user) {
-            $user->update([
-                'status' => 1,
-            ]);
+            if ($user) {
+                $user->update([
+                    'status' => 1,
+                ]);
 
-            $cart_to_users = Cart_to_usersModel::create([
-                'user_id' => $user->id,
-                'status' => 1,
-            ]);
-            $activeDone = [
-                'status' => true,
-                'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
-            ];
-            return response()->json($activeDone, 200);
-        } else {
-            $activeFail = [
-                'status' => 404,
-                'message' => "Tài khoản không tồn tại, Vui lòng đăng ký lại",
-            ];
-            return response()->json($activeFail, 404);
+                $cart_to_users = Cart_to_usersModel::create([
+                    'user_id' => $user->id,
+                    'status' => 1,
+                ]);
+                $activeDone = [
+                    'status' => true,
+                    'message' => "Tài khoản đã được kích hoạt, vui lòng đăng nhập lại",
+                ];
+                return response()->json($activeDone, 200);
+            } else {
+                $activeFail = [
+                    'status' => 404,
+                    'message' => "Tài khoản không tồn tại, Vui lòng đăng ký lại",
+                ];
+                return response()->json($activeFail, 404);
+            }
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
         }
     }
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
+            $credentials = $request->only('email', 'password');
+            try {
+                if (!$token = JWTAuth::attempt($credentials)) {
+                    return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
+                }
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'Không thể tạo token'], 500);
             }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Không thể tạo token'], 500);
-        }
-        $user = UsersModel::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['error' => 'Tài khoản không tồn tại'], 404);
-        }
-        if ($user->status == 101) {
-            return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
-        }
+            $user = UsersModel::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['error' => 'Tài khoản không tồn tại'], 404);
+            }
+            if ($user->status == 101) {
+                return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
+            }
 
-        $user->refesh_token = $token;
-        // $user->is_login = 1;
-        $user->save();
-        return response()->json([
-            'status' => true,
-            'message' => 'Đăng nhập thành công',
-            'data' => [
-                'token' => $token,
-                // 'user' => $user,
-            ],
-        ], 200);
+            $user->refesh_token = $token;
+            // $user->is_login = 1;
+            $user->save();
+            return response()->json([
+                'status' => true,
+                'message' => 'Đăng nhập thành công',
+                'data' => [
+                    'token' => $token,
+                    // 'user' => $user,
+                ],
+            ], 200);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
+        }
     }
 
 
     public function adminLogin(Request $request)
     {
-        $credentials = $request->only('email', 'password');
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
+            $credentials = $request->only('email', 'password');
+            try {
+                if (!$token = JWTAuth::attempt($credentials)) {
+                    return view("login")->with('error', 'Tài khoản và mật khẩu không đúng!');
+                }
+            } catch (JWTException $e) {
+                return view("login")->with('error', 'Không thể tạo token!');
+            }
+            $user = UsersModel::where('email', $request->email)->first();
+            if (!$user) {
+                return view("login")->with('error', 'Tài khoản không tồn tại!');
+            }
+            if ($user->status == 101) {
                 return view("login")->with('error', 'Tài khoản và mật khẩu không đúng!');
             }
-        } catch (JWTException $e) {
-            return view("login")->with('error', 'Không thể tạo token!');
+            $token = JWTAuth::fromUser($user);
+            $user->refesh_token = $token;
+            // $user->is_login = 1;
+            $user->save();
+            $user->load('role', 'address');
+            $user = auth::user();
+            $notification = Notification::where('user_id', $user->id)->get();
+            $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
+            $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
+            session(['notifyMain' => $notifyMain]);
+            return redirect()->route('dashboard', ['token' => auth()->user()->refesh_token]);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return view("login")->with('error', 'Có lỗi xảy ra!');
         }
-        $user = UsersModel::where('email', $request->email)->first();
-        if (!$user) {
-            return view("login")->with('error', 'Tài khoản không tồn tại!');
-        }
-        if ($user->status == 101) {
-            return view("login")->with('error', 'Tài khoản và mật khẩu không đúng!');
-        }
-        $token = JWTAuth::fromUser($user);
-        $user->refesh_token = $token;
-        // $user->is_login = 1;
-        $user->save();
-        $user->load('role', 'address');
-        $user = auth::user();
-        $notification = Notification::where('user_id', $user->id)->get();
-        $notificationIds = $notification->pluck('id_notification'); // Lấy danh sách các ID từ collection
-        $notifyMain = Notification_to_mainModel::whereIn('id', $notificationIds)->get();
-        session(['notifyMain' => $notifyMain]);
-        return redirect()->route('dashboard', ['token' => auth()->user()->refesh_token]);
     }
 
     public function show(string $id)
@@ -370,25 +396,15 @@ class AuthenController extends Controller
                 'message' => 'Lấy dữ liệu thành công',
                 'data' => $user,
             ], 200);
-        } catch (JWTException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Token không hợp lệ hoặc không tồn tại',
-                'error' => $e->getMessage(),
-            ], 401);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lấy dữ liệu thất bại',
-                'error' => $e->getMessage(),
-            ], 500);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return view("login")->with('error', 'Có lỗi xảy ra!');
         }
     }
 
 
     public function me()
     {
-
         try {
             $user_present = JWTAuth::parseToken()->authenticate();
             $shop = Shop::where('owner_id', $user_present->id)->first();
@@ -401,146 +417,163 @@ class AuthenController extends Controller
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
                 'data' => $user_present,
-
             ], 200);
-        } catch (JWTException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Token không hợp lệ hoặc không tồn tại',
-                'error' => $e->getMessage(),
-            ], 401);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lấy dữ liệu thất bại',
-                'error' => $e->getMessage(),
-            ], 500);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
         }
     }
 
     public function update(Request $request, string $id)
     {
-        $user = UsersModel::where('id', $id)->where('status', 1)->first();
-        $dataUpdate = [
-            "status" => 103, //tài khoản bị khóa
-        ];
-        $user = UsersModel::where('id', $id)->update($dataUpdate);
+        try {
+            
+            $user = UsersModel::where('id', $id)->where('status', 1)->first();
+            $dataUpdate = [
+                "status" => 103, //tài khoản bị khóa
+            ];
+            $user = UsersModel::where('id', $id)->update($dataUpdate);
 
-        $dataDone = [
-            'status' => true,
-            'message' => "Tài khoản đã bị khóa",
-        ];
-        return response()->json($dataDone, 200);
+            $dataDone = [
+                'status' => true,
+                'message' => "Tài khoản đã bị khóa",
+            ];
+            return response()->json($dataDone, 200);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return view("login")->with('error', 'Có lỗi xảy ra!');
+        }
     }
 
     
     public function update_profile(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $cloudinary = new Cloudinary();
-        // if ($request->hasFile('avatar')) {
-        //     $avatar = $request->file('avatar');
-        //     $uploadedavatar = $cloudinary->uploadApi()->upload($avatar->getRealPath());
-        //     $avatarUrl = $uploadedavatar['secure_url'];
-        // }
-        $dataUpdate = [
-            "fullname" => $request->fullname ?? $user->fullname,
-            "phone" => $request->phone ?? $user->phone,
-            "email" => $request->email ?? $user->email,
-            "genre" => $request->genre ?? 1,
-            "datebirth" => $request->datebirth ? date('Y-m-d', strtotime($request->datebirth)) : null,
-            "updated_at" => now(),
-            "avatar" => $request->avatar ?? $user->avatar,
-            "description" => $request->description ?? $user->description,
-        ];
-        UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
-        // if($request->input('address')){
-        //     if ($request->input('address')['default'] == 1) {
-        //         AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
-        //     }
-        //     AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
-        //         "province" => $request->input('address')['province'],
-        //         "province_id" => $request->input('address')['province_id'],
-        //         "district" => $request->input('address')['district'],
-        //         "district_id" => $request->input('address')['district_id'],
-        //         "ward" => $request->input('address')['ward'],
-        //         "ward_id" => $request->input('address')['ward_id'],
-        //         "address" => $request->input('address')['address'],
-        //         "user_id" => $user->id,
-        //         "default" => $request->input('address')['default'] ?? 0,
-        //         "type" => $request->input('address')['type'] ?? null,
-        //         "name" => $request->name ?? $user->fullname,
-        //         "phone" => $request->phone ?? $user->phone,
-        //     ]);
-        // }
-        $dataDone = [
-            'status' => true,
-            'message' => "Cập nhật thành công!",
-        ];
-        if($request->token){
-            return redirect()->back()->with('message', 'Cập nhật thành công!');
-        }
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            $cloudinary = new Cloudinary();
+            // if ($request->hasFile('avatar')) {
+            //     $avatar = $request->file('avatar');
+            //     $uploadedavatar = $cloudinary->uploadApi()->upload($avatar->getRealPath());
+            //     $avatarUrl = $uploadedavatar['secure_url'];
+            // }
+            $dataUpdate = [
+                "fullname" => $request->fullname ?? $user->fullname,
+                "phone" => $request->phone ?? $user->phone,
+                "email" => $request->email ?? $user->email,
+                "genre" => $request->genre ?? 1,
+                "datebirth" => $request->datebirth ? date('Y-m-d', strtotime($request->datebirth)) : null,
+                "updated_at" => now(),
+                "avatar" => $request->avatar ?? $user->avatar,
+                "description" => $request->description ?? $user->description,
+            ];
+            UsersModel::where('id', $user->id)->where('status', 1)->update($dataUpdate);
+            // if($request->input('address')){
+            //     if ($request->input('address')['default'] == 1) {
+            //         AddressModel::where('default', 1)->where('user_id', $user->id)->update(['default' => 0]);
+            //     }
+            //     AddressModel::where('id', $request->input('address')['id'])->where('user_id', $user->id)->update([
+            //         "province" => $request->input('address')['province'],
+            //         "province_id" => $request->input('address')['province_id'],
+            //         "district" => $request->input('address')['district'],
+            //         "district_id" => $request->input('address')['district_id'],
+            //         "ward" => $request->input('address')['ward'],
+            //         "ward_id" => $request->input('address')['ward_id'],
+            //         "address" => $request->input('address')['address'],
+            //         "user_id" => $user->id,
+            //         "default" => $request->input('address')['default'] ?? 0,
+            //         "type" => $request->input('address')['type'] ?? null,
+            //         "name" => $request->name ?? $user->fullname,
+            //         "phone" => $request->phone ?? $user->phone,
+            //     ]);
+            // }
+            $dataDone = [
+                'status' => true,
+                'message' => "Cập nhật thành công!",
+            ];
+            if($request->token){
+                return redirect()->back()->with('message', 'Cập nhật thành công!');
+            }
 
-        return response()->json($dataDone, 200);
+            return response()->json($dataDone, 200);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
+        }
     }
 
     public function change_password(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        if (!$user) {
-            return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
-        }
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Mật khẩu không đúng'], 401);
-        }
-        $dataUpdate = [
-            "password" => Hash::make($request->new_password),
-            "updated_at" => now(),
-        ];
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) {
+                return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
+            }
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json(['error' => 'Mật khẩu không đúng'], 401);
+            }
+            $dataUpdate = [
+                "password" => Hash::make($request->new_password),
+                "updated_at" => now(),
+            ];
 
-        UsersModel::where('id', $user->id)->update($dataUpdate);
-        $user = UsersModel::find($user->id);
+            UsersModel::where('id', $user->id)->update($dataUpdate);
+            $user = UsersModel::find($user->id);
 
-        $dataDone = [
-            'status' => true,
-            'message' => "Mật khẩu đã được thay đổi thành công",
-        ];
-        if ($request->token) {
-            return redirect()->back()->with('message', 'Mật khẩu đã được thay đổi thành công');
+            $dataDone = [
+                'status' => true,
+                'message' => "Mật khẩu đã được thay đổi thành công",
+            ];
+            if ($request->token) {
+                return redirect()->back()->with('message', 'Mật khẩu đã được thay đổi thành công');
+            }
+            return response()->json($dataDone, 200);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return view("login")->with('error', 'Có lỗi xảy ra!');
         }
-        return response()->json($dataDone, 200);
     }
 
     
     public function fogot_password(Request $request)
     {
-        $user = UsersModel::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
-        }
-        $token = JWTAuth::fromUser($user);
-        $user->update([
-            'refesh_token' => $token,
-        ]);
+        try {
+            $user = UsersModel::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['error' => 'Tài khoản không tồn tại'], 401);
+            }
+            $token = JWTAuth::fromUser($user);
+            $user->update([
+                'refesh_token' => $token,
+            ]);
 
-        Mail::to($user->email)->send(new ConfirmMailChangePassword($user, $token));
-        $dataDone = [
-            'status' => true,
-            'message' => "Đã gửi mã xác nhận đến email",
-            'user' => $user->email,
-        ];
-        return response()->json($dataDone, 200);
+            Mail::to($user->email)->send(new ConfirmMailChangePassword($user, $token));
+            $dataDone = [
+                'status' => true,
+                'message' => "Đã gửi mã xác nhận đến email",
+                'user' => $user->email,
+            ];
+            return response()->json($dataDone, 200);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return view("login")->with('error', 'Có lỗi xảy ra!');
+        }
     }
 
     public function confirm_mail_change_password(Request $request, $token, $email)
     {
-        $user = UsersModel::where('email', $email)->first();
-        if(!$request->newpassword){
-            return response()->json(['error' => 'vui lòng nhập mật khẩu mới'], 401);
+        try {
+            $user = UsersModel::where('email', $email)->first();
+            if (!$request->newpassword) {
+                return response()->json(['error' => 'vui lòng nhập mật khẩu mới'], 401);
+            }
+            if ($user) {
+                return $this->reset_password($request, $token, $email);
+            }
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
         }
-        if ($user) {
-            return $this->reset_password($request, $token, $email);
-        }
+    
     }
 
     /**
@@ -589,17 +622,22 @@ class AuthenController extends Controller
  */
     public function reset_password(Request $request, $token, $email)
     {
-        $user = UsersModel::where('email', $email)->first();
-        if ($user) {
-            $user->update([
-                'password' => Hash::make($request->newpassword),
-            ]);
+        try {
+            $user = UsersModel::where('email', $email)->first();
+            if ($user) {
+                $user->update([
+                    'password' => Hash::make($request->newpassword),
+                ]);
 
-            $dataDone = [
-                'status' => true,
-                'message' => "Mật khẩu đã được thay đổi thành công",
-            ];
-            return response()->json($dataDone, 200);
+                $dataDone = [
+                    'status' => true,
+                    'message' => "Mật khẩu đã được thay đổi thành công",
+                ];
+                return response()->json($dataDone, 200);
+            }
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return view("login")->with('error', 'Có lỗi xảy ra!');
         }
     }
 

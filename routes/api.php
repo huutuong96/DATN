@@ -53,7 +53,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\VnshopController;
 use App\Http\Controllers\EventController;
-
+use App\Http\Controllers\TestAllController;
 
 Route::get('/search', function () {
     return "API - VNSHOP";
@@ -114,6 +114,7 @@ Route::get('/search', function () {
                 });
                 
                
+        Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
                 
                
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
@@ -416,6 +417,8 @@ Route::get('/search', function () {
             return view('swagger');
         });
 
+        Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
+
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
 
@@ -427,3 +430,6 @@ Route::get('/search', function () {
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
         Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
 
+        Route::get('/testall', [TestAllController::class, 'testAllControllers']);
+
+        

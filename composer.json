@@ -10,12 +10,14 @@
         "beyondcode/laravel-websockets": "^1.14",
         "cloudinary-labs/cloudinary-laravel": "^2.2",
         "darkaonline/l5-swagger": "8.6",
+        "google/cloud-vision": "*",
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
+        "php-ai/php-ml": "^0.10.0",
         "pusher/pusher-php-server": "^7.2",
         "telegram-bot/api": "^2.5",
         "tymon/jwt-auth": "^2.1"
@@ -33,7 +35,12 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/"
-        }
+        },
+        "files": [
+            "app/Helpers/log.php",
+            "app/Helpers/beta.php",
+            "app/Helpers/check_pro.php"
+            ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -39,12 +39,10 @@ class Handler extends ExceptionHandler
 
     public function report(Throwable $exception)
     {
-        
-        
         $message = $exception->getMessage();
         $this->telegramService->sendMessage($message);
-
-        parent::report($exception);
+        // parent::report($exception);
+        return $exception;
     }
 
 
@@ -61,7 +59,7 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
+        $this->reportable(function () {
             //
         });
     }

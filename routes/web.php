@@ -181,3 +181,7 @@ Route::get('auth/google', function () {
 })->name('google_login');
 
 Route::get('/callback', [AuthenController::class, 'handleGoogleCallback']);
+
+
+
+Route::get('/checkWebDie', [VnshopController::class, 'checkWebDie'])->name('checkWebDie');
