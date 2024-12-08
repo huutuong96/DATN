@@ -26,7 +26,7 @@ class CheckRole
                 $user = JWTAuth::parseToken()->authenticate();
                 // dd($user);
                 if ($user->role_id == 2 || $user->role_id == 3) {
-                    return $next($request);
+                     $next($request);
                 }
             } catch (TokenExpiredException $e) {
                 return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
@@ -45,9 +45,9 @@ class CheckRole
             ], 401);
         }
         $role = DB::table('roles')->where('id', $user->role_id)->first();
-        return $role;
+
         if ($role->title == 'OWNER' || $role->title == 'MANAGER') {
-            return $next($request);
+          $next($request);
         }
         if ($request->token) {
             return redirect()->route('login')->with('error', 'Bạn không có quyền vào trang này');
