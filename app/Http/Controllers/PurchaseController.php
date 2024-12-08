@@ -814,9 +814,10 @@ class PurchaseController extends Controller
             ]);
         }else {
             $variant = product_variants::find($result->id);
+            $product = Product::find($variant->product_id); 
             return OrderDetailsModel::create([
                 'order_id' => $order->id,
-                'category_id'=> $variant->product->category_id,
+                'category_id'=>  $product->category_id,
                 'product_id' => $product_id,
                 'variant_id' => $variant_id,
                 'quantity' => $quantity,
