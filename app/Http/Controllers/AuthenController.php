@@ -991,6 +991,9 @@ class AuthenController extends Controller
                 'password' => Hash::make($googleUser->id),
                 'login_at' => Carbon::now(),
                 'google_id' => $googleUser->id,
+                'role_id' => 1,
+                'rank_id' => 1,
+                'status' => 1,
             ]);
     
             Auth::login($user);
