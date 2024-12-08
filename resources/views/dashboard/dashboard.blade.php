@@ -52,7 +52,7 @@
                                             >
                                         </h4>
                                         <a
-                                            href="#"
+                                            href="{{route('pending_approval_stores',['token' => auth()->user()->refesh_token])}}"
                                             class="text-decoration-underline"
                                             >Cửa hàng cần duyệt</a
                                         >
@@ -118,7 +118,7 @@
                                             >
                                         </h4>
                                         <a
-                                            href="#"
+                                            href="{{route('product_all',['token' => auth()->user()->refesh_token, 'tab'=>2])}}"
                                             class="text-decoration-underline"
                                             >Sản phẩm cần duyệt</a
                                         >
@@ -248,11 +248,11 @@
                                             >
                                         </h4>
                                         <a
-                                            href="#"
+                                            href="{{route('store',['token' => auth()->user()->refesh_token])}}"
                                             class="text-decoration-underline"
                                             >Số cửa hàng đang hoạt động</a
                                         >
-                                    </div>
+                                    </div>  
                                     <div
                                         class="avatar-sm flex-shrink-0"
                                     >
