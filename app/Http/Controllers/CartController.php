@@ -206,7 +206,7 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
-        return $product->category_id;
+
         $tax_category = tax_category::where('category_id', $product->category_id)->first();
         if (!$tax_category) {
             return response()->json(['error' => 'Danh mục của sản phẩm này chưa có khai báo thuế'], 404);
