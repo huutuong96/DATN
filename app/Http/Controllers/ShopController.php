@@ -689,8 +689,9 @@ class ShopController extends Controller
             'code' => $request->code,
             'shop_id' => $shop_id,
             'status' => $request->status ?? 1,
-            'ratio' => is_numeric($request->percent) ? $request->percent / 100 : null,
-            'price' => $request->percent ? null : ($request->price ?? null),
+            'ratio' => is_numeric($request->ratio) ? $request->ratio / 100 : null,
+            'price' => $request->ratio ? null : ($request->price ?? null),
+            'min' => $request->min ?? null,
             'type' => $request->type ?? 1,
         ];
         $VoucherToShop = VoucherToShop::create($dataInsert);
