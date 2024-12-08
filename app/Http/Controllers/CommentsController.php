@@ -247,7 +247,7 @@ class CommentsController extends Controller
     $product = Product::find($request->product_id);
     if ($product && $product->shop_id) {
         $notificationRequest = new Request([
-            'type' => 'shop',
+            'type' => 'main',
             'user_id' => $user->id,
             'title' => 'Thông báo từ Sản Phẩm',
             'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
