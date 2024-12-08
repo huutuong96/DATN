@@ -15,6 +15,7 @@ class OrderDetailsModel extends Model
         'subtotal',
         'status',
         'order_id',
+        'category_id',
         'product_id',
         'variant_id',
         'quantity',
