@@ -261,7 +261,8 @@ class PurchaseController extends Controller
                         'url' => $url,
                     ], 200);
                 }
-                $total_amount = OrdersModel::where('group_order_id', $groupOrderIds)->sum('total_amount');
+                $total_amounts = OrdersModel::where('group_order_id', $groupOrderIds)->sum('total_amount');
+                $total_amount = $total_amounts + $shipFee;
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
                 // ProducttocartModel::whereIn('id', $request->carts)->delete();
