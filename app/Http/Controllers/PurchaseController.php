@@ -264,10 +264,10 @@ class PurchaseController extends Controller
                     ], 200);
                 }
                 
-                // SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
-                return view('test', compact('orders', "total_amount", "carts", "orderDetails", "shipFee", "products", "variants"));
-                SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-                ProducttocartModel::whereIn('id', $request->carts)->delete();
+                SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
+                // return view('test', compact('orders', "total_amount", "carts", "orderDetails", "shipFee", "products", "variants"));
+                // SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
+                // ProducttocartModel::whereIn('id', $request->carts)->delete();
                 // deleteProductToCart::dispatch($request->carts);   
                 return response()->json([
                     'status' => true,

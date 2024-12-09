@@ -486,7 +486,7 @@
                                                                                             <strong>ID:</strong> <span class="text-muted me-5">{{ $product->product_id }}</span> 
                                                                                         </div>
                                                                                         <div class="mb-3 d-flex ">
-                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted" style="word-wrap: break-word; white-space: normal; max-width: 50px;">{{ $product->name}}</span>
+                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted" style="word-wrap: break-word; white-space: normal; max-width: 200px;">{{ $product->name}}</span>
                                                                                         </div>
                                                                                        
                                                                                        
