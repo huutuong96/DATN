@@ -105,20 +105,20 @@
                                                     </a>
                                                 </li>
                                                 @elseif ($role->status == 3)
+                                               
                                                 <li class="list-inline-item">
-                                                    <a
+                                                    <a 
                                                         href="{{ route('change_role', [
                                                                                             'token' => auth()->user()->refesh_token,
                                                                                             'id' => $role->id,
                                                                                             'status' => 2,
-                                                                                            ]) }}">
-                                                        <button type="button" class="btn btn-primary" title="Bật">
-                                                            <i class="ri-power-line align-middle"></i>
-                                                        </button>
-                                                        
-
-
-                                                </li>
+                                                                                            ]) }}"
+                                                    >
+                                                    <button type="button" class="btn btn-success" title="Bật">
+                                                        <i class="ri-check-line align-middle"></i>
+                                                    </button>
+                                                    </a>
+                                                    </li>
                                                 @endif
                                                 <li class="list-inline-item">
                                                     <!-- Toggle Between Modals -->
