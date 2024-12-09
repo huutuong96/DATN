@@ -784,8 +784,6 @@ class ProductController extends Controller
                 'message' => "Sản phẩm không tồn tại",
             ], 404);
         }
-
-<<<<<<< HEAD
         $user = JWTAuth::parseToken()->authenticate();
 
         if($request->name != $product->name){
@@ -856,20 +854,7 @@ class ProductController extends Controller
                 'error' => $th->getMessage(),
             ], 500);
         }
-=======
-        return response()->json([
-            'status' => true,
-            'message' => "Yêu cầu của bạn đã được gửi, vui lòng chờ xét duyệt",
-        ], 200);
-    } catch (\Throwable $th) {
-        log_debug($th->getMessage());
-        return response()->json([
-            'status' => false,
-            'message' => "Yêu cầu cập nhật không thành công",
-            'error' => $th->getMessage(),
-        ], 500);
->>>>>>> dab160fa5ed155749558742a1a84c18bb9ab59e8
-    }
+
 
     
     // public function handleUpdateProduct(Request $request, string $id)
