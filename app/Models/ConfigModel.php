@@ -17,7 +17,12 @@ class ConfigModel extends Model
         'thumbnail',
         'main_color',
         'is_active',
-        'create_by'
+        'create_by',
+        'description',
+        'address',
+        'mail',
+        'release_page',
+        'social',
     ];
     public $timestamps = false;
 

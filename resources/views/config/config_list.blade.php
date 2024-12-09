@@ -57,8 +57,16 @@
                                                                     <input type="file" name="icon" id="icon" class="form-control" accept="image/*">
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="thumbnail" class="form-label">ThumBnail</label>
-                                                                    <input type="text" name="thumbnail" id="thumbnail" class="form-control" value="{{ $config->thumbnail }}" required>
+                                                                    <label for="description" class="form-label">Mô tả doanh nghiệp</label>
+                                                                    <input type="text" name="description" id="description" class="form-control" value="{{ $config->description }}" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="address" class="form-label">Địa chỉ doanh nghiệp</label>
+                                                                    <input type="text" name="address" id="address" class="form-control" value="{{ $config->address }}" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="mail" class="form-label">Mail</label>
+                                                                    <input type="text" name="mail" id="mail" class="form-control" value="{{ $config->mail }}" required>
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label for="logo_admin" class="form-label">logo admin</label>
@@ -66,6 +74,11 @@
                                                                         <img src="{{ $config->logo_admin }}" alt="logo_admin" style="max-width: 100px; height: auto;">
                                                                     </div>
                                                                     <input type="file" name="logo_admin" id="logo_admin" class="form-control" accept="image/*">
+                                                                </div>
+                                                                
+                                                                <div class="mb-3">
+                                                                    <label for="thumbnail" class="form-label">ThumBnail</label>
+                                                                    <input type="text" name="thumbnail" id="thumbnail" class="form-control" value="{{ $config->thumbnail }}" required>
                                                                 </div>
                                                                 
                                                                 
