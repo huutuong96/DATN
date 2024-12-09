@@ -267,8 +267,8 @@ class PurchaseController extends Controller
                 
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-                // ProducttocartModel::whereIn('id', $request->carts)->delete();
-                deleteProductToCart::dispatch($request->carts);   
+                ProducttocartModel::whereIn('id', $request->carts)->delete();
+                // deleteProductToCart::dispatch($request->carts);   
                 return response()->json([
                     'status' => true,
                     'message' => 'Đặt hàng thành công',
@@ -277,6 +277,7 @@ class PurchaseController extends Controller
         
             } catch (\Exception $e) {
                 DB::rollBack();
+                log_debug($e->getMessage());
                 return response()->json([
                     'status' => 400,
                     'message' => 'Đặt hàng thất bại',
@@ -591,6 +592,20 @@ class PurchaseController extends Controller
         }
     }
 
+    // private function getProduct($productId, $variantId, $quantity)
+    // {
+    //     $result = Product::with(['variants' => function ($query) use ($variantId) {
+    //         $query->where('id', $variantId);
+    //     }])
+    //         ->where('id', $productId)
+    //         ->first();
+        
+    //     $result->increment('sold_count', $quantity);
+    //     $variant = $result->variants->first();
+
+    //     return $variant;
+
+    // }
     private function getProduct($productId, $variantId, $quantity)
     {
         $product = Product::where('id', $productId)->first();
@@ -613,8 +628,19 @@ class PurchaseController extends Controller
             }
             return $result;
         }
+    
+        // Nếu có `variantId` và không có `productId`, lấy sản phẩm có biến thể
+        if ($variantId && !$productId) {
+            $variant = product_variants::where('id', $variantId)->with('product')->first();
+    
+            if ($variant) {
+                $variant->product->increment('sold_count', $quantity); // Tăng số lượng bán
+                return $variant; // Trả về biến thể
+            }
+        }
+    
+        return null; // Nếu không tìm thấy sản phẩm hoặc biến thể
     }
-
     private function getProductForShip($productId)
     {
         $result = Product::whereIn('id', $productId)->get();
@@ -772,7 +798,7 @@ class PurchaseController extends Controller
     private function createOrderDetail($order, $result, $quantity, $totalPrice, $product_id, $variant_id, $shop_id)
     {
         if ($variant_id == null) {
-            $product = Product::find($result->id); 
+            $product = Product::find($result->id);
             return OrderDetailsModel::create([
                 'order_id' => $order->id,
                 'category_id'=> $product->category_id,

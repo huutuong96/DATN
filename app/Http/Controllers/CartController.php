@@ -206,9 +206,13 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
         }
-        
+
         $tax_category = tax_category::where('category_id', $product->category_id)->first();
-        $taxes = Tax::find($tax_category->tax_id);
+        if (!$tax_category) {
+            return response()->json(['error' => 'Danh mục của sản phẩm này chưa có khai báo thuế'], 404);
+        }
+        $taxes = Tax::where('id',$tax_category->tax_id)->first();
+       
         // $taxAmount = $request->price * $taxes->rate;
         if ($request->variant_id) {
             $productVariant = product_variants::where('id', $request->variant_id)->first();

@@ -16,6 +16,7 @@ class OrderDetailsModel extends Model
         'status',
         'category_id',
         'order_id',
+        'category_id',
         'product_id',
         'variant_id',
         'quantity',

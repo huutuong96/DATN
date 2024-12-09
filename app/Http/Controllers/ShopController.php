@@ -604,11 +604,12 @@ class ShopController extends Controller
         ], 200);
     }
     public function calculatePercentage ($ids){
-        $total = $products_to_cart->count();
-        $counts = $products_to_cart->countBy();
+        $total = $ids->count();
+        $counts = $ids->countBy();
         $percentages = $counts->map(function ($count) use ($total) {
             return round(($count / $total) * 100, 2);
         });
+        return $percentages;
     }
 
     public function get_dashboard_shop(string $id)
@@ -625,19 +626,9 @@ class ShopController extends Controller
         $orders_shipping = OrdersModel::where('shop_id', $shop->id)->where('order_status', 5)->count();
         $orders_delivery_failed = OrdersModel::where('shop_id', $shop->id)->where('order_status', 6)->count();
         $orders_delivered = OrdersModel::where('shop_id', $shop->id)->where('order_status', 7)->count();
-        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
         $orders_refund = OrdersModel::where('shop_id', $shop->id)->where('order_status', 9)->count();
+        $orders_complete = OrdersModel::where('shop_id', $shop->id)->where('order_status', 8)->count();
         $orders_canceled = OrdersModel::where('shop_id', $shop->id)->where('order_status', 10)->count();
-        $products_to_cart = ProducttocartModel::where('shop_id', $shop->id)->pluck('product_id');
-        $total = $products_to_cart->count();
-        $counts = $products_to_cart->countBy();
-        $percentages = $counts->map(function ($count) use ($total) {
-            return round(($count / $total) * 100, 2);
-        });
-        $productNames = $percentages->map(function ($percentage, $productId) {
-            $product = Product::find($productId);
-            return $product ? ['name' => $product->name, 'percentage' => $percentage] : null;
-        })->filter()->values();
         $totalOrder = OrdersModel::where('shop_id', $shop->id)->count();
         $totalProduct = Product::where('shop_id', $shop->id)->count();
         $totalRevenue = OrdersModel::where('shop_id', $shop->id)->sum('net_amount');
@@ -651,7 +642,6 @@ class ShopController extends Controller
             'total_follow' => $totalFollow,
             'total_view' => $totalView,
             'total_rating' => $totalRating,
-            'total_product_to_cart' => $productNames,
             'orders_wait_confirm' => $orders_wait_confirm,
             'orders_confirmed' => $orders_confirmed,
             'orders_prepare' => $orders_prepare,
@@ -666,29 +656,26 @@ class ShopController extends Controller
         ]);
     }
 
-    public function get_voucher_to_shop(string $id)
+    public function get_voucher_to_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse('Shop không tồn tại', null, 404);
         }
 
-        $perPage = 10; // Number of items per page
+        $perPage = $request->limit ?? 10; // Number of items per page
         $voucher_to_shop = VoucherToShop::where('shop_id', $shop->id)
             ->where('status', 1)
             ->paginate($perPage);
 
         return $this->successResponse('Lấy voucher thành công', [
-            'voucher_to_shop' => $voucher_to_shop->items(),
-            'current_page' => $voucher_to_shop->currentPage(),
-            'per_page' => $voucher_to_shop->perPage(),
-            'total' => $voucher_to_shop->total(),
-            'last_page' => $voucher_to_shop->lastPage(),
+            $voucher_to_shop,
         ]);
     }
 
     public function VoucherToShop(Request $request, $shop_id)
     {
+        
         $dataInsert = [
             'title' => $request->title,
             'description' => $request->description,
@@ -698,8 +685,10 @@ class ShopController extends Controller
             'code' => $request->code,
             'shop_id' => $shop_id,
             'status' => $request->status ?? 1,
-            'ratio' => $request->ratio ?? null,
+            'ratio' => is_numeric($request->ratio) ? $request->ratio / 100 : null,
             'price' => $request->ratio ? null : ($request->price ?? null),
+            'min' => $request->min ?? null,
+            'type' => $request->type ?? 1,
         ];
         $VoucherToShop = VoucherToShop::create($dataInsert);
         return $this->successResponse("Tạo Voucher thành công", $VoucherToShop);

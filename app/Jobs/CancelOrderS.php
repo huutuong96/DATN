@@ -53,8 +53,9 @@ class CancelOrderS implements ShouldQueue
             DB::table('log_jobs')->insert([
                 'log' => 'autoCancelOrder for Order ID:'
             ]);
+           
         }
-        
+        check_var('Đ', 200);
         
  
     }

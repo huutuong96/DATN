@@ -52,7 +52,6 @@ class NotificationController extends Controller
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
             $image = $uploadedImage['secure_url'];
         }
-
         if ($request->type === 'main') {
             $notificationToMain = new Notification_to_mainModel();
             $notificationToMain->title = $request->title;
@@ -60,18 +59,9 @@ class NotificationController extends Controller
             $notificationToMain->image = $image ?? null;
             $notificationToMain->shop_id = $request->shop_id;
             $notificationToMain->save();
-            $notification->id_notification = $notificationToMain->id;
-        } elseif ($request->type === 'shop') {
-            $notificationToShops = new Notification_to_shop();
-            $notificationToShops->title = $request->title;
-            $notificationToShops->description = $request->description;
-            $notificationToShops->image = $image ?? null;
-            $notificationToShops->shop_id = $request->shop_id;
-            $notificationToShops->create_by = $user->id;
-            $notificationToShops->save();
 
-            $notification->id_notification = $notificationToShops->id;
-        }
+            $notification->id_notification = $notificationToMain->id;
+        } 
         $notification->save();
 
         return response()->json($notification, 201);
@@ -135,7 +125,7 @@ class NotificationController extends Controller
         EventMail::dispatch();
         return response()->json([
             'status' => 'success',
-            'message' => 'Gửi mail Event thành công'
+            'message' => 'Đang khởi tạo...'
         ], 200);
     }
 

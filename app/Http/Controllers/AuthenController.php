@@ -351,6 +351,40 @@ class AuthenController extends Controller
         }
     }
 
+    public function login_test(Request $request)
+    {
+        try {
+            $credentials = $request->only('email', 'password');
+            try {
+                if (!$token = JWTAuth::attempt($credentials)) {
+                    return response()->json(['error' => 'Tài khoản hoặc mật khẩu không đúng'], 401);
+                }
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'Không thể tạo token'], 500);
+            }
+            $user = UsersModel::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['error' => 'Tài khoản không tồn tại'], 404);
+            }
+            if ($user->status == 101) {
+                return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
+            }
+            $user->refesh_token = $token;
+            $user->save();
+            return response()->json([
+                'status' => true,
+                'message' => 'Đăng nhập thành công',
+                'data' => [
+                    'token' => $token,
+                    'user' => $user,
+                ],
+            ], 200);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json('error', 'Có lỗi xảy ra!');
+        }
+    }
+
 
     public function adminLogin(Request $request)
     {
@@ -973,7 +1007,7 @@ class AuthenController extends Controller
             $token = JWTAuth::fromUser($user);
             $user->refesh_token = $token;
             $user->save();
-            return redirect()->away("https://test.vnshop.top/auth/login?token={$token}");
+            return redirect()->away("http://localhost:3000/auth/verify_google?token={$token}");
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Đăng nhập thành công',
@@ -991,6 +1025,9 @@ class AuthenController extends Controller
                 'password' => Hash::make($googleUser->id),
                 'login_at' => Carbon::now(),
                 'google_id' => $googleUser->id,
+                'role_id' => 1,
+                'rank_id' => 1,
+                'status' => 1,
             ]);
     
             Auth::login($user);
