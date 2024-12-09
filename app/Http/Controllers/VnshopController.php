@@ -171,7 +171,7 @@ class VnshopController extends Controller
         ));
     }
     public function store($limit = 5)
-    {    $shops = Shop::whereIn("status", [1, 2])->with('user')->paginate($limit);
+    {    $shops = Shop::whereIn("status", [1, 2, 4])->with('user')->paginate($limit);
          foreach ($shops as $Key => $shop) {
             $doanhthu = OrdersModel::whereMonth('created_at', Carbon::now()->month)
                                     ->where('shop_id', $shop->id)->sum('net_amount');

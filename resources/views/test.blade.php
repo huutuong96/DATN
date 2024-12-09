@@ -8,6 +8,7 @@
 <body style="background-color: #f8f9fa; font-family: Arial, sans-serif; margin: 0; padding: 0;">
     <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden;">
         <!-- Header -->
+         @dd($orders)
         <div style="background-color: #0e64c1; text-align: center; color: #ffffff; padding: 20px;">
             <img src="https://res.cloudinary.com/dg5xvqt5i/image/upload/v1732077788/igagmdm7troprglewvnz.png" alt="Hình ảnh" style="width: 100px; height: auto;">
             <h1 style="margin: 10px 0; font-size: 24px; font-weight: bold;">Đặt Hàng Thành Công!</h1>
