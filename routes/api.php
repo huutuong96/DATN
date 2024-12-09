@@ -435,3 +435,6 @@ Route::get('/search', function () {
 
         
         Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
+
+
+        Route::get('main/config/client', [configController::class, 'index_client']);
