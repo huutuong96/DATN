@@ -77,6 +77,7 @@ class PurchaseController extends Controller
                     ], 400);
                 }
             }
+            
             // Validate vouchers
             if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
                 return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
@@ -121,8 +122,9 @@ class PurchaseController extends Controller
                     $ordersByShop[$shopId]['items'][] = $cart;
                 }
                 // Process each shop's order
+                // dd("ok");
                 $groupOrderIds = time() . '-' . auth()->id(); // Tạo mã đặc thù cho từng phiên mua hàng
-                foreach ($ordersByShop as $shopId => &$shopOrder) {
+                foreach ($ordersByShop as $shopId => &$shopOrder) { 
                     $ship_id = ShipsModel::where('code', $cart->ship_code)->first();
                     $order = $this->createOrder($request, $ship_id, $groupOrderIds, $payment);
                     $order->shop_id = $shopId;
@@ -770,7 +772,7 @@ class PurchaseController extends Controller
     private function createOrderDetail($order, $result, $quantity, $totalPrice, $product_id, $variant_id, $shop_id)
     {
         if ($variant_id == null) {
-            $product = Product::find($result->id);
+            $product = Product::find($result->id); 
             return OrderDetailsModel::create([
                 'order_id' => $order->id,
                 'category_id'=> $product->category_id,
@@ -787,9 +789,10 @@ class PurchaseController extends Controller
             ]);
         }else {
             $variant = product_variants::find($result->id);
+            $product = Product::find($variant->product_id); 
             return OrderDetailsModel::create([
                 'order_id' => $order->id,
-                'category_id'=> $variant->category_id,
+                'category_id'=>  $product->category_id,
                 'product_id' => $product_id,
                 'variant_id' => $variant_id,
                 'quantity' => $quantity,

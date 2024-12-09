@@ -287,7 +287,7 @@
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Line & Column Charts</h4>
+                    <h4 class="card-title mb-0">Thống kê tổng quát</h4>
                 </div><!-- end card header -->
 
                 <div class="card-body">
@@ -305,7 +305,18 @@
                         }
                         return colors;
                     }
-
+                    // Lấy số ngày trong tháng hiện tại
+                    const now = new Date();
+                    const year = now.getFullYear(); // Năm hiện tại
+                    const month = now.getMonth() + 1; // Tháng hiện tại (getMonth trả về giá trị từ 0-11)
+                    // Hàm để lấy số ngày trong tháng
+                    function getDaysInMonth(year, month) {
+                        return new Date(year, month, 0).getDate(); // Lấy ngày cuối cùng của tháng
+                    }
+                    const xValues1 = Array.from({ length: getDaysInMonth(year, month) }, (_, i) => i + 1);
+                    var red_data = @json($luongtrahangJson);
+                    var green_data = @json($luotmuaJson);
+                    var blue_data = @json($doanhthuJson);
                     // Lấy màu từ data-colors
                     var chartLineColumnColors = getChartColorsArray("chart_line_column_chart");
 
@@ -313,14 +324,19 @@
                     var options = {
                         series: [
                             {
-                                name: "Website Blog",
+                                name: "Doanh thu",
                                 type: "column",
-                                data: [440, 505, 414, 671, 227, 413, 201, 352, 752, 320, 257, 160],
+                                data: blue_data,
                             },
                             {
-                                name: "Social Media",
+                                name: "Lượt Mua hàng",
                                 type: "line",
-                                data: [23, 42, 35, 27, 43, 22, 17, 31, 22, 22, 12, 16],
+                                data: green_data,
+                            },
+                            {
+                                name: "Lượt trả hàng",
+                                type: "line",
+                                data: red_data,
                             },
                         ],
                         chart: {
@@ -331,42 +347,29 @@
                         stroke: {
                             width: [0, 4],
                         },
-                        title: {
-                            text: "Traffic Sources",
-                            style: { fontWeight: 500 },
-                        },
+                        // title: {
+                        //     text: "Thống kê Tổng quát",
+                        //     style: { fontWeight: 500 },
+                        // },
                         dataLabels: {
                             enabled: true,
                             enabledOnSeries: [1],
                         },
-                        labels: [
-                            "01 Jan 2001",
-                            "02 Jan 2001",
-                            "03 Jan 2001",
-                            "04 Jan 2001",
-                            "05 Jan 2001",
-                            "06 Jan 2001",
-                            "07 Jan 2001",
-                            "08 Jan 2001",
-                            "09 Jan 2001",
-                            "10 Jan 2001",
-                            "11 Jan 2001",
-                            "12 Jan 2001",
-                        ],
-                        xaxis: {
-                            type: "datetime",
-                        },
+                        labels: xValues1,
+                        // xaxis: {
+                        //     type: "datetime",
+                        // },
                         yaxis: [
                             {
                                 title: {
-                                    text: "Website Blog",
+                                    text: "Số tiền",
                                     style: { fontWeight: 500 },
                                 },
                             },
                             {
                                 opposite: true,
                                 title: {
-                                    text: "Social Media",
+                                    text: "Số lượng",
                                     style: { fontWeight: 500 },
                                 },
                             },
@@ -424,7 +427,6 @@
         <!-- end col -->
     </div>
     <!-- end row -->
-   
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 <!-- 
@@ -468,7 +470,6 @@ new Chart("myChart", {
 const xValues2 = @json($listCategoryJson);
 const yValues =  @json($listCategorydoanhthu);
 const barColors = @json($listCategoryColors);
-console.log( barColors);
 
 
 new Chart("chart", {

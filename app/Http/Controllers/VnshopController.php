@@ -105,7 +105,7 @@ class VnshopController extends Controller
             $day = $order->created_at->day; 
             if ($day <= Carbon::now()->day) { 
                 if($order->status == 2){
-                    $doanhthu[$day] += ($order->total_amount / 1000000 );
+                    $doanhthu[$day] += ($order->total_amount );
                     if($order->status == 9){
                         $luongtrahang[$day] += 1;
                     }
@@ -155,6 +155,7 @@ class VnshopController extends Controller
             'violet'
         ];
         $listCategoryColors= array_slice($colors, 0, count($listCategoryJson));
+    //  $listCategorydoanhthu = [1,2,3,4,5,6,6];  
         return view('dashboard.dashboard',compact(
             'checkProduct',
             'checkShop',
