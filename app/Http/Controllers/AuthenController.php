@@ -288,6 +288,9 @@ class AuthenController extends Controller
             if ($user->status == 101) {
                 return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
             }
+            if ($user->status == 2) {
+                return response()->json(['error' => 'Tài khoản đã bị khóa'], 401);
+            }
 
             $user->refesh_token = $token;
             // $user->is_login = 1;
