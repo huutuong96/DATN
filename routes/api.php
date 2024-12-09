@@ -235,6 +235,7 @@ Route::get('/search', function () {
                 Route::post('orders/update/{id}', [OrdersController::class, "update"]);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
+                Route::get('order/user/client', [OrdersController::class, "indexOrderToUserNew"]);
                 Route::get('order/user/detail/{id}', [OrdersController::class, "OrderToUserDetail"]);
                 Route::get('order/shop/detail/{id}', [OrdersController::class, "OrderToShopDetail"]);
                 Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);
