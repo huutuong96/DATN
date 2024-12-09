@@ -1,6 +1,11 @@
 @extends('index')
 @section('title', 'Tổng quan')
+@section('link')
+<!-- ApexCharts Library -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+
+@endsection
 @section('main')
 
 
@@ -286,8 +291,103 @@
                 </div><!-- end card header -->
 
                 <div class="card-body">
-                    <canvas id="myChart"></canvas>
+                    <div id="chart_line_column_chart" data-colors='["--vz-primary", "--vz-success"]' class="apex-charts" dir="ltr"></div>
                 </div><!-- end card-body -->
+                <script>
+                    // Hàm lấy màu từ thuộc tính data-colors
+                    function getChartColorsArray(chartId) {
+                        var colors = document.getElementById(chartId).getAttribute("data-colors");
+                        if (colors) {
+                            colors = JSON.parse(colors).map(function(value) {
+                                var newValue = getComputedStyle(document.documentElement).getPropertyValue(value.trim());
+                                return newValue ? newValue.trim() : value;
+                            });
+                        }
+                        return colors;
+                    }
+                    // Lấy số ngày trong tháng hiện tại
+                    const now = new Date();
+                    const year = now.getFullYear(); // Năm hiện tại
+                    const month = now.getMonth() + 1; // Tháng hiện tại (getMonth trả về giá trị từ 0-11)
+                    // Hàm để lấy số ngày trong tháng
+                    function getDaysInMonth(year, month) {
+                        return new Date(year, month, 0).getDate(); // Lấy ngày cuối cùng của tháng
+                    }
+                    const xValues1 = Array.from({ length: getDaysInMonth(year, month) }, (_, i) => i + 1);
+                    var red_data = @json($luongtrahangJson);
+                    var green_data = @json($luotmuaJson);
+                    var blue_data = @json($doanhthuJson);
+                    // Lấy màu từ data-colors
+                    var chartLineColumnColors = getChartColorsArray("chart_line_column_chart");
+
+                    // Cấu hình biểu đồ
+                    var options = {
+                        series: [
+                            {
+                                name: "Doanh thu",
+                                type: "column",
+                                data: blue_data,
+                            },
+                            {
+                                name: "Lượt Mua hàng",
+                                type: "line",
+                                data: green_data,
+                            },
+                            {
+                                name: "Lượt trả hàng",
+                                type: "line",
+                                data: red_data,
+                            },
+                        ],
+                        chart: {
+                            height: 350,
+                            type: "line",
+                            toolbar: { show: false },
+                        },
+                        stroke: {
+                            width: [0, 4],
+                        },
+                        // title: {
+                        //     text: "Thống kê Tổng quát",
+                        //     style: { fontWeight: 500 },
+                        // },
+                        dataLabels: {
+                            enabled: true,
+                            enabledOnSeries: [1],
+                        },
+                        labels: xValues1,
+                        // xaxis: {
+                        //     type: "datetime",
+                        // },
+                        yaxis: [
+                            {
+                                title: {
+                                    text: "Số tiền",
+                                    style: { fontWeight: 500 },
+                                },
+                            },
+                            {
+                                opposite: true,
+                                title: {
+                                    text: "Số lượng",
+                                    style: { fontWeight: 500 },
+                                },
+                            },
+                        ],
+                        colors: chartLineColumnColors,
+                    };
+
+                    // Khởi tạo biểu đồ
+                    var chart = new ApexCharts(document.querySelector("#chart_line_column_chart"), options);
+                    chart.render();
+                </script>
+
+                <!-- <div class="card-header">
+                    <h4 class="card-title mb-0">Thống kê tổng quát</h4>
+                </div> 
+                <div class="card-body">
+                    <canvas id="myChart"></canvas>
+                </div>
                 <div class="card-footer">
                     <ul style="display: flex; list-style-type: none; padding: 0; margin: 0;">
                         <li style="margin-right: 10px;">
@@ -303,7 +403,7 @@
                             Doanh thu * 1.000.000 vnd 
                         </li>
                     </ul>
-                </div>
+                </div> -->
 
             </div><!-- end card -->
         </div>
@@ -327,10 +427,9 @@
         <!-- end col -->
     </div>
     <!-- end row -->
-   
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-
+<!-- 
 <script>
 const xValues1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 
@@ -365,13 +464,12 @@ new Chart("myChart", {
     legend: { display: false }
   }
 });
-</script>
+</script> -->
 
 <script>
 const xValues2 = @json($listCategoryJson);
 const yValues =  @json($listCategorydoanhthu);
 const barColors = @json($listCategoryColors);
-console.log( barColors);
 
 
 new Chart("chart", {

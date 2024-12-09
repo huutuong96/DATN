@@ -14,6 +14,7 @@ class OrderDetailsModel extends Model
     protected $fillable = [
         'subtotal',
         'status',
+        'category_id',
         'order_id',
         'category_id',
         'product_id',

@@ -45,6 +45,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         '320163ac6b93aebe3dc25b60a0533d56' => __DIR__ . '/..' . '/spatie/laravel-ignition/src/helpers.php',
         '97266e347e26a0f49e48c4ceb769bdde' => __DIR__ . '/../..' . '/app/Helpers/log.php',
         '4eb1262a0a645b109aafb0fa32522bcd' => __DIR__ . '/../..' . '/app/Helpers/beta.php',
+        'bf727355f3f1327711a5aa6e6e43526a' => __DIR__ . '/../..' . '/app/Helpers/alpha.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -911,6 +912,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'App\\Jobs\\UploadImagesJob' => __DIR__ . '/../..' . '/app/Jobs/UploadImagesJob.php',
         'App\\Jobs\\autoCancelOrder' => __DIR__ . '/../..' . '/app/Jobs/autoCancelOrder.php',
         'App\\Jobs\\changeConfig' => __DIR__ . '/../..' . '/app/Jobs/changeConfig.php',
+        'App\\Jobs\\checkWebDie' => __DIR__ . '/../..' . '/app/Jobs/checkWebDie.php',
         'App\\Jobs\\check_time_event' => __DIR__ . '/../..' . '/app/Jobs/check_time_event.php',
         'App\\Jobs\\deleteProductToCart' => __DIR__ . '/../..' . '/app/Jobs/deleteProductToCart.php',
         'App\\Jobs\\sendMailBirthDay' => __DIR__ . '/../..' . '/app/Jobs/sendMailBirthDay.php',

@@ -115,7 +115,7 @@ Route::get('/search', function () {
                 });
                 
                
-        Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
+  
                 
                
                 Route::resource('faqs', FAQController::class)->middleware('CheckRole');
@@ -418,7 +418,7 @@ Route::get('/search', function () {
             return view('swagger');
         });
 
-        Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
+        // Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
 
         // TRUY CẬP ADMIN SÀN VNSHOP
         Route::post('admin/login', [AuthenController::class, "adminLogin"])->name('adminLogin');
@@ -430,7 +430,11 @@ Route::get('/search', function () {
 
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
         Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
-
+        Route::post('login_test', [AuthenController::class, "login_test"])->name('login_test');
         // Route::get('/check_product', [ProductController::class, 'check_product']);
 
         
+        Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
+
+
+        Route::get('main/config/client', [configController::class, 'index_client']);

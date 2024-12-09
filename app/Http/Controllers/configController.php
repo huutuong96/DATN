@@ -19,6 +19,20 @@ class configController extends Controller
     return view('config.config_list', compact('configs', 'information'));
 }
 
+public function index_client()
+{
+
+    $configs = ConfigModel::all();
+    $information = json_decode($configs[0]);
+    return response()->json(
+        [
+            'status' => true,
+            'message' => "Lấy dữ liệu thành công",
+            'data' => $information,
+        ]
+    );
+}
+
     public function is_active()
     {
         $active = ConfigModel::where('is_active', 1)->first();

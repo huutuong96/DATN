@@ -55,7 +55,7 @@ class CancelOrderS implements ShouldQueue
             ]);
            
         }
-        
+        check_var('Đ', 200);
         
  
     }

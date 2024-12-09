@@ -656,24 +656,20 @@ class ShopController extends Controller
         ]);
     }
 
-    public function get_voucher_to_shop(string $id)
+    public function get_voucher_to_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse('Shop không tồn tại', null, 404);
         }
 
-        $perPage = 10; // Number of items per page
+        $perPage = $request->limit ?? 10; // Number of items per page
         $voucher_to_shop = VoucherToShop::where('shop_id', $shop->id)
             ->where('status', 1)
             ->paginate($perPage);
 
         return $this->successResponse('Lấy voucher thành công', [
-            'voucher_to_shop' => $voucher_to_shop->items(),
-            'current_page' => $voucher_to_shop->currentPage(),
-            'per_page' => $voucher_to_shop->perPage(),
-            'total' => $voucher_to_shop->total(),
-            'last_page' => $voucher_to_shop->lastPage(),
+            $voucher_to_shop,
         ]);
     }
 
@@ -689,8 +685,9 @@ class ShopController extends Controller
             'code' => $request->code,
             'shop_id' => $shop_id,
             'status' => $request->status ?? 1,
-            'ratio' => is_numeric($request->percent) ? $request->percent / 100 : null,
-            'price' => $request->percent ? null : ($request->price ?? null),
+            'ratio' => is_numeric($request->ratio) ? $request->ratio / 100 : null,
+            'price' => $request->ratio ? null : ($request->price ?? null),
+            'min' => $request->min ?? null,
             'type' => $request->type ?? 1,
         ];
         $VoucherToShop = VoucherToShop::create($dataInsert);
