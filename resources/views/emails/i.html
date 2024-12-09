@@ -35,9 +35,11 @@
                                 @if($orderDetail->product_id == $product->id)
                                     <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
                                         <span>
-                                            <img src="{{$product->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                            {{$product->name ?? null}} x{{$orderDetail->quantity ?? null}}
+                                            <div><img src="{{$product->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;"></div>
+                                           
+                                           
                                         </span>
+                                        <div> {{$product->name ?? null}} X {{$orderDetail->quantity ?? null}}</div>
                                         <span style="font-weight: bold;">{{$orderDetail->subtotal ?? null}}</span>
                                     </li>
                                 @endif
@@ -45,13 +47,15 @@
                         @elseif($orderDetail->variant_id != null)
                             @foreach($variants as $variant)
                                 @if($orderDetail->variant_id == $variant->id)
-                                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
-                                        <span>
-                                            <img src="{{$product->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                            {{$variant->name ?? null}} x{{$orderDetail->quantity ?? null}}
-                                        </span>
-                                        <span style="font-weight: bold;">{{$orderDetail->subtotal ?? null}}</span>
-                                    </li>
+                                <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                                    <span>
+                                        <div><img src="{{$variant->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;"></div>
+                                       
+                                       
+                                    </span>
+                                    <div> {{$variant->name ?? null}} X {{$orderDetail->quantity ?? null}}</div>
+                                    <span style="font-weight: bold;">{{$orderDetail->subtotal ?? null}}</span>
+                                </li>
                                 @endif
                             @endforeach
                         @endif
@@ -71,16 +75,16 @@
                         <span style="font-weight: bold;">{{number_format($shipFee) ?? 0}} đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">Giảm giá thành viên:
-                        <span style="font-weight: bold;">{{$order->disscount_by_rank ?? null}} đ</span>
+                        <span style="font-weight: bold;">{{$order->disscount_by_rank ?? 0}} đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">Mã giảm giá cửa hàng:
-                        <span style="font-weight: bold;">{{$order->voucher_shop_disscount ?? null}} đ</span>
+                        <span style="font-weight: bold;">{{$order->voucher_shop_disscount ?? 0}} đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">Mã giảm giá VNSHOP:
-                        <span style="font-weight: bold;">{{$order->voucher_main_disscount ?? null}} đ</span>
+                        <span style="font-weight: bold;">{{$order->voucher_main_disscount ?? 0}} đ</span>
                     </p>
                     <p style="margin: 0 0 10px;"><strong>Tổng tiền:</strong>
-                        <span style="color: #dc3545; font-weight: bold;">{{$order->total_amount ?? null}} đ</span>
+                        <span style="color: #dc3545; font-weight: bold;">{{$order->total_amount ?? 0}} đ</span>
                     </p>
                 </div>
             </div>

@@ -928,7 +928,6 @@ class PurchaseController extends Controller
             "to_district"=> $addressUser->district_id
         ]);
         $service = $response->json();
-        dd($service);
         return $service['data'];
     }
 

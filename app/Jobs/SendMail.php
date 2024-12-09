@@ -50,6 +50,7 @@ class SendMail implements ShouldQueue
      */
     public function handle(): void
     {
+        // dd($this->orders);
             Mail::to($this->email)->send(new ConfirmOderToCart($this->orders, $this->total_amount, $this->carts, $this->orderDetails, $this->shipFee, $this->products, $this->variants, $this->email, $this->paymentMethod, $this->user, $this->disscount));
     }
 }
