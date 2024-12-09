@@ -669,11 +669,7 @@ class ShopController extends Controller
             ->paginate($perPage);
 
         return $this->successResponse('Lấy voucher thành công', [
-            'voucher_to_shop' => $voucher_to_shop->items(),
-            'current_page' => $voucher_to_shop->currentPage(),
-            'per_page' => $voucher_to_shop->perPage(),
-            'total' => $voucher_to_shop->total(),
-            'last_page' => $voucher_to_shop->lastPage(),
+            $voucher_to_shop,
         ]);
     }
 

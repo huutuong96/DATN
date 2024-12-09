@@ -376,6 +376,7 @@ class AuthenController extends Controller
                 'message' => 'Đăng nhập thành công',
                 'data' => [
                     'token' => $token,
+                    'user' => $user,
                 ],
             ], 200);
         } catch (\Throwable $th) {
