@@ -111,7 +111,7 @@ class EventMail implements ShouldQueue
                                     $voucher->save();
                         }
                         
-                        Banner::where('status', 2)->update(['status' => 5]);
+                        Banner::where('status', 2)->update(['status' => 15]);
                         foreach ($images as $image) {
                             $BannerEvent = [
                                 'title' => $events->event_title ?? "Mừng ngày $today",

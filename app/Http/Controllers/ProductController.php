@@ -114,7 +114,6 @@ class ProductController extends Controller
                 'data' => $products,
             ]
         );
-        return $products;
     }
 
     public function getProductToSlug($slug) {
@@ -1421,7 +1420,13 @@ public function ProductAll(Request $request)
             }else {
                 $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
             }
-            return response()->json(['release_products' => $products]);
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Lấy dữ liệu thành công",
+                    'data' => $products,
+                ]
+            );
             
         } catch (\Throwable $th) {
             log_debug($th->getMessage());

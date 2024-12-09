@@ -37,8 +37,8 @@ class check_time_event implements ShouldQueue
                 $event->save();
                 check_var($event->event_title. " Đã kết thúc", 201);
             }
-            $event_is_active_banner = Banner::where('status', 2)->update(['status' => 6]);
-            $rollback_banner = Banner::where('status', 5)->update(['status' => 2]);
+            $event_is_active_banner = Banner::where('status', 2)->update(['status' => 16]);
+            $rollback_banner = Banner::where('status', 15)->update(['status' => 2]);
             $voucher_is_active = voucherToMain::where('is_event', 1)->delete();            
         } catch (\Throwable $th) {
             check_var($th->getMessage(), 400);
