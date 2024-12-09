@@ -39,6 +39,10 @@ class EventMail implements ShouldQueue
                     'log' => 'EventMail ',
                 ]);
                 $events = events::where('event_day', date('d'))->where('event_month', date('m'))->where('status', 2 )->first();
+                if (!$events) {
+                    check_var('Không có sự kiện nào', 404);
+                    return;
+                }
                 $voucherData = json_decode($events->voucher_apply);
                 $images = json_decode($events->images);
                 $queryUser = UsersModel::query();

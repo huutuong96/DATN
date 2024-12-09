@@ -430,7 +430,8 @@ Route::get('/search', function () {
 
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
         Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
-
+        Route::get('login_test', [AuthenController::class, "login_test"])->name('login_test');
         // Route::get('/check_product', [ProductController::class, 'check_product']);
 
+        
         

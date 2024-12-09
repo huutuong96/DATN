@@ -11,11 +11,14 @@ if (!function_exists('check_var')) {
 
         if ($status == 200) {
             $message = "🚀 Sự kiện của sàn đã bắt đầu rồi nè: " . $message;
-        } elseif ($status == 201) {
+        }
+        if ($status == 201) {
             $message = "❤️" . $message;
         }
-
-        elseif($status == 400) {
+        if ($status == 404) {
+            $message = "🎉" . $message;
+        }
+        if($status == 400) {
             $message = "🔥 Oh! Sự kiện không chạy nè: " . $message;
         }
 
