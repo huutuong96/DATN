@@ -54,6 +54,9 @@ public function index_client()
             ]),
             'main_color' => $request->main_color ?? '',
             'is_active' => $request->is_active ?? 0,
+            'mail' => $request->mail,
+            'address' => $request->address,
+            'description' => $request->description,
         ];
         // dd($inserData);
         $config = ConfigModel::create($inserData);
@@ -97,6 +100,9 @@ public function index_client()
             $config->icon = $this->storeImage($request->icon);
         }
         $config->thumbnail = $request->thumbnail ?? $config->thumbnail;
+        $config->mail = $request->mail ?? $config->mail;
+        $config->address = $request->address ?? $config->address;
+        $config->description = $request->description ?? $config->description;
         $config->save();
     
         return back()->with('message', 'Đã cập nhật thành công');
