@@ -95,54 +95,9 @@ use Illuminate\Support\Str;
  */
 class AuthenController extends Controller
 {
-/**
- * @OA\Get(
- *     path="api/users",
- *     summary="Get list of active users",
- *     description="Retrieves a paginated list of users with status 1.",
- *     tags={"Authentication"},
- *     @OA\Response(
- *         response=200,
- *         description="Data retrieved successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thành công"),
- *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="current_page", type="integer", example=1),
- *                 @OA\Property(property="data", type="array",
- *                     @OA\Items(
- *                         @OA\Property(property="id", type="integer", example=1),
- *                         @OA\Property(property="fullname", type="string", example="John Doe"),
- *                         @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *                         @OA\Property(property="status", type="integer", example=1),
- *                         @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-01T12:00:00Z"),
- *                         @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-01T12:00:00Z")
- *                     )
- *                 ),
- *                 @OA\Property(property="first_page_url", type="string", example="http://example.com?page=1"),
- *                 @OA\Property(property="from", type="integer", example=1),
- *                 @OA\Property(property="last_page", type="integer", example=10),
- *                 @OA\Property(property="last_page_url", type="string", example="http://example.com?page=10"),
- *                 @OA\Property(property="next_page_url", type="string", example="http://example.com?page=2"),
- *                 @OA\Property(property="path", type="string", example="http://example.com"),
- *                 @OA\Property(property="per_page", type="integer", example=20),
- *                 @OA\Property(property="prev_page_url", type="string", example=null),
- *                 @OA\Property(property="to", type="integer", example=20),
- *                 @OA\Property(property="total", type="integer", example=200)
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Data retrieval failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thất bại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
+
+
+
     public function index()
     {
         try {
