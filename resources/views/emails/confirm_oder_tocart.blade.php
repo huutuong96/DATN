@@ -35,8 +35,9 @@
                                     <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
                                         <span>
                                             <img src="{{$product->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                            {{$product->name ?? null}} x{{$orderDetail->quantity ?? null}}
+                                           
                                         </span>
+                                        {{$product->name ?? null}} x{{$orderDetail->quantity ?? null}}
                                         <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
                                     </li>
                                 @endif
@@ -47,8 +48,9 @@
                                         <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
                                             <span>
                                                 <img src="{{$cart->variant_image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                                {{ \Illuminate\Support\Str::words($cart->product_name ?? '', 7, '...') }} x{{$orderDetail->quantity ?? null}}
+                                               
                                             </span>
+                                            {{ \Illuminate\Support\Str::words($cart->product_name ?? '', 7, '...') }} x{{$orderDetail->quantity ?? null}}
                                             <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
                                         </li>
                                     @endif
@@ -59,25 +61,25 @@
                 <!-- Summary -->
                 <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                     <p style="margin: 0 0 10px;">Tổng tiền hàng:
-                        <span style="font-weight: bold;">{{number_format($subTotal ?? $order->total_amount)}} đ</span>
+                        <span style="font-weight: bold;">{{number_format($subTotal ?? $order->total_amount)}}đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">VAT:
-                        <span style="font-weight: bold;">{{number_format($order->vat ?? 0)}} đ</span>
+                        <span style="font-weight: bold;">{{number_format($order->vat ?? 0)}}đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">Phí vận chuyển:
-                        <span style="font-weight: bold;">{{number_format($shipFee) ?? 0}} đ</span>
+                        <span style="font-weight: bold;">{{number_format($shipFee) ?? 0}}đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">Giảm giá thành viên:
-                        <span style="font-weight: bold;">{{$order->disscount_by_rank ?? 0}} đ</span>
+                        <span style="font-weight: bold;">{{number_format($order->disscount_by_rank ?? 0)}}đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">Mã giảm giá cửa hàng:
-                        <span style="font-weight: bold;">{{$order->voucher_shop_disscount ?? 0}} đ</span>
+                        <span style="font-weight: bold;">{{number_format($order->voucher_shop_disscount ?? 0)}}đ</span>
                     </p>
                     <p style="margin: 0 0 10px;">Mã giảm giá VNSHOP:
-                        <span style="font-weight: bold;">{{$order->voucher_main_disscount ?? 0}} đ</span>
+                        <span style="font-weight: bold;">{{number_format($order->voucher_main_disscount ?? 0)}}đ</span>
                     </p>
                     <p style="margin: 0 0 10px;"><strong>Tổng tiền:</strong>
-                        <span style="color: #dc3545; font-weight: bold;">{{$order->total_amount ?? 0}} đ</span>
+                        <span style="color: #dc3545; font-weight: bold;">{{number_format($order->total_amount ?? 0)}}đ</span>
                     </p>
                 </div>
             </div>
