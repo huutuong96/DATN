@@ -42,7 +42,6 @@ class SendMail implements ShouldQueue
         $this->paymentMethod = $paymentMethod;
         $this->user = $user;
         $this->disscount = $disscount ?? 0;
-        $this->handle();
     }
 
     /**

@@ -21,18 +21,15 @@
             <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                 <p style="margin: 0 0 10px;"><strong>Mã đơn hàng:</strong> {{$order->group_order_id}}</p>
                 <p style="margin: 0 0 10px;"><strong>Ngày đặt hàng:</strong> {{$order->created_at}}</p>
+                <p style="margin: 0 0 10px;"><strong>Phương thức thanh toán:</strong> {{$paymentMethod}}</p>
             </div>
-            @dd($orderDetails)
             <!-- Product Details -->
             <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                 <h4 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Chi tiết sản phẩm</h4>
                 <ul style="list-style: none; padding: 0; margin: 0;">
                     @foreach($orderDetails as $orderDetail)
-                    @if($orderDetail->product_id == 627)
-                    @dd($orderDetail)
-                    @endif
                     @if($orderDetail->order_id == $order->id)
-                        @if(empty($orderDetail->variant_id))
+                        @if(!$orderDetail->variant_id )
                             @foreach($products as $product)
                                 @if($orderDetail->product_id == $product->id)
                                     <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
@@ -40,31 +37,25 @@
                                             <img src="{{$product->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
                                             {{$product->name ?? null}} x{{$orderDetail->quantity ?? null}}
                                         </span>
-                                        <span style="font-weight: bold;">{{$orderDetail->subtotal ?? null}}</span>
+                                        <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
                                     </li>
                                 @endif
                             @endforeach
-                        @else
-                        
-                            @if($variants)
-                            
-                                @foreach($variants as $variant)
-                                    @if($orderDetail->variant_id == $variant->id)
+                        @else 
+                                @foreach($carts as $cart)
+                                    @if($cart->product_id == $orderDetail->product_id)
                                         <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
                                             <span>
-                                                <img src="{{$variant->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                                {{$variant->name ?? null}} x{{$orderDetail->quantity ?? null}}
+                                                <img src="{{$cart->variant_image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
+                                                {{ \Illuminate\Support\Str::words($cart->product_name ?? '', 7, '...') }} x{{$orderDetail->quantity ?? null}}
                                             </span>
-                                            <span style="font-weight: bold;">{{$orderDetail->subtotal ?? null}}</span>
+                                            <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
                                         </li>
                                     @endif
                                 @endforeach
-                            @endif
                         @endif
                     @endif
                     @endforeach
-                </ul>
-
                 <!-- Summary -->
                 <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                     <p style="margin: 0 0 10px;">Tổng tiền hàng:

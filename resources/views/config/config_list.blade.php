@@ -68,6 +68,7 @@
                                                                     <label for="mail" class="form-label">Mail</label>
                                                                     <input type="text" name="mail" id="mail" class="form-control" value="{{ $config->mail }}" required>
                                                                 </div>
+                                                              
                                                                 <div class="mb-3">
                                                                     <label for="logo_admin" class="form-label">logo admin</label>
                                                                     <div>
