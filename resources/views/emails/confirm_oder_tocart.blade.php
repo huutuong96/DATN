@@ -27,8 +27,7 @@
             <!-- Product Details -->
             <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                 <h4 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Chi tiết sản phẩm</h4>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                   @dd($orderDetails);
+                <ul style="list-style: none; padding: 0; margin: 0;"> 
                     @foreach($orderDetails as $orderDetail)
                     @if($orderDetail->order_id == $order->id)
                         @if(empty($orderDetail->variant_id))
