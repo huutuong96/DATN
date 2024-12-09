@@ -242,7 +242,7 @@
                                                         
                                                             <!-- Modal Chi tiết sản phẩm -->
                                                             <div class="modal fade" id="detailsModal-{{ $user->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $user->id }}" aria-hidden="true">
-                                                                <div class="modal-dialog modal-lg">
+                                                                <div class="modal-dialog modal-xl">
                                                                     <div class="modal-content">
                                                                         <div class="modal-header">
                                                                             <h5 class="modal-title" id="detailsModalLabel-{{ $user->id }}">Thông tin tài khoản</h5>
@@ -333,8 +333,8 @@
                                                                                     </tbody>
                                                                                 </table>
                                                                             </div>
-                                                                            </div>
-                                                                        </div>
+                                                                         </div>
+                                                                       
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                                         </div>

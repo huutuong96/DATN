@@ -87,6 +87,10 @@ public function index_client()
     // }
     public function update(request $request, string $id)
     {
+        $thumbnail = [
+            'name' =>  $request->name,
+            'phone' =>  $request->phone
+        ];
         $config = ConfigModel::findOrFail($id);
         $config->main_color = $request->main_color ?? $config->main_color;
         $config->is_active = $request->has('is_active') ? 1 : 0;
@@ -99,7 +103,7 @@ public function index_client()
         if ($request->hasFile('icon')) {
             $config->icon = $this->storeImage($request->icon);
         }
-        $config->thumbnail = $request->thumbnail ?? $config->thumbnail;
+        $config->thumbnail = json_encode($thumbnail);
         $config->mail = $request->mail ?? $config->mail;
         $config->address = $request->address ?? $config->address;
         $config->description = $request->description ?? $config->description;
