@@ -144,7 +144,7 @@
                                             <th scope="col">ID</th>
                                             <th scope="col">Ảnh đại diện</th>
                                             <th scope="col">Thông tin tài khoản</th>
-                                            <th scope="col">Địa chỉ</th>
+                                            {{-- <th scope="col">Địa chỉ</th> --}}
                                             <th scope="col">Ngày tạo</th>
                                             
                                             <th scope="col ">Hành động</th>
@@ -166,18 +166,21 @@
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$user->fullname ?? 'No Name'}}</span>
                                                             @if( optional($user->role)->title == "OWNER")
-                                                            <span class="badge bg-success text-white" style="font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
+                                                            <span class="badge bg-success text-white" style="width:200px; font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
                                                             @else
                                                             <span class="badge bg-info text-white" style="font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
                                                             @endif
                                                         </div>
                                                     </td>
-                                                    <td>
+                                                    {{-- <td>
                                                         @foreach($user->address as $address)
                                                             *. {{ $address->district }}_{{ $address->ward }}_{{ $address->address }}<br>
                                                         @endforeach
+                                                    </td> --}}
+                                                    <td>
+                                                        {{ $user->created_at}}
+                                                        {{-- {{ $user->status}} --}}
                                                     </td>
-                                                    <td>{{ $user->created_at}}</td>
                                                     
                                                     <td>
                                                     <ul class="list-inline">
@@ -194,19 +197,29 @@
                                                                     <i class="ri-lock-line align-middle"></i>
                                                                 </button>                                                                </a>
                                                             </li>
-                                                        @elseif ($user->status == 2)
+                                                            <li class="list-inline-item">
+                                                                <a 
+                                                                    href="{{ route('change_user', [
+                                                                                                        'token' => auth()->user()->refesh_token,
+                                                                                                        'id' => $user->id,
+                                                                                                        'status' => 4,
+                                                                                                        ]) }}"
+                                                                >
+                                                                <button type="button" class="btn btn-warning" title="Vi phạm"> <i class="ri-error-warning-line align-middle"></i></button>
+                                                            </li>
+                                                        @elseif($user->status == 4 ||  $user->status ==  2)
                                                             <li class="list-inline-item">
                                                             <a 
                                                                 href="{{ route('change_user', [
                                                                                                     'token' => auth()->user()->refesh_token,
                                                                                                     'id' => $user->id,
-                                                                                                    'status' => 2,
+                                                                                                    'status' => 1,
                                                                                                     ]) }}"
                                                             >
                                                             <button type="button" class="btn btn-success" title="mở"> <i class="ri-check-line align-middle"></i></button>
                                                             </li>
                                                         @endif
-                                                            
+                                                        
                                                         <li class="list-inline-item">
                                                             <a 
                                                                     href="{{ route('change_user', [
@@ -229,7 +242,7 @@
                                                         
                                                             <!-- Modal Chi tiết sản phẩm -->
                                                             <div class="modal fade" id="detailsModal-{{ $user->id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $user->id }}" aria-hidden="true">
-                                                                <div class="modal-dialog modal-lg">
+                                                                <div class="modal-dialog modal-xl">
                                                                     <div class="modal-content">
                                                                         <div class="modal-header">
                                                                             <h5 class="modal-title" id="detailsModalLabel-{{ $user->id }}">Thông tin tài khoản</h5>
@@ -320,8 +333,8 @@
                                                                                     </tbody>
                                                                                 </table>
                                                                             </div>
-                                                                            </div>
-                                                                        </div>
+                                                                         </div>
+                                                                       
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                                         </div>

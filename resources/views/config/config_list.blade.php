@@ -78,8 +78,12 @@
                                                                 </div>
                                                                 
                                                                 <div class="mb-3">
-                                                                    <label for="thumbnail" class="form-label">ThumBnail</label>
-                                                                    <input type="text" name="thumbnail" id="thumbnail" class="form-control" value="{{ $config->thumbnail }}" required>
+                                                                    <label for="thumbnail" class="form-label">name</label>
+                                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $information->name }}" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="thumbnail" class="form-label">phone</label>
+                                                                    <input type="text" name="phone" id="phone" class="form-control" value="{{ $information->phone }}" required>
                                                                 </div>
                                                                 
                                                                 
@@ -120,14 +124,13 @@
                                     
                                     <h5 class="card-title">Thông tin khác</h5>
                                     <p class="mb-1"><strong>Tên Người Đại Diện:</strong> {{$information->name}}</p>
-                                    <p class="mb-1"><strong>Email:</strong> <a href="mailto:hoang@gmail.com">{{$information->mail}}</a></p>
+                                    <p class="mb-1"><strong>Email:</strong> <a href="mailto:hoang@gmail.com">{{$config->mail}}</a></p>
                                     <p class="mb-0"><strong>Đường dây nóng:</strong> <a href="tel:01122334455">{{$information->phone}}</a></p>
-                                    ...
                                 </div>
                             </div>
                             <div class="col-4">
                                     <div>
-                                        <h4>logo header</h4>
+                                        <h4>logo header</h4
                                         <div class="card">
                                             <img src="{{ $config->logo_header }}"  
                                                 alt="Promotional Banner" class="card-img-top">

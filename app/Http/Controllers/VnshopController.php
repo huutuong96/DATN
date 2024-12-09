@@ -596,7 +596,7 @@ class VnshopController extends Controller
         $customer_id = RolesModel::where('title', '!=', 'CUSTOMER')->pluck('id');
         // ->where('title', '!=', 'OWNER')
         // dd($customer_id);
-        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1, 2])->whereIn('role_id', $customer_id)->paginate($limit);
+        $users = UsersModel::orderBy('created_at', 'desc')->with('address')->with('rank')->whereIn("status", [1,2,4])->whereIn('role_id', $customer_id)->paginate($limit);
         $roles = RolesModel::all();
         // dd($roles[0]->title);
         // dd($users);
