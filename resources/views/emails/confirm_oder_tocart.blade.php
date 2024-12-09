@@ -19,6 +19,7 @@
             @foreach($orders as $order)
             <!-- Order Info -->
             <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
+                <p style="margin: 0 0 10px;"><strong><h1>{{$order->shop->shop_name}}</h1></strong></p>
                 <p style="margin: 0 0 10px;"><strong>Mã đơn hàng:</strong> {{$order->group_order_id}}</p>
                 <p style="margin: 0 0 10px;"><strong>Ngày đặt hàng:</strong> {{$order->created_at}}</p>
                 <p style="margin: 0 0 10px;"><strong>Phương thức thanh toán:</strong> {{$paymentMethod}}</p>
