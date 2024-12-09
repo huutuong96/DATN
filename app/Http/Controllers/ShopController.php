@@ -656,14 +656,14 @@ class ShopController extends Controller
         ]);
     }
 
-    public function get_voucher_to_shop(string $id)
+    public function get_voucher_to_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse('Shop không tồn tại', null, 404);
         }
 
-        $perPage = 10; // Number of items per page
+        $perPage = $request->limit ?? 10; // Number of items per page
         $voucher_to_shop = VoucherToShop::where('shop_id', $shop->id)
             ->where('status', 1)
             ->paginate($perPage);
