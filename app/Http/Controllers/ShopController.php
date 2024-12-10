@@ -577,9 +577,55 @@ class ShopController extends Controller
         $limit = $request->input('limit', 10); 
         $limit = is_numeric($limit) && $limit > 0 ? (int)$limit : 10;
     
-        $query = Product::where('shop_id', $shop->id)->orderby('updated_at', 'desc');
+        $query = Product::where('shop_id', $shop->id)->select('name', 'sku', 'description');
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+            $q->where('name', 'LIKE', "%{$search}%")
+              ->orWhere('sku', 'LIKE', "%{$search}%")
+              ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
+        if (request()->has('sort')) {
+            $sort = request()->input('sort');
+            switch ($sort) {
+            case 'price':
+                $query->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED ) ELSE CAST(show_price AS UNSIGNED) END'), 'asc');                
+                break;
+            case '-price':
+                $query->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED ) ELSE CAST(show_price AS UNSIGNED) END'), 'desc');                
+                break;
+            case 'updated_at':
+                $query->orderBy('updated_at', 'asc');
+                break;
+            case '-updated_at':
+                $query->orderBy('updated_at', 'desc');
+                break;
+            case 'quantity':
+                $query->orderBy('quantity', 'asc');
+                break;
+            case '-quantity':
+                $query->orderBy('quantity', 'desc');
+                break;
+            case 'name':
+                $query->orderBy('name', 'asc');
+                break;
+            case '-name':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'sold_count':
+                $query->orderBy('sold_count', 'asc');
+                break;
+            case '-sold_count':
+                $query->orderBy('sold_count', 'desc');
+                break;
+            default:
+                break;
+            }
         }
     
         if ($request->has('status')) {
@@ -597,7 +643,7 @@ class ShopController extends Controller
             $product->appends(['status' => $request->status]);
         }
     
-        $product->load('variants', 'attributes');
+        // $product->load('variants', 'attributes');
     
         return response()->json([
             'status' => true,
