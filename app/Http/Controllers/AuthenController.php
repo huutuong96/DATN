@@ -875,7 +875,7 @@ class AuthenController extends Controller
             $token = JWTAuth::fromUser($user);
             $user->refesh_token = $token;
             $user->save();
-            return redirect()->away("http://localhost:3000/auth/verify_google?token={$token}");
+            return redirect()->away("https://test.vnshop.top/auth/verify_google?token={$token}");
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Đăng nhập thành công',
@@ -903,7 +903,7 @@ class AuthenController extends Controller
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
         $user->save();
-        return redirect()->away("http://localhost:3000/auth/verify_google?token={$token}");
+        return redirect()->away("https://test.vnshop.top/auth/verify_google?token={$token}");
         // return response()->json([
         //     'status' => true,
         //     'message' => 'Đăng nhập thành công',
