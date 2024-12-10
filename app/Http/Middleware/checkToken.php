@@ -50,7 +50,7 @@ class checkToken
         } catch (JWTException $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Token không hợp lệ hoặc không tồn tại',
+                'message' => 'Token không hợp lệ hoặc không tồn tại ss',
                 'error' => $e->getMessage(),
             ], 401);
         } catch (\Exception $e) {
