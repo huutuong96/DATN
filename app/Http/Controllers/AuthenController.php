@@ -903,6 +903,10 @@ class AuthenController extends Controller
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
         $user->save();
+        $cart_to_users = Cart_to_usersModel::create([
+            'user_id' => $user->id,
+            'status' => 1,
+        ]);
         return redirect()->away("https://test.vnshop.top/auth/verify_google?token={$token}");
         // return response()->json([
         //     'status' => true,
