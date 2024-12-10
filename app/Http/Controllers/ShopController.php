@@ -524,6 +524,41 @@ class ShopController extends Controller
         if ($request->status) {
             $query->where('status', $request->status);
         }
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+            $q->where('to_name', 'LIKE', "%{$search}%")
+              ->orWhere('id', 'LIKE', "%{$search}%")
+              ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
+        if (request()->has('sort')) {
+            $sort = request()->input('sort');
+            switch ($sort) {
+            case 'price':
+                $query->orderBy('total_amount', 'asc');
+                break;
+            case '-price':
+                $query->orderBy('total_amount', 'desc');
+                break;
+            case 'updated_at':
+                $query->orderBy('updated_at', 'asc');
+                break;
+            case '-updated_at':
+                $query->orderBy('updated_at', 'desc');
+                break;
+            case 'name':
+                $query->orderBy('to_name', 'asc');
+                break;
+            case '-name':
+                $query->orderBy('to_name', 'desc');
+                break;
+            default:
+                break;
+            }
+        }
+
         $orders = $query->with('orderDetails', 'payment')->where('shop_id', $shop->id)->where('order_status', $order_status)->orderBy('updated_at', 'desc')->paginate($limit);
 
 
@@ -637,7 +672,7 @@ class ShopController extends Controller
             $product->appends(['status' => $request->status]);
         }
     
-        // $product->load('variants', 'attributes');
+        $product->load('variants', 'attributes');
     
         return response()->json([
             'status' => true,
