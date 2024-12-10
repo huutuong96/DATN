@@ -127,7 +127,7 @@ class ProductController extends Controller
         $products = Product::where('slug', $slug)->where('status', 2)->with(['images', 'shop' => function($query) {
             $query->select('id', 'shop_name', 'slug', 'image', 'province', 'created_at', 'contact_number')->withCount('products as countProduct')
             ->with(['products' => function($queryPro) {
-                $queryPro->select('id', 'name', 'slug', 'price', 'sale_price', 'image', 'quantity', 'sold_count', 'view_count', 'shop_id', 'status', 'created_at', 'updated_at')
+                $queryPro->select('id', 'name', 'slug', 'show_price', 'image', 'quantity', 'sold_count', 'view_count', 'shop_id', 'status', 'created_at', 'updated_at')
                 ->where('status', 2)
                 ->orderBy('sold_count', 'desc')
                 ->limit(5);
