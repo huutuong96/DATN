@@ -46,53 +46,7 @@ use Illuminate\Support\Str;
  * @param  array  $options
  * @return LengthAwarePaginator
  */
-/**
- * @OA\Schema(
- *     schema="Users",
- *     type="object",
- *     @OA\Property(
- *         property="username",
- *         type="string",
- *         description="The username of the user"
- *     ),
- *     @OA\Property(
- *         property="email",
- *         type="email",
- *         description="The email of the user"
- *     ),
- *     @OA\Property(
- *         property="phone",
- *         type="string",
- *         description="The phone of the user"
- *     ),
- *     @OA\Property(
- *         property="password",
- *         type="string",
- *         description="The password of the user"
- *     ),
- *     @OA\Property(
- *         property="gender",
- *         type="string",
- *         description="The gender of the user"
- *     ),
- *  *     @OA\Property(
- *         property="nationality",
- *         type="string",
- *         description="The nationality of the user"
- *     ),
- *     @OA\Property(
- *         property="name",
- *         type="string",
- *         description="The name of the user"
- *     ),
- *     @OA\Property(
- *         property="birthday",
- *         type="date",
- *         description="The birthday of the user"
- *     ),
- *     required={"name", "username", "email", "password", "gender", "nationality", "update_by", "delete_by"}
- * )
- */
+
 class AuthenController extends Controller
 {
 
@@ -117,51 +71,7 @@ class AuthenController extends Controller
         }
     }
 
-    /**
- * @OA\Post(
- *     path="api/register",
- *     summary="Register a new user",
- *     description="Registers a new user and returns a JWT token.",
- *     tags={"Authentication"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"fullname", "password", "email"},
- *             @OA\Property(property="fullname", type="string", example="John Doe"),
- *             @OA\Property(property="password", type="string", example="password123"),
- *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *             @OA\Property(property="rank_id", type="integer", example=1),
- *             @OA\Property(property="role_id", type="integer", example=2)
- *         )
- *     ),
- *     @OA\Response(
- *         response=201,
- *         description="User registered successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đăng ký thành công, chưa kích hoạt"),
- *             @OA\Property(property="user", type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="fullname", type="string", example="John Doe"),
- *                 @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *                 @OA\Property(property="rank_id", type="integer", example=1),
- *                 @OA\Property(property="role_id", type="integer", example=2),
- *                 @OA\Property(property="status", type="integer", example=101),
- *                 @OA\Property(property="login_at", type="string", format="date-time", example="2023-10-01T12:00:00Z"),
- *                 @OA\Property(property="refesh_token", type="string", example="jwt_token_here")
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Email already exists",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Email đã tồn tại.")
- *         )
- *     )
- * )
- */
+  
     public function register(UserRequest $request)
     {
         try {
