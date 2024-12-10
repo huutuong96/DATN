@@ -529,8 +529,7 @@ class ShopController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
             $q->where('to_name', 'LIKE', "%{$search}%")
-              ->orWhere('id', 'LIKE', "%{$search}%")
-              ->orWhere('description', 'LIKE', "%{$search}%");
+              ->orWhere('id', 'LIKE', "%{$search}%");
             });
         }
         if (request()->has('sort')) {
