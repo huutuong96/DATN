@@ -571,7 +571,7 @@ class ShopController extends Controller
         $limit = $request->input('limit', 10); 
         $limit = is_numeric($limit) && $limit > 0 ? (int)$limit : 10;
     
-        $query = Product::where('shop_id', $shop->id)->get();
+        $query = Product::where('shop_id', $shop->id);
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
         }
