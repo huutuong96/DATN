@@ -31,6 +31,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
+use App\Models\Follow_to_shop;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
@@ -312,9 +313,11 @@ class AuthenController extends Controller
             $shop = Shop::where('owner_id', $user_present->id)->first();
             $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
             $rank = RanksModel::where('id', $user_present->rank_id)->first();
+            $followers = Follow_to_shop::where('user_id', $user_present->id)->select('shop_id')->get();
             $user_present->shop_id = $shop?->id;
             $user_present->cart_id = $cartUser?->id;
             $user_present->rank = $rank;
+            $user_present->followers = $followers;
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
