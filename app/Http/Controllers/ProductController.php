@@ -744,8 +744,6 @@ class ProductController extends Controller
         $query = Product::query();
             if ($request->has('min_price') && $request->has('max_price')) {
                 $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price]);
-                // $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price])
-                //       ->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), 'ASC');      
             }
             if ($request->has('category_id')) {
                 $categoryIds = CategoriesModel::where('parent_id', $request->category_id)
