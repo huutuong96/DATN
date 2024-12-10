@@ -193,7 +193,7 @@ Route::get('/search', function () {
                 //PAYMENT
                 //cod
                 Route::post('/cod_payment', [PaymentsController::class, "cod_payment"]);
-                //vnpay
+                //vnpay/{}
                 Route::post('/vnpay_payment', [PaymentsController::class, "vnpay_payment"]);
 
                 //SHOP

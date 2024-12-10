@@ -264,6 +264,7 @@ class ShopController extends Controller
         $Shop->visits = $Shop->visits + 1;
         $Shop->save();
         $is_follow = Follow_to_shop::where('shop_id', $Shop->id)->where('user_id', $user->id)->first() ? $Shop->is_follow = true : $Shop->is_follow = false;
+        $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();
         $limit = $request->limit ?? 20;
         $tax = Tax::where('id', $Shop->tax_id)->where('status', 2)->get();
         $bannerShop = BannerShop::where('shop_id', $Shop->id)->where('status', 2)->get();
@@ -289,6 +290,7 @@ class ShopController extends Controller
             // 'products' => $products,
             'categories' => $category,
             'is_follow' => $is_follow,
+            'follow_count' => $follow_count,
         ]);
     }
 
