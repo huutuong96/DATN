@@ -76,7 +76,14 @@ class AuthenController extends Controller
     {
         try {
             $existingUser = UsersModel::where('email', $request->email)->first();
-
+            if ($existingUser) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Email đã được sử dụng.',
+                ], 409); 
+            }
+    
+    
             $dataInsert = [
                 "fullname" => $request->fullname,
                 "password" => Hash::make($request->password),
