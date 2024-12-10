@@ -45,6 +45,7 @@ use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Imports\UsersImport;
+use App\Models\Follow_to_shop;
 use App\Models\OrderDetailsModel;
 use App\Models\OrdersModel;
 use App\Services\RecommendationService;
@@ -116,7 +117,7 @@ class ProductController extends Controller
         );
     }
 
-    public function getProductToSlug($slug) {
+    public function getProductToSlug(Request $request, $slug) {
         
         if (empty($slug)) {
             return response()->json([
@@ -132,7 +133,13 @@ class ProductController extends Controller
                 ->orderBy('sold_count', 'desc')
                 ->limit(5);
             }]);
+            
         }])->get();
+        $authorization = $request->header('Authorization');
+        if ($authorization) {
+            $user = JWTAuth::parseToken()->authenticate();
+            Follow_to_shop::where('shop_id', $products[0]->shop->id)->where('user_id', $user->id)->first() ? $products[0]->shop->is_follow = true : $products[0]->shop->is_follow = false;
+        }
 
         if ($products->isEmpty()) {
             return response()->json([
