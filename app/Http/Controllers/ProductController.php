@@ -718,7 +718,8 @@ class ProductController extends Controller
     public function destroys(Request $request)
     {
         try {
-            foreach($arrayID as $id){
+            foreach($request->arrayID as $id){
+                $product = Product::find($id);
                 if (!$product) {
                     return response()->json([
                         'status' => false,
@@ -727,7 +728,7 @@ class ProductController extends Controller
                 }
                 $product->update(['status' => 5]);
             }
-            $product = Product::find($id);
+            
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa sản phẩm thành công',
