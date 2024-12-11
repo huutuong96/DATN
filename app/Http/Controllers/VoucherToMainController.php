@@ -24,6 +24,7 @@ class VoucherToMainController extends Controller
 
         return $this->successResponse('Lấy dữ liệu thành công', $voucherMains);
     }
+    
     public function voucherall(Request $request)
     {
         $tab = $request->input('tab', 1); 

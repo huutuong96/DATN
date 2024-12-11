@@ -699,6 +699,32 @@ class ProductController extends Controller
             ]);
         }
     }
+    public function destroys(Request $request)
+    {
+        try {
+            foreach($arrayID as $id){
+                if (!$product) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Product không tồn tại',
+                    ], 404);
+                }
+                $product->update(['status' => 5]);
+            }
+            $product = Product::find($id);
+            return response()->json([
+                'status' => true,
+                'message' => 'Xóa sản phẩm thành công',
+            ]);
+        } catch (\Throwable $th) {
+            log_debug($th->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => "Xóa sản phẩm không thành công",
+                'error' => $th->getMessage(),
+            ]);
+        }
+    }
     
 
     public function search(Request $request)
