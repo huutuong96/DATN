@@ -701,16 +701,19 @@ class PurchaseController extends Controller
     {
         $discountAmount = null;
         if ($voucherToShopCode) {
-            // $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where('status', 1)->first();
-
             $voucherToShop = VoucherToShop::whereIn('code', $voucherToShopCode)
                                   ->where('status', 2)
                                   ->where('shop_id', $shopId)
                                   ->first();
             
             if ($voucherToShop) { 
-
-                $discountAmount = $totalPrice * $voucherToShop->ratio;
+                if ($voucherToShop->type == 1) {
+                    $discountAmount = $totalPrice * $voucherToShop->ratio;
+                }
+                if ($voucherToShop->type == 2) {
+                    $discountAmount = $voucherToShop->price;
+                }
+                
 
                 // Kiểm tra limitValue
                 if ($voucherToShop->limitValue !== null && $voucherToShop->limitValue > 0) {
