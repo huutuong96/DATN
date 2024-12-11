@@ -737,9 +737,7 @@ class ShopController extends Controller
         $shop = Shop::find($id);
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
-        }
-
-        
+        } 
         $query = OrdersModel::where('shop_id', $shop->id);
         if ($request->has('time')) {
             $time = $request->input('time');
@@ -748,15 +746,12 @@ class ShopController extends Controller
             $query->whereDate('created_at', Carbon::today());
             break;
             case '2':
-            $query->whereDate('created_at', Carbon::yesterday());
-            break;
-            case '3':
             $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
             break;
-            case '4':
+            case '3':
             $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
             break;
-            case '5':
+            case '4':
             $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()]);
             break;
             default:
@@ -770,7 +765,6 @@ class ShopController extends Controller
                 if ($request->status) {
                     $orders = $query->where('order_status',$request->status)->get();
                 }
-
                 $total_orders = $orders->count();
                 $total_revenue_orders = $orders->sum('net_amount');
                 $average_revenue_per_order =$orders->avg('net_amount');
@@ -780,6 +774,103 @@ class ShopController extends Controller
             'total_orders' => $total_orders,
             'average_revenue_per_order' => $average_revenue_per_order,
             'visits' => $visits,
+        ]);
+    }
+
+    public function get_analyst_chart_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        } 
+        $query = OrdersModel::where('shop_id', $shop->id);
+                $orders = $query->get();
+                if ($request->order_status) {
+                    $orders = $query->where('order_status',$request->order_status)->get();
+                }
+                if ($request->status) {
+                    $orders = $query->where('order_status',$request->status)->get();
+                }
+        if ($request->has('time')) {
+            $time = $request->input('time');
+            switch ($time) {
+            case '1':
+            // $orders->whereDate('created_at', Carbon::today());
+            $orders = $query->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('H:00');
+            });
+
+            $formattedOrders = $orders->map(function ($orderGroup, $time) {
+                return [
+                    'dateKey' => $time,
+                    'revenue' => $orderGroup->sum('net_amount'),
+                    'orders' => $orderGroup->count(),
+                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'visits' => $orderGroup->sum('visits'),
+                ];
+            })->values();
+            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
+            // return $this->successResponse("Lấy dữ liệu thành công", [
+            //     'chartConfig' => $chartConfig,
+            //     'data' => $formattedOrders,
+            // ]);
+            break;
+            case '2':
+            $orders->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            $orders = $query->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('d-m-Y');
+            });
+
+            $formattedOrders = $orders->map(function ($orderGroup, $date) {
+                return [
+                    'dateKey' => $date,
+                    'revenue' => $orderGroup->sum('net_amount'),
+                    'orders' => $orderGroup->count(),
+                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'visits' => $orderGroup->sum('visits'),
+                ];
+            })->values();
+            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
+            break;
+            case '3':
+            $orders = $query->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('d-m-Y');
+            });
+
+            $formattedOrders = $orders->map(function ($orderGroup, $date) {
+                return [
+                    'dateKey' => $date,
+                    'revenue' => $orderGroup->sum('net_amount'),
+                    'orders' => $orderGroup->count(),
+                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'visits' => $orderGroup->sum('visits'),
+                ];
+            })->values();
+            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
+            break;
+            case '4':
+            $orders = $query->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('m-Y');
+            });
+
+            $formattedOrders = $orders->map(function ($orderGroup, $month) {
+                return [
+                    'dateKey' => $month,
+                    'revenue' => $orderGroup->sum('net_amount'),
+                    'orders' => $orderGroup->count(),
+                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'visits' => $orderGroup->sum('visits'),
+                ];
+            })->values();
+            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
+            break;
+            default:
+            break;
+            }
+        }       
+                
+        return $this->successResponse("Lấy dữ liệu thành công", [
+
         ]);
     }
 
