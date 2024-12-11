@@ -391,6 +391,7 @@ Route::get('/search', function () {
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
         Route::get('shop/get_categories_for_shop/{id}', [ShopController::class, "get_categories_for_shop"]);
         Route::get('shop/get_dashboard_shop/{id}', [ShopController::class, "get_dashboard_shop"]);
+        Route::get('shop/get_analyst_shop/{id}', [ShopController::class, "get_analyst_shop"]);
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
         Route::get('categoryAll', [CategoriesController::class, 'categoryAll']);

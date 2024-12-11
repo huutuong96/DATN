@@ -732,6 +732,57 @@ class ShopController extends Controller
         ]);
     }
 
+    public function get_analyst_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        }
+
+        
+        $query = OrdersModel::where('shop_id', $shop->id);
+        if ($request->has('time')) {
+            $time = $request->input('time');
+            switch ($time) {
+            case '1':
+            $query->whereDate('created_at', Carbon::today());
+            break;
+            case '2':
+            $query->whereDate('created_at', Carbon::yesterday());
+            break;
+            case '3':
+            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            break;
+            case '4':
+            $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+            break;
+            case '5':
+            $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()]);
+            break;
+            default:
+            break;
+            }
+        }       
+                $orders = $query->get();
+                if ($request->order_status) {
+                    $orders = $query->where('order_status',$request->order_status)->get();
+                }
+                if ($request->status) {
+                    $orders = $query->where('order_status',$request->status)->get();
+                }
+
+                $total_orders = $orders->count();
+                $total_revenue_orders = $orders->sum('net_amount');
+                $average_revenue_per_order =$orders->avg('net_amount');
+                $visits = $shop->visits;
+        return $this->successResponse("Lấy dữ liệu thành công", [
+            'total_revenue_orders' => $total_revenue_orders,
+            'total_orders' => $total_orders,
+            'average_revenue_per_order' => $average_revenue_per_order,
+            'visits' => $visits,
+        ]);
+    }
+
     public function get_voucher_to_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
