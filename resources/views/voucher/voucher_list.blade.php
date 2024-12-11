@@ -401,7 +401,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-3">
-                                    {{-- {{ $Posts->appends(['token' => auth()->user()->refesh_token])->links() }} --}}
+                                    {{ $voucherMains->appends(['token' => auth()->user()->refesh_token])->links() }}
                                 </div>
                             </div><!-- end card-body -->
 
@@ -685,7 +685,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-3">
-                                    {{-- {{ $Posts->appends(['token' => auth()->user()->refesh_token])->links() }} --}}
+                                    {{ $inactiveVoucher->appends(['token' => auth()->user()->refesh_token])->links() }}
                                 </div>
                             </div><!-- end card-body -->
 
