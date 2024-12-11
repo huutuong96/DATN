@@ -11,6 +11,15 @@
 <!-- include summernote css/js -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+<style>
+.modal-body img {
+max-width: 100%; /* Hình ảnh không vượt quá chiều rộng modal */
+height: auto; /* Giữ nguyên tỉ lệ hình ảnh */
+display: block; /* Đặt ảnh trên một dòng riêng */
+margin: 10px 0; /* Thêm khoảng cách giữa ảnh và nội dung */
+}
+
+</style>
 @endsection
 @section('main')
    <div class="container-fluid">
@@ -145,13 +154,14 @@
                                                                         <div class="mb-3">
                                                                             <label for="blog_id-{{ $Post->id }}" class="form-label">Chọn Blog</label>
                                                                             <select name="blog_id" id="blog_id-{{ $Post->id }}" class="form-select" required>
-                                                                                <option value="">-- Chọn Blog --</option>
+                                                                                <option value="{{ $blog->id }}">{{ $blog->name }}</option>
                                                                                 @foreach($blogs as $blog)
-                                                                                    <option value="{{ $blog->id }}" {{ $Post->blog_id == $blog->id ? 'selected' : '' }}>
+                                                                                    <option value="{{ $blog->id }}" {{ (int)$Post->blog_id === (int)$blog->id ? 'selected' : '' }}>
                                                                                         {{ $blog->name }}
                                                                                     </option>
                                                                                 @endforeach
                                                                             </select>
+                                                                                
                                                                         </div>
                                                                         <div class="mb-3">
                                                                             <label for="title-{{ $Post->id }}" class="form-label">Tiêu đề</label>
@@ -214,9 +224,19 @@
                                                                     <h5 class="modal-title" id="blogDetailsModalLabel-{{ $Post->id }}">Chi tiết Bài viết</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
-                                                                <div class="modal-body ">
-                                                                    {!! $Post->content !!}
-                                                                </div>
+                                                                <div class="modal-body" style="
+                                                                word-wrap: break-word; 
+                                                                overflow-wrap: break-word; 
+                                                                white-space: pre-wrap; 
+                                                                max-height: 900px; 
+                                                                overflow-y: auto; 
+                                                                text-align: justify;
+                                                            ">
+                                                                
+                                                                {!! $Post->content !!}
+                                                            </div>
+                                                            
+                                                            
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                                 </div>
