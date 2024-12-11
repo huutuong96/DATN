@@ -715,7 +715,7 @@ class ProductController extends Controller
             ]);
         }
     }
-    public function destroys(Request $request)
+    public function destroyArray(Request $request)
     {
         try {
             foreach($request->arrayID as $id){
