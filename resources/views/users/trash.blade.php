@@ -46,7 +46,6 @@
                                             <th scope="col">ID</th>
                                             <th scope="col">Ảnh đại diện</th>
                                             <th scope="col">Thông tin tài khoản</th>
-                                            <th scope="col">Địa chỉ</th>
                                             <th scope="col">Ngày tạo</th>
                                             <th scope="col">Hành động</th>
                                         </tr>
@@ -63,18 +62,17 @@
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         <img src="{{$user->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="avatar-xs rounded-circle me-3 material-shadow" style="width: 60px; height: 60px;">
                                                     </td>
-                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
+                                                    <td style="word-wrap: break-word; white-space: normal; max-width: 150px;">
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$user->fullname ?? 'No Name'}}</span>
-                                                            <span style="color: gray;">{{$user->email ?? 'No Email'}}</span>
-                                                            <span style="color: gray;">{{$user->phone ?? 'No Phone'}}</span>
+                                                            @if( optional($user->role)->title == "OWNER")
+                                                            <span class="badge bg-success text-white" style="width:150px; font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
+                                                            @else
+                                                            <span class="badge bg-info text-white" style="width:150px;font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
+                                                            @endif
                                                         </div>
                                                     </td>
-                                                    <td>
-                                                        @foreach($user->address as $address)
-                                                            *. {{ $address->district }}_{{ $address->ward }}_{{ $address->address }}<br>
-                                                        @endforeach
-                                                    </td>
+                                                   
                                                     <td>{{ $user->created_at}}</td>
                                                     <td>
                                                     <ul class="list-inline">

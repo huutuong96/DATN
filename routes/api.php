@@ -69,9 +69,7 @@ Route::get('/search', function () {
     Route::get('posts', [PostController::class, "index"]);
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
-        Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
-        });
                 Route::post('categories', [CategoriesController::class, 'store']);
                 Route::get('categories/{id}', [CategoriesController::class, 'show']);
                 Route::put('categories/{id}', [CategoriesController::class, 'update']);
@@ -193,7 +191,7 @@ Route::get('/search', function () {
                 //PAYMENT
                 //cod
                 Route::post('/cod_payment', [PaymentsController::class, "cod_payment"]);
-                //vnpay
+                //vnpay/{}
                 Route::post('/vnpay_payment', [PaymentsController::class, "vnpay_payment"]);
 
                 //SHOP
@@ -235,6 +233,7 @@ Route::get('/search', function () {
                 Route::post('orders/update/{id}', [OrdersController::class, "update"]);
                 Route::get('orders/shop/{id}', [OrdersController::class, "indexOrderToShop"]);
                 Route::get('order/user', [OrdersController::class, "indexOrderToUser"]);
+                Route::get('order/user/client', [OrdersController::class, "indexOrderToUserNew"]);
                 Route::get('order/user/detail/{id}', [OrdersController::class, "OrderToUserDetail"]);
                 Route::get('order/shop/detail/{id}', [OrdersController::class, "OrderToShopDetail"]);
                 Route::get('order/user/history', [OrdersController::class, "HistoryOrderToUser"]);

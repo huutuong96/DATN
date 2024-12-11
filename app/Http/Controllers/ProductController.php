@@ -45,6 +45,7 @@ use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Imports\UsersImport;
+use App\Models\Follow_to_shop;
 use App\Models\OrderDetailsModel;
 use App\Models\OrdersModel;
 use App\Services\RecommendationService;
@@ -116,7 +117,7 @@ class ProductController extends Controller
         );
     }
 
-    public function getProductToSlug($slug) {
+    public function getProductToSlug(Request $request, $slug) {
         
         if (empty($slug)) {
             return response()->json([
@@ -124,7 +125,22 @@ class ProductController extends Controller
                 'message' => 'Sản phẩm không tồn tại'
             ], 400);
         }
-        $products = Product::where('slug', $slug)->where('status', 2)->with('images')->get();
+        $products = Product::where('slug', $slug)->where('status', 2)->with(['images', 'shop' => function($query) {
+            $query->select('id', 'shop_name', 'slug', 'image', 'province', 'created_at', 'contact_number')->withCount('products as countProduct')
+            ->with(['products' => function($queryPro) {
+                $queryPro->select('id', 'name', 'slug', 'show_price', 'image', 'quantity', 'sold_count', 'view_count', 'shop_id', 'status', 'created_at', 'updated_at')
+                ->where('status', 2)
+                ->orderBy('sold_count', 'desc')
+                ->limit(5);
+            }]);
+            
+        }])->get();
+        $authorization = $request->header('Authorization');
+        if ($authorization) {
+            $user = JWTAuth::parseToken()->authenticate();
+            Follow_to_shop::where('shop_id', $products[0]->shop->id)->where('user_id', $user->id)->first() ? $products[0]->shop->is_follow = true : $products[0]->shop->is_follow = false;
+        }
+
         if ($products->isEmpty()) {
             return response()->json([
                 'status' => 'error',
@@ -754,8 +770,6 @@ class ProductController extends Controller
         $query = Product::query();
             if ($request->has('min_price') && $request->has('max_price')) {
                 $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price]);
-                // $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price])
-                //       ->orderBy(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), 'ASC');      
             }
             if ($request->has('category_id')) {
                 $categoryIds = CategoriesModel::where('parent_id', $request->category_id)
@@ -810,7 +824,14 @@ class ProductController extends Controller
                 'message' => "Sản phẩm không tồn tại",
             ], 404);
         }
-
+        Image::where('product_id',$product->id)->delete();
+        foreach ($request->images as $image) {
+            $imageModel = Image::create([
+                'product_id' => $product->id,
+                'url' => $image ?? null,
+                'status' => 1,
+            ]);
+        }
         $user = JWTAuth::parseToken()->authenticate();
 
         if($request->name != $product->name){
@@ -818,12 +839,7 @@ class ProductController extends Controller
         }else{
             $slug = $product->slug;
         }
-
-            if($request->name != $product->name){
-                $slug = Str::slug($request->name);
-            }else{
-                $slug = $product->slug;
-            }
+        
         $dataInsert = [
             'product_id' => $product->id,
             'name' => $request->name ?? $product->name,
@@ -833,7 +849,7 @@ class ProductController extends Controller
             'infomation' => $request->infomation ?? $product->infomation ,
             'price' => $request->variantMode ? 0 : $request->price, // nếu có biến thể thì nó = 0
             'sale_price' => $request->sale_price ?? $product->sale_price,
-            'image' => $product->image,
+            'image' => $request->images[0],
             'quantity' => $request->stock ?? $product->quantity,
             'parent_id' => $request->parent_id ?? $product->parent_id,
             'update_by' => $user->id,
@@ -858,18 +874,7 @@ class ProductController extends Controller
         
         try {
             DB::table('update_product')->insert($dataInsert);
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-                    $imageUrl = $uploadedImage['secure_url'];
-
-                    Image::create([
-                        'product_id' => $product->id,
-                        'url' => $imageUrl,
-                        'status' => 0,
-                    ]);
-                }
-            }
+            
             return response()->json([
                 'status' => true,
                 'message' => "Yêu cầu của bạn đã được gửi vui lòng chờ xét duyệt"

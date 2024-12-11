@@ -31,6 +31,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Cloudinary\Cloudinary;
 use App\Jobs\ConfirmMailRegister;
+use App\Models\Follow_to_shop;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
@@ -46,103 +47,12 @@ use Illuminate\Support\Str;
  * @param  array  $options
  * @return LengthAwarePaginator
  */
-/**
- * @OA\Schema(
- *     schema="Users",
- *     type="object",
- *     @OA\Property(
- *         property="username",
- *         type="string",
- *         description="The username of the user"
- *     ),
- *     @OA\Property(
- *         property="email",
- *         type="email",
- *         description="The email of the user"
- *     ),
- *     @OA\Property(
- *         property="phone",
- *         type="string",
- *         description="The phone of the user"
- *     ),
- *     @OA\Property(
- *         property="password",
- *         type="string",
- *         description="The password of the user"
- *     ),
- *     @OA\Property(
- *         property="gender",
- *         type="string",
- *         description="The gender of the user"
- *     ),
- *  *     @OA\Property(
- *         property="nationality",
- *         type="string",
- *         description="The nationality of the user"
- *     ),
- *     @OA\Property(
- *         property="name",
- *         type="string",
- *         description="The name of the user"
- *     ),
- *     @OA\Property(
- *         property="birthday",
- *         type="date",
- *         description="The birthday of the user"
- *     ),
- *     required={"name", "username", "email", "password", "gender", "nationality", "update_by", "delete_by"}
- * )
- */
+
 class AuthenController extends Controller
 {
-/**
- * @OA\Get(
- *     path="api/users",
- *     summary="Get list of active users",
- *     description="Retrieves a paginated list of users with status 1.",
- *     tags={"Authentication"},
- *     @OA\Response(
- *         response=200,
- *         description="Data retrieved successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thành công"),
- *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="current_page", type="integer", example=1),
- *                 @OA\Property(property="data", type="array",
- *                     @OA\Items(
- *                         @OA\Property(property="id", type="integer", example=1),
- *                         @OA\Property(property="fullname", type="string", example="John Doe"),
- *                         @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *                         @OA\Property(property="status", type="integer", example=1),
- *                         @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-01T12:00:00Z"),
- *                         @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-01T12:00:00Z")
- *                     )
- *                 ),
- *                 @OA\Property(property="first_page_url", type="string", example="http://example.com?page=1"),
- *                 @OA\Property(property="from", type="integer", example=1),
- *                 @OA\Property(property="last_page", type="integer", example=10),
- *                 @OA\Property(property="last_page_url", type="string", example="http://example.com?page=10"),
- *                 @OA\Property(property="next_page_url", type="string", example="http://example.com?page=2"),
- *                 @OA\Property(property="path", type="string", example="http://example.com"),
- *                 @OA\Property(property="per_page", type="integer", example=20),
- *                 @OA\Property(property="prev_page_url", type="string", example=null),
- *                 @OA\Property(property="to", type="integer", example=20),
- *                 @OA\Property(property="total", type="integer", example=200)
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Data retrieval failed",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Lấy dữ liệu thất bại"),
- *             @OA\Property(property="error", type="string", example="Error message")
- *         )
- *     )
- * )
- */
+
+
+
     public function index()
     {
         try {
@@ -162,51 +72,7 @@ class AuthenController extends Controller
         }
     }
 
-    /**
- * @OA\Post(
- *     path="api/register",
- *     summary="Register a new user",
- *     description="Registers a new user and returns a JWT token.",
- *     tags={"Authentication"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"fullname", "password", "email"},
- *             @OA\Property(property="fullname", type="string", example="John Doe"),
- *             @OA\Property(property="password", type="string", example="password123"),
- *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *             @OA\Property(property="rank_id", type="integer", example=1),
- *             @OA\Property(property="role_id", type="integer", example=2)
- *         )
- *     ),
- *     @OA\Response(
- *         response=201,
- *         description="User registered successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Đăng ký thành công, chưa kích hoạt"),
- *             @OA\Property(property="user", type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="fullname", type="string", example="John Doe"),
- *                 @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *                 @OA\Property(property="rank_id", type="integer", example=1),
- *                 @OA\Property(property="role_id", type="integer", example=2),
- *                 @OA\Property(property="status", type="integer", example=101),
- *                 @OA\Property(property="login_at", type="string", format="date-time", example="2023-10-01T12:00:00Z"),
- *                 @OA\Property(property="refesh_token", type="string", example="jwt_token_here")
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Email already exists",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Email đã tồn tại.")
- *         )
- *     )
- * )
- */
+  
     public function register(UserRequest $request)
     {
         try {
@@ -333,6 +199,9 @@ class AuthenController extends Controller
             if ($user->status == 101) {
                 return response()->json(['error' => 'Tài khoản chưa được xác thực'], 401);
             }
+            if ($user->status == 2) {
+                return response()->json(['error' => 'Tài khoản đã bị khóa'], 401);
+            }
 
             $user->refesh_token = $token;
             // $user->is_login = 1;
@@ -444,9 +313,11 @@ class AuthenController extends Controller
             $shop = Shop::where('owner_id', $user_present->id)->first();
             $cartUser = Cart_to_usersModel::where('user_id', $user_present->id)->first();
             $rank = RanksModel::where('id', $user_present->rank_id)->first();
+            $followers = Follow_to_shop::where('user_id', $user_present->id)->select('shop_id')->get();
             $user_present->shop_id = $shop?->id;
             $user_present->cart_id = $cartUser?->id;
             $user_present->rank = $rank;
+            $user_present->followers = $followers;
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lấy dữ liệu thành công',
@@ -1007,7 +878,7 @@ class AuthenController extends Controller
             $token = JWTAuth::fromUser($user);
             $user->refesh_token = $token;
             $user->save();
-            return redirect()->away("http://localhost:3000/auth/verify_google?token={$token}");
+            return redirect()->away("https://test.vnshop.top/auth/verify_google?token={$token}");
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Đăng nhập thành công',
@@ -1035,7 +906,11 @@ class AuthenController extends Controller
         $token = JWTAuth::fromUser($user);
         $user->refesh_token = $token;
         $user->save();
-        return redirect()->away("http://localhost:3000/auth/verify_google?token={$token}");
+        $cart_to_users = Cart_to_usersModel::create([
+            'user_id' => $user->id,
+            'status' => 1,
+        ]);
+        return redirect()->away("https://test.vnshop.top/auth/verify_google?token={$token}");
         // return response()->json([
         //     'status' => true,
         //     'message' => 'Đăng nhập thành công',

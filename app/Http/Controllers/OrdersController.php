@@ -104,6 +104,46 @@ class OrdersController extends Controller
     
         return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
     }
+
+    public function indexOrderToUserNew(Request $request)
+    {
+        
+        $user = JWTAuth::parseToken()->authenticate();
+        $order_status = $request->order_status ?? 1;
+        $orders = OrdersModel::with(['orderDetails.variant.product', 'shop','payment']) // Eager load 'product' qua 'orderDetails'
+            ->where('user_id', $user->id)
+            ->where(function ($query) use ($order_status) {
+                if ($order_status == 5) {
+                    $query->whereIn('order_status', [2, 3, 4, 5]);
+                } else {
+                    $query->where('order_status', $order_status);
+                }
+            })
+            ->orderby('updated_at', 'desc')
+            ->paginate(10);
+
+            $orders->appends(['order_status' => $order_status])->links();
+            foreach ($orders as $order) {
+                foreach ($order->orderDetails as $orderDetail) {
+                    if($orderDetail->variant!=null){
+                        $variant = $orderDetail->variant;  
+                    }else{
+                        $product = $orderDetail->product;  
+                    }
+                  
+                }
+            }
+            foreach ($orders as $key => $order) {
+                foreach ($order->orderDetails as $orderDetail  ) {
+                    if( $orderDetail->variant){
+                       $orderDetail['product']  = $orderDetail->variant->product;
+                       unset($orderDetail->variant['product']);
+                    }
+                }
+            }
+    
+        return $this->successResponse('Lấy dữ liệu thành công', $orders ?? []);
+    }
     
 
     public function OrderToUserDetail(Request $request, $id)

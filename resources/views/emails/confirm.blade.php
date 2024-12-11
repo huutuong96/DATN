@@ -80,7 +80,7 @@
         <p>Xin chào <b>{{ $user->fullname }}</b>,</p>
         <p>Cảm ơn bạn đã đăng ký tài khoản để truy cập và sử dụng các dịch vụ của website chúng tôi. Vui lòng nhấn nút bên dưới để xác nhận đăng ký tài khoản của bạn:</p>
         <div class="confirmation-button">
-            <a href="https://vshop.io.vn/auth/verify_email?token={{ $token }}">Xác nhận đăng ký tài khoản</a>
+            <a href="http://test.vnshop.top/auth/verify_email?token={{ $token }}">Xác nhận đăng ký tài khoản</a>
 
         </div>
         <p>Mail này sẽ hết hạn trong 24 giờ.</p>

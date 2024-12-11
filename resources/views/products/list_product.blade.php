@@ -449,7 +449,6 @@
                                                             </button>
                                                         </a>
                                                         <!-- Modal Chi tiết sản phẩm -->
-                                                        <div class="modal fade" id="detailsModal-{{ $product->product_id}}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
                                                         <div class="modal fade" id="detailsModal-{{ $product->product_id }}" tabindex="-1" aria-labelledby="detailsModalLabel-{{ $product->product_id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
@@ -462,9 +461,9 @@
                                                                             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                                                                                 <h5 class="mb-0 text-white">Sản phẩm chi tiết</h5>
                                                                                 <span class="badge bg-success">
-                                                                                    @if($product->status == 3)
+                                                                                   
                                                                                     Chưa duyệt
-                                                                                        @endif
+                                                                                       
                                                                                 </span>
                                                                             </div>
                                                                             <div class="card-body">
@@ -487,7 +486,7 @@
                                                                                             <strong>ID:</strong> <span class="text-muted me-5">{{ $product->product_id }}</span> 
                                                                                         </div>
                                                                                         <div class="mb-3 d-flex ">
-                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted">{{ $product->name}}</span>
+                                                                                            <strong>Tên sản phẩm: </strong> <span class="text-muted" style="word-wrap: break-word; white-space: normal; max-width: 200px;">{{ $product->name}}</span>
                                                                                         </div>
                                                                                        
                                                                                        

@@ -709,7 +709,7 @@
                                             href="{{ route('blog', ['token' => auth()->user()->refesh_token]) }}"
                                             class="nav-link"
                                             data-key="t-analytics">
-                                            Danh sách Danh mục bài viết
+                                            Danh sách Danh mục
                                         </a>
                                     </li>
                                     <li class="nav-item">

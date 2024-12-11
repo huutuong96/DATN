@@ -77,7 +77,7 @@ class PurchaseController extends Controller
                     ], 400);
                 }
             }
-            
+
             // Validate vouchers
             if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
                 return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
@@ -203,6 +203,7 @@ class PurchaseController extends Controller
                     $totalAdded = 0;
                     if ($voucherToShopCode != null) {
                         $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                        return $totalAdded;
                         $discountShopVoucher = $totalAdded;
                         $shopTotalPrice -= $totalAdded;
                     }
@@ -701,16 +702,23 @@ class PurchaseController extends Controller
     {
         $discountAmount = null;
         if ($voucherToShopCode) {
-            // $voucherToShop = VoucherToShop::where('code', $voucherToShopCode)->where('status', 1)->first();
-
             $voucherToShop = VoucherToShop::whereIn('code', $voucherToShopCode)
                                   ->where('status', 2)
                                   ->where('shop_id', $shopId)
                                   ->first();
             
             if ($voucherToShop) { 
-
-                $discountAmount = $totalPrice * $voucherToShop->ratio;
+                if ($voucherToShop->type == 1) {
+                    $discountAmount = $totalPrice * $voucherToShop->ratio;
+                }else {
+                    $discountAmount = $voucherToShop->price;
+                }
+                if ($voucherToShop->type == 2) {
+                    $discountAmount = $voucherToShop->price;
+                }else {
+                    $discountAmount = $totalPrice * $voucherToShop->ratio;
+                }
+                
 
                 // Kiểm tra limitValue
                 if ($voucherToShop->limitValue !== null && $voucherToShop->limitValue > 0) {

@@ -16,22 +16,22 @@ class Kernel extends ConsoleKernel
         ->everyMinute()
         ->withoutOverlapping();
 
-        // Add this method to your Kernel.php file to schedule the cancel_order_auto method to run every minute
-        $schedule->call(function () {
-            app(\App\Http\Controllers\OrdersController::class)->cancel_order_auto();
-        })->daily();
+        // // Add this method to your Kernel.php file to schedule the cancel_order_auto method to run every minute
+        // $schedule->call(function () {
+        //     app(\App\Http\Controllers\OrdersController::class)->cancel_order_auto();
+        // })->daily();
 
-        $schedule->call(function () {
-            app(\App\Http\Controllers\NotificationController::class)->send_mail_event();
-        })->daily();
+        // $schedule->call(function () {
+        //     app(\App\Http\Controllers\NotificationController::class)->send_mail_event();
+        // })->daily();
 
-        $schedule->call(function () {
-            app(\App\Http\Controllers\NotificationController::class)->check_time_event();
-        })->daily();
+        // $schedule->call(function () {
+        //     app(\App\Http\Controllers\NotificationController::class)->check_time_event();
+        // })->daily();
 
-        $schedule->call(function () {
-            app(\App\Http\Controllers\VnshopController::class)->checkWebDie();
-        })->everyTenMinutes();
+        // $schedule->call(function () {
+        //     app(\App\Http\Controllers\VnshopController::class)->checkWebDie();
+        // })->everyTenMinutes();
     }
 
     /**
