@@ -709,9 +709,13 @@ class PurchaseController extends Controller
             if ($voucherToShop) { 
                 if ($voucherToShop->type == 1) {
                     $discountAmount = $totalPrice * $voucherToShop->ratio;
+                }else {
+                    $discountAmount = $voucherToShop->price;
                 }
                 if ($voucherToShop->type == 2) {
                     $discountAmount = $voucherToShop->price;
+                }else {
+                    $discountAmount = $totalPrice * $voucherToShop->ratio;
                 }
                 
 
