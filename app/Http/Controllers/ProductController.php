@@ -723,7 +723,8 @@ class ProductController extends Controller
                 if (!$product) {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Product không tồn tại',
+                        'product_id'=>$id,
+                        'message' => 'Product id: '.$id.' không tồn tại',
                     ], 404);
                 }
                 $product->update(['status' => 5]);
