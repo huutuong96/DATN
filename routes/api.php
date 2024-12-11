@@ -378,6 +378,7 @@ Route::get('/search', function () {
         Route::get('calculateShippingFee', [DistanceCalculatorService::class, "calculateShippingFee"]);
         // lọc sản phẩmorders
         Route::get('/products/filter', [ProductController::class, 'filterProducts']);
+        Route::post('/destroyArray', [ProductController::class, 'destroyArray']);
         Route::get('/shops/filter', [ShopController::class, 'filterShops']);
         Route::get('/shops/categories', [ShopController::class, 'getShopByCategory']);
 
