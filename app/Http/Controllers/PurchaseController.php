@@ -77,7 +77,7 @@ class PurchaseController extends Controller
                     ], 400);
                 }
             }
-            
+
             // Validate vouchers
             if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
                 return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
@@ -203,6 +203,7 @@ class PurchaseController extends Controller
                     $totalAdded = 0;
                     if ($voucherToShopCode != null) {
                         $totalAdded = $this->applyVouchersToShop($voucherToShopCode, $shopTotalPrice, $shopId);
+                        return $totalAdded;
                         $discountShopVoucher = $totalAdded;
                         $shopTotalPrice -= $totalAdded;
                     }
