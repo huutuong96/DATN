@@ -770,11 +770,72 @@ class ShopController extends Controller
                 $average_revenue_per_order =$orders->avg('net_amount');
                 $visits = $shop->visits;
         return $this->successResponse("Lấy dữ liệu thành công", [
-            'total_revenue_orders' => $total_revenue_orders,
-            'total_orders' => $total_orders,
-            'average_revenue_per_order' => $average_revenue_per_order,
-            'visits' => $visits,
+                'revenue' => [
+                    'labelEN' => 'revenue',
+                    'labelVN' => 'Doanh số',
+                    'value' => $total_revenue_orders,
+                    'isPrice' => true
+                ],
+                'orders' => [
+                    'labelEN' => 'orders',
+                    'labelVN' => 'Tổng Đơn Hàng',
+                    'value' => $total_orders,
+                    'isPrice' => false
+                ],
+                'average_revenue_per_order' => [
+                    'labelEN' => 'average_revenue_per_order',
+                    'labelVN' => 'Trung Bình Doanh Số Mỗi Đơn Hàng',
+                    'value' => $average_revenue_per_order,
+                    'isPrice' => true
+                ],
+                'visits' => [
+                    'labelEN' => 'visits',
+                    'labelVN' => 'Lượt Truy Cập',
+                    'value' => $visits,
+                    'isPrice' => false
+                ],
         ]);
+    }
+
+    public function get_analyst_rank_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        } 
+        if ($request->has('sort')) {
+            $sort = $request->input('sort');
+            switch ($sort) {
+            case 'orders':
+                $orders = OrdersModel::where('shop_id', $shop->id)->orderBy('net_amount', 'desc')->select('id', 'net_amount')->get();
+                return $this->successResponse("Lấy dữ liệu thành công", $orders ?? []);
+            break;
+            case 'products':
+                $products = Product::where('shop_id', $shop->id)->orderBy('sold_count', 'desc')->select('name', 'sold_count')->get();
+                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
+            break;
+            case 'views':
+                $products = Product::where('shop_id', $shop->id)->orderBy('view_count', 'desc')->select('name', 'view_count')->get();
+                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
+            break;
+            default:
+            break;
+            }
+        }       
+            
+
+    }
+
+    public function get_analyst_cate_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        } 
+        $products = Product::where('shop_id', $shop->id)->select('category_id')->get();
+        $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->get;
+        return $this->successResponse("Lấy dữ liệu thành công", $categories ?? []);
+
     }
 
     public function get_analyst_chart_shop(Request $request, string $id)
@@ -805,15 +866,11 @@ class ShopController extends Controller
                     'dateKey' => $time,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
             return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
-            // return $this->successResponse("Lấy dữ liệu thành công", [
-            //     'chartConfig' => $chartConfig,
-            //     'data' => $formattedOrders,
-            // ]);
             break;
             case '2':
             $orders->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
@@ -826,7 +883,7 @@ class ShopController extends Controller
                     'dateKey' => $date,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
@@ -842,7 +899,7 @@ class ShopController extends Controller
                     'dateKey' => $date,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
@@ -858,7 +915,7 @@ class ShopController extends Controller
                     'dateKey' => $month,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
@@ -883,7 +940,7 @@ class ShopController extends Controller
 
         $perPage = $request->limit ?? 10; // Number of items per page
         $voucher_to_shop = VoucherToShop::where('shop_id', $shop->id)
-            ->where('status', 1)
+            ->where('status', 2)
             ->paginate($perPage);
 
         return $this->successResponse('Lấy voucher thành công', [
@@ -902,7 +959,7 @@ class ShopController extends Controller
             'limitValue' => $request->limitValue,
             'code' => $request->code,
             'shop_id' => $shop_id,
-            'status' => $request->status ?? 1,
+            'status' => 2,
             'ratio' => is_numeric($request->ratio) ? $request->ratio / 100 : null,
             'price' => $request->ratio ? null : ($request->price ?? null),
             'min' => $request->min ?? null,

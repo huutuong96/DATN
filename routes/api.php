@@ -164,11 +164,11 @@ Route::get('/search', function () {
 
                 Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
                 Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
+                
+                
 
                 Route::get('get_voucher_to_shop/{id}', [ShopController::class, 'get_voucher_to_shop']);
                 Route::post('update_voucher_to_shop/{id}', [ShopController::class, 'UpdateVoucherToShop']);
-                
-                
 
                 Route::resource('follows', FollowToShopController::class);
                 Route::post('up_follow/{shop_id}', [FollowToShopController::class, 'follows']);
@@ -394,6 +394,9 @@ Route::get('/search', function () {
         Route::get('shop/get_dashboard_shop/{id}', [ShopController::class, "get_dashboard_shop"]);
         Route::get('shop/get_analyst_chart_shop/{id}', [ShopController::class, "get_analyst_chart_shop"]);
         Route::get('shop/get_analyst_shop/{id}', [ShopController::class, "get_analyst_shop"]);
+        Route::get('shop/get_analyst_rank_shop/{id}', [ShopController::class, "get_analyst_rank_shop"]);
+        Route::get('shop/get_analyst_cate_shop/{id}', [ShopController::class, "get_analyst_cate_shop"]);
+
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
         Route::get('categoryAll', [CategoriesController::class, 'categoryAll']);
