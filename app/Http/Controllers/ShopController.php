@@ -961,7 +961,7 @@ class ShopController extends Controller
             'limitValue' => $request->limitValue,
             'code' => $request->code,
             'shop_id' => $shop_id,
-            'status' => $request->status ?? 1,
+            'status' => 2,
             'ratio' => is_numeric($request->ratio) ? $request->ratio / 100 : null,
             'price' => $request->ratio ? null : ($request->price ?? null),
             'min' => $request->min ?? null,
