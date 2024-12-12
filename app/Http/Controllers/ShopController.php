@@ -322,7 +322,6 @@ class ShopController extends Controller
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
-        $user = JWTAuth::parseToken()->authenticate();
 
         $dataInsert = [
             'shop_name' => $request->shop_name ?? $shop->shop_name,
