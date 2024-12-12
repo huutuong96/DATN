@@ -259,7 +259,10 @@ class ShopController extends Controller
 
     public function show(string $id)
     {
-        $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        $Shop = Shop::where('id', $id)->where('status', 1)->first();
+        if (!$Shop) {
+            return $this->errorResponse("Không tồn tại Shop nào");
+        }
         $Shop->visits = $Shop->visits + 1;
         $Shop->save();
         $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();
