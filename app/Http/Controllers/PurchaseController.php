@@ -227,7 +227,6 @@ class PurchaseController extends Controller
                 }
 
                 // return $ordersByShop;
-                // return ($grandTotalPrice + $shipFee) - $discountMainVoucher;
                 DB::commit();
                 if($payment->code == 'COD'){
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
