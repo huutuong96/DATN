@@ -259,7 +259,7 @@ class ShopController extends Controller
 
     public function show(string $id)
     {
-        $Shop = Shop::where('id', $id)->where('status', 1)->first();
+        $Shop = Shop::where('id', $id)->where('status', 2)->first();
         if (!$Shop) {
             return $this->errorResponse("Không tồn tại Shop nào");
         }
@@ -1630,4 +1630,15 @@ class ShopController extends Controller
         $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->select('id', 'title', 'slug')->get();
         return $this->successResponse('Lấy danh sách danh mục thành công', $categories);
     }
+
+    public function restore(Request $request, string $id)
+    {
+        $shop = Shop::where('id', $id)->first();
+        if (!$shop) {
+            return $this->errorResponse('shop không tồn tại', 404);
+        }
+        $shop->status = 2;
+        $shop->save();
+        return $this->successResponse('Khôi phục shop thành công', $shop);
+    }   
 }
