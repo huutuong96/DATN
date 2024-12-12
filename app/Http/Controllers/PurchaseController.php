@@ -255,7 +255,7 @@ class PurchaseController extends Controller
                         'ship_fee' => $shipFee,
                         'email' => auth()->user()->email,
                     ]);
-                    // ProducttocartModel::whereIn('id', $request->carts)->delete();
+                    ProducttocartModel::whereIn('id', $request->carts)->delete();
                     $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
                     return response()->json([
                         'status' => true,
@@ -265,8 +265,8 @@ class PurchaseController extends Controller
                 }  
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-                // ProducttocartModel::whereIn('id', $request->carts)->delete();
-                deleteProductToCart::dispatch($request->carts);   
+                ProducttocartModel::whereIn('id', $request->carts)->delete();
+                // deleteProductToCart::dispatch($request->carts);   
                 return response()->json([
                     'status' => true,
                     'message' => 'Đặt hàng thành công',
@@ -1035,7 +1035,7 @@ class PurchaseController extends Controller
             "from_district_name" => $shopData->district,
             "from_province_name" => $shopData->province,
             "to_name" => $user->fullname,
-            "to_phone" => $user->phone,
+            "to_phone" => $address->phone ?? $user->phone,
             "to_address" => $address->address . ", " . $address->ward . ", " . $address->district . ", " . $address->province . ", Vietnam",
             "to_ward_name" => $address->ward,
             "to_district_name" => $address->district,
@@ -1082,7 +1082,7 @@ class PurchaseController extends Controller
             "from_district_name" => $shopData->district,
             "from_province_name" => $shopData->province,
             "to_name" => $user->fullname,
-            "to_phone" => $user->phone,
+            "to_phone" => $address->phone ?? $user->phone,
             "to_address" => $address->address . ", " . $address->ward . ", " . $address->district . ", " . $address->province . ", Vietnam",
             "to_ward_name" => $address->ward,
             "to_district_name" => $address->district,
@@ -1146,7 +1146,7 @@ class PurchaseController extends Controller
             "from_district_name" => $shopData->district,
             "from_province_name" => $shopData->province,
             "to_name" => $user->fullname,
-            "to_phone" => $user->phone,
+            "to_phone" => $address->phone ?? $user->phone,
             "to_address" => $address->address . ", " . $address->ward . ", " . $address->district . ", " . $address->province . ", Vietnam",
             "to_ward_name" => $address->ward,
             "to_district_name" => $address->district,
