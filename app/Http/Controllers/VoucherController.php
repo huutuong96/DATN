@@ -141,7 +141,7 @@ class VoucherController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $vouchers = Voucher::where('user_id', $user->id)->get();
         if ($vouchers->isEmpty()) {
-            return $this->errorResponse("Không tồn tại voucher nào");
+            return $this->errorResponse("Không tồn tại voucher nào", [], 404);
         }
         return $this->successResponse("Lấy dữ liệu thành công", $vouchers);
     }   
