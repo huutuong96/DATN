@@ -260,6 +260,9 @@ class ShopController extends Controller
     public function show(string $id)
     {
         $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        if (!$Shop) {
+            return $this->errorResponse("Không tồn tại Shop nào");
+        }
         $Shop->visits = $Shop->visits + 1;
         $Shop->save();
         $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();
@@ -318,7 +321,10 @@ class ShopController extends Controller
         // }
         $shop = Shop::where('id', $id)->where('status', 2)->first();
         $user = JWTAuth::parseToken()->authenticate();
-    
+        $shopLock = Shop::where('id', $id)->first();
+        if ($shopLock->status == 3) {
+            $shop = Shop::where('id', $id)->where('owner_id', $user->id)->first();
+        }
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
@@ -338,6 +344,7 @@ class ShopController extends Controller
             'district_id' => $request->district_id,
             'ward' => $request->ward,
             'ward_id' => $request->ward_id,
+            'image' => $request->image ?? $shop->image,
         ];
         try {
             $shop->update($dataInsert);
@@ -1626,4 +1633,15 @@ class ShopController extends Controller
         $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->select('id', 'title', 'slug')->get();
         return $this->successResponse('Lấy danh sách danh mục thành công', $categories);
     }
+
+    public function restore(Request $request, string $id)
+    {
+        $shop = Shop::where('id', $id)->first();
+        if (!$shop) {
+            return $this->errorResponse('shop không tồn tại', 404);
+        }
+        $shop->status = 2;
+        $shop->save();
+        return $this->successResponse('Khôi phục shop thành công', $shop);
+    }   
 }

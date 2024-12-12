@@ -203,7 +203,7 @@ Route::get('/search', function () {
                     Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"])->middleware('CheckRole:Seller');
                     Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"])->middleware('CheckRole:Seller');
                     Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"])->middleware('CheckRole:Seller');
-
+                    Route::get('shop/restore/{id}', [ShopController::class, "restore"])->middleware('CheckRole:Seller');
 
                     Route::post('shop/increase_follower/{id}', [ShopController::class, "increase_follower"]);
                     Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);
