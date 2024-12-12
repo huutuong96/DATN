@@ -28,16 +28,17 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $userId = JWTAuth::parseToken()->authenticate();
+       
         $limit = $request->limit ?? 10;
-        $notifications = Notification::where('user_id', $userId)->pluck('id_notification');
+        $notifications = Notification::where('user_id', $userId->id)->pluck('id_notification');
         $notificationToMain = Notification_to_mainModel::whereIn('id', $notifications)->paginate($limit);
         return response()->json($notificationToMain);
     }
-    public function get_noti_admin (Request $request){
-        $user = JWTAuth::parseToken()->authenticate();
-        $notifications = Notification::where('type', 'main')->paginate(10);
-        return response()->json($notifications);
-    }
+    // public function get_noti_admin (Request $request){
+    //     $user = JWTAuth::parseToken()->authenticate();
+    //     $notifications = Notification::where('type', 'main')->paginate(10);
+    //     return response()->json($notifications);
+    // }
 
     public function store(Request $request)
     {
