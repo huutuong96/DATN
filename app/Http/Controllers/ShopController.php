@@ -259,7 +259,10 @@ class ShopController extends Controller
 
     public function show(string $id)
     {
-        $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        $Shop = Shop::where('id', $id)->whereIn('status', [2, 3])->first();
+        if (!$Shop) {
+            return $this->errorResponse("Không tồn tại Shop nào");
+        }
         $Shop->visits = $Shop->visits + 1;
         $Shop->save();
         $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();
@@ -316,20 +319,16 @@ class ShopController extends Controller
         // if (!$IsOwnerShop) {
         //     return $this->errorResponse("Bạn không phải là chủ shop");
         // }
-        $shop = Shop::where('id', $id)->where('status', 1)->first();
+        $shop = Shop::where('id', $id)->where('status', 2)->first();
         $user = JWTAuth::parseToken()->authenticate();
-        $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
-        $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
-        $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
+        $shopLock = Shop::where('id', $id)->first();
+        if ($shopLock->status == 3) {
+            $shop = Shop::where('id', $id)->where('owner_id', $user->id)->first();
+        }
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $cloudinary = new Cloudinary();
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $dataInsert['image'] = $uploadedImage['secure_url'];
-        }
+
         $dataInsert = [
             'shop_name' => $request->shop_name ?? $shop->shop_name,
             'pick_up_address' => $request->pick_up_address ?? $shop->pick_up_address,
@@ -337,14 +336,15 @@ class ShopController extends Controller
             'cccd' => $request->cccd ?? $shop->cccd,
             'status' => $request->status ?? $shop->status,
             'tax_id' => $request->tax_id ?? $shop->tax_id,
-            'update_by' => auth()->user()->id,
+            'update_by' => $user->id,
             'updated_at' => now(),
-            'province' => $request->input('address')['province'],
-            'province_id' => $filteredCity['ProvinceID'],
-            'district' => $request->input('address')['district'],
-            'district_id' => $filteredDistrict['DistrictID'],
-            'ward' => $request->input('address')['ward'],
-            'ward_id' => $filledWard,
+            'province' => $request->province,
+            'province_id' => $request->province_id,
+            'district' => $request->district,
+            'district_id' => $request->district_id,
+            'ward' => $request->ward,
+            'ward_id' => $request->ward_id,
+            'image' => $request->image ?? $shop->image,
         ];
         try {
             $shop->update($dataInsert);
@@ -1633,4 +1633,15 @@ class ShopController extends Controller
         $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->select('id', 'title', 'slug')->get();
         return $this->successResponse('Lấy danh sách danh mục thành công', $categories);
     }
+
+    public function restore(Request $request, string $id)
+    {
+        $shop = Shop::where('id', $id)->first();
+        if (!$shop) {
+            return $this->errorResponse('shop không tồn tại', 404);
+        }
+        $shop->status = 2;
+        $shop->save();
+        return $this->successResponse('Khôi phục shop thành công', $shop);
+    }   
 }

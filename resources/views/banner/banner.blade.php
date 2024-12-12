@@ -79,12 +79,12 @@
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="index" class="form-label">Thứ tự</label>
-                                                                <input type="number" class="form-control" id="index" name="index" placeholder="Thứ tự hiển thị" required>
+                                                                <input type="number" class="form-control" id="index" name="index" min="1" placeholder="Thứ tự hiển thị" required title="lớn hơn 0">
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-12">
                                                             <div class="text-end">
-                                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                                <button type="submit" class="btn btn-primary">Thêm</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -222,7 +222,7 @@
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="index" class="form-label">Thứ tự</label>
-                                                                                                <input type="number" class="form-control" id="index" name="index" placeholder="Thứ tự hiển thị" value="{{ old('index', $banner->index) }}" required>
+                                                                                                <input type="number" class="form-control" id="index" name="index" min="0" placeholder="Thứ tự hiển thị" value="{{ old('index', $banner->index) }}" required title="vui lòng nhập lớn hơn 1">
                                                                                             </div>
                                                                                         </div>
                                                                                 

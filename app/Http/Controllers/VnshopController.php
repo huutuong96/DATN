@@ -480,9 +480,46 @@ class VnshopController extends Controller
     public function changeShop(Request $rqt){
        
         $shop = Shop::find($rqt->id);
+        $user_id = $shop->owner_id;
         if ($shop) {
             $shop->status =$rqt->status; 
             $shop->save(); 
+            switch ($rqt->status) {
+                case "1":
+                    $notificationRequest = new Request([
+                        'type' => 'main',
+                        'user_id' => $user_id,
+                        'title' => 'Tài khoản của bạn bị khóa',
+                        'description' => 'Tài khoản '.$shop->shop_name.' đã bị khóa',
+                        'shop_id' => $shop->id 
+                    ]);
+                    $notificationController = new NotificationController();
+                    $notificationController->store($notificationRequest);
+                    break;
+                case "4":
+                    $notificationRequest = new Request([
+                        'type' => 'main',
+                        'user_id' => $user_id,
+                        'title' => 'Tài khoản của bạn đã vi phạm',
+                        'description' => 'Tài khoản ' .$shop->shop_name.' đã bị vi phạm',
+                        'shop_id' => $shop->id 
+                    ]);
+                    $notificationController = new NotificationController();
+                    $notificationController->store($notificationRequest);
+                    break;
+                case "5":
+                    $notificationRequest = new Request([
+                        'type' => 'main',
+                        'user_id' => $user_id,
+                        'title' => 'Tài khoản của bạn bị xóa',
+                        'description' => 'Tài khoản '.$shop->shop_name.' đã bị xóa',
+                        'shop_id' => $shop->id 
+                    ]);
+                    $notificationController = new NotificationController();
+                    $notificationController->store($notificationRequest);
+                    break;
+               
+            }
             return back()->with('message', 'Cập nhật thành công!');
         }
     }
@@ -657,9 +694,82 @@ class VnshopController extends Controller
         if ($user) {
             $user->status =$rqt->status; 
             $user->save(); 
+            switch ($rqt->status) {
+                case "2":
+                    $notificationRequest = new Request([
+                        'type' => 'main',
+                        'user_id' => $user->id,
+                        'title' => 'Tài khoản của bạn bị khóa',
+                        'description' => 'Tài khoản '.$user->fullname.' đã bị khóa',
+                        'shop_id' => $user->shop->id 
+                    ]);
+                    $notificationController = new NotificationController();
+                    $notificationController->store($notificationRequest);
+                    break;
+                case "4":
+                    $notificationRequest = new Request([
+                        'type' => 'main',
+                        'user_id' => $user->id,
+                        'title' => 'Tài khoản của bạn đã vi phạm',
+                        'description' => 'Tài khoản ' .$user->fullname.' đã bị vi phạm',
+                       
+                    ]);
+                    $notificationController = new NotificationController();
+                    $notificationController->store($notificationRequest);
+                    break;
+                case "5":
+                    $notificationRequest = new Request([
+                        'type' => 'main',
+                        'user_id' => $user->id,
+                        'title' => 'Tài khoản của bạn bị xóa',
+                        'description' => 'Tài khoản '.$user->fullname.' đã bị xóa',
+                        
+                    ]);
+                    $notificationController = new NotificationController();
+                    $notificationController->store($notificationRequest);
+                    break;
+               
+            }
+            
             return Back();
         }
     }
+
+    // public function changeUser(Request $rqt){
+    //     $user = UsersModel::find($rqt->id);
+    //     if ($user) {
+    //         $user->status = $rqt->status;
+    //         $user->save();
+    //         $notifications = [
+    //             "2" => [
+    //                 'title' => 'Tài khoản của bạn bị khóa',
+    //                 'description' => 'Tài khoản ' . $user->fullname . ' đã bị khóa',
+    //             ],
+    //             "4" => [
+    //                 'title' => 'Tài khoản của bạn đã vi phạm',
+    //                 'description' => 'Tài khoản ' . $user->fullname . ' đã vi phạm',
+    //             ],
+    //             "5" => [
+    //                 'title' => 'Tài khoản của bạn bị xóa',
+    //                 'description' => 'Tài khoản ' . $user->fullname . ' đã bị xóa',
+    //             ],
+    //         ];
+    
+    //         if (isset($notifications[$rqt->status])) {
+    //             $notificationRequest = new Request([
+    //                 'type' => 'main',
+    //                 'user_id' => $user->id,
+    //                 'title' => $notifications[$rqt->status]['title'],
+    //                 'description' => $notifications[$rqt->status]['description'],
+    //             ]);
+    
+    //             $notificationController = new NotificationController();
+    //             $notificationController->store($notificationRequest);
+    //         }
+    
+    //         return back();
+    //     }
+    // }
     public function trashUser($limit = 5){
         $users = UsersModel::orderBy('updated_at', 'desc')->with('address')->with('rank')->where('status', "=", 5 )->paginate($limit);
         return view('users.trash',compact(

@@ -806,15 +806,7 @@ class ProductController extends Controller
     }
     
 
-    public function approve_product(Request $request, $id){
-        $product = Product::find($id);
-        if(!$product){
-            return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
-        }
-        $product->status = 2;
-        $product->save();
-        return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
-    }
+
     public function updateProduct(Request $request, string $id)
     // ProductRequest
     {
@@ -1109,6 +1101,16 @@ class ProductController extends Controller
         if ($product) {
             $product->status = 2;
             $product->save();
+            $user_id = $product->shop->owner_id;
+            $notificationRequest = new Request([
+                'type' => 'main',
+                'user_id' => $user_id,
+                'title' => 'Sản phẩm đã bị từ chối',
+                'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối với lý do'.$product->admin_note,
+                'shop_id' => $product->shop_id
+            ]);
+            $notificationController = new NotificationController();
+            $notificationController->store($notificationRequest);
             if($request->search){
                 return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
             }
@@ -1121,6 +1123,25 @@ class ProductController extends Controller
         return redirect()->route('product_all', ['tab' => $tab,'tabchill'=>$tabchill])->with('error', 'Sản phẩm không tìm thấy.');
     }
     
+    public function approve_product(Request $request, $id){
+        $product = Product::find($id);
+        if(!$product){
+            return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
+        }
+        $product->status = 2;
+        $product->save();
+         $user_id = $product->shop->owner_id;
+        $notificationRequest = new Request([
+            'type' => 'main',
+            'user_id' => $user_id,
+            'title' => 'Sản phẩm đã bị từ chối',
+            'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối với lý do'.$product->admin_note,
+            'shop_id' => $product->shop_id
+        ]);
+        $notificationController = new NotificationController();
+        $notificationController->store($notificationRequest);
+        return redirect()->back()->with('success', 'Duyệt sản phẩm thành công');
+    }
     public function rejectProduct(Request $request,$id)
     {
         $tab = $request->tab;
@@ -1128,6 +1149,16 @@ class ProductController extends Controller
         if ($product) {
             $product->status = 0;
             $product->save();
+            $user_id = $product->shop->owner_id;
+            $notificationRequest = new Request([
+                'type' => 'main',
+                'user_id' => $user_id,
+                'title' => 'Sản phẩm đã bị từ chối',
+                'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối',
+                'shop_id' => $product->shop_id
+            ]);
+            $notificationController = new NotificationController();
+            $notificationController->store($notificationRequest);
             if($request->search){
                 return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
             }
@@ -1145,11 +1176,21 @@ class ProductController extends Controller
     $token = $request->query('token'); // Lấy token từ URL
     $reason = $request->input('reason');
     $product = Product::find($id);
-
+   
     if ($product) {
         $product->status = 4;
         $product->admin_note = $reason;
         $product->save();
+        $user_id = $product->shop->owner_id;
+        $notificationRequest = new Request([
+            'type' => 'main',
+            'user_id' => $user_id,
+            'title' => 'Sản phẩm đã bị từ chối',
+            'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối với lý do'.$product->admin_note,
+            'shop_id' => $product->shop_id
+        ]);
+        $notificationController = new NotificationController();
+        $notificationController->store($notificationRequest);
         if($request->search){
             return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
         }

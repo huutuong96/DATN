@@ -196,14 +196,14 @@ Route::get('/search', function () {
 
                 //SHOP
                     Route::post('shops', [ShopController::class, 'store']);
-                    Route::put('shops/{id}', [ShopController::class, 'update'])->middleware('CheckRole:Admin');
+                    Route::post('shops/{id}', [ShopController::class, 'update'])->middleware('CheckRole:Admin');
                     Route::delete('shops/{id}', [ShopController::class, 'destroy'])->middleware('CheckRole:Admin');
                     Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"])->middleware('CheckRole:Admin');
                     Route::post('shop/manager', [ShopController::class, "shop_manager_store"])->middleware('CheckRole:Seller');
                     Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"])->middleware('CheckRole:Seller');
                     Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"])->middleware('CheckRole:Seller');
                     Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"])->middleware('CheckRole:Seller');
-
+                    Route::get('shop/restore/{id}', [ShopController::class, "restore"])->middleware('CheckRole:Seller');
 
                     Route::post('shop/increase_follower/{id}', [ShopController::class, "increase_follower"]);
                     Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);

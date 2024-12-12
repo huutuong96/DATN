@@ -62,7 +62,7 @@
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="condition" class="form-label">Số điểm áp dụng</label>
-                                                                <input type="text" class="form-control" placeholder="Nhập Số điểm áp dụng" id="condition" name="condition" required>
+                                                                <input type="text" class="form-control" placeholder="Nhập Số điểm áp dụng" id="condition" name="condition" min="0" required title="nhập lớn hơn 0">
                                                             </div>
                                                         </div>
                                                 
@@ -72,7 +72,7 @@
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="value" class="form-label">Tỷ lệ (%)</label>
-                                                                <input type="number" step="0.01" class="form-control" placeholder="Nhập tỷ lệ" id="value" name="value" required>
+                                                                <input type="number" step="0.01" class="form-control" min="0" placeholder="Nhập tỷ lệ" id="value" name="value" required title="Nhập lớn hơn 0">
                                                             </div>
                                                         </div>
                                                 
@@ -80,7 +80,7 @@
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="limitValue" class="form-label">Số tiền giới hạn</label>
-                                                                <input type="number" step="0.01" class="form-control" placeholder="Nhập giá trị giới hạn" id="limitValue" name="limitValue" required>
+                                                                <input type="number" step="0.01" class="form-control" placeholder="Nhập giá trị giới hạn" id="limitValue" min="0" name="limitValue" required title="Nhập lớn hơn 0">
                                                             </div>
                                                         </div>
                                                           <!-- Trạng thái -->
@@ -218,7 +218,7 @@
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="value-{{ $rank->id }}" class="form-label">Tỷ lệ (%)</label>
-                                                                                                <input type="number" step="0.01" class="form-control" placeholder="Tỷ lệ (%)" id="value-{{ $rank->id }}" name="value" value="{{ $rank->value }}" required>
+                                                                                                <input type="number" step="0.01" class="form-control" placeholder="Tỷ lệ (%)" id="value-{{ $rank->id }}" name="value" value="{{ $rank->value }}" min="0" required title="Nhập lớn hơn 0">
                                                                                             </div>
                                                                                         </div>
                                                                                 
@@ -226,7 +226,7 @@
                                                                                         <div class="col-6">
                                                                                             <div class="mb-3">
                                                                                                 <label for="limitValue-{{ $rank->id }}" class="form-label">Giá trị giới hạn</label>
-                                                                                                <input type="number" step="0.01" class="form-control" placeholder="Giá trị giới hạn" id="limitValue-{{ $rank->id }}" name="limitValue" value="{{ $rank->limitValue }}" required>
+                                                                                                <input type="number" step="0.01" class="form-control" placeholder="Giá trị giới hạn" id="limitValue-{{ $rank->id }}" name="limitValue" value="{{ $rank->limitValue }}" min="0" required title="Nhập lớn hơn 0">
                                                                                             </div>
                                                                                         </div>
                                                                                 
