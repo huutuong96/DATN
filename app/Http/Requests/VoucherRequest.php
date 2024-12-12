@@ -22,17 +22,20 @@ class VoucherRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:0',
-            'condition' => 'nullable',
-           'ratio' => 'nullable|numeric',
-            'code' => 'nullable|string|max:100',
-            'status' => 'required',
-        ];
-    }
+{
+    return [
+        'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'quantity' => 'required|integer|min:1',
+        'condition' => 'nullable',
+        'ratio' => 'nullable|numeric|min:0', 
+        'code' => 'nullable|string|max:100',
+        'status' => 'required',
+        'amount' => 'required|integer|min:1',
+        'count' => 'required|integer|min:1',
+       
+    ];
+}
 
     /**
      * Get the custom validation messages.
@@ -42,19 +45,19 @@ class VoucherRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'The title field is required.',
-            'title.string' => 'The title must be a string.',
-            'title.max' => 'The title may not be greater than 255 characters.',
-            'description.string' => 'The description must be a string.',
-            'quantity.required' => 'The quantity field is required.',
-            'quantity.integer' => 'The quantity must be an integer.',
-            'quantity.min' => 'The quantity must be at least 0.',
-            'condition.string' => 'The condition must be a string.',
-            'ratio.numeric' => 'The ratio must be a number.',
-            'code.string' => 'The code must be a string.',
-            'code.max' => 'The code may not be greater than 100 characters.',
-            'status.required' => 'The status field is required.',
-            'status.string' => 'The status must be a string.',
+            'title.required' => 'Trường tiêu đề là bắt buộc.',
+            'title.string' => 'Trường tiêu đề phải là một chuỗi ký tự.',
+            'title.max' => 'Trường tiêu đề không được vượt quá 255 ký tự.',
+            'description.string' => 'Trường mô tả phải là một chuỗi ký tự.',
+            'quantity.required' => 'Trường số lượng là bắt buộc.',
+            'quantity.integer' => 'Trường số lượng phải là một số nguyên.',
+            'quantity.min' => 'Trường số lượng phải lớn hơn hoặc bằng 0.',
+            'condition.string' => 'Trường điều kiện phải là một chuỗi ký tự.',
+            'ratio.numeric' => 'Trường tỷ lệ phải là một số.',
+            'code.string' => 'Trường mã phải là một chuỗi ký tự.',
+            'code.max' => 'Trường mã không được vượt quá 100 ký tự.',
+            'status.required' => 'Trường trạng thái là bắt buộc.',
+            'status.string' => 'Trường trạng thái phải là một chuỗi ký tự.',
         ];
     }
 
