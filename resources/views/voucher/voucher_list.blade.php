@@ -88,8 +88,8 @@
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="min_order" class="form-label">Đơn hàng tối thiểu được áp dụng</label>
-                                                                <input type="number" class="form-control" id="min_order"
-                                                                    name="min_order" placeholder="Đơn hàng tối thiểu được áp dụng">
+                                                                <input type="number" class="form-control" id="min"
+                                                                    name="min" placeholder="Đơn hàng tối thiểu được áp dụng">
                                                             </div>
                                                         </div>
 
