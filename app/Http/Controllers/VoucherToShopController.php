@@ -46,18 +46,8 @@ class VoucherToShopController extends Controller
             $voucherMain->image = $voucherImage ?? null;
             $voucherMain->create_by = auth()->user()->id;
             $voucherMain->save();
-            try {
-                $voucherMain->save();
-                foreach ($users as $user) {
-                    SendNotification::dispatch($voucherMain->title, $voucherMain->description, $user->id, null, $voucherImage);
-                }
-                return redirect()->route('voucherall', [
-                    'token' => $token,
-                ])->with('message', 'Thêm voucher main thành công');
-            } catch (\Throwable $th) {
-                return redirect()->route('voucherall', [
-                    'token' => $token,
-                ])->with('error', 'Thêm voucher main không thành công: ' . $th->getMessage());
+            foreach ($users as $user) {
+                SendNotification::dispatch($voucherMain->title, $voucherMain->description, $user->id, null, $voucherImage);
             }
             return $this->successResponse("Thêm voucher shop thành công", $voucherShop);
         } catch (\Throwable $th) {
