@@ -77,7 +77,7 @@
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="rate" class="form-label">Tỷ lệ (%)</label>
-                                                                <input type="number" step="0.01" class="form-control" placeholder="Nhập tỷ lệ" id="rate" name="rate" required>
+                                                                <input type="number" step="0.01" class="form-control" placeholder="Nhập tỷ lệ" id="rate" name="rate" min="0" required title="Nhập lớn hơn 0">
                                                             </div>
                                                         </div>
                                                 

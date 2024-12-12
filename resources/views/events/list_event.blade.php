@@ -40,7 +40,7 @@
                                   </div>
                                   <div class="col-md-6">
                                       <label for="qualifier" class="form-label">Điều kiện</label>
-                                      <input type="text" class="form-control" id="qualifier" name="qualifier" value="{{ old('qualifier') }}">
+                                      <input type="text" class="form-control" id="qualifier" name="qualifier" min="1" value="{{ old('qualifier') }}" required title="nhập lớn hơn 0">
                                   </div>
                                   <div class="col-md-6">
                                       <label for="voucher_apply" class="form-label">Tiêu Đề Mã Giảm Giá</label>
@@ -52,15 +52,15 @@
                                   </div>
                                   <div class="col-md-2">
                                       <label for="voucher_apply" class="form-label">Số lượng mã giảm giá</label>
-                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_quantity" value="{{ old('voucher_apply') }}">
+                                      <input type="text" class="form-control" id="voucher_apply" min="1" name="voucher_quantity" value="{{ old('voucher_apply') }}" required title="Nhập lớn hơn 0">
                                   </div>
                                   <div class="col-md-2">
                                       <label for="voucher_apply" class="form-label">Số tiền giới hạn</label>
-                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_limit" value="{{ old('voucher_apply') }}">
+                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_limit" min="1" value="{{ old('voucher_apply') }}"required title="Nhập lớn hơn 0">
                                   </div>
                                   <div class="col-md-2">
                                       <label for="voucher_apply" class="form-label">% Giảm giá</label>
-                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_ratio" value="{{ old('voucher_apply') }}">
+                                      <input type="text" class="form-control" id="voucher_apply" name="voucher_ratio" min="0" value="{{ old('voucher_apply') }}"required title="Nhập lớn hơn 0">
                                   </div>
                                   <div class="col-md-2">
                                       <label for="voucher_apply" class="form-label">Mã Giảm Giá</label>
@@ -82,16 +82,16 @@
                                 </div>
                                   <div class="col-md-3">
                                       <label for="point" class="form-label">Áp dụng theo điểm</label>
-                                      <input type="number" class="form-control" id="point" name="point" value="{{ old('point', 0) }}">
+                                      <input type="number" class="form-control" id="point" name="point" value="{{ old('point', 0) }}" min="0" required title="Nhập lớn hơn 0">
                                   </div>
                                 
                                   <div class="col-md-3">
                                       <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
-                                      <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', 0) }}">
+                                      <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', 0) }}" min="0" required title="Nhập lớn hơn 0">
                                   </div>
                                   <div class="col-md-3">
                                       <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
-                                      <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" value="{{ old('where_price', 0) }}">
+                                      <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" value="{{ old('where_price', 0) }}" min="0" required title="Nhập lớn hơn 0">
                                   </div>
 
                                   <div class="col-md-3">
@@ -235,7 +235,7 @@
                                                                                   <div class="col-md-6">
                                                                                     <label for="qualifier" class="form-label">Điều kiện</label>
                                                                                     <input type="text" class="form-control" id="qualifier" name="qualifier" 
-                                                                                           value="{{ old('qualifier', $event->qualifier) }}">
+                                                                                           value="{{ old('qualifier', $event->qualifier) }}" min="0" required title="Nhập lớn hơn 0">
                                                                                 </div>
                                                                                 <div class="col-md-6">
                                                                                     <label for="voucher_title" class="form-label">Tiêu Đề Mã Giảm Giá</label>
@@ -250,22 +250,22 @@
                                                                                 <div class="col-md-2">
                                                                                     <label for="voucher_quantity" class="form-label">Số lượng mã giảm giá</label>
                                                                                     <input type="number" class="form-control" id="voucher_quantity" name="voucher_quantity" 
-                                                                                           value="{{ old('voucher_quantity', $event['voucher_apply']['voucher_quantity'] ?? 'N/A') }}">
+                                                                                           value="{{ old('voucher_quantity', $event['voucher_apply']['voucher_quantity'] ?? 'N/A') }}" min="0" required title="Nhập lớn hơn 0">
                                                                                 </div>
                                                                                 <div class="col-md-2">
                                                                                     <label for="voucher_limit" class="form-label">Số tiền giới hạn</label>
                                                                                     <input type="number" class="form-control" id="voucher_limit" name="voucher_limit" 
-                                                                                           value="{{ old('voucher_limit', $event['voucher_apply']['voucher_limit'] ?? 'N/A') }}">
+                                                                                           value="{{ old('voucher_limit', $event['voucher_apply']['voucher_limit'] ?? 'N/A') }}" min="0" required title="Nhập lớn hơn 0">
                                                                                 </div>
                                                                                 <div class="col-md-2">
                                                                                     <label for="voucher_ratio" class="form-label">% Giảm giá</label>
                                                                                     <input type="number" step="0.01" class="form-control" id="voucher_ratio" name="voucher_ratio" 
-                                                                                           value="{{ old('voucher_ratio', $event['voucher_apply']['voucher_ratio'] ?? 'N/A') }}">
+                                                                                           value="{{ old('voucher_ratio', $event['voucher_apply']['voucher_ratio'] ?? 'N/A') }}" min="0" required title="Nhập lớn hơn 0">
                                                                                 </div>
                                                                                 <div class="col-md-2">
                                                                                     <label for="voucher_code" class="form-label">Mã Giảm Giá</label>
                                                                                     <input type="text" class="form-control" id="voucher_code" name="voucher_code" 
-                                                                                           value="{{ old('voucher_code', $event['voucher_apply']['voucher_code'] ?? 'N/A') }}" required>
+                                                                                     min="0" value="{{ old('voucher_code', $event['voucher_apply']['voucher_code'] ?? 'N/A') }}" required>
                                                                                 </div>
                                                                                 
                                                                                   <div class="col-md-3">
@@ -288,17 +288,17 @@
                                                                                   <div class="col-md-3">
                                                                                       <label for="point" class="form-label">Áp dụng theo điểm</label>
                                                                                       <input type="number" class="form-control" id="point" name="point" 
-                                                                                             value="{{ old('point', $event->point) }}">
+                                                                                             value="{{ old('point', $event->point) }}" min="0" required title="Nhập lớn hơn 0">
                                                                                   </div>
                                                                                   <div class="col-md-3">
                                                                                       <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
                                                                                       <input type="number" class="form-control" id="where_order" name="where_order" 
-                                                                                             value="{{ old('where_order', $event->where_order) }}">
+                                                                                             value="{{ old('where_order', $event->where_order) }}" min="0" required title="Nhập lớn hơn 0">
                                                                                   </div>
                                                                                   <div class="col-md-3">
                                                                                       <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
                                                                                       <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" 
-                                                                                             value="{{ old('where_price', $event->where_price) }}">
+                                                                                             value="{{ old('where_price', $event->where_price) }}" min="0" required title="Nhập lớn hơn 0">
                                                                                   </div>
                                                                                   <div class="col-md-3">
                                                                                       <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
