@@ -6,6 +6,7 @@ use App\Models\VoucherToShop;
 use App\Http\Requests\VoucherRequest;
 use App\Models\UsersModel;
 use App\Models\voucherToMain;
+use App\Http\Controllers\SendNotification;
 
 class VoucherToShopController extends Controller
 {
