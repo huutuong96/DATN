@@ -164,11 +164,11 @@ Route::get('/search', function () {
 
                 Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
                 Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
+                
+                
 
                 Route::get('get_voucher_to_shop/{id}', [ShopController::class, 'get_voucher_to_shop']);
                 Route::post('update_voucher_to_shop/{id}', [ShopController::class, 'UpdateVoucherToShop']);
-                
-                
 
                 Route::resource('follows', FollowToShopController::class);
                 Route::post('up_follow/{shop_id}', [FollowToShopController::class, 'follows']);

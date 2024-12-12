@@ -770,11 +770,71 @@ class ShopController extends Controller
                 $average_revenue_per_order =$orders->avg('net_amount');
                 $visits = $shop->visits;
         return $this->successResponse("Lấy dữ liệu thành công", [
-            'total_revenue_orders' => $total_revenue_orders,
-            'total_orders' => $total_orders,
-            'average_revenue_per_order' => $average_revenue_per_order,
-            'visits' => $visits,
+                'revenue' => [
+                    'labelEN' => 'revenue',
+                    'labelVN' => 'Doanh số',
+                    'value' => $total_revenue_orders,
+                    'isPrice' => true
+                ],
+                'total_orders' => [
+                    'labelEN' => 'total_orders',
+                    'labelVN' => 'Tổng Đơn Hàng',
+                    'value' => $total_orders,
+                    'isPrice' => false
+                ],
+                'average_revenue_per_order' => [
+                    'labelEN' => 'average_revenue_per_order',
+                    'labelVN' => 'Trung Bình Doanh Số Mỗi Đơn Hàng',
+                    'value' => $average_revenue_per_order,
+                    'isPrice' => true
+                ],
+                'visits' => [
+                    'labelEN' => 'visits',
+                    'labelVN' => 'Lượt Truy Cập',
+                    'value' => $visits,
+                    'isPrice' => false
+                ],
         ]);
+    }
+
+    public function get_analyst_rank_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        } 
+        if ($request->has('sort')) {
+            $sort = $request->input('sort');
+            switch ($sort) {
+            case 'orders':
+                $orders = OrdersModel::where('shop_id', $shop->id)->get()->orderby('net_amount', 'desc');
+                $products = Product::whereIn('id', $orders->pluck('id'))->get()->orderby('visits', 'desc');;
+                if ($request->category_id) {
+                    $products->where('category_id', $request->category_id);
+                    $orders->whereIn('product_id', $products->pluck('id'));
+                }
+                return $this->successResponse("Lấy dữ liệu thành công", $orders ?? []);
+            break;
+            case 'producs':
+                $products = Product::where('shop_id', $shop->id)->get()->orderby('sold_count', 'desc');
+                if ($request->category_id) {
+                    $products->where('category_id', $request->category_id);
+                }
+                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
+            break;
+            case 'views':
+                $products = Product::where('shop_id', $shop->id)->get()->orderby('visits', 'desc');;
+                if ($request->category_id) {
+                    $products->where('category_id', $request->category_id);
+                }
+                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
+            break;
+            default:
+            break;
+            }
+        }       
+            
+
     }
 
     public function get_analyst_chart_shop(Request $request, string $id)
@@ -810,10 +870,6 @@ class ShopController extends Controller
                 ];
             })->values();
             return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
-            // return $this->successResponse("Lấy dữ liệu thành công", [
-            //     'chartConfig' => $chartConfig,
-            //     'data' => $formattedOrders,
-            // ]);
             break;
             case '2':
             $orders->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
