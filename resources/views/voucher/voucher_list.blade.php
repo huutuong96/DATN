@@ -93,9 +93,15 @@
                                                         </div>
                                                         <div class="col-6">
                                                             <div class="mb-3">
-                                                                <label for="status" class="form-label">Trạng thái</label>
-                                                                <select class="form-control" id="status" name="status" required title="Vui lòng chọn trạng thái.">
-                                                                    <option value="" disabled selected>Chọn trạng thái</option>
+                                                                <label for="status" class="form-label">Status</label>
+                                                                <select style="    width: 513px;
+                                                                                    margin-top: -12px;
+                                                                                    left: 2em;"
+                                                                        class="form-control" id="status"
+                                                                        name="status"
+                                                                        required title="Vui lòng chọn trạng thái."
+                                                                >
+                                                                    <option  value="" disabled selected>chọn trạng thái</option>
                                                                     <option value="2">Active</option>
                                                                     <option value="0">Inactive</option>
                                                                 </select>
