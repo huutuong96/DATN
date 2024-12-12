@@ -32,7 +32,7 @@
                                             <div class="col-6">
                                                 <div class="mb-3">
                                                     <label for="index" class="form-label">Vị trí</label>
-                                                    <input type="number" class="form-control" value="1" name="index" required>
+                                                    <input type="number" class="form-control" value="1" min="0" name="index" required title="nhập lớn hơn 0">
                                                 </div>
                                             </div>
                                     
