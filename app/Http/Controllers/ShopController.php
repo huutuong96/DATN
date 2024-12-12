@@ -797,45 +797,48 @@ class ShopController extends Controller
         ]);
     }
 
-    public function get_analyst_rank_shop(Request $request, string $id)
-    {
-        $shop = Shop::find($id);
-        if (!$shop) {
-            return $this->errorResponse("Shop không tồn tại");
-        } 
-        if ($request->has('sort')) {
-            $sort = $request->input('sort');
-            switch ($sort) {
-            case 'orders':
-                $orders = OrdersModel::where('shop_id', $shop->id)->get()->orderby('net_amount', 'desc');
-                $products = Product::whereIn('id', $orders->pluck('id'))->get()->orderby('visits', 'desc');;
-                if ($request->category_id) {
-                    $products->where('category_id', $request->category_id);
-                    $orders->whereIn('product_id', $products->pluck('id'));
-                }
-                return $this->successResponse("Lấy dữ liệu thành công", $orders ?? []);
-            break;
-            case 'producs':
-                $products = Product::where('shop_id', $shop->id)->get()->orderby('sold_count', 'desc');
-                if ($request->category_id) {
-                    $products->where('category_id', $request->category_id);
-                }
-                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
-            break;
-            case 'views':
-                $products = Product::where('shop_id', $shop->id)->get()->orderby('visits', 'desc');;
-                if ($request->category_id) {
-                    $products->where('category_id', $request->category_id);
-                }
-                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
-            break;
-            default:
-            break;
-            }
-        }       
+    // public function get_analyst_rank_shop(Request $request, string $id)
+    // {
+    //     $shop = Shop::find($id);
+    //     if (!$shop) {
+    //         return $this->errorResponse("Shop không tồn tại");
+    //     } 
+    //     if ($request->has('sort')) {
+    //         $sort = $request->input('sort');
+    //         switch ($sort) {
+    //         case 'orders':
+    //             $orders = OrdersModel::where('shop_id', $shop->id)->orderBy('net_amount', 'desc')->select('id', 'net_amount')->get();
+    //             return $this->successResponse("Lấy dữ liệu thành công", $orders ?? []);
+    //         break;
+    //         case 'products':
+    //             $ordersGroup = [];
+    //             $orders = OrdersModel::where('shop_id', $shop->id)->select('id', 'net_amount')->get();
+    //             $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->select('order_id', 'product_id')->get();
+    //             return $orderDetails;
+    //             $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->select('id', 'name')->get();
+    //             foreach ($products as $product) {
+    //                 $ordersGroup['name'] = $product->name;
+    //             }
+    //             foreach ($orders as $order) {
+    //                 $ordersGroup['net_amount'] = $order->net_amount;
+    //             }
+        
+    //             return $this->successResponse("Lấy dữ liệu thành công", $ordersGroup ?? []);
+    //         break;
+    //         case 'views':
+    //             $products = Product::where('shop_id', $shop->id)->orderBy('view_count', 'desc')->get();
+    //             if ($request->category_id) {
+    //                 $products->where('category_id', $request->category_id);
+    //             }
+    //             return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
+    //         break;
+    //         default:
+    //         break;
+    //         }
+    //     }       
             
 
-    }
+    // }
 
     public function get_analyst_chart_shop(Request $request, string $id)
     {
@@ -865,7 +868,7 @@ class ShopController extends Controller
                     'dateKey' => $time,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
@@ -882,7 +885,7 @@ class ShopController extends Controller
                     'dateKey' => $date,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
@@ -898,7 +901,7 @@ class ShopController extends Controller
                     'dateKey' => $date,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
@@ -914,7 +917,7 @@ class ShopController extends Controller
                     'dateKey' => $month,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'cancelledOrders' => $orderGroup->where('order_status', 10)->count(),
+                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
