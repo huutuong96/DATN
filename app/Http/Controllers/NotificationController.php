@@ -28,8 +28,9 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $userId = JWTAuth::parseToken()->authenticate();
+       
         $limit = $request->limit ?? 10;
-        $notifications = Notification::where('user_id', $userId)->pluck('id_notification');
+        $notifications = Notification::where('user_id', $userId->id)->pluck('id_notification');
         $notificationToMain = Notification_to_mainModel::whereIn('id', $notifications)->paginate($limit);
         return response()->json($notificationToMain);
     }
