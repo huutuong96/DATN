@@ -832,10 +832,17 @@ class ShopController extends Controller
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         } 
-        $products = Product::where('shop_id', $shop->id)->select('category_id')->get();
-        $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->get;
-        return $this->successResponse("Lấy dữ liệu thành công", $categories ?? []);
+        $products = Product::where('shop_id', $shop->id)->select('category_id', 'sold_count')->get();
+        $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->get();
 
+        $soldCounts = $products->groupBy('category_id')->map(function ($group) {
+            return [
+                'category_id' => $group->first()->category_id,
+                'sold_count' => $group->sum('sold_count')
+            ];
+        })->values()->toArray();
+        $soldCounts = collect($soldCounts)->sortByDesc('sold_count')->values()->all();
+        return $this->successResponse("Lấy dữ liệu thành công", $soldCounts ?? []);
     }
 
     public function get_analyst_chart_shop(Request $request, string $id)
