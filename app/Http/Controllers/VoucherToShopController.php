@@ -41,7 +41,7 @@ class VoucherToShopController extends Controller
             $voucherMain->limitValue = $request->limitValue;
             $voucherMain->ratio = $request->ratio;
             $voucherMain->code = $request->code;
-            $voucherMain->status = $request->status;
+            $voucherMain->status = $request->status ?? 2;
             $voucherMain->min = $request->min_order;
             $voucherMain->image = $voucherImage ?? null;
             $voucherMain->create_by = auth()->user()->id;
