@@ -28,9 +28,13 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $userId = JWTAuth::parseToken()->authenticate();
+       
         $limit = $request->limit ?? 10;
-        $notifications = Notification::where('user_id', $userId)->pluck('id_notification');
-        $notificationToMain = Notification_to_mainModel::whereIn('id', $notifications)->paginate($limit);
+        $notifications = Notification::where('user_id', $userId->id)->pluck('id_notification');
+        $notificationToMain = Notification_to_mainModel::whereIn('id', $notifications)
+        ->orderBy('created_at', 'desc') 
+        ->paginate($limit);
+    
         return response()->json($notificationToMain);
     }
     public function get_noti_admin (Request $request){
@@ -41,10 +45,11 @@ class NotificationController extends Controller
 
     public function store(Request $request)
     {
+
         $user = JWTAuth::parseToken()->authenticate();
         $notification = new Notification();
         $notification->type = $request->type;
-        $notification->user_id = $user->id;
+        $notification->user_id = $request->user_id;
 
         if ($request->image) {
             $image = $request->file('image');

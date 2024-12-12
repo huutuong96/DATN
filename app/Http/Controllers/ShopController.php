@@ -322,12 +322,8 @@ class ShopController extends Controller
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $cloudinary = new Cloudinary();
-            $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
-            $dataInsert['image'] = $uploadedImage['secure_url'];
-        }
+        $user = JWTAuth::parseToken()->authenticate();
+
         $dataInsert = [
             'shop_name' => $request->shop_name ?? $shop->shop_name,
             'pick_up_address' => $request->pick_up_address ?? $shop->pick_up_address,
