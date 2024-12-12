@@ -942,7 +942,7 @@ class ShopController extends Controller
 
         $perPage = $request->limit ?? 10; // Number of items per page
         $voucher_to_shop = VoucherToShop::where('shop_id', $shop->id)
-            ->where('status', 1)
+            ->where('status', 2)
             ->paginate($perPage);
 
         return $this->successResponse('Lấy voucher thành công', [
