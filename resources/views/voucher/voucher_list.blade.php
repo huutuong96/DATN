@@ -39,68 +39,58 @@
                                     <div class="modal-dialog modal-dialog-centered modal-xl">
                                         <div class="modal-content">
                                             <div class="modal-body text-center p-5">
-                                                <form action="{{ route('voucher_main.store',[
-                                                                                                'token' => auth()->user()->refesh_token]) }}" method="POST" enctype="multipart/form-data">
+                                                <form action="{{ route('voucher_main.store', ['token' => auth()->user()->refesh_token]) }}" method="POST" enctype="multipart/form-data">
                                                     @csrf
                                                     <div class="row">
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="title" class="form-label">Tiêu đề</label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Tiêu đề" id="title" name="title"
-                                                                    required>
+                                                                <input type="text" class="form-control" id="title" name="title" 
+                                                                    placeholder="Tiêu đề" required title="Tiêu đề không được để trống.">
                                                             </div>
                                                         </div>
-
                                                         <div class="col-6">
                                                             <div class="mb-3">
-                                                                <label for="description"
-                                                                    class="form-label">Nội dung</label>
-                                                                <textarea class="form-control" placeholder="Nội dung" id="description" name="description" rows="2"
-                                                                    required></textarea>
+                                                                <label for="description" class="form-label">Nội dung</label>
+                                                                <textarea class="form-control" id="description" name="description" 
+                                                                    rows="2" placeholder="Nội dung" required title="Nội dung không được để trống."></textarea>
                                                             </div>
                                                         </div>
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="quantity" class="form-label">Số lượng</label>
-                                                                <input type="number" class="form-control" id="quantity"
-                                                                    name="quantity" placeholder="Số lượng" required>
+                                                                <input type="number" min="1" class="form-control" id="quantity" name="quantity" 
+                                                                    placeholder="Số lượng" required title="Số lượng phải lớn hơn hoặc bằng 1.">
                                                             </div>
                                                         </div>
-
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="limitValue" class="form-label">Số tiền tối đa được giảm</label>
-                                                                <input type="number" class="form-control" id="limitValue"
-                                                                    name="limitValue" placeholder="số tiền tối đa được giảm"
-                                                                    required>
+                                                                <input type="number" min="1" class="form-control" id="limitValue" name="limitValue" 
+                                                                    placeholder="Số tiền tối đa được giảm" required title="Số tiền phải lớn hơn hoặc bằng 1.">
                                                             </div>
                                                         </div>
-
                                                         <div class="col-6">
                                                             <div class="mb-3">
-                                                                <label for="ratio" class="form-label">Phần trăm giảm giá</label>
-                                                                <input type="number"  step="0.01" class="form-control" id="ratio"
-                                                                    name="ratio" placeholder="Phần trăm giảm giá">
+                                                                <label for="ratio" class="form-label">Phần trăm giảm giá(%)</label>
+                                                                <input type="number" step="0.01" min="0" max="1" class="form-control" id="ratio" name="ratio" 
+                                                                    placeholder="Phần trăm giảm giá (0-100)" required title="Phần trăm giảm giá phải nằm trong khoảng 0 đến 1.">
                                                             </div>
                                                         </div>
-
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="min_order" class="form-label">Đơn hàng tối thiểu được áp dụng</label>
-                                                                <input type="number" class="form-control" id="min_order"
-                                                                    name="min_order" placeholder="Đơn hàng tối thiểu được áp dụng">
+                                                                <input type="number" min="1" class="form-control" id="min" name="min" 
+                                                                    placeholder="Đơn hàng tối thiểu được áp dụng" required title="Giá trị tối thiểu phải lớn hơn hoặc bằng 1.">
                                                             </div>
                                                         </div>
-
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="code" class="form-label">Mã giảm giá</label>
-                                                                <input type="text" class="form-control" id="code"
-                                                                    name="code" placeholder="Enter code">
+                                                                <input type="text" class="form-control" id="code" name="code" 
+                                                                    placeholder="Mã giảm giá" required title="Mã giảm giá không được để trống.">
                                                             </div>
                                                         </div>
-
                                                         <div class="col-6">
                                                             <div class="mb-3">
                                                                 <label for="status" class="form-label">Status</label>
@@ -109,7 +99,7 @@
                                                                                     left: 2em;"
                                                                         class="form-control" id="status"
                                                                         name="status"
-                                                                        required
+                                                                        required title="Vui lòng chọn trạng thái."
                                                                 >
                                                                     <option  value="" disabled selected>chọn trạng thái</option>
                                                                     <option value="2">Active</option>
@@ -117,23 +107,21 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-
                                                         <div class="col-4">
                                                             <div class="mb-3">
                                                                 <label for="image_voucher" class="form-label">Hình ảnh</label>
-                                                                <input type="file" class="form-control" id="image_voucher"
-                                                                    name="image_voucher" placeholder="Hình ảnh voucher">
+                                                                <input type="file" class="form-control" id="image_voucher" name="image_voucher" 
+                                                                    accept="image/*" required title="Vui lòng chọn một hình ảnh.">
                                                             </div>
                                                         </div>
-
                                                         <div class="col-lg-12">
                                                             <div class="text-end">
-                                                                <button type="submit"
-                                                                    class="btn btn-primary">Submit</button>
+                                                                <button type="submit" class="btn btn-primary">Thêm </button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </form>
+                                                
                                             </div>
                                         </div>
                                     </div>
