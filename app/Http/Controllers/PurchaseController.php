@@ -223,7 +223,9 @@ class PurchaseController extends Controller
                     $order->total_amount = $shipFee + $order->total_amount;
                     $this->order_update_infomaion($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                     $order->save();
+                    $shopData->save();
                 }
+
                 // return $ordersByShop;
                 // return ($grandTotalPrice + $shipFee) - $discountMainVoucher;
                 DB::commit();
