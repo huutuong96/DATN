@@ -28,7 +28,7 @@
             <div class="card-body p-4">
                 <div class="text-center">
                     <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
-                            <img src="{{ auth()->user()->avatar }}" class="rounded-circle avatar-xl img-thumbnail user-profile-image material-shadow" alt="user-profile-image">
+                            <img src="{{ auth()->user()->avatar ?? 'assets/images/users/avatar-1.jpg'  }}" class="rounded-circle avatar-xl img-thumbnail user-profile-image material-shadow" alt="user-profile-image">
                         <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
                             <input id="profile-img-file-input" type="file" class="profile-img-file-input">
                             <label for="profile-img-file-input" class="profile-photo-edit avatar-xs">
@@ -44,7 +44,7 @@
             </div>
         </div>
         <!--end card-->
-        <div class="card">
+        <!-- <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-4">
                     <div class="flex-grow-1">
@@ -87,7 +87,7 @@
                     <input type="text" class="form-control" id="pinterestName" placeholder="Username" value="Advance Dave">
                 </div>
             </div>
-        </div>
+        </div> -->
         <!--end card-->
     </div>
     <!--end col-->

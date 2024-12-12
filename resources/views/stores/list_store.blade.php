@@ -35,7 +35,17 @@
                                                 <tr>
                                                     <th scope="row"><a href="#" class="fw-medium">{{ $shop->id }}</a></th>
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
-                                                        {{ $shop->shop_name ?? "Chưa đặt tên"}}
+                                                        {{ $shop->shop_name ?? "Chưa đặt tên"}} <br>
+                                                        @if($shop->status == 1) {{-- Khóa --}}
+                                                            <span class="badge bg-danger text-white" style="width:100px; padding: 5px 10px;">Bị Khóa</span>
+                                                        @elseif($shop->status == 2) {{-- Đang hoạt động --}}
+                                                            <span class="badge bg-success text-white" style="width:100px; padding: 5px 10px;">Đang hoạt động</span>
+                                                        @elseif($shop->status == 4) {{-- Vi phạm --}}
+                                                            <span class="badge bg-warning text-white" style="width:100px; padding: 5px 10px;">Vi phạm</span>
+                                                        @else {{-- Trạng thái không xác định --}}
+                                                            <span class="badge bg-secondary text-white" style="width:100px; padding: 5px 10px;">Không xác định</span>
+                                                        @endif
+
                                                     </td>
                                                     <td style="word-wrap: break-word; white-space: normal;">
                                                         <img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="avatar-xs rounded-circle me-3 material-shadow" style="width: 60px; height: 60px;">
@@ -68,7 +78,17 @@
                                                                 </button>
                                                                 </a>
                                                             </li>
-                                                        @elseif ($shop->status == 1)
+                                                            <li class="list-inline-item">
+                                                            <a 
+                                                                href="{{ route('change_shop', [
+                                                                                                    'token' => auth()->user()->refesh_token,
+                                                                                                    'id' => $shop->id,
+                                                                                                    'status' => 4,
+                                                                                                    ]) }}"
+                                                            >
+                                                            <button type="button" class="btn btn-warning" title="vi pham"> <i class=" ri-close-line align-middle"></i></button>
+                                                        </li> 
+                                                        @elseif ($shop->status == 1 || $shop->status == 4)
                                                             <li class="list-inline-item">
                                                             <a 
                                                                 href="{{ route('change_shop', [
@@ -80,17 +100,8 @@
                                                             <button type="button" class="btn btn-success" title="mở"> <i class="ri-check-line align-middle"></i></button>
 
                                                             </li>
-                                                        @endif
-                                                        <li class="list-inline-item">
-                                                            <a 
-                                                                href="{{ route('change_shop', [
-                                                                                                    'token' => auth()->user()->refesh_token,
-                                                                                                    'id' => $shop->id,
-                                                                                                    'status' => 4,
-                                                                                                    ]) }}"
-                                                            >
-                                                            <button type="button" class="btn btn-warning" title="vi pham"> <i class=" ri-close-line align-middle"></i></button>
-                                                        </li>  
+                                                        
+                                                        @endif 
                                                     </ul>
                                                     <ul class="list-inline d-flex">
                                                         <li class="me-2">

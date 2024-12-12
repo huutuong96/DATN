@@ -64,7 +64,7 @@
                                                         </div>
                                                         <div class="col-6">
                                                             <div class="mb-3">
-                                                                <label for="status" class="form-label">Status</label>
+                                                                <label for="status" class="form-label">Trạng Thái</label>
                                                                 <select style="width: 130px" class="form-control" id="status"
                                                                     name="status" required>
                                                                     <option  value="" disabled selected>chọn trạng thái</option>

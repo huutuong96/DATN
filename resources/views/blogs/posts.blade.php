@@ -75,7 +75,7 @@ margin: 10px 0; /* Thêm khoảng cách giữa ảnh và nội dung */
                                                     <div class="col-12">
                                                         <div class="mb-3">
                                                             <label for="content" class="form-label">Nội dung</label>
-                                                            <textarea class="form-control" placeholder="Enter post content" id="summernote" name="content" rows="4" required></textarea>
+                                                            <textarea class="form-control" placeholder="Nội dung bài viết" id="summernote" name="content" rows="4" required></textarea>
                                                         </div><!--end mb-3-->
                                                     </div><!--end col-->
                                             
@@ -175,7 +175,59 @@ margin: 10px 0; /* Thêm khoảng cách giữa ảnh và nội dung */
                                                                         </div>
                                                                         <div class="mb-3">
                                                                             <label for="image-{{ $Post->id }}" class="form-label">Cập nhật ảnh mới (tùy chọn)</label>
-                                                                            <input type="file" name="image" id="image-{{ $Post->id }}" class="form-control" accept="image/*">
+                                                                            <!-- <input type="file" name="image" id="image-{{ $Post->id }}" class="form-control" accept="image/*"> -->
+                                                                            <div class="file-upload">
+                                                                                <input type="file" name="image" id="image-{{ $Post->id }}" class="form-control" accept="image/*" hidden>
+                                                                                <label for="image-{{ $Post->id }}" class="file-label">Chọn file</label>
+                                                                                <span class="file-name">Chưa có file nào</span>
+                                                                                <style>
+                                                                                    .file-upload {
+                                                                                        display: flex;
+                                                                                        align-items: center;
+                                                                                        gap: 10px;
+                                                                                        font-family: Arial, sans-serif;
+                                                                                    }
+
+                                                                                    .file-label {
+                                                                                        background-color: #007bff;
+                                                                                        color: white;
+                                                                                        padding: 5px 10px;
+                                                                                        border-radius: 5px;
+                                                                                        cursor: pointer;
+                                                                                        text-align: center;
+                                                                                    }
+
+                                                                                    .file-label:hover {
+                                                                                        background-color: #0056b3;
+                                                                                    }
+
+                                                                                    .file-name {
+                                                                                        font-size: 14px;
+                                                                                        color: #555;
+                                                                                        font-style: italic;
+                                                                                    }
+                                                                                </style>
+                                                                                
+                                                                                <script>
+                                                                                    document.addEventListener("DOMContentLoaded", () => {
+                                                                                        document.querySelectorAll('.file-upload').forEach(uploadDiv => {
+                                                                                            const fileInput = uploadDiv.querySelector('input[type="file"]');
+                                                                                            const fileName = uploadDiv.querySelector('.file-name');
+
+                                                                                            fileInput.addEventListener("change", () => {
+                                                                                                if (fileInput.files.length > 0) {
+                                                                                                    // console.log(fileInput.files[0].name);
+                                                                                                    
+                                                                                                    fileName.textContent = fileInput.files[0].name; // Hiển thị tên file
+                                                                                                } else {
+                                                                                                    fileName.textContent = "Chưa có file nào"; // Nếu không chọn file
+                                                                                                }
+                                                                                            });
+                                                                                        });
+                                                                                    });
+                                                                                </script>
+                                                                                
+                                                                            </div>
                                                                         </div>
                                                 
                                                                         <div class="mb-3">
@@ -272,8 +324,15 @@ margin: 10px 0; /* Thêm khoảng cách giữa ảnh và nội dung */
                                 <script>
                                     new DataTable('#postalll', {
                                         language: {   
-                                            lengthMenu: "Hiển thị _MENU_ Doanh mục bài viết",
-                                            search: "Tìm kiếm:"
+                                            lengthMenu: "Hiển thị _MENU_ bài viết",
+                                                search: "Tìm kiếm:",
+                                                sEmptyTable: "Không có dữ liệu trong bảng",
+                                                sProcessing: "Đang xử lý...",
+                                                sLengthMenu: "Hiển thị _MENU_ mục",
+                                                sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                                sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                                sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                                sInfoFiltered: "(lọc từ _MAX_ mục)",
                                         },
                                        
                                     });

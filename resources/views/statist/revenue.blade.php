@@ -143,12 +143,12 @@
                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="text-muted">Tháng {{ \Carbon\Carbon::now()->format('m') }}<i class="mdi mdi-chevron-down ms-1"></i></span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-end">
+                            <!-- <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="#">Today</a>
                                 <a class="dropdown-item" href="#">Last Week</a>
                                 <a class="dropdown-item" href="#">Last Month</a>
                                 <a class="dropdown-item" href="#">Current Year</a>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div><!-- end card header -->

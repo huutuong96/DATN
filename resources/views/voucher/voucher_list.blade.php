@@ -93,7 +93,7 @@
                                                         </div>
                                                         <div class="col-6">
                                                             <div class="mb-3">
-                                                                <label for="status" class="form-label">Status</label>
+                                                                <label for="status" class="form-label">Trạng thái</label>
                                                                 <select style="    width: 513px;
                                                                                     margin-top: -12px;
                                                                                     left: 2em;"

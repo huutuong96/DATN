@@ -116,7 +116,14 @@
                                 new DataTable('#all', {
                                     language: {   
                                         lengthMenu: "Hiển thị _MENU_ sản phẩm",
-                                        search: "Tìm kiếm:" 
+                                        search: "Tìm kiếm:",
+                                        sEmptyTable: "Không có dữ liệu trong bảng",
+                                        sProcessing: "Đang xử lý...",
+                                        sLengthMenu: "Hiển thị _MENU_ mục",
+                                        sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                        sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                        sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                        sInfoFiltered: "(lọc từ _MAX_ mục)",
                                     }
                                 });
                             </script>
@@ -365,7 +372,14 @@
                                 new DataTable('#pending', {
                                     language: {   
                                         lengthMenu: "Hiển thị _MENU_ sản phẩm",
-                                        search: "Tìm kiếm:" 
+                                        search: "Tìm kiếm:",
+                                        sEmptyTable: "Không có dữ liệu trong bảng",
+                                        sProcessing: "Đang xử lý...",
+                                        sLengthMenu: "Hiển thị _MENU_ mục",
+                                        sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                        sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                        sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                        sInfoFiltered: "(lọc từ _MAX_ mục)",
                                     }
                                 });
                             </script>
@@ -573,7 +587,14 @@
                                 new DataTable('#update2', {
                                     language: {   
                                         lengthMenu: "Hiển thị _MENU_ sản phẩm",
-                                        search: "Tìm kiếm:" 
+                                        search: "Tìm kiếm:",
+                                        sEmptyTable: "Không có dữ liệu trong bảng",
+                                        sProcessing: "Đang xử lý...",
+                                        sLengthMenu: "Hiển thị _MENU_ mục",
+                                        sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                        sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                        sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                        sInfoFiltered: "(lọc từ _MAX_ mục)",
                                     }
                                 });
                             </script>
@@ -795,7 +816,14 @@
                                 new DataTable('#active', {
                                     language: {   
                                         lengthMenu: "Hiển thị _MENU_ sản phẩm",
-                                        search: "Tìm kiếm:" 
+                                        search: "Tìm kiếm:",
+                                        sEmptyTable: "Không có dữ liệu trong bảng",
+                                        sProcessing: "Đang xử lý...",
+                                        sLengthMenu: "Hiển thị _MENU_ mục",
+                                        sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                        sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                        sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                        sInfoFiltered: "(lọc từ _MAX_ mục)", 
                                     }
                                 });
                             </script>
@@ -1002,7 +1030,14 @@
                                 new DataTable('#rejected', {
                                     language: {   
                                         lengthMenu: "Hiển thị _MENU_ sản phẩm",
-                                        search: "Tìm kiếm:" 
+                                        search: "Tìm kiếm:",
+                                        sEmptyTable: "Không có dữ liệu trong bảng",
+                                        sProcessing: "Đang xử lý...",
+                                        sLengthMenu: "Hiển thị _MENU_ mục",
+                                        sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                        sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                        sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                        sInfoFiltered: "(lọc từ _MAX_ mục)",
                                     }
                                 });
                             </script>
@@ -1030,8 +1065,8 @@
                                             <th scope="col">ID Sản phẩm</th>
                                             <th scope="col">Hình ảnh</th>
                                             <th scope="col">Tên sản phẩm</th>
-                                            <th scope="col">Mã SKU</th>
-                                            <th scope="col">Giá Sản phẩm</th>
+                                            <!-- <th scope="col">Mã SKU</th> -->
+                                            <!-- <th scope="col">Giá Sản phẩm</th> -->
                                             <th scope="col">Tên Shop</th> 
                                             <th scope="col">Trạng thái</th>
                                             <th scope="col">Ngày tạo</th>
@@ -1054,14 +1089,12 @@
                                                     <td style="word-wrap: break-word; white-space: normal; max-width: 200px;">
                                                         {{ $product->name }}
                                                     </td>
-                                                    <td>{{ $product->sku }}</td>
-                                                    <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td>
+                                                    <!-- <td>{{ $product->sku }}</td>
+                                                    <td>{{ number_format($product->price, 0, ',', '.') }} VNĐ</td> -->
                                                     <td>{{$product->shop->shop_name ?? "Không có tên"}}</td> 
-                                                    <td>
-                                                        @if($product->status == 4)
-                                                        sản phẩm vi phạm
-                                                   
-                                                    @endif
+                                                    <td> 
+                                                        sản phẩm vi phạm <br>
+                                                        <span style="color:red">Lý do</span>: {{$product->admin_note}} 
                                                     <td>{{ $product->created_at}}</td>
                                                     <td>
                                                         <!-- Duyệt -->
@@ -1206,7 +1239,14 @@
                                 new DataTable('#report', {
                                     language: {   
                                         lengthMenu: "Hiển thị _MENU_ sản phẩm",
-                                        search: "Tìm kiếm:" 
+                                        search: "Tìm kiếm:",
+                                        sEmptyTable: "Không có dữ liệu trong bảng",
+                                        sProcessing: "Đang xử lý...",
+                                        sLengthMenu: "Hiển thị _MENU_ mục",
+                                        sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                        sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                        sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                        sInfoFiltered: "(lọc từ _MAX_ mục)",
                                     }
                                 });
                             </script>

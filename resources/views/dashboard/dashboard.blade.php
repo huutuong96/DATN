@@ -186,11 +186,7 @@
                                         {{ number_format($monthlyRevenue)}} vnđ
                                         </span>
                                         </h4>
-                                        <a
-                                            href="#"
-                                            class="text-decoration-underline"
-                                            >Lợi nhận của sàn trong tháng</a
-                                        >
+                                        Lợi nhận của sàn trong tháng 
                                     </div>
                                     <div
                                         class="avatar-sm flex-shrink-0"

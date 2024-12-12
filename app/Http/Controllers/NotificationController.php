@@ -35,7 +35,8 @@ class NotificationController extends Controller
     }
     public function get_noti_admin (Request $request){
         $user = JWTAuth::parseToken()->authenticate();
-        $notifications = Notification::where('type', 'main')->paginate(10);
+        $notifications = Notifica
+        tion::where('type', 'main')->paginate(10);
         return response()->json($notifications);
     }
 
