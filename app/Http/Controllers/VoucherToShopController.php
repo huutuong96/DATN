@@ -29,23 +29,23 @@ class VoucherToShopController extends Controller
     public function store(VoucherRequest $request)
     {
         try {
-            $token = $request->query('token');
-            $users = UsersModel::select('id')->get();
-            if ($request->image_voucher) {
-                $voucherImage = $this->storeImage($request->image_voucher);
-            }
-            $voucherMain = new VoucherToShop();
-            $voucherMain->title = $request->title;
-            $voucherMain->description = $request->description;
-            $voucherMain->quantity = $request->quantity;
-            $voucherMain->limitValue = $request->limitValue;
-            $voucherMain->ratio = $request->ratio;
-            $voucherMain->code = $request->code;
-            $voucherMain->status = 2;
-            $voucherMain->min = $request->min_order;
-            $voucherMain->image = $voucherImage ?? null;
-            $voucherMain->create_by = auth()->user()->id;
-            $voucherMain->save();
+            // $token = $request->query('token');
+            // $users = UsersModel::select('id')->get();
+            // if ($request->image_voucher) {
+            //     $voucherImage = $this->storeImage($request->image_voucher);
+            // }
+            // $voucherMain = new VoucherToShop();
+            // $voucherMain->title = $request->title;
+            // $voucherMain->description = $request->description;
+            // $voucherMain->quantity = $request->quantity;
+            // $voucherMain->limitValue = $request->limitValue;
+            // $voucherMain->ratio = $request->ratio;
+            // $voucherMain->code = $request->code;
+            // $voucherMain->status = 2;
+            // $voucherMain->min = $request->min_order;
+            // $voucherMain->image = $voucherImage ?? null;
+            // $voucherMain->create_by = auth()->user()->id;
+            // $voucherMain->save();
             try {
                 $voucherMain->save();
                 foreach ($users as $user) {
