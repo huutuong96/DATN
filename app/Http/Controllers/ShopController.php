@@ -797,48 +797,48 @@ class ShopController extends Controller
         ]);
     }
 
-    // public function get_analyst_rank_shop(Request $request, string $id)
-    // {
-    //     $shop = Shop::find($id);
-    //     if (!$shop) {
-    //         return $this->errorResponse("Shop không tồn tại");
-    //     } 
-    //     if ($request->has('sort')) {
-    //         $sort = $request->input('sort');
-    //         switch ($sort) {
-    //         case 'orders':
-    //             $orders = OrdersModel::where('shop_id', $shop->id)->orderBy('net_amount', 'desc')->select('id', 'net_amount')->get();
-    //             return $this->successResponse("Lấy dữ liệu thành công", $orders ?? []);
-    //         break;
-    //         case 'products':
-    //             $ordersGroup = [];
-    //             $orders = OrdersModel::where('shop_id', $shop->id)->select('id', 'net_amount')->get();
-    //             $orderDetails = OrderDetailsModel::whereIn('order_id', $orders->pluck('id'))->select('order_id', 'product_id')->get();
-    //             return $orderDetails;
-    //             $products = Product::whereIn('id', $orderDetails->pluck('product_id'))->select('id', 'name')->get();
-    //             foreach ($products as $product) {
-    //                 $ordersGroup['name'] = $product->name;
-    //             }
-    //             foreach ($orders as $order) {
-    //                 $ordersGroup['net_amount'] = $order->net_amount;
-    //             }
-        
-    //             return $this->successResponse("Lấy dữ liệu thành công", $ordersGroup ?? []);
-    //         break;
-    //         case 'views':
-    //             $products = Product::where('shop_id', $shop->id)->orderBy('view_count', 'desc')->get();
-    //             if ($request->category_id) {
-    //                 $products->where('category_id', $request->category_id);
-    //             }
-    //             return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
-    //         break;
-    //         default:
-    //         break;
-    //         }
-    //     }       
+    public function get_analyst_rank_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        } 
+        if ($request->has('sort')) {
+            $sort = $request->input('sort');
+            switch ($sort) {
+            case 'orders':
+                $orders = OrdersModel::where('shop_id', $shop->id)->orderBy('net_amount', 'desc')->select('id', 'net_amount')->get();
+                return $this->successResponse("Lấy dữ liệu thành công", $orders ?? []);
+            break;
+            case 'products':
+                $products = Product::where('shop_id', $shop->id)->orderBy('sold_count', 'desc')->select('name', 'sold_count')->get();
+                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
+            break;
+            case 'views':
+                $products = Product::where('shop_id', $shop->id)->orderBy('view_count', 'desc')->select('name', 'view_count')->get();
+                return $this->successResponse("Lấy dữ liệu thành công", $products ?? []);
+            break;
+            default:
+            break;
+            }
+        }       
             
 
-    // }
+    }
+
+    public function get_analyst_cate_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        } 
+        if ($request->has('category_id')) {
+           $categories = Product::where('shop_id', $shop->id)->where('category_id', $request->category_id)->sum('sold_count');
+        }
+        return $this->successResponse("Lấy dữ liệu thành công", $categories ?? []);
+            
+
+    }
 
     public function get_analyst_chart_shop(Request $request, string $id)
     {

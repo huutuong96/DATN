@@ -395,7 +395,7 @@ Route::get('/search', function () {
         Route::get('shop/get_analyst_chart_shop/{id}', [ShopController::class, "get_analyst_chart_shop"]);
         Route::get('shop/get_analyst_shop/{id}', [ShopController::class, "get_analyst_shop"]);
         Route::get('shop/get_analyst_rank_shop/{id}', [ShopController::class, "get_analyst_rank_shop"]);
-
+        Route::get('shop/get_analyst_cate_shop/{id}', [ShopController::class, "get_analyst_cate_shop"]);
 
         Route::get('shop/get_category_shop', [ShopController::class, "get_category_shop"]);
         Route::get('categories', [CategoriesController::class, 'index']);
