@@ -339,6 +339,7 @@ class ShopController extends Controller
             'district_id' => $request->district_id,
             'ward' => $request->ward,
             'ward_id' => $request->ward_id,
+            'image' => $request->image ?? $shop->image,
         ];
         try {
             $shop->update($dataInsert);
