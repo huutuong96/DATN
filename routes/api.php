@@ -196,7 +196,7 @@ Route::get('/search', function () {
 
                 //SHOP
                     Route::post('shops', [ShopController::class, 'store']);
-                    Route::put('shops/{id}', [ShopController::class, 'update'])->middleware('CheckRole:Admin');
+                    Route::post('shops/{id}', [ShopController::class, 'update'])->middleware('CheckRole:Admin');
                     Route::delete('shops/{id}', [ShopController::class, 'destroy'])->middleware('CheckRole:Admin');
                     Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"])->middleware('CheckRole:Admin');
                     Route::post('shop/manager', [ShopController::class, "shop_manager_store"])->middleware('CheckRole:Seller');

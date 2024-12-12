@@ -316,11 +316,9 @@ class ShopController extends Controller
         // if (!$IsOwnerShop) {
         //     return $this->errorResponse("Bạn không phải là chủ shop");
         // }
-        $shop = Shop::where('id', $id)->where('status', 1)->first();
+        $shop = Shop::where('id', $id)->where('status', 2)->first();
         $user = JWTAuth::parseToken()->authenticate();
-        $filteredCity = $this->get_infomaiton_province_and_city($request->input('address')['province']);
-        $filteredDistrict = $this->get_infomaiton_district($request->input('address')['district']);
-        $filledWard = $this->get_infomaiton_ward($filteredDistrict['DistrictID'], $request->input('address')['ward']);
+    
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         }
@@ -337,14 +335,14 @@ class ShopController extends Controller
             'cccd' => $request->cccd ?? $shop->cccd,
             'status' => $request->status ?? $shop->status,
             'tax_id' => $request->tax_id ?? $shop->tax_id,
-            'update_by' => auth()->user()->id,
+            'update_by' => $user->id,
             'updated_at' => now(),
-            'province' => $request->input('address')['province'],
-            'province_id' => $filteredCity['ProvinceID'],
-            'district' => $request->input('address')['district'],
-            'district_id' => $filteredDistrict['DistrictID'],
-            'ward' => $request->input('address')['ward'],
-            'ward_id' => $filledWard,
+            'province' => $request->province,
+            'province_id' => $request->province_id,
+            'district' => $request->district,
+            'district_id' => $request->district_id,
+            'ward' => $request->ward,
+            'ward_id' => $request->ward_id,
         ];
         try {
             $shop->update($dataInsert);
