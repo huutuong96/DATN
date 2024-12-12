@@ -777,7 +777,7 @@ class ShopController extends Controller
                     'isPrice' => true
                 ],
                 'orders' => [
-                    'labelEN' => 'total_orders',
+                    'labelEN' => 'orders',
                     'labelVN' => 'Tổng Đơn Hàng',
                     'value' => $total_orders,
                     'isPrice' => false
@@ -832,11 +832,9 @@ class ShopController extends Controller
         if (!$shop) {
             return $this->errorResponse("Shop không tồn tại");
         } 
-        if ($request->has('category_id')) {
-           $categories = Product::where('shop_id', $shop->id)->where('category_id', $request->category_id)->sum('sold_count');
-        }
+        $products = Product::where('shop_id', $shop->id)->select('category_id')->get();
+        $categories = CategoriesModel::whereIn('id', $products->pluck('category_id'))->get;
         return $this->successResponse("Lấy dữ liệu thành công", $categories ?? []);
-            
 
     }
 
