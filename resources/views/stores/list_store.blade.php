@@ -68,7 +68,7 @@
                                                                 </button>
                                                                 </a>
                                                             </li>
-                                                        @elseif ($shop->status == 1)
+                                                        @elseif ($shop->status == 1||4)
                                                             <li class="list-inline-item">
                                                             <a 
                                                                 href="{{ route('change_shop', [
