@@ -1109,6 +1109,15 @@ class ProductController extends Controller
         if ($product) {
             $product->status = 2;
             $product->save();
+            $user_id = $product->shop->owner_id;
+            $notificationRequest = new Request([
+                'type' => 'main',
+                'user_id' => $user_id,
+                'title' => 'Sản phẩm đã được duyệt',
+                'description' => ' sản phẩm'.$product->name.' của bạn đã được duyệt',
+            ]);
+            $notificationController = new NotificationController();
+            $notificationController->store($notificationRequest);
             if($request->search){
                 return redirect()->route('admin_search_get', ['token' => auth()->user()->refesh_token, 'tab' => $request->tab,'search'=>$request->search]);
             }
@@ -1150,7 +1159,7 @@ class ProductController extends Controller
         $product->status = 4;
         $product->admin_note = $reason;
         $product->save();
-        $user_id = Product::find($product->user_id);
+        $user_id = $product->user_id;
         $notificationRequest = new Request([
             'type' => 'main',
             'user_id' => $user_id,
