@@ -44,18 +44,18 @@
                                 @endif
                             @endforeach
                         @else 
-                                @foreach($carts as $cart)
-                                    @if($cart->product_id == $orderDetail->product_id)
-                                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
-                                            <span>
-                                                <img src="{{$cart->variant_image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                               
-                                            </span>
-                                            {{ \Illuminate\Support\Str::words($cart->product_name ?? '', 7, '...') }} x{{$orderDetail->quantity ?? null}}
-                                            <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
-                                        </li>
-                                    @endif
-                                @endforeach
+                            @foreach($variants as $variant)
+                                @if($orderDetail->varian_id == $variant->id)
+                                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                                        <span>
+                                            <img src="{{$variant->image ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
+                                        
+                                        </span>
+                                        {{$variant->name ?? null}} x{{$orderDetail->quantity ?? null}}
+                                        <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
+                                    </li>
+                                @endif
+                            @endforeach
                         @endif
                     @endif
                     @endforeach
