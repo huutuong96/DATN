@@ -319,7 +319,7 @@ class ShopController extends Controller
         // if (!$IsOwnerShop) {
         //     return $this->errorResponse("Bạn không phải là chủ shop");
         // }
-        $shop = Shop::where('id', $id)->where('status', 2)->first();
+        $shop = Shop::where('id', $id)->whereIn('status', [2, 3])->first();
         $user = JWTAuth::parseToken()->authenticate();
     
         if (!$shop) {
