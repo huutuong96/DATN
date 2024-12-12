@@ -77,7 +77,7 @@ class PurchaseController extends Controller
                     ], 400);
                 }
             }
-            
+
             // Validate vouchers
             if ($voucherToMainCode && !$this->getValidVoucherCode($voucherToMainCode, 'main')) {
                 return response()->json(['status' => false, 'message' => 'Mã giảm giá chung không hợp lệ'], 400);
@@ -196,7 +196,7 @@ class PurchaseController extends Controller
                     $checkRank = $this->check_point_to_user();
                     $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);
                     $newtotal = $this->addOrderFeesToTotal($order, $shopTotalPrice);
-                    $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
+                    // $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
                     $order->disscount_by_rank = $get_discountsByRank;
                     $order->total_amount = $shopTotalPrice;
                     $discountShopVoucher = 0;
@@ -705,7 +705,6 @@ class PurchaseController extends Controller
                                   ->where('status', 2)
                                   ->where('shop_id', $shopId)
                                   ->first();
-            
             if ($voucherToShop) { 
                 if ($voucherToShop->type == 1) {
                     $discountAmount = $totalPrice * $voucherToShop->ratio;
@@ -717,7 +716,6 @@ class PurchaseController extends Controller
                 }else {
                     $discountAmount = $totalPrice * $voucherToShop->ratio;
                 }
-                
 
                 // Kiểm tra limitValue
                 if ($voucherToShop->limitValue !== null && $voucherToShop->limitValue > 0) {
@@ -726,6 +724,8 @@ class PurchaseController extends Controller
                 }
                 $this->updateVoucherQuantity($voucherToShop);
             }
+            
+
         }
         return $discountAmount;
     }

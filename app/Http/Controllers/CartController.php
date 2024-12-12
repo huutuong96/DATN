@@ -370,6 +370,10 @@ class CartController extends Controller
     {
         $data = [];
         $user = JWTAuth::parseToken()->authenticate();
+        $address = AddressModel::where('user_id', $user->id)->first();
+        if ($address == null) {
+            return response()->json(['error' => 'Vui lòng thêm địa chỉ giao hàng'], 404);
+        }
         $token = env('TOKEN_API_GIAO_HANG_NHANH_DEV');
         $inputArray = $request->all();
         foreach ($inputArray as $input) {
