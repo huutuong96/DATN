@@ -776,7 +776,7 @@ class ShopController extends Controller
                     'value' => $total_revenue_orders,
                     'isPrice' => true
                 ],
-                'total_orders' => [
+                'orders' => [
                     'labelEN' => 'total_orders',
                     'labelVN' => 'Tổng Đơn Hàng',
                     'value' => $total_orders,
