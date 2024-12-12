@@ -40,7 +40,7 @@ class VoucherToMainController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(VoucherRequest $request)
+    public function store(Request $request)
     {
         $token = $request->query('token');
         $users = User::select('id')->get();
