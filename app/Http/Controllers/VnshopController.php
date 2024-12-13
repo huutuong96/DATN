@@ -81,10 +81,12 @@ class VnshopController extends Controller
         $shopAC = Shop::where("status", 2)
         ->get()
         ->count();
-        $checkProduct = Product::where("status", 3)
-                                ->where('is_delete', 0)
+        $product_rejecte = Product::where("status", 3)
+                               
                                 ->get()
                                 ->count();
+      $allUpdateProductsCount = update_product::all()->count();
+       $checkProduct=$product_rejecte+$allUpdateProductsCount;
         $monthlyRevenue = order_fee_details::
         whereMonth('created_at', Carbon::now()->month)
         ->whereYear('created_at', Carbon::now()->year)
