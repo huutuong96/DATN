@@ -65,7 +65,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/costomer', [VnshopController::class, 'costomer'])->name('costomer');
     Route::get('/change-user', [VnshopController::class, 'changeUser'])->name('change_user')->middleware('CheckAdminPremission:manage_user');
     Route::get('/change-user-search', [VnshopController::class, 'changeUserSearch'])->name('changeUserSearch')->middleware('CheckAdminPremission:manage_user');
-    Route::get('/trash-user', [VnshopController::class, 'trashUser'])->name('trash_user')->middleware('CheckAdminPremission:manage_user');
+    Route::get('/trash-user', [VnshopController::class, 'trashUser'])->name('trash_user');
     Route::get('/pending-approval', [VnshopController::class, 'pendingApproval'])->name('pending_approval');
     Route::get('/manager', [VnshopController::class, 'manager'])->name('manager');
     Route::get('/store', [VnshopController::class, 'store'])->name('store');

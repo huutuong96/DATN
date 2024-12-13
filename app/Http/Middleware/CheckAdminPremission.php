@@ -24,9 +24,9 @@ class CheckAdminPremission
                 'message' => 'Tài khoản không tồn tại',
             ], 401);
         };
-        // if($user->role_id == 2){
-        //     return $next($request);
-        // }
+        if($user->role_id == 2){
+            return $next($request);
+        }
         $premissions = role_premissionModel::with('permission')
         ->where('role_id', $user->role_id)
         ->get();
@@ -35,7 +35,7 @@ class CheckAdminPremission
                 // dd($value->permission->premissionName, $premission);
                 return $next($request);
             }
-        }return Back()->with('error', 'Bạn không có quyền truy cập chức năng này.!');
+        }return Back()->with('error', 'Bạn không được cấp quyền để sử dụng chức năng này!');
         
     }
 }
