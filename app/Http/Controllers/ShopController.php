@@ -938,7 +938,7 @@ class ShopController extends Controller
 
 
                     $data = array_values($allHours);
-                    $data['sum']= $sum;
+                    // $data['sum']= $sum;
                     return response()->json(['data' => $data]);
                     break;
                
@@ -972,7 +972,7 @@ class ShopController extends Controller
 
 
                     $data = array_values($allDays);
-                    $data['sum']= $sum;
+                    // $data['sum']= $sum;
                     return response()->json(['data' => $data]);
                     break;
                 case '3':
@@ -1005,7 +1005,7 @@ class ShopController extends Controller
 
 
                     $data = array_values($allDays);
-                    $data['sum']= $sum;
+                    // $data['sum']= $sum;
                     return response()->json(['data' => $data]);
                     break;
                 case '4':
@@ -1038,7 +1038,7 @@ class ShopController extends Controller
 
 
                     $data = array_values($allMonths);
-                    $data['sum']= $sum;
+                    // $data['sum']= $sum;
                     return response()->json(['data' => $data]);
                     break;
                 default:
