@@ -263,6 +263,44 @@ class ShopController extends Controller
         if (!$Shop) {
             return $this->errorResponse("Không tồn tại Shop nào");
         }
+        
+        $Shop->visits = $Shop->visits + 1;
+        $Shop->save();
+        $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();
+        $limit = $request->limit ?? 20;
+        $tax = Tax::where('id', $Shop->tax_id)->where('status', 2)->get();
+        $bannerShop = BannerShop::where('shop_id', $Shop->id)->where('status', 2)->get();
+        $VoucherToShop = VoucherToShop::where('shop_id', $Shop->id)->where('status', 2)->get();
+        $productsQuery = Product::where('shop_id', $Shop->id)
+                                ->where('status', 2);
+        $category = [];
+        foreach ($productsQuery->get() as $product) {
+            $categoryId = $product->category_id;
+            if (!in_array($categoryId, array_column($category, 'id'))) {
+                $category[] = CategoriesModel::find($categoryId);
+            }
+        }
+        $products = $productsQuery->paginate($limit);
+        if (!$Shop) {
+            return $this->errorResponse("Không tồn tại Shop nào");
+        }
+        return $this->successResponse("Lấy dữ liệu thành công", [
+            'shop' => $Shop,
+            'tax' => $tax,
+            'banner' => $bannerShop,
+            'Vouchers' => $VoucherToShop,
+            // 'products' => $products,
+            'categories' => $category,
+            'follow_count' => $follow_count,
+        ]);
+    }
+    public function showClient(string $id)
+    {
+        $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        if (!$Shop) {
+            return $this->errorResponse("Không tồn tại Shop nào", [], 404);
+        }
+
         $Shop->visits = $Shop->visits + 1;
         $Shop->save();
         $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();
@@ -315,41 +353,54 @@ class ShopController extends Controller
     }
     public function update(Request $request, string $id)
     {
-        // $IsOwnerShop =  $this->IsOwnerShop($id);
-        // if (!$IsOwnerShop) {
-        //     return $this->errorResponse("Bạn không phải là chủ shop");
-        // }
-        $shop = Shop::where('id', $id)->where('status', 2)->first();
-        $user = JWTAuth::parseToken()->authenticate();
-        $shopLock = Shop::where('id', $id)->first();
-        if ($shopLock->status == 3) {
-            $shop = Shop::where('id', $id)->where('owner_id', $user->id)->first();
-        }
-        if (!$shop) {
-            return $this->errorResponse("Shop không tồn tại");
-        }
-
-        $dataInsert = [
-            'shop_name' => $request->shop_name ?? $shop->shop_name,
-            'pick_up_address' => $request->pick_up_address ?? $shop->pick_up_address,
-            'slug' => $request->slug ?? Str::slug($request->shop_name ?? $shop->shop_name, '-'),
-            'cccd' => $request->cccd ?? $shop->cccd,
-            'status' => $request->status ?? $shop->status,
-            'tax_id' => $request->tax_id ?? $shop->tax_id,
-            'update_by' => $user->id,
-            'updated_at' => now(),
-            'province' => $request->province,
-            'province_id' => $request->province_id,
-            'district' => $request->district,
-            'district_id' => $request->district_id,
-            'ward' => $request->ward,
-            'ward_id' => $request->ward_id,
-            'image' => $request->image ?? $shop->image,
-        ];
         try {
-            $shop->update($dataInsert);
-            return $this->successResponse("Cập nhật thông tin Shop thành công", $shop);
+            $shop = Shop::where('id', $id)->where('status', 2)->first();
+            $user = JWTAuth::parseToken()->authenticate();
+            $shopLock = Shop::where('id', $id)->first();
+            if ($shopLock->status == 3) {
+                $shop = Shop::where('id', $id)->where('owner_id', $user->id)->first();
+                $products = Product::where('shop_id', $id)->get();
+                foreach ($products as $product) {
+                    $product->status = 2;
+                    $product->save();
+                }
+            }
+            if (!$shop) {
+                return $this->errorResponse("Shop không tồn tại");
+            }
+            if ($request->status == 3) {
+                $products = Product::where('shop_id', $id)->get();
+                foreach ($products as $product) {
+                    $product->status = 2;
+                    $product->save();
+                }
+            }
+
+            $dataInsert = [
+                'shop_name' => $request->shop_name ?? $shop->shop_name,
+                'pick_up_address' => $request->pick_up_address ?? $shop->pick_up_address,
+                'slug' => $request->slug ?? Str::slug($request->shop_name ?? $shop->shop_name, '-'),
+                'cccd' => $request->cccd ?? $shop->cccd,
+                'status' => $request->status ?? $shop->status,
+                'tax_id' => $request->tax_id ?? $shop->tax_id,
+                'update_by' => $user->id,
+                'updated_at' => now(),
+                'province' => $request->province,
+                'province_id' => $request->province_id,
+                'district' => $request->district,
+                'district_id' => $request->district_id,
+                'ward' => $request->ward,
+                'ward_id' => $request->ward_id,
+                'image' => $request->image ?? $shop->image,
+            ];
+            try {
+                $shop->update($dataInsert);
+                return $this->successResponse("Cập nhật thông tin Shop thành công", $shop);
+            } catch (\Throwable $th) {
+                return $this->errorResponse("Cập nhật thông tin Shop không thành công", $th->getMessage());
+            }
         } catch (\Throwable $th) {
+            log_debug($th);
             return $this->errorResponse("Cập nhật thông tin Shop không thành công", $th->getMessage());
         }
     }
