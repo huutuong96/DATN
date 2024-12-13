@@ -258,7 +258,7 @@ class PurchaseController extends Controller
                         'ship_fee' => $shipFee,
                         'email' => auth()->user()->email,
                     ]);
-                    ProducttocartModel::whereIn('id', $request->carts)->delete();
+                    // ProducttocartModel::whereIn('id', $request->carts)->delete();
                     $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
                     return response()->json([
                         'status' => true,

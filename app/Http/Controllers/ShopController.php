@@ -784,70 +784,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function get_analyst_shop(Request $request, string $id)
-    {
-        $shop = Shop::find($id);
-        if (!$shop) {
-            return $this->errorResponse("Shop không tồn tại");
-        } 
-        $query = OrdersModel::where('shop_id', $shop->id);
-        if ($request->has('time')) {
-            $time = $request->input('time');
-            switch ($time) {
-            case '1':
-            $query->whereDate('created_at', Carbon::today());
-            break;
-            case '2':
-            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            break;
-            case '3':
-            $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-            break;
-            case '4':
-            $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()]);
-            break;
-            default:
-            break;
-            }
-        }       
-                $orders = $query->get();
-                if ($request->order_status) {
-                    $orders = $query->where('order_status',$request->order_status)->get();
-                }
-                if ($request->status) {
-                    $orders = $query->where('order_status',$request->status)->get();
-                }
-                $total_orders = $orders->count();
-                $total_revenue_orders = $orders->sum('net_amount');
-                $average_revenue_per_order =$orders->avg('net_amount');
-                $visits = $shop->visits;
-        return $this->successResponse("Lấy dữ liệu thành công", [
-                'revenue' => [
-                    'labelEN' => 'revenue',
-                    'labelVN' => 'Doanh số',
-                    'value' => $total_revenue_orders,
-                    'isPrice' => true
-                ],
-                'orders' => [
-                    'labelEN' => 'orders',
-                    'labelVN' => 'Tổng Đơn Hàng',
-                    'value' => $total_orders,
-                    'isPrice' => false
-                ],
-                'average_revenue_per_order' => [
-                    'labelEN' => 'average_revenue_per_order',
-                    'labelVN' => 'Trung Bình Doanh Số Mỗi Đơn Hàng',
-                    'value' => $average_revenue_per_order,
-                    'isPrice' => true
-                ],
-                'visits' => [
-                    'labelEN' => 'visits',
-                    'labelVN' => 'Lượt Truy Cập',
-                    'value' => $visits,
-                    'isPrice' => false
-                ],
-        ]);
-    }
+    
 
     public function get_analyst_rank_shop(Request $request, string $id)
     {
@@ -897,6 +834,64 @@ class ShopController extends Controller
         return $this->successResponse("Lấy dữ liệu thành công", $soldCounts ?? []);
     }
 
+    public function get_analyst_shop(Request $request, string $id)
+    {
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return $this->errorResponse("Shop không tồn tại");
+        } 
+        $query = OrdersModel::where('shop_id', $shop->id);
+        if ($request->order_status || $request->order_status == 0) {
+            $query->where('order_status', $request->order_status);
+        }
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->has('time')) {
+            $time = $request->input('time');
+            switch ($time) {
+                case '1':
+                    $query->whereDate('created_at', Carbon::today());
+                    break;
+                case '2':
+                    $query->whereBetween('created_at', [Carbon::now()->subDays(7), Carbon::now()]);
+                    break;
+                case '3':
+                    $query->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()]);
+                    break;
+                case '4':
+                    $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()]);
+                    break;
+                default:
+                    break;
+            }
+        }
+        $orders = $query->get();
+        $total_orders = $orders->count();
+        $total_revenue_orders = $orders->sum('net_amount');
+        $average_revenue_per_order = $orders->avg('net_amount');
+        return $this->successResponse("Lấy dữ liệu thành công", [
+            'revenue' => [
+                'labelEN' => 'revenue',
+                'labelVN' => 'Doanh số',
+                'value' => $total_revenue_orders,
+                'isPrice' => true
+            ],
+            'orders' => [
+                'labelEN' => 'orders',
+                'labelVN' => 'Tổng Đơn Hàng',
+                'value' => $total_orders,
+                'isPrice' => false
+            ],
+            'average_revenue_per_order' => [
+                'labelEN' => 'average_revenue_per_order',
+                'labelVN' => 'Trung Bình Doanh Số Mỗi Đơn Hàng',
+                'value' => round($average_revenue_per_order, 2),
+                'isPrice' => true
+            ],
+        ]);
+    }
+
     public function get_analyst_chart_shop(Request $request, string $id)
     {
         $shop = Shop::find($id);
@@ -904,90 +899,146 @@ class ShopController extends Controller
             return $this->errorResponse("Shop không tồn tại");
         } 
         $query = OrdersModel::where('shop_id', $shop->id);
-                $orders = $query->get();
-                if ($request->order_status) {
-                    $orders = $query->where('order_status',$request->order_status)->get();
-                }
-                if ($request->status) {
-                    $orders = $query->where('order_status',$request->status)->get();
-                }
+        if ($request->order_status || $request->order_status == 0) {
+            $query->where('order_status', $request->order_status);
+        }
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
         if ($request->has('time')) {
             $time = $request->input('time');
             switch ($time) {
             case '1':
-            // $orders->whereDate('created_at', Carbon::today());
-            $orders = $query->get()->groupBy(function ($date) {
+                $orders = $query->whereDate('created_at', Carbon::today())->get()->groupBy(function ($date) {
                 return Carbon::parse($date->created_at)->format('H:00');
-            });
-
-            $formattedOrders = $orders->map(function ($orderGroup, $time) {
-                return [
-                    'dateKey' => $time,
-                    'revenue' => $orderGroup->sum('net_amount'),
-                    'orders' => $orderGroup->count(),
-                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
-                    'visits' => $orderGroup->sum('visits'),
+                });
+                $allHours = [];
+                for ($i = 0; $i < 24; $i++) {
+                $hour = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
+                $allHours[$hour] = [
+                    'dateKey' => $hour,
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
                 ];
-            })->values();
-            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
-            break;
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allHours[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
+
+                $data = array_values($allHours);
+                return response()->json(['data' => $data]);
+                break;
+               
             case '2':
-            $orders->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            $orders = $query->get()->groupBy(function ($date) {
+                $orders = $query->whereBetween('created_at', [Carbon::now()->subDays(7), Carbon::now()])->get()->groupBy(function ($date) {
                 return Carbon::parse($date->created_at)->format('d-m-Y');
-            });
-
-            $formattedOrders = $orders->map(function ($orderGroup, $date) {
-                return [
-                    'dateKey' => $date,
-                    'revenue' => $orderGroup->sum('net_amount'),
-                    'orders' => $orderGroup->count(),
-                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
-                    'visits' => $orderGroup->sum('visits'),
+                });
+                $allDays = [];
+                for ($i = 0; $i < 7; $i++) {
+                $day = Carbon::now()->subDays($i)->format('d-m-Y');
+                $allDays[$day] = [
+                    'dateKey' => $day,
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
                 ];
-            })->values();
-            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
-            break;
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allDays[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
+
+                $data = array_reverse(array_values($allDays));
+                return response()->json(['data' => $data]);
+                break;
             case '3':
-            $orders = $query->get()->groupBy(function ($date) {
+                $orders = $query->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])->get()->groupBy(function ($date) {
                 return Carbon::parse($date->created_at)->format('d-m-Y');
-            });
-
-            $formattedOrders = $orders->map(function ($orderGroup, $date) {
-                return [
-                    'dateKey' => $date,
-                    'revenue' => $orderGroup->sum('net_amount'),
-                    'orders' => $orderGroup->count(),
-                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
-                    'visits' => $orderGroup->sum('visits'),
+                });
+                $allDays = [];
+                for ($i = 0; $i < 30; $i++) {
+                $day = Carbon::now()->subDays($i)->format('d-m-Y');
+                $allDays[$day] = [
+                    'dateKey' => $day,
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
                 ];
-            })->values();
-            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
-            break;
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allDays[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
+
+                $data = array_reverse(array_values($allDays));
+                return response()->json(['data' => $data]);
+                break;
             case '4':
-            $orders = $query->get()->groupBy(function ($date) {
+                $orders = $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()])->get()->groupBy(function ($date) {
                 return Carbon::parse($date->created_at)->format('m-Y');
-            });
-
-            $formattedOrders = $orders->map(function ($orderGroup, $month) {
-                return [
+                });
+                $allMonths = [];
+                for ($i = 0; $i < 12; $i++) {
+                $month = Carbon::now()->subMonths($i)->format('m-Y');
+                $allMonths[$month] = [
                     'dateKey' => $month,
-                    'revenue' => $orderGroup->sum('net_amount'),
-                    'orders' => $orderGroup->count(),
-                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
-                    'visits' => $orderGroup->sum('visits'),
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
                 ];
-            })->values();
-            return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
-            break;
-            default:
-            break;
-            }
-        }       
-                
-        return $this->successResponse("Lấy dữ liệu thành công", [
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allMonths[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
 
-        ]);
+                $data = array_reverse(array_values($allMonths));
+                return response()->json(['data' => $data]);
+                break;
+            default:
+                $orders = collect();
+                break;
+            }
+        }
+        return $this->successResponse("Lấy dữ liệu thành công", []);
     }
 
     public function get_voucher_to_shop(Request $request, string $id)
