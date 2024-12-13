@@ -917,15 +917,17 @@ class ShopController extends Controller
             case '1':
             // $orders->whereDate('created_at', Carbon::today());
             $orders = $query->get()->groupBy(function ($date) {
-                return Carbon::parse($date->created_at)->format('H:00');
-            });
+                $hour = Carbon::parse($date->created_at)->format('H');
+                $hourGroup = floor($hour / 4) * 4;
+                return sprintf('%02d:00', $hourGroup);
+            })->sortKeys();
 
             $formattedOrders = $orders->map(function ($orderGroup, $time) {
                 return [
                     'dateKey' => $time,
                     'revenue' => $orderGroup->sum('net_amount'),
                     'orders' => $orderGroup->count(),
-                    'average_revenue_per_order' => $orderGroup->avg('net_amount'),
+                    'average_revenue_per_order' => round($orderGroup->avg('net_amount'), 2),
                     'visits' => $orderGroup->sum('visits'),
                 ];
             })->values();
