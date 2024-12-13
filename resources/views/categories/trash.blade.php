@@ -38,7 +38,18 @@
                                         <th scope="row"><a href="#" class="fw-medium">{{$category->id}}</a></th>
                                         <td>{{$category->title}}</td>
                                         <td><img src="{{$category->image ?? 'assets/images/users/avatar-1.jpg'}}" alt="" class="avatar-xs rounded-circle me-2 material-shadow"></td>
-                                        <td>{{$category->parent_id ?? "Đây là danh mục cha"}}</td>
+                                        <td>
+                                            @if ($category->parent_id == null || $category->parent_id == 0)
+                                                <pp >Doanh mục cha</pp>
+                                            @else
+                                                @foreach($ListCategories as $detail)
+                                                    @if ($category->parent_id == $detail->id)
+                                                        <p >{{$detail->title}}</p>
+                                                    @endif
+                                                @endforeach 
+        
+                                            @endif
+                                        </td>
                                         <td>
                                             <ul class="list-inline">
                                                 <li class="list-inline-item">

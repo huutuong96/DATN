@@ -22,8 +22,8 @@
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="mb-3">
-                                                    <label for="title" class="form-label">Tên doanh mục</label>
-                                                    <input type="text" class="form-control" placeholder="Enter category title" name="title" required>
+                                                    <label for="title" class="form-label">Tên danh mục</label>
+                                                    <input type="text" class="form-control" placeholder="Đồ Điện Tử ..." name="title" required>
                                                 </div>
                                             </div>
                                             
@@ -311,11 +311,18 @@
                                     <script>
                                         new DataTable('#cateall', {
                                             language: {   
-                                                lengthMenu: "Hiển thị _MENU_ Doanh mục bài viết",
-                                                search: "Tìm kiếm:"
+                                                lengthMenu: "Hiển thị _MENU_ Doanh mục sản phẩm",
+                                                search: "Tìm kiếm:",
+                                                sEmptyTable: "Không có dữ liệu trong bảng",
+                                                sProcessing: "Đang xử lý...",
+                                                sLengthMenu: "Hiển thị _MENU_ mục",
+                                                sZeroRecords: "Không tìm thấy dòng nào phù hợp",
+                                                sInfo: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                                                sInfoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+                                                sInfoFiltered: "(lọc từ _MAX_ mục)",
                                             },
-                                           
                                         });
+                                         
                                     </script>
                                     
                                 </div>

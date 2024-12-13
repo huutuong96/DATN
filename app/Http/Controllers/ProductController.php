@@ -792,15 +792,15 @@ class ProductController extends Controller
             if ($request->has('shop_id')) {
                 $query->where('shop_id', $request->shop_id);
             }
-            
             if ($request->sort == 'price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END ASC');
             }
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
-            // $query->with('shop');
             $products = $query->where('status', 2)->paginate($limit);
+
+
 
         return response()->json($products);
     }
@@ -1098,6 +1098,11 @@ class ProductController extends Controller
         $tabchill = $request->tabchill;
         // dd($tabchill);
         $product = Product::find($id ?? $request->id);
+        $shop = Shop::where('id', $product->shop_id)->select('owner_id')->first();
+        if (!$shop) {
+            return back()->with('error', 'Cửa hàng không còn hoạt động hoặc bị xóa.');
+        }
+        // dd($shop);
         if ($product) {
             $product->status = 2;
             $product->save();

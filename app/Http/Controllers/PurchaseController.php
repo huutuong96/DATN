@@ -231,6 +231,7 @@ class PurchaseController extends Controller
                 if($payment->code == 'COD'){
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                     $order->order_infomation = $orderInfomation;
+                    $order->status = 2;
                     $order->save();
                 }
                 $orders = OrdersModel::where('group_order_id', $groupOrderIds)->get();
@@ -246,6 +247,7 @@ class PurchaseController extends Controller
                     $PaymentsController = new PaymentsController();
                     $orderInfomation = $this->shippingOrderCreate($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                     $order->order_infomation = $orderInfomation;
+                    $order->status = 1;
                     $order->save();
                     DB::table("data_mail")->insert( [
                         'groupOrderIds' => $groupOrderIds,
@@ -780,10 +782,10 @@ class PurchaseController extends Controller
     private function createOrder(Request $request, $ship_id, $groupOrderIds, $payment)
     {
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
-        $status = 1;
+        $status = 2;
         $order_status = 0;
         if ($payment->code == 'VNPAY') {
-            $status = 2;
+            $status = 1;
             // $order_status = 12;
         }
         $order = OrdersModel::create([

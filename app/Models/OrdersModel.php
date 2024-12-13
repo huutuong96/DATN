@@ -182,5 +182,6 @@ public function orderDetails()
 {
     return $this->hasMany(OrderDetailsModel::class, 'order_id');
 }
+
 }
 

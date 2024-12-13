@@ -36,7 +36,7 @@
                                     <tbody>
                                         @if($shops->isEmpty())
                                             <tr>
-                                                <td colspan="6" class="text-center">Không có cửa hàng nào chờ duyệt.</td>
+                                                <td colspan="6" class="text-center">Không có cửa hàng nào vi phạm.</td>
                                             </tr>
                                         @else
                                             @foreach($shops as $shop)
@@ -49,8 +49,7 @@
                                                         <img src="{{$shop->user[0]->avatar ?? 'assets/images/users/avatar-1.jpg'}}" alt="Avatar" class="avatar-xs rounded-circle me-3 material-shadow" style="width: 60px; height: 60px;">
                                                         <div style="display: flex; flex-direction: column;">
                                                             <span style="font-weight: bold;">{{$shop->user[0]->fullname ?? 'No Name'}}</span>
-                                                            <span style="color: gray;">{{$shop->user[0]->phone ?? 'No Phone'}}</span>
-                                                            <span style="color: gray;">{{$shop->user[0]->phone ?? 'No Phone'}}</span>
+                                                            <span style="color: gray;">{{$shop->user[0]->phone ?? 'No Phone'}}</span> 
                                                         </div>
                                                     </td>
                                                     <td>
