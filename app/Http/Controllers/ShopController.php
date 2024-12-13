@@ -1279,7 +1279,7 @@ class ShopController extends Controller
             // ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('sold_count', 'desc')
             ->take(10)  // Get top 10 best-selling products
-            ->get(['id', 'name', 'show_price', 'sold_count'])->take(5);
+            ->get(['id', 'name', 'show_price', 'sold_count','image'])->take(5);
 
         return $this->successResponse('Lấy báo cáo sản phẩm bán chạy thành công', [
             'best_selling_products' => $bestSellingProducts,
