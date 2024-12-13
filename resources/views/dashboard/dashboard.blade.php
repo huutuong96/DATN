@@ -288,7 +288,7 @@
 
                 <div class="card-body">
                     <div id="chart_line_column_chart" data-colors='["--vz-primary", "--vz-success", "--vz-danger"]' class="apex-charts" dir="ltr"></div>
-                </div><!-- end card-body -->
+                </div><!-- end card-body --> 
                 <script>
                     // Hàm lấy màu từ thuộc tính data-colors
                     function getChartColorsArray(chartId) {
@@ -325,13 +325,13 @@
                                 data: blue_data,
                             },
                             {
-                                name: "Lượt Mua hàng",
+                                name: "Lượt Mua",
                                 type: "line",
                                 cole: "red",
                                 data: green_data,
                             },
                             {
-                                name: "Lượt trả hàng",
+                                name: "Lượt trả đổi",
                                 type: "line",
                                 data: red_data,
                             },
@@ -340,24 +340,26 @@
                             height: 350,
                             type: "line",
                             toolbar: { show: false },
+                            
                         },
                         stroke: {
                             width: [0, 4],
                         },
                         // title: {
                         //     text: "Thống kê Tổng quát",
-                        //     style: { fontWeight: 500 },
+                        //     // style: { fontWeight: 500 },
                         // },
                         dataLabels: {
                             enabled: true,
                             enabledOnSeries: [1],
                         },
                         labels: xValues1,
-                        // xaxis: {
-                        //     type: "datetime",
-                        // },
+                        xaxis: {
+                            // type: "datetime",
+                        },
                         yaxis: [
                             {
+                                
                                 title: {
                                     text: "Số tiền",
                                     style: { fontWeight: 500 },
@@ -378,30 +380,6 @@
                     var chart = new ApexCharts(document.querySelector("#chart_line_column_chart"), options);
                     chart.render();
                 </script>
-
-                <!-- <div class="card-header">
-                    <h4 class="card-title mb-0">Thống kê tổng quát</h4>
-                </div> 
-                <div class="card-body">
-                    <canvas id="myChart"></canvas>
-                </div>
-                <div class="card-footer">
-                    <ul style="display: flex; list-style-type: none; padding: 0; margin: 0;">
-                        <li style="margin-right: 10px;">
-                            <span style="display: inline-block; background-color: red; height: 10px; width: 10px;"></span>
-                            lượt trả hàng
-                        </li>
-                        <li style="margin-right: 10px;">
-                            <span style="display: inline-block; background-color: green; height: 10px; width: 10px;"></span>
-                            Lượt mua sản phẩm
-                        </li>
-                        <li>
-                            <span style="display: inline-block; background-color: blue; height: 10px; width: 10px;"></span>
-                            Doanh thu * 1.000.000 vnd 
-                        </li>
-                    </ul>
-                </div> -->
-
             </div><!-- end card -->
         </div>
         <!-- end col -->

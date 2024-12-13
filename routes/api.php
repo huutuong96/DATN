@@ -57,7 +57,7 @@ use App\Http\Controllers\TestAllController;
 
 Route::get('/search', function () {
     return "API - VNSHOP";
-})->middleware('CheckPremission:create_category');
+}) ;
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
     // Route không áp dụng middleware
@@ -73,7 +73,7 @@ Route::get('/search', function () {
                 Route::post('categories', [CategoriesController::class, 'store']);
                 Route::get('categories/{id}', [CategoriesController::class, 'show']);
                 Route::put('categories/{id}', [CategoriesController::class, 'update']);
-                Route::delete('categories/{id}', [CategoriesController::class, 'destroy'])->middleware('CheckPremission:delete_category');
+                Route::delete('categories/{id}', [CategoriesController::class, 'destroy']);
 
                 Route::resource('categori_shops', Categori_ShopsController::class);
 
@@ -105,9 +105,9 @@ Route::get('/search', function () {
   
                 
                
-                Route::resource('faqs', FAQController::class)->middleware('CheckRole');
+                Route::resource('faqs', FAQController::class) ;
 
-                Route::resource('taxs', TaxController::class)->middleware('CheckRole');
+                Route::resource('taxs', TaxController::class) ;
 
                 Route::resource('ranks', RanksController::class);
 
@@ -149,7 +149,7 @@ Route::get('/search', function () {
                 Route::resource('notification_to_shops', Notification_to_shopController::class);
 
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
-                Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
+                Route::resource('vouchers', VoucherController::class) ;
 
                 Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
                 Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
@@ -167,8 +167,8 @@ Route::get('/search', function () {
                 Route::resource('Product_to_carts', ProducttocartController::class);
                 // Route::resource('voucher_shop', VoucherToShopController::class);
 
-                Route::get('learning_seller/{shop_id}', [Learning_sellerController::class, 'index'])->middleware('CheckRole:Seller');
-                Route::get('learning_seller/{shop_id}/{learn_id}', [Learning_sellerController::class, 'show'])->middleware('CheckRole:Seller');
+                Route::get('learning_seller/{shop_id}', [Learning_sellerController::class, 'index']) ;
+                Route::get('learning_seller/{shop_id}/{learn_id}', [Learning_sellerController::class, 'show']) ;
                 Route::post('learning_seller', [Learning_sellerController::class, 'store']);
                 Route::put('learning_seller/{id}', [Learning_sellerController::class, 'update']);
                 Route::delete('learning_seller/delete/{id}', [Learning_sellerController::class, 'destroy']);
@@ -188,18 +188,18 @@ Route::get('/search', function () {
                     Route::post('shops/{id}', [ShopController::class, 'update']);
                     Route::delete('shops/{id}', [ShopController::class, 'destroy']);
                     Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
-                    Route::post('shop/manager', [ShopController::class, "shop_manager_store"])->middleware('CheckRole:Seller');
-                    Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"])->middleware('CheckRole:Seller');
-                    Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"])->middleware('CheckRole:Seller');
-                    Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"])->middleware('CheckRole:Seller');
-                    Route::get('shop/restore/{id}', [ShopController::class, "restore"])->middleware('CheckRole:Seller');
+                    Route::post('shop/manager', [ShopController::class, "shop_manager_store"]) ;
+                    Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"]) ;
+                    Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"]) ;
+                    Route::delete('shop/manager/destroy/members/{id}', [ShopController::class, "destroy_members"]) ;
+                    Route::get('shop/restore/{id}', [ShopController::class, "restore"]) ;
 
                     Route::post('shop/increase_follower/{id}', [ShopController::class, "increase_follower"]);
                     Route::post('shop/decrease_follower/{id}', [ShopController::class, "decrease_follower"]);
                     Route::post('shop/store_banner_to_shop/{id}', [ShopController::class, "store_banner_to_shop"]);
-                    Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"])->middleware('CheckRole:Seller');
-                    Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"])->middleware('CheckRole:Seller');
-                    Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"])->middleware('CheckRole:Seller');
+                    Route::post('shop/programe_to_shop/{id}', [ShopController::class, "programe_to_shop"]) ;
+                    Route::put('shop/update_category_shop/{id}', [ShopController::class, "update_category_shop"]) ;
+                    Route::get('shop/done_learning_seller/{shop_id}', [ShopController::class, "done_learning_seller"]) ;
                     Route::post('shop/voucher/{shop_id}', [ShopController::class, "VoucherToShop"]);
                     Route::get('shop/order/{id}', [ShopController::class, "get_order_to_shop_by_status"]);
                     Route::put('shop/update/order/{id}', [ShopController::class, "update_status_order"]);
@@ -233,9 +233,10 @@ Route::get('/search', function () {
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
-            Route::middleware('CheckPremission:create_products')->group(function () {
-                Route::post('products', action: [ProductController::class, 'store']);
-            });
+            // Route::middleware('CheckPremission:create_products')->group(function () {
+            //     Route::post('products', action: [ProductController::class, 'store']);
+            // });
+            Route::post('products', action: [ProductController::class, 'store']);
 
             
 
@@ -246,7 +247,7 @@ Route::get('/search', function () {
             Route::put('products/{id}', [ProductController::class, 'update']);
             Route::post('shop/product/remove/{id}', [ShopController::class, 'shop_remove_product']);
 
-            Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('CheckPremission:delete_products');
+            Route::delete('products/{id}', [ProductController::class, 'destroy']) ;
             Route::get('product/get_variant_not_image/{id}', [ProductController::class, 'getVariant']);
 
             Route::post('products/update_variant/{id}', [ProductController::class, 'updateVariant']); // update variant
