@@ -9,7 +9,7 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header align-items-center d-flex">
-                    @if(session('message'))
+                    <!-- @if(session('message'))
                     <div class="alert alert-success">
                         {{ session('message') }}
                     </div>
@@ -19,7 +19,7 @@
                         <div class="alert alert-danger">
                             {{ session('error') }}
                         </div>
-                    @endif
+                    @endif -->
                     <h4 class="card-title mb-0 flex-grow-1">Danh sách phân quyền</h4>
                     <!-- Toggle Between Modals -->
                     <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal">Thêm phân quyền</button>
@@ -78,6 +78,7 @@
                                         <td>{{$role->title}}</td>
                                         <td>{{$role->description ?? "Không có mô tả"}}</td>
                                         <td>
+                                            @if($role->title != 'OWNER')
                                             <ul class="list-inline">                                   
                                                 <li class="list-inline-item">
                                                     <a
@@ -185,6 +186,7 @@
                                                     </a>
                                                 </li>
                                             </ul>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach

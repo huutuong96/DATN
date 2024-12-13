@@ -77,19 +77,8 @@ Route::get('/search', function () {
 
                 Route::resource('categori_shops', Categori_ShopsController::class);
 
-                // Route::resource('roles', RolesController::class)->middleware('CheckRole');
-                Route::get('role/destroy/{id}', [RolesController::class, 'destroy'])->name('role_destroy');
-                Route::put('roles/update}', [RolesController::class, 'update'])->name('role_update');
-                Route::post('roles', [RolesController::class, 'store'])->name('role_store');
-                Route::get('change_role', [RolesController::class, 'change_role'])->name('change_role');
-
-
                 Route::resource('address', AddressController::class);
                 Route::post('update_address/{id}', [AddressController::class, 'update_address']);
-
-                // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
-                Route::post('permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckRole:OWNER');
-                Route::get('permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access');
 
               
 
@@ -120,7 +109,7 @@ Route::get('/search', function () {
 
                 Route::resource('taxs', TaxController::class)->middleware('CheckRole');
 
-                Route::resource('ranks', RanksController::class)->middleware('CheckRole:Admin');
+                Route::resource('ranks', RanksController::class);
 
                 Route::resource('ships',ShipsController::class);
 
@@ -129,19 +118,19 @@ Route::get('/search', function () {
                 Route::resource('ships',ShipsController::class);//chu ro lam nen chua bat premission
 
 
-                Route::resource('brands',BrandsController::class)->middleware('CheckRole:Admin');
+                Route::resource('brands',BrandsController::class);
 
                 Route::get('colors/client', [ColorsController::class, "index"]);
-                Route::resource('colors',ColorsController::class)->middleware('CheckRole:Admin');
+                Route::resource('colors',ColorsController::class);
 
                 Route::get('categori_learns/client', [CategorilearnsController::class, "index"]);
-                Route::resource('categori_learns', CategorilearnsController::class)->middleware('CheckRole:Admin');
+                Route::resource('categori_learns', CategorilearnsController::class);
 
                 Route::get('categoriessupportmains/client', [CategoriessupportmainController::class, "index"]);
-                Route::resource('categoriessupportmains', CategoriessupportmainController::class)->middleware('CheckRole:Admin');
+                Route::resource('categoriessupportmains', CategoriessupportmainController::class);
 
                 Route::get('learns/client', [LearnController::class, "index"]);
-                Route::resource('learns', LearnController::class)->middleware('CheckRole:Admin');
+                Route::resource('learns', LearnController::class);
 
                 Route::resource('messages', MessageController::class);
                 Route::post('messages/detail', [MessageController::class, "store_message_detail"]);
@@ -149,13 +138,13 @@ Route::get('/search', function () {
                 Route::get('messages/all/detail/{id}', [MessageController::class, "index_message_detail"]);
 
                
-                // Route::resource('voucher_main', VoucherToMainController::class)->middleware('CheckRole:Admin');
+                // Route::resource('voucher_main', VoucherToMainController::class);
 
                 Route::resource('notification_to_main', Notification_to_mainController::class);
                 Route::resource('notifications', NotificationController::class);
                 
                 
-                Route::resource('programes', ProgrameController::class)->middleware('CheckRole:Admin');
+                Route::resource('programes', ProgrameController::class);
 
                 Route::resource('notification_to_shops', Notification_to_shopController::class);
 
@@ -180,9 +169,9 @@ Route::get('/search', function () {
 
                 Route::get('learning_seller/{shop_id}', [Learning_sellerController::class, 'index'])->middleware('CheckRole:Seller');
                 Route::get('learning_seller/{shop_id}/{learn_id}', [Learning_sellerController::class, 'show'])->middleware('CheckRole:Seller');
-                Route::post('learning_seller', [Learning_sellerController::class, 'store'])->middleware('CheckRole:Admin');
-                Route::put('learning_seller/{id}', [Learning_sellerController::class, 'update'])->middleware('CheckRole:Admin');
-                Route::delete('learning_seller/delete/{id}', [Learning_sellerController::class, 'destroy'])->middleware('CheckRole:Admin');
+                Route::post('learning_seller', [Learning_sellerController::class, 'store']);
+                Route::put('learning_seller/{id}', [Learning_sellerController::class, 'update']);
+                Route::delete('learning_seller/delete/{id}', [Learning_sellerController::class, 'destroy']);
                 Route::resource('learning_seller', Learning_sellerController::class); // chưa biết phân kiểu gì
 
 
@@ -196,9 +185,9 @@ Route::get('/search', function () {
 
                 //SHOP
                     Route::post('shops', [ShopController::class, 'store']);
-                    Route::post('shops/{id}', [ShopController::class, 'update'])->middleware('CheckRole:Admin');
-                    Route::delete('shops/{id}', [ShopController::class, 'destroy'])->middleware('CheckRole:Admin');
-                    Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"])->middleware('CheckRole:Admin');
+                    Route::post('shops/{id}', [ShopController::class, 'update']);
+                    Route::delete('shops/{id}', [ShopController::class, 'destroy']);
+                    Route::post('shop/category/{id}/{category_main_id}', [ShopController::class, "category_shop_store"]);
                     Route::post('shop/manager', [ShopController::class, "shop_manager_store"])->middleware('CheckRole:Seller');
                     Route::get('shop/manager/members/{id}', [ShopController::class, "show_shop_members"])->middleware('CheckRole:Seller');
                     Route::put('shop/manager/update/members/{id}', [ShopController::class, "update_shop_members"])->middleware('CheckRole:Seller');

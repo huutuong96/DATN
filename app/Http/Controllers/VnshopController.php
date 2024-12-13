@@ -734,6 +734,12 @@ class VnshopController extends Controller
             return Back();
         }
     }
+    function userChangeRole(Request $rqt) {
+        $user = UsersModel::findOrFail( $rqt->id);
+        $user->role_id = $rqt->roleId;
+        $user->save();
+        return back()->with('success', 'Cập nhật chức vụ thành công!');
+    }
 
     // public function changeUser(Request $rqt){
     //     $user = UsersModel::find($rqt->id);

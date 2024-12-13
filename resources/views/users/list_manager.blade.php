@@ -168,7 +168,7 @@
                                                             @if( optional($user->role)->title == "OWNER")
                                                             <span class="badge bg-success text-white" style="width:200px; font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
                                                             @else
-                                                            <span class="badge bg-info text-white" style="font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
+                                                            <span class="badge bg-info text-white" style="width:200px; font-size: 1rem; padding: 5px 10px;">{{ optional($user->role)->title ?? 'No Role' }}</span>
                                                             @endif
                                                         </div>
                                                     </td>
@@ -233,7 +233,7 @@
                                                         </button>
                                                             </a>
                                                         </li>
-                                                        <li class="mt-2 mb-2">
+                                                        <li class="list-inline-item">
                                                             <a href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-{{ $user->id }}">
                                                                 <button type="button" class="btn btn-primary" title="Chi tiết sản phẩm">
                                                                     <i class="ri-eye-line align-middle"></i>
@@ -338,6 +338,42 @@
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                                         </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#changeRolechangeRole-{{ $user->id }}">
+                                                                <button type="button" class="btn btn-success" title="Cập nhật chức vụ cho user">
+                                                                    <i class="ri-edit-line align-middle"></i>
+                                                                </button>
+                                                            </a>
+                                                        
+                                                            <!-- Modal Chi tiết sản phẩm -->
+                                                            <div class="modal fade" id="changeRolechangeRole-{{ $user->id }}" tabindex="-1" aria-labelledby="changeRolechangeRoleLabel-{{ $user->id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-xl">
+                                                                    <div class="modal-content"  style="width: 400px; margin: 0 auto">
+                                                                    <form action="{{ route('user_change_role', ['id' => $user->id, 'token' => auth()->user()->refesh_token]) }}" method="POST">
+                                                                        @csrf
+                                                                        @method('PUT')
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="changeRolechangeRoleLabel-{{ $user->id }}">Cập nhật chức vụ cho user</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                        <select id="role_id" name="roleId" class="form-control js-example-templating">
+                                                                                <option value="{{$user->role->id}}">{{ $user->role->title}}</option>
+                                                                                @foreach($roles as $role)
+                                                                                    <option value="{{$role->id}}">{{$role->title}}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                       
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-secondary" onclick="return confirm('Bạn có chắc muốn thay đổi chức vụ của tài khoản này ???') "> cập nhật</button>
+                                                                        </div>
+                                                                        </form>
                                                                     </div>
                                                                 </div>
                                                             </div>
