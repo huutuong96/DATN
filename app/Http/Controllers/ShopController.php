@@ -45,7 +45,7 @@ class ShopController extends Controller
     public function __construct()
     {
         $this->middleware('SendNotification');
-        $this->middleware('CheckShop')->except('store', 'done_learning_seller', 'revenueReport', 'orderReport', 'bestSellingProducts', 'create_refund_order', 'index', 'show','getShopByCategory');
+        $this->middleware('CheckShop')->except('store', 'done_learning_seller', 'revenueReport', 'orderReport', 'bestSellingProducts', 'create_refund_order', 'index', 'show','getShopByCategory','showClient');
     }
 
     private function successResponse($message, $data = null, $status = 200)
