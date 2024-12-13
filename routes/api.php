@@ -77,7 +77,8 @@ Route::get('/search', function () {
 
                 Route::resource('categori_shops', Categori_ShopsController::class);
 
-                
+                Route::resource('address', AddressController::class);
+                Route::post('update_address/{id}', [AddressController::class, 'update_address']);
 
               
 

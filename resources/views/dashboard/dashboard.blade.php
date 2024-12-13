@@ -327,6 +327,7 @@
                             {
                                 name: "Lượt Mua hàng",
                                 type: "line",
+                                cole: "red",
                                 data: green_data,
                             },
                             {
