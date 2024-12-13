@@ -241,6 +241,7 @@ class PurchaseController extends Controller
                 if ($orderDetails->first()->variant_id != null) {
                     $variants = product_variants::whereIn('id', $orderDetails->pluck('variant_id'))->get();
                 }
+               
                 $user = jwtAuth::parseToken()->authenticate();
                 $total_amount = OrdersModel::where('group_order_id', $groupOrderIds)->sum('total_amount');
                 if ($payment->code == 'VNPAY') {
@@ -266,7 +267,8 @@ class PurchaseController extends Controller
                         'url' => $url,
                     ], 200);
                 }  
-                // return view('emails.test',compact('orders','total_amount','result','carts','orderDetails','shipFee','products','variants','discountMainVoucher','user','payment'));
+                // dd($variants);
+                // return view('emails.test',compact('orders','total_amount','carts','orderDetails','shipFee','products','variants','discountMainVoucher','user','payment'));
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
                 // ProducttocartModel::whereIn('id', $request->carts)->delete();
