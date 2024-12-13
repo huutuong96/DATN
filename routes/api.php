@@ -97,6 +97,8 @@ Route::get('/search', function () {
                    
                 });
                 Route::get('blogs/{id}', [BlogsController::class, "show"]);
+                Route::get('post/{id}', [PostController::class, "show"]);
+
                 Route::middleware('CheckPremission:handle_blog')->group(function () {
                     
                     Route::resource('posts', PostController::class)->except(['index']);

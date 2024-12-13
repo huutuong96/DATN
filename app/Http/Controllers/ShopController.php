@@ -688,10 +688,10 @@ class ShopController extends Controller
                 $query->orderBy('updated_at', 'desc');
                 break;
             case 'stock':
-                $query->orderBy('quantity', 'asc');
+                $query->withSum('variants', 'quantity')->orderBy(DB::raw('IFNULL(variants_sum_quantity, stock)'), 'asc');
                 break;
             case '-stock':
-                $query->orderBy('quantity', 'desc');
+                $query->withSum('variants', 'quantity')->orderBy(DB::raw('IFNULL(variants_sum_quantity, stock)'), 'desc');
                 break;
             case 'name':
                 $query->orderBy('name', 'asc');
