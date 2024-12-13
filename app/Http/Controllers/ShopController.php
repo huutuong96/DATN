@@ -296,7 +296,7 @@ class ShopController extends Controller
     }
     public function showClient(string $id)
     {
-        $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        $Shop = Shop::where('id', $id)->whereIn('status', [2,3])->first();
         if (!$Shop) {
             return $this->errorResponse("Không tồn tại Shop nào", [], 404);
         }
