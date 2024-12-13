@@ -139,6 +139,16 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::put('/events/{id}', [VnshopController::class, 'update_events'])->name('update_events')->middleware('CheckAdminPremission:manage_eveneven');
     Route::get('/events-status', [VnshopController::class, 'changeStatusEvent'])->name('change_status_events')->middleware('CheckAdminPremission:manage_eveneven');
     Route::get('/trash-events', [VnshopController::class, 'listEvent_trash'])->name('trash_events')->middleware('CheckAdminPremission:manage_eveneven');
+    // Route::resource('roles', RolesController::class)->middleware('CheckRole');
+    Route::get('/api/role/destroy/{id}', [RolesController::class, 'destroy'])->name('role_destroy')->middleware('CheckAdminPremission:role');
+    Route::put('/api/roles/update}', [RolesController::class, 'update'])->name('role_update')->middleware('CheckAdminPremission:role');
+    Route::post('/api/roles', [RolesController::class, 'store'])->name('role_store')->middleware('CheckAdminPremission:role');
+    Route::get('/api/change_role', [RolesController::class, 'change_role'])->name('change_role')->middleware('CheckAdminPremission:role');
+    Route::put('/user/change_role', [VnshopController::class, 'userChangeRole'])->name('user_change_role')->middleware('CheckAdminPremission:role');
+
+    // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
+    Route::post('/api/permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckAdminPremission:role');
+    Route::get('/api/permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access')->middleware('CheckAdminPremission:role');
 });
 
 
