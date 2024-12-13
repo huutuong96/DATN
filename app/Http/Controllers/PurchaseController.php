@@ -779,10 +779,10 @@ class PurchaseController extends Controller
     private function createOrder(Request $request, $ship_id, $groupOrderIds, $payment)
     {
         $address = AddressModel::where('user_id', auth()->id())->where('default', 1)->first();
-        $status = 1;
+        $status = 2;
         $order_status = 0;
         if ($payment->code == 'VNPAY') {
-            $status = 2;
+            $status = 1;
             // $order_status = 12;
         }
         $order = OrdersModel::create([

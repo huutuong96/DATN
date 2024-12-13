@@ -263,6 +263,44 @@ class ShopController extends Controller
         if (!$Shop) {
             return $this->errorResponse("Không tồn tại Shop nào");
         }
+        
+        $Shop->visits = $Shop->visits + 1;
+        $Shop->save();
+        $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();
+        $limit = $request->limit ?? 20;
+        $tax = Tax::where('id', $Shop->tax_id)->where('status', 2)->get();
+        $bannerShop = BannerShop::where('shop_id', $Shop->id)->where('status', 2)->get();
+        $VoucherToShop = VoucherToShop::where('shop_id', $Shop->id)->where('status', 2)->get();
+        $productsQuery = Product::where('shop_id', $Shop->id)
+                                ->where('status', 2);
+        $category = [];
+        foreach ($productsQuery->get() as $product) {
+            $categoryId = $product->category_id;
+            if (!in_array($categoryId, array_column($category, 'id'))) {
+                $category[] = CategoriesModel::find($categoryId);
+            }
+        }
+        $products = $productsQuery->paginate($limit);
+        if (!$Shop) {
+            return $this->errorResponse("Không tồn tại Shop nào");
+        }
+        return $this->successResponse("Lấy dữ liệu thành công", [
+            'shop' => $Shop,
+            'tax' => $tax,
+            'banner' => $bannerShop,
+            'Vouchers' => $VoucherToShop,
+            // 'products' => $products,
+            'categories' => $category,
+            'follow_count' => $follow_count,
+        ]);
+    }
+    public function showClient(string $id)
+    {
+        $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        if (!$Shop) {
+            return $this->errorResponse("Không tồn tại Shop nào", [], 404);
+        }
+
         $Shop->visits = $Shop->visits + 1;
         $Shop->save();
         $follow_count = Follow_to_shop::where('shop_id', $Shop->id)->count();

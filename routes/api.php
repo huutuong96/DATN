@@ -389,6 +389,8 @@ Route::get('/search', function () {
         Route::get('variantattribute/{shop_id}/{id}', [ProductController::class, 'variantattribute']);
         Route::get('shops', [ShopController::class, 'index']);
         Route::get('shops/{id}', [ShopController::class, 'show']);
+        Route::get('shop_client/{id}', [ShopController::class, 'showClient']);
+        
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
         Route::get('shop/get_categories_for_shop/{id}', [ShopController::class, "get_categories_for_shop"]);
         Route::get('shop/get_dashboard_shop/{id}', [ShopController::class, "get_dashboard_shop"]);
