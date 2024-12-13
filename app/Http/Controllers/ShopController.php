@@ -687,10 +687,10 @@ class ShopController extends Controller
             case '-updated_at':
                 $query->orderBy('updated_at', 'desc');
                 break;
-            case 'quantity':
+            case 'stock':
                 $query->orderBy('quantity', 'asc');
                 break;
-            case '-quantity':
+            case '-stock':
                 $query->orderBy('quantity', 'desc');
                 break;
             case 'name':
