@@ -792,15 +792,15 @@ class ProductController extends Controller
             if ($request->has('shop_id')) {
                 $query->where('shop_id', $request->shop_id);
             }
-            
             if ($request->sort == 'price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END ASC');
             }
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
-            // $query->with('shop');
             $products = $query->where('status', 2)->paginate($limit);
+
+            
 
         return response()->json($products);
     }
