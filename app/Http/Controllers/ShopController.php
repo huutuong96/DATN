@@ -762,6 +762,7 @@ class ShopController extends Controller
         $totalFollow = Follow_to_shop::where('shop_id', $shop->id)->count();
         $totalView = $shop->visits;
         $totalRating = $shop->rating;
+        
         return $this->successResponse("Lấy dữ liệu thành công", [
             'total_order' => $totalOrder,
             'total_product' => $totalProduct,
@@ -1268,25 +1269,34 @@ class ShopController extends Controller
         ]);
     }
 
-    public function bestSellingProducts(Request $request)
+    public function bestSellingProducts(Request $request, string $id)
     {
-        $IsOwnerShop =  $this->IsOwnerShop($request->shop_id);
-        if (!$IsOwnerShop) {
-            return $this->errorResponse(" không phải là chủ shop");
-        }
         $startDate = $request->start_date;
         $endDate = $request->end_date;
-        $shopId = $request->shop_id;
+        // $shopId = $request->shop_id;
 
-        $bestSellingProducts = Product::where('shop_id', $shopId)
-            ->whereBetween('created_at', [$startDate, $endDate])
+        $bestSellingProducts = Product::where('shop_id', $id)
+            // ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('sold_count', 'desc')
             ->take(10)  // Get top 10 best-selling products
-            ->get(['id', 'name', 'price', 'sold_count']);
+            ->get(['id', 'name', 'show_price', 'sold_count'])->take(5);
 
         return $this->successResponse('Lấy báo cáo sản phẩm bán chạy thành công', [
             'best_selling_products' => $bestSellingProducts,
         ]);
+    }
+
+    public function TopUserBuy(Request $request, string $id)
+    {
+        $bestUser = OrdersModel::where('shop_id', $id)
+            ->select('user_id', DB::raw('COUNT(*) as total_orders'))
+            ->groupBy('user_id')
+            ->orderBy('total_orders', 'desc')
+            ->take(5)
+            ->with('user:id,fullname')
+            ->get();
+
+        return $this->successResponse('Lấy báo cáo sản phẩm bán chạy thành công', $bestUser);
     }
 
     public function create_refund_order(Request $request, string $id)
