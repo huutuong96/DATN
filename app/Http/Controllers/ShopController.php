@@ -798,13 +798,13 @@ class ShopController extends Controller
             $query->whereDate('created_at', Carbon::today());
             break;
             case '2':
-            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            $query->whereBetween('created_at', [Carbon::now()->subDays(7), Carbon::now()]);
             break;
             case '3':
-            $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+                $query->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()]);
             break;
             case '4':
-            $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()]);
+            $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()]);
             break;
             default:
             break;
@@ -932,7 +932,7 @@ class ShopController extends Controller
             return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
             break;
             case '2':
-            $orders->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            $orders->whereBetween('created_at', [Carbon::now()->subDays(7), Carbon::now()]);
             $orders = $query->get()->groupBy(function ($date) {
                 return Carbon::parse($date->created_at)->format('d-m-Y');
             });
@@ -949,6 +949,7 @@ class ShopController extends Controller
             return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
             break;
             case '3':
+            $orders->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()]);
             $orders = $query->get()->groupBy(function ($date) {
                 return Carbon::parse($date->created_at)->format('d-m-Y');
             });
@@ -965,6 +966,7 @@ class ShopController extends Controller
             return $this->successResponse("Lấy dữ liệu thành công", $formattedOrders);
             break;
             case '4':
+            $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()]);
             $orders = $query->get()->groupBy(function ($date) {
                 return Carbon::parse($date->created_at)->format('m-Y');
             });
