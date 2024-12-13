@@ -313,8 +313,11 @@ class ShopController extends Controller
         $category = [];
         foreach ($productsQuery->get() as $product) {
             $categoryId = $product->category_id;
-            if (!in_array($categoryId, array_column($category, 'id'))) {
-                $category[] = CategoriesModel::find($categoryId);
+            if ($categoryId && !in_array($categoryId, array_column($category, 'id'))) {
+            $categoryModel = CategoriesModel::find($categoryId);
+            if ($categoryModel) {
+                $category[] = $categoryModel;
+            }
             }
         }
         $products = $productsQuery->paginate($limit);
