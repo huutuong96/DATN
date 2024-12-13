@@ -48,19 +48,19 @@
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="fullname" class="form-label">Họ Tên</label>
-                                                <input type="text" class="form-control" placeholder="Enter your firstname" id="fullname">
+                                                <input type="text" class="form-control" placeholder="Tên tài khoảnkhoản" id="fullname">
                                             </div>
                                         </div><!--end col-->
                                         <div class="col-12">
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">Email</label>
-                                                <input type="email" class="form-control" placeholder="example@gamil.com" id="email">
+                                                <input type="email" class="form-control" placeholder="Nhập Email" id="email">
                                             </div>
                                         </div><!--end col-->
                                         <div class="col-6">
                                             <div class="mb-3">
                                                 <label for="password" class="form-label">Mật Khẩu</label>
-                                                <input type="text" class="form-control" placeholder="Enter your city" id="password">
+                                                <input type="text" class="form-control" placeholder="*********" id="password">
                                             </div>
                                         </div><!--end col-->
                                         <div class="col-6">

@@ -1472,7 +1472,8 @@ public function ProductAll(Request $request)
             if ($user) {
                 $allProducts = Product::pluck('id')->toArray();
                 $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
-                $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->toArray();
+                $userPurc
+                ::whereIn('order_id', $userOrders)->pluck('product_id')->toArray();
                 $orderForUser = [];
                 foreach ($userPurchasedProducts as $value) {
                     if(!in_array($value, $orderForUser)){

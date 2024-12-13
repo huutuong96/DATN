@@ -249,8 +249,10 @@ class VnshopController extends Controller
     
     public function trash_category($limit = 5){
         $categories = CategoriesModel::orderBy('updated_at', 'desc')->where('status', "=", 5 )->paginate($limit);
+        $ListCategories = CategoriesModel::all();
         return view('categories.trash',compact(
-            'categories'
+            'categories',
+            'ListCategories'
         ));
     }
     
@@ -363,20 +365,42 @@ class VnshopController extends Controller
     //     }
     //     return Back()->with('message', 'Không có sản phẩm nào!');
     // }
+
+
+
+    // public function changeCategory(Request $rqt)
+    // {  
+    //     $category = CategoriesModel::find($rqt->id);
+       
+    //     if (!$category) {
+    //         return Back()->with('message', 'Không tìm thấy danh mục!');
+    //     } 
+    //     if ($rqt->status == 1 || $rqt->status == 5) {
+    //         $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)
+    //                                             ->where("status", 2) 
+    //                                             ->get();
+    //         if ($chillrenCategory) {
+    //             return Back()->with('error', 'Không thể xóa danh mục cha vì có danh mục con đang hoạt động!');
+    //         }
+    //     }
+    //     $category->status = $rqt->status;  
+    //     $category->save(); 
+    
+    //     return Back()->with('message', 'Cập nhật thành công!');
+    // }
+    
+
     public function changeCategory(Request $rqt)
-    { 
-        // dd($rqt);
+    {  
         $category = CategoriesModel::find($rqt->id);
+       
         if (!$category) {
             return Back()->with('message', 'Không tìm thấy danh mục!');
-        }
-        if ($rqt->status === 0 || $rqt->status == 5) {
-            $chillrenCategory = CategoriesModel::where("parent_id", $rqt->id)
-                                                ->where("status", 2) 
-                                                ->get();
-                                                // dd($chillrenCategory);
-            if ($chillrenCategory->isNotEmpty()) {
-                return Back()->with('message', 'Không thể xóa danh mục cha vì có danh mục con đang hoạt động!');
+        } 
+        if ($rqt->status == 1 || $rqt->status == 5) {
+           // Kiểm tra trước khi xóa
+            if ($this->hasActiveDescendants($rqt->id)) {
+                return back()->with('error', 'Không thể xóa danh mục cha vì có danh mục con, cháu hoặc chắt đang hoạt động!');
             }
         }
         $category->status = $rqt->status;  
@@ -384,6 +408,28 @@ class VnshopController extends Controller
     
         return Back()->with('message', 'Cập nhật thành công!');
     }
+
+    function hasActiveDescendants($categoryId) {
+        // Lấy danh sách danh mục con
+        $children = CategoriesModel::where('parent_id', $categoryId)->where('status', 2)->get();
+    
+        foreach ($children as $child) {
+            // Kiểm tra nếu danh mục con đang hoạt động
+            if ($child->status == 2) {
+                return true;
+            }
+    
+            // Đệ quy kiểm tra danh mục cháu, chắt
+            if (hasActiveDescendants($child->id)) {
+                return true;
+            }
+        }
+    
+        return false;
+    }
+    
+    
+    
     
     
     public function updateCategory(Request $request){
