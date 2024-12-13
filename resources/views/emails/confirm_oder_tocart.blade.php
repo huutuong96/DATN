@@ -23,11 +23,13 @@
                     <p style="margin: 0 0 10px;"><strong>Ngày đặt hàng: </strong> {{$order->created_at}}</p>
                     <p style="margin: 0 0 10px;"><strong>Phương thức thanh toán: </strong> {{$paymentMethod}}</p>
                 </div>
+            
                 <!-- Product Details -->
                 <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                     <h4 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Chi tiết sản phẩm</h4>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         @foreach($orderDetails as $orderDetail)
+                        
                             @if($orderDetail->order_id == $order->id)
                                 @if(!$orderDetail->variant_id )
                                     @foreach($products as $product)
