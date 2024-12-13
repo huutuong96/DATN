@@ -908,142 +908,134 @@ class ShopController extends Controller
         if ($request->has('time')) {
             $time = $request->input('time');
             switch ($time) {
-                case '1':
-                    $orders = $query->whereDate('created_at', Carbon::today())->get()->groupBy(function ($date) {
-                        return Carbon::parse($date->created_at)->format('H:00');
-                    });
-                    $allHours = [];
-                    for ($i = 0; $i < 24; $i++) {
-                        $hour = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
-                        $allHours[$hour] = [
-                            'dateKey' => $hour,
-                            'revenue' => 0,
-                            'orders' => 0,
-                            'average_revenue_per_order' => 0
-                        ];
-                    }
-                    $sum = 0;
-                    foreach ($orders as $key => $group) {
-                        $revenue = $group->sum('net_amount');
-                        $sum += $group->sum('net_amount');
-                        $orderCount = $group->count();
-                        $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
-                        $allHours[$key] = [
-                            'dateKey' => $key,
-                            'revenue' => $revenue,
-                            'orders' => $orderCount,
-                            'average_revenue_per_order' => $averageRevenuePerOrder,
-                        ];
-                    }
+            case '1':
+                $orders = $query->whereDate('created_at', Carbon::today())->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('H:00');
+                });
+                $allHours = [];
+                for ($i = 0; $i < 24; $i++) {
+                $hour = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
+                $allHours[$hour] = [
+                    'dateKey' => $hour,
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
+                ];
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allHours[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
 
-
-                    $data = array_values($allHours);
-                    // $data['sum']= $sum;
-                    return response()->json(['data' => $data]);
-                    break;
+                $data = array_values($allHours);
+                return response()->json(['data' => $data]);
+                break;
                
-                case '2':
-                    $orders = $query->whereBetween('created_at', [Carbon::now()->subDays(7), Carbon::now()])->get()->groupBy(function ($date) {
-                        return Carbon::parse($date->created_at)->format('d-m-Y');
-                    });
-                    $allDays = [];
-                    for ($i = 0; $i < 7; $i++) {
-                        $day = Carbon::now()->subDays($i)->format('d-m-Y');
-                        $allDays[$day] = [
-                            'dateKey' => $day,
-                            'revenue' => 0,
-                            'orders' => 0,
-                            'average_revenue_per_order' => 0
-                        ];
-                    }
-                    $sum = 0;
-                    foreach ($orders as $key => $group) {
-                        $revenue = $group->sum('net_amount');
-                        $sum += $group->sum('net_amount');
-                        $orderCount = $group->count();
-                        $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
-                        $allDays[$key] = [
-                            'dateKey' => $key,
-                            'revenue' => $revenue,
-                            'orders' => $orderCount,
-                            'average_revenue_per_order' => $averageRevenuePerOrder,
-                        ];
-                    }
+            case '2':
+                $orders = $query->whereBetween('created_at', [Carbon::now()->subDays(7), Carbon::now()])->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('d-m-Y');
+                });
+                $allDays = [];
+                for ($i = 0; $i < 7; $i++) {
+                $day = Carbon::now()->subDays($i)->format('d-m-Y');
+                $allDays[$day] = [
+                    'dateKey' => $day,
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
+                ];
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allDays[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
 
+                $data = array_reverse(array_values($allDays));
+                return response()->json(['data' => $data]);
+                break;
+            case '3':
+                $orders = $query->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('d-m-Y');
+                });
+                $allDays = [];
+                for ($i = 0; $i < 30; $i++) {
+                $day = Carbon::now()->subDays($i)->format('d-m-Y');
+                $allDays[$day] = [
+                    'dateKey' => $day,
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
+                ];
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allDays[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
 
-                    $data = array_values($allDays);
-                    // $data['sum']= $sum;
-                    return response()->json(['data' => $data]);
-                    break;
-                case '3':
-                    $orders = $query->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])->get()->groupBy(function ($date) {
-                        return Carbon::parse($date->created_at)->format('d-m-Y');
-                    });
-                    $allDays = [];
-                    for ($i = 0; $i < 30; $i++) {
-                        $day = Carbon::now()->subDays($i)->format('d-m-Y');
-                        $allDays[$day] = [
-                            'dateKey' => $day,
-                            'revenue' => 0,
-                            'orders' => 0,
-                            'average_revenue_per_order' => 0
-                        ];
-                    }
-                    $sum = 0;
-                    foreach ($orders as $key => $group) {
-                        $revenue = $group->sum('net_amount');
-                        $sum += $group->sum('net_amount');
-                        $orderCount = $group->count();
-                        $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
-                        $allDays[$key] = [
-                            'dateKey' => $key,
-                            'revenue' => $revenue,
-                            'orders' => $orderCount,
-                            'average_revenue_per_order' => $averageRevenuePerOrder,
-                        ];
-                    }
+                $data = array_reverse(array_values($allDays));
+                return response()->json(['data' => $data]);
+                break;
+            case '4':
+                $orders = $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()])->get()->groupBy(function ($date) {
+                return Carbon::parse($date->created_at)->format('m-Y');
+                });
+                $allMonths = [];
+                for ($i = 0; $i < 12; $i++) {
+                $month = Carbon::now()->subMonths($i)->format('m-Y');
+                $allMonths[$month] = [
+                    'dateKey' => $month,
+                    'revenue' => 0,
+                    'orders' => 0,
+                    'average_revenue_per_order' => 0
+                ];
+                }
+                $sum = 0;
+                foreach ($orders as $key => $group) {
+                $revenue = $group->sum('net_amount');
+                $sum += $group->sum('net_amount');
+                $orderCount = $group->count();
+                $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
+                $allMonths[$key] = [
+                    'dateKey' => $key,
+                    'revenue' => $revenue,
+                    'orders' => $orderCount,
+                    'average_revenue_per_order' => $averageRevenuePerOrder,
+                ];
+                }
 
-
-                    $data = array_values($allDays);
-                    // $data['sum']= $sum;
-                    return response()->json(['data' => $data]);
-                    break;
-                case '4':
-                    $orders = $query->whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()])->get()->groupBy(function ($date) {
-                        return Carbon::parse($date->created_at)->format('m-Y');
-                    });
-                    $allMonths = [];
-                    for ($i = 0; $i < 12; $i++) {
-                        $month = Carbon::now()->subMonths($i)->format('m-Y');
-                        $allMonths[$month] = [
-                            'dateKey' => $month,
-                            'revenue' => 0,
-                            'orders' => 0,
-                            'average_revenue_per_order' => 0
-                        ];
-                    }
-                    $sum = 0;
-                    foreach ($orders as $key => $group) {
-                        $revenue = $group->sum('net_amount');
-                        $sum += $group->sum('net_amount');
-                        $orderCount = $group->count();
-                        $averageRevenuePerOrder = $orderCount > 0 ? $revenue / $orderCount : 0;
-                        $allMonths[$key] = [
-                            'dateKey' => $key,
-                            'revenue' => $revenue,
-                            'orders' => $orderCount,
-                            'average_revenue_per_order' => $averageRevenuePerOrder,
-                        ];
-                    }
-
-
-                    $data = array_values($allMonths);
-                    // $data['sum']= $sum;
-                    return response()->json(['data' => $data]);
-                    break;
-                default:
-                    $orders = collect();
-                    break;
+                $data = array_reverse(array_values($allMonths));
+                return response()->json(['data' => $data]);
+                break;
+            default:
+                $orders = collect();
+                break;
             }
         }
         return $this->successResponse("Lấy dữ liệu thành công", []);
