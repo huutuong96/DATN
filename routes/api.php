@@ -237,7 +237,6 @@ Route::get('/search', function () {
             //     Route::post('products', action: [ProductController::class, 'store']);
             // });
             Route::post('products', action: [ProductController::class, 'store']);
-            });
 
             
 
