@@ -333,7 +333,8 @@ Route::get('/search', function () {
 
             Route::get('shop/revenue_report', [ShopController::class, 'revenueReport']);
             Route::get('shop/order_report', [ShopController::class, 'orderReport']);
-            Route::get('shop/best_selling_products', [ShopController::class, 'bestSellingProducts']);
+            Route::get('shop/best_selling_products/{id}', [ShopController::class, 'bestSellingProducts']);
+            Route::get('shop/top_user_paid/{id}', [ShopController::class, 'TopUserBuy']);
             Route::get('shops/leadtime/{shop_id}/{order_id}', [ShopController::class, 'leadtime']);
             Route::get('shops/wallet/{shop_id}', [ShopController::class, 'wallet']);
             Route::get('shops/history_get_cash/{shop_id}', [ShopController::class, 'history_get_cash']);
