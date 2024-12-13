@@ -149,7 +149,7 @@ Route::get('/search', function () {
                 Route::resource('notification_to_shops', Notification_to_shopController::class);
 
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
-                Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
+                Route::resource('vouchers', VoucherController::class) ;
 
                 Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
                 Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
@@ -233,9 +233,10 @@ Route::get('/search', function () {
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
-            Route::middleware('CheckPremission:create_products')->group(function () {
-                Route::post('products', action: [ProductController::class, 'store']);
-            });
+            // Route::middleware('CheckPremission:create_products')->group(function () {
+            //     Route::post('products', action: [ProductController::class, 'store']);
+            // });
+            Route::post('products', action: [ProductController::class, 'store']);
 
             
 
@@ -379,7 +380,6 @@ Route::get('/search', function () {
         Route::get('variantattribute/{shop_id}/{id}', [ProductController::class, 'variantattribute']);
         Route::get('shops', [ShopController::class, 'index']);
         Route::get('shops/{id}', [ShopController::class, 'show']);
-        Route::get('shop_client/{id}', [ShopController::class, 'showClient']);
         
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
         Route::get('shop/get_categories_for_shop/{id}', [ShopController::class, "get_categories_for_shop"]);
@@ -435,3 +435,4 @@ Route::get('/search', function () {
 
 
         Route::get('main/config/client', [configController::class, 'index_client']);
+        Route::get('shop_client/{id}', [ShopController::class, 'showClient']);

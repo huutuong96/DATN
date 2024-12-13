@@ -45,7 +45,7 @@ class ShopController extends Controller
     public function __construct()
     {
         $this->middleware('SendNotification');
-        $this->middleware('CheckShop')->except('store', 'done_learning_seller', 'revenueReport', 'orderReport', 'bestSellingProducts', 'create_refund_order', 'index', 'show','getShopByCategory');
+        $this->middleware('CheckShop')->except('store', 'done_learning_seller', 'revenueReport', 'orderReport', 'bestSellingProducts', 'create_refund_order', 'index', 'show','getShopByCategory','showClient');
     }
 
     private function successResponse($message, $data = null, $status = 200)
@@ -296,7 +296,7 @@ class ShopController extends Controller
     }
     public function showClient(string $id)
     {
-        $Shop = Shop::where('id', $id)->where('status', 2)->first();
+        $Shop = Shop::where('id', $id)->whereIn('status', [2,3])->first();
         if (!$Shop) {
             return $this->errorResponse("Không tồn tại Shop nào", [], 404);
         }
@@ -313,8 +313,11 @@ class ShopController extends Controller
         $category = [];
         foreach ($productsQuery->get() as $product) {
             $categoryId = $product->category_id;
-            if (!in_array($categoryId, array_column($category, 'id'))) {
-                $category[] = CategoriesModel::find($categoryId);
+            if ($categoryId && !in_array($categoryId, array_column($category, 'id'))) {
+            $categoryModel = CategoriesModel::find($categoryId);
+            if ($categoryModel) {
+                $category[] = $categoryModel;
+            }
             }
         }
         $products = $productsQuery->paginate($limit);
