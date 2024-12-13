@@ -51,11 +51,9 @@
                             @else 
                                 @foreach($variants as $variant)
                                     @if($orderDetail->variant_id == $variant->id)
-                                   {{-- @dd( $variant->product->name); --}}
                                         <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
                                             <span>
                                                 <img src="{{$variant->images ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                            
                                             </span>
                                             <div>
                                             <div> Tên sản phẩm{{ \Illuminate\Support\Str::words($variant->product->name ?? '', 7, '...') }}</div>
@@ -63,9 +61,7 @@
                                             <div>Phân loại: {{$variant->name}}</div>
                                             </div>
                                             <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
-                                        
                                         </li>
-                                        
                                     @endif
                                  @endforeach 
                             @endif
