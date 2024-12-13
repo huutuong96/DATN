@@ -287,7 +287,7 @@
                 </div><!-- end card header -->
 
                 <div class="card-body">
-                    <div id="chart_line_column_chart" data-colors='["--vz-primary", "--vz-success"]' class="apex-charts" dir="ltr"></div>
+                    <div id="chart_line_column_chart" data-colors='["--vz-primary", "--vz-success", "--vz-danger"]' class="apex-charts" dir="ltr"></div>
                 </div><!-- end card-body -->
                 <script>
                     // Hàm lấy màu từ thuộc tính data-colors
