@@ -149,7 +149,7 @@ Route::get('/search', function () {
                 Route::resource('notification_to_shops', Notification_to_shopController::class);
 
                 Route::get('vouchers/client', [VoucherController::class, "index"]);
-                Route::resource('vouchers', VoucherController::class)->middleware('CheckRole:Seller');
+                Route::resource('vouchers', VoucherController::class) ;
 
                 Route::post('add/voucher', [VoucherController::class, 'addVoucherByCode']);
                 Route::get('get/voucher', [VoucherController::class, 'get_voucher_by_user']);
@@ -233,8 +233,10 @@ Route::get('/search', function () {
             Route::post('shop_send/{mes_id}', [MessageController::class, "shop_send"]);
 
             Route::get('product/approve/{id}', [ProductController::class, 'approve_product'])->name('approve_product');
-            Route::middleware('CheckPremission:create_products')->group(function () {
-                Route::post('products', action: [ProductController::class, 'store']);
+            // Route::middleware('CheckPremission:create_products')->group(function () {
+            //     Route::post('products', action: [ProductController::class, 'store']);
+            // });
+            Route::post('products', action: [ProductController::class, 'store']);
             });
 
             
