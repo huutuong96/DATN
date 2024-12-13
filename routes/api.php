@@ -96,9 +96,12 @@ Route::get('/search', function () {
                     Route::resource('voucher_shop', VoucherToShopController::class)->except(['index']);
                    
                 });
+                Route::get('blogs/{id}', [BlogsController::class, "show"]);
                 Route::middleware('CheckPremission:handle_blog')->group(function () {
+                    
                     Route::resource('posts', PostController::class)->except(['index']);
-                    Route::resource('blogs', BlogsController::class)->except(['index']);
+                    Route::resource('blogs', BlogsController::class)->except(['index', 'show']);
+                   
                 });
                 
                
