@@ -180,7 +180,7 @@ class PurchaseController extends Controller
                     $order->vat = $tax;
                     $order->price_before_vat = $shopTotalPrice;
                     $order->price_after_vat = $shopTotalPrice + $tax;
-                    $shopTotalPrice = $shopTotalPrice + $tax;
+                    // $shopTotalPrice = $shopTotalPrice + $tax;
                     $order->height = $height;
                     $order->length = $length;
                     $order->weight = $weight;
