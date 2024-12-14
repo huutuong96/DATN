@@ -17,19 +17,20 @@
             <h2 style="text-align: center; margin-bottom: 20px; font-size: 18px; font-weight: normal;">Cảm ơn bạn đã mua sắm tại Shop!</h2>
             @foreach($orders as $order)
             <!-- Order Info -->
+            {{-- @dd($variants); --}}
             <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                 <p style="margin: 0 0 10px;"><strong><h1> {{$order->shop->shop_name}}</h1></strong></p>
                 <p style="margin: 0 0 10px;"><strong>Mã đơn hàng: </strong> {{$order->group_order_id}}</p>
                 <p style="margin: 0 0 10px;"><strong>Ngày đặt hàng: </strong> {{$order->created_at}}</p>
                 <p style="margin: 0 0 10px;"><strong>Phương thức thanh toán: </strong> {{$payment->name}}</p>
             </div>
-        
+            {{-- @dd($variants); --}}
             <!-- Product Details -->
             <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
                 <h4 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Chi tiết sản phẩm</h4>
                 <ul style="list-style: none; padding: 0; margin: 0;">
                     @foreach($orderDetails as $orderDetail)
-                    {{-- @dd($result); --}}
+                   
                         @if($orderDetail->order_id == $order->id)
                             @if(!$orderDetail->variant_id )
                                 @foreach($products as $product)
@@ -40,7 +41,7 @@
                                             
                                             </span>
                                         <div>
-                                            <div>Tên sản phẩm  {{\Illuminate\Support\Str::words($product->name ?? '', 7, '...')}} </div>
+                                            <div>Tên sản phẩm:{{\Illuminate\Support\Str::words($product->name ?? '', 7, '...')}} </div>
                                             <div>Số lượng: {{$orderDetail->quantity ?? null}}</div>
                                         </div>
                                             <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
@@ -48,24 +49,21 @@
                                     @endif
                                 @endforeach
                             @else 
-                         
-                                    @if($orderDetail->variant_id == $result->id)
+                                @foreach($variants as $variant)
+                                    @if($orderDetail->variant_id == $variant->id)
                                         <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
                                             <span>
-                                                <img src="{{$result->images ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
-                                            
+                                                <img src="{{$variant->images ?? null}}" alt="" style="width: 110px; height: 80px; padding-right: 10px;">
                                             </span>
                                             <div>
-                                            <div> {{ \Illuminate\Support\Str::words($cart->product_name ?? '', 7, '...') }}</div>
+                                            <div> Tên sản phẩm{{ \Illuminate\Support\Str::words($variant->product->name ?? '', 7, '...') }}</div>
                                         <div>Số Lượng: {{$orderDetail->quantity ?? null}}</div>
-                                            <div>Phân loại: {{$result->name}}</div>
+                                            <div>Phân loại: {{$variant->name}}</div>
                                             </div>
                                             <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
-                                        
                                         </li>
-                                        
                                     @endif
-                               
+                                 @endforeach 
                             @endif
                         @endif
                         

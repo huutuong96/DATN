@@ -60,6 +60,9 @@ Route::get('/search', function () {
 }) ;
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
+
+
+    Route::post('/client/search', [SearchController::class, "searchClient"]);
     // Route không áp dụng middleware
     Route::get('banners/client', [BannerController::class, "index"]);
     Route::get('banners/client/{id}', [BannerController::class, "show"]);
@@ -96,9 +99,14 @@ Route::get('/search', function () {
                     Route::resource('voucher_shop', VoucherToShopController::class)->except(['index']);
                    
                 });
+                Route::get('blogs/{id}', [BlogsController::class, "show"]);
+                Route::get('post/{id}', [PostController::class, "show"]);
+
                 Route::middleware('CheckPremission:handle_blog')->group(function () {
+                    
                     Route::resource('posts', PostController::class)->except(['index']);
-                    Route::resource('blogs', BlogsController::class)->except(['index']);
+                    Route::resource('blogs', BlogsController::class)->except(['index', 'show']);
+                   
                 });
                 
                
@@ -380,7 +388,6 @@ Route::get('/search', function () {
         Route::get('variantattribute/{shop_id}/{id}', [ProductController::class, 'variantattribute']);
         Route::get('shops', [ShopController::class, 'index']);
         Route::get('shops/{id}', [ShopController::class, 'show']);
-        Route::get('shop_client/{id}', [ShopController::class, 'showClient']);
         
         Route::get('shop/get_product_to_shop/{id}', [ShopController::class, "get_product_to_shop"]);
         Route::get('shop/get_categories_for_shop/{id}', [ShopController::class, "get_categories_for_shop"]);
@@ -436,3 +443,6 @@ Route::get('/search', function () {
 
 
         Route::get('main/config/client', [configController::class, 'index_client']);
+        Route::get('shop_client/{id}', [ShopController::class, 'showClient']);
+
+

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Predis\Response\Status;
+
 class SearchController extends Controller
 {
     public function searchShop(Request $rqt)
@@ -65,6 +68,69 @@ class SearchController extends Controller
 
         // Trả về kết quả đã được phân trang theo từng bảng
         return response()->json($resultsByTable);
+    }
+
+
+
+    public function searchClient(Request $request)
+    {
+        
+        $limit = $request->limit ?? 20;
+        $query = Product::query();
+            if ($request->has('min_price') && $request->has('max_price')) {
+                $query->whereBetween(DB::raw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END'), [$request->min_price, $request->max_price]);
+            }
+            if ($request->has('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('sku', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%");
+                });
+            }
+            if ($request->has('updated_at')) {
+                $query->orderby('updated_at', 'desc');
+            }
+            if ($request->has('sold_count')) {
+                $query->orderby('sold_count', 'desc');
+            }
+            if ($request->has('view_count')) {
+                $query->orderby('view_count', 'desc');
+            }
+            if ($request->has('shop_id')) {
+                $query->where('shop_id', $request->shop_id);
+            }
+            if ($request->sort == 'price') {
+                $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END ASC');
+            }
+            if ($request->sort == '-price') {
+                $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
+            }
+            if ($request->sort == 'updated_at') {
+                $query->orderby('updated_at', 'asc');
+            }
+            if ($request->sort == '-updated_at') {
+                $query->orderby('updated_at', 'desc');
+            }
+            if ($request->sort == 'sold_count') {
+                $query->orderby('sold_count', 'asc');
+            }
+            if ($request->sort == '-sold_count') {
+                $query->orderby('sold_count', 'desc');
+            }
+            if ($request->sort == 'view_count') {
+                $query->orderby('view_count', 'asc');
+            }
+            if ($request->sort == '-view_count') {
+                $query->orderby('view_count', 'desc');
+            }
+            $products = $query->where('status', 2)->paginate($limit);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Lấy dữ liệu thành công',
+                'data' => $products
+            ]);
+        
     }
 
 }
