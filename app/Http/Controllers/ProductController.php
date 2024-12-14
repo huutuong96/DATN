@@ -1141,6 +1141,7 @@ class ProductController extends Controller
         $notificationRequest = new Request([
             'type' => 'main',
             'user_id' => $user_id,
+            'image' => "https://res.cloudinary.com/dg5xvqt5i/image/upload/v1734184099/Pngtree_check_done_approve_vector_13446153_xeqzc5.png",
             'title' => 'Sản phẩm đã được phê duyệt',
             'description' => ' sản phẩm'.$product->name.' của bạn đã được phê duyệt bởi nhân viên ' . $user->fullname,
             'shop_id' => $product->shop_id
