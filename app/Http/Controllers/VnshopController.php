@@ -1114,7 +1114,7 @@ public function statistByQuantity(Request $request)
     $listShop = [];
 
     foreach ($listShopId as $shopId) {
-        $shop = Shop::where('id', $shopId)->with('user')->first();
+        $shop = Shop::where('id', $shopId)->with(relations: 'user')->first();
         $shopQuantity = OrderDetailsModel::where('shop_id', $shopId)
             ->whereMonth('created_at', Carbon::now()->month)
             ->sum('quantity');
@@ -1122,7 +1122,7 @@ public function statistByQuantity(Request $request)
         $shop['soluong'] = $shopQuantity; // Gắn thêm trường số lượng vào thông tin cửa hàng
         $listShop[] = $shop;
     }
-
+    dd($listShop);
     // Sắp xếp các cửa hàng theo số lượng bán ra (giảm dần)
     usort($listShop, function ($a, $b) {
         return $b['soluong'] <=> $a['soluong'];
