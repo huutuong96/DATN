@@ -35,6 +35,7 @@ use App\Models\history_get_cash_shops;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
+use App\Models\product_variants;
 use App\Models\ProducttocartModel;
 use App\Models\UsersModel;
 use Illuminate\Support\Facades\Http;
@@ -688,11 +689,12 @@ class ShopController extends Controller
                 $query->orderBy('updated_at', 'desc');
                 break;
             case 'stock':
-                $query->withSum('variants', 'quantity')->orderBy(DB::raw('IFNULL(variants_sum_quantity, stock)'), 'asc');
+                $query->orderBy(DB::raw('CASE WHEN quantity > 0 THEN quantity ELSE (SELECT SUM(stock) FROM product_variants WHERE product_variants.product_id = products.id) END'), 'asc');
                 break;
             case '-stock':
-                $query->withSum('variants', 'quantity')->orderBy(DB::raw('IFNULL(variants_sum_quantity, stock)'), 'desc');
+                $query->orderBy(DB::raw('CASE WHEN quantity > 0 THEN quantity ELSE (SELECT SUM(stock) FROM product_variants WHERE product_variants.product_id = products.id) END'), 'desc');
                 break;
+                    
             case 'name':
                 $query->orderBy('name', 'asc');
                 break;
