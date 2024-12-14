@@ -18,6 +18,7 @@ class CheckAdminPremission
     public function handle(Request $request, Closure $next, string $premission): Response
     {
         $user = JWTAuth::parseToken()->authenticate();
+        // dd($user);
         if (!$user) {
             return response()->json([
                 'status' => 'error',
