@@ -1122,7 +1122,6 @@ public function statistByQuantity(Request $request)
         $shop['soluong'] = $shopQuantity; // Gắn thêm trường số lượng vào thông tin cửa hàng
         $listShop[] = $shop;
     }
-    dd($listShop);
     // Sắp xếp các cửa hàng theo số lượng bán ra (giảm dần)
     usort($listShop, function ($a, $b) {
         return $b['soluong'] <=> $a['soluong'];
