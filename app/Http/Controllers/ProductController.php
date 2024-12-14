@@ -1095,6 +1095,7 @@ class ProductController extends Controller
 
     public function approveProduct( Request $request, $id)
     {  
+        $user = JWTAuth::parseToken()->authenticate();
         $tab = $request->tab;
         $tabchill = $request->tabchill;
         // dd($tabchill);
@@ -1111,8 +1112,9 @@ class ProductController extends Controller
             $notificationRequest = new Request([
                 'type' => 'main',
                 'user_id' => $user_id,
-                'title' => 'Sản phẩm đã bị từ chối',
-                'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối với lý do'.$product->admin_note,
+                'title' => 'Sản phẩm đã phê duyệt',
+                'image' => "https://res.cloudinary.com/dg5xvqt5i/image/upload/v1734184099/Pngtree_check_done_approve_vector_13446153_xeqzc5.png",
+                'description' => ' sản phẩm'.$product->name.' của bạn đã được phê duyệt bởi nhân viên '.$user->fullname,
                 'shop_id' => $product->shop_id
             ]);
             $notificationController = new NotificationController();
@@ -1130,20 +1132,18 @@ class ProductController extends Controller
     }
     
     public function approve_product(Request $request, $id){
-        $user = JWTAuth::parseToken()->authenticate();
         $product = Product::find($id);
         if(!$product){
             return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
         }
         $product->status = 2;
         $product->save();
-        $user_id = $product->shop->owner_id;
+         $user_id = $product->shop->owner_id;
         $notificationRequest = new Request([
             'type' => 'main',
             'user_id' => $user_id,
-            'image' => "https://res.cloudinary.com/dg5xvqt5i/image/upload/v1734184099/Pngtree_check_done_approve_vector_13446153_xeqzc5.png",
-            'title' => 'Sản phẩm đã được phê duyệt',
-            'description' => ' sản phẩm'.$product->name.' của bạn đã được phê duyệt bởi nhân viên ' . $user->fullname,
+            'title' => 'Sản phẩm đã bị từ chối',
+            'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối với lý do'.$product->admin_note,
             'shop_id' => $product->shop_id
         ]);
         $notificationController = new NotificationController();
