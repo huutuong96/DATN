@@ -135,10 +135,10 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::delete('/destroypayment/{id}', [VnshopController::class, 'destroypayment'])->name('destroypayment');
     Route::post('products/update/handle/{id}', [VnshopController::class, 'handleUpdateProduct'])->name('handleUpdateProduct');
     Route::get('/events', [VnshopController::class, 'listEvent'])->name('events');
-    Route::post('/events', [VnshopController::class, 'store_events'])->name('store_events')->middleware('CheckAdminPremission:manage_eveneven');
-    Route::put('/events/{id}', [VnshopController::class, 'update_events'])->name('update_events')->middleware('CheckAdminPremission:manage_eveneven');
-    Route::get('/events-status', [VnshopController::class, 'changeStatusEvent'])->name('change_status_events')->middleware('CheckAdminPremission:manage_eveneven');
-    Route::get('/trash-events', [VnshopController::class, 'listEvent_trash'])->name('trash_events')->middleware('CheckAdminPremission:manage_eveneven');
+    Route::post('/events', [VnshopController::class, 'store_events'])->name('store_events')->middleware('CheckAdminPremission:manage_even');
+    Route::put('/events/{id}', [VnshopController::class, 'update_events'])->name('update_events')->middleware('CheckAdminPremission:manage_even');
+    Route::get('/events-status', [VnshopController::class, 'changeStatusEvent'])->name('change_status_events')->middleware('CheckAdminPremission:manage_even');
+    Route::get('/trash-events', [VnshopController::class, 'listEvent_trash'])->name('trash_events')->middleware('CheckAdminPremission:manage_even');
     // Route::resource('roles', RolesController::class)->middleware('CheckRole');
     Route::get('/api/role/destroy/{id}', [RolesController::class, 'destroy'])->name('role_destroy')->middleware('CheckAdminPremission:role');
     Route::put('/api/roles/update}', [RolesController::class, 'update'])->name('role_update')->middleware('CheckAdminPremission:role');
