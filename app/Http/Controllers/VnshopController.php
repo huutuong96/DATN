@@ -1800,6 +1800,20 @@ public function store_events(Request $request)
                 $images[] = $this->storeImage($image);
             }
         }
+        $query = Product::where('status', 2);
+        // $categoryForProduct = CategoriesModel::where('id', )
+
+
+
+
+        $product_apply = [];
+        if ($request->product_view) {
+            $product_apply[] = $query->where('view_count' ,'>', $request->product_view)
+            ->where('status', 2)
+            ->select('id')->get();
+        }
+        dd($product_apply);
+
         $event = new Event();
         $event->event_title = $request->input('event_title', $event->event_title);
         $event->event_day = $request->input('event_day', $event->event_day);
@@ -1819,6 +1833,7 @@ public function store_events(Request $request)
         $event->status = $request->input('status', $event->status);
         $event->description = $request->input('description', $event->description);
         $event->images = json_encode($images);
+        // $event->
         $event->save();
         DB::commit();
         return redirect()

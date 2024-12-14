@@ -29,6 +29,18 @@ class Event extends Model
         'status',
         'description',
         'images',
+        'product_apply',
+        'shop_apply',
+        'user_apply',
+        'product_accept',
+        'shop_accept',
+        'user_accept',
+        'visits',
+        'click_to_cart',
+        'top_product',
+        'top_shop',
+        'click_shop',
+        'click_product',
     ];
     public $timestamps = false;
 }
