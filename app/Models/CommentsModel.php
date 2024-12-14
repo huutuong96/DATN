@@ -32,4 +32,8 @@ class CommentsModel extends Model
     {
         return $this->hasMany(CommentsModel::class, 'parent_id'); 
     }
+    public function user()
+{
+    return $this->belongsTo(User::class, 'user_id')->select('fullname','avatar'); 
+}
 }
