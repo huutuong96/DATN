@@ -177,9 +177,10 @@ class PurchaseController extends Controller
                             ], 400);
                         }
                         $this->addStateTaxToOrder($order, $tax, $cart->product_id);
-                    $order->vat = $tax;
+                    $order->vat = $tax - $tax;
                     $order->price_before_vat = $shopTotalPrice;
-                    $order->price_after_vat = $shopTotalPrice + $tax;
+                    // $order->price_after_vat = $shopTotalPrice + $tax;
+                    $order->price_after_vat = $shopTotalPrice;
                     // $shopTotalPrice = $shopTotalPrice + $tax;
                     $order->height = $height;
                     $order->length = $length;
@@ -196,9 +197,10 @@ class PurchaseController extends Controller
                     $checkRank = $this->check_point_to_user();
                     $get_discountsByRank = $this->get_discountsByRank($checkRank, $shopTotalPrice);
                     $newtotal = $this->addOrderFeesToTotal($order, $shopTotalPrice);
-                    // $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
+                    $shopTotalPrice = $this->discountsByRank($checkRank, $shopTotalPrice);
                     $order->disscount_by_rank = $get_discountsByRank;
-                    $order->total_amount = $shopTotalPrice;
+                    $order->total_amount = (int)$shopTotalPrice;
+                    // dd($order->total_amount);
                     $discountShopVoucher = 0;
                     $totalAdded = 0;
                     if ($voucherToShopCode != null) {
@@ -208,7 +210,7 @@ class PurchaseController extends Controller
                     }
                     $order->net_amount -= $totalAdded;
                     $shopData->wallet = $shopData->wallet + $order->net_amount;
-                    $order->total_amount = $shopTotalPrice;
+                    $order->total_amount = (int)$shopTotalPrice;
                     $total_amount = $shopTotalPrice;
                     $order->voucher_shop_disscount = $discountShopVoucher;
                     $discountMainVoucher = 0;
@@ -273,7 +275,7 @@ class PurchaseController extends Controller
                 // return view('emails.test',compact('orders','total_amount','carts','orderDetails','shipFee','products','variants','discountMainVoucher','user','payment'));
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-                ProducttocartModel::whereIn('id', $request->carts)->delete();
+                // ProducttocartModel::whereIn('id', $request->carts)->delete();
                 if ($voucherToMainCode != null) {
                     Voucher::where('code', $voucherToMainCode)->delete();
                 }
