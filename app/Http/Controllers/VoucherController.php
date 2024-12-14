@@ -103,7 +103,7 @@ class VoucherController extends Controller
             return $this->errorResponse("Bạn đã thêm voucher này rồi, Tham lam quá" , [] , 404);
         }
         $voucherMain = voucherToMain::where('code', $request->code)->where('status', 2)->first();
-        $user_geted = json_decode($voucherMain->user_geted, true) ?? [];
+        // $user_geted = json_decode($voucherMain->user_geted, true) ?? [];
         if (in_array($user->id, $user_geted)) {
             return $this->errorResponse("Mỗi người chỉ được lấy 1 lần, Bạn đã lấy trước đây rồi"  , [] , 404);
         }
