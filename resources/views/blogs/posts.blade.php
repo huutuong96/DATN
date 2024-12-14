@@ -302,7 +302,7 @@ margin: 10px 0; /* Thêm khoảng cách giữa ảnh và nội dung */
                                                                 tabsize: 2,
                                                                 height: 300,
                                                                 width:950,
-                                                                lineHeights: ['0.8', '1.2', '1.5', '1.8', '2.0', '2.5'] // Dòng tự động xuống hàng
+                                                                lineHeights: ['0.8', '1.2', '1.5', '1.8', '2.0', '2.5'] 
                                                             });
                                                         });
                                                     </script>
