@@ -1162,6 +1162,7 @@ class ProductController extends Controller
                 'type' => 'main',
                 'user_id' => $user_id,
                 'title' => 'Sản phẩm đã bị từ chối',
+                'image' => "https://res.cloudinary.com/dg5xvqt5i/image/upload/v1734185014/Pngtree_error-cross_6020171_gngo5g.png",
                 'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối',
                 'shop_id' => $product->shop_id
             ]);
