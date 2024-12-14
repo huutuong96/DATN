@@ -58,8 +58,11 @@ use App\Http\Controllers\TestAllController;
 Route::get('/search', function () {
     return "API - VNSHOP";
 }) ;
-    Route::get('/test/search', [SearchController::class, "search"]);
+    Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
+
+
+    Route::post('/client/search', [SearchController::class, "searchClient"]);
     // Route không áp dụng middleware
     Route::get('banners/client', [BannerController::class, "index"]);
     Route::get('banners/client/{id}', [BannerController::class, "show"]);
