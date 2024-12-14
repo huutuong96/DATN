@@ -1812,7 +1812,7 @@ public function store_events(Request $request)
             ->where('status', 2)
             ->select('id')->get();
         }
-        dd($product_apply);
+        // dd($product_apply);
 
         $event = new Event();
         $event->event_title = $request->input('event_title', $event->event_title);
