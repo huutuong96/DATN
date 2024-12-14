@@ -118,7 +118,7 @@
                                       <label for="from" class="form-label">Hình ảnh</label>
                                       <input type="file" class="form-control" id="from" name="event_image[]" multiple>
                                   </div>
-                                  <h5>Áp dụng cho sản sản phẩm</h5>
+                                  <!-- <h5>Áp dụng cho sản sản phẩm</h5>
                                   <div class="col-md-2">
                                       <label for="product_view" class="form-label">Chỉ những sản phẩm có lượt xem từ: </label>
                                       <input type="text" class="form-control" id="product_view" name="product_view" value="{{ old('product_view') }}">
@@ -135,7 +135,7 @@
                                   <div class="col-md-2">
                                       <label for="shop_where_product_sold_count" class="form-label">Áp dụng cửa hàng theo lượt bán (tổng sản phẩm): </label>
                                       <input type="text" class="form-control" id="shop_where_product_sold_count" name="shop_where_product_sold_count" value="{{ old('shop_where_product_sold_count') }}">
-                                  </div>
+                                  </div> -->
                                   <div class="col-md-12 ">
                                       <button type="submit" class="btn btn-primary mt-3">Thêm sự kiện</button>
                                   </div>

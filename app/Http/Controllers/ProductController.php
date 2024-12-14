@@ -1469,21 +1469,7 @@ public function ProductAll(Request $request)
 
     public function recommendProducts()
     {
-       
-
-        $events = Event::where('status', 2)->first();
-        if ($events != null) {
-            $productIds = json_decode($events->product_apply);
-            $products = Product::whereIn('id', $productIds)->select('id','name','slug','image','sold_count','show_price')->take(1)->get();
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => "Lấy dữ liệu thành công",
-                    'data' => $products,
-                ]
-            );
-        }else {
-             try {
+        try {
             try {
                 $user = JWTAuth::parseToken()->authenticate();
             } catch (\Exception $e) {
@@ -1537,7 +1523,21 @@ public function ProductAll(Request $request)
                 'error' => $th->getMessage(),
             ]);
         }
-        }
+
+        // $events = Event::where('status', 2)->first();
+        // if ($events != null) {
+        //     $productIds = json_decode($events->product_apply);
+        //     $products = Product::whereIn('id', $productIds)->select('id','name','slug','image','sold_count','show_price')->take(1)->get();
+        //     return response()->json(
+        //         [
+        //             'status' => true,
+        //             'message' => "Lấy dữ liệu thành công",
+        //             'data' => $products,
+        //         ]
+        //     );
+        // }else {
+           
+        // }
         
     }
 }
