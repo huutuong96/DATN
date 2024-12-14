@@ -26,8 +26,10 @@ class CommentsController extends Controller
 
         $productId = $request->product_id; 
         $perPage = $request->per_page;
+        $ratecomment= $request->rate;
         $comments = CommentsModel::with('parent') 
             ->where('product_id', $productId) 
+            ->where('rate', $ratecomment) 
             ->where('parent_id', null) 
             ->paginate($perPage);
         foreach ($comments as $comment) {
