@@ -688,10 +688,10 @@ class ShopController extends Controller
             case '-updated_at':
                 $query->orderBy('updated_at', 'desc');
                 break;
-            case 'stock':
+            case 'quantity':
                 $query->orderBy(DB::raw('CASE WHEN quantity > 0 THEN quantity ELSE (SELECT SUM(stock) FROM product_variants WHERE product_variants.product_id = products.id) END'), 'asc');
                 break;
-            case '-stock':
+            case '-quantity':
                 $query->orderBy(DB::raw('CASE WHEN quantity > 0 THEN quantity ELSE (SELECT SUM(stock) FROM product_variants WHERE product_variants.product_id = products.id) END'), 'desc');
                 break;
                     

@@ -118,6 +118,19 @@
                                       <label for="from" class="form-label">Hình ảnh</label>
                                       <input type="file" class="form-control" id="from" name="event_image[]" multiple>
                                   </div>
+                                  <h5>Áp dụng cho sản sản phẩm</h5>
+                                  <div class="col-md-2">
+                                      <label for="product_view" class="form-label">Chỉ những sản phẩm có lượt xem từ: </label>
+                                      <input type="text" class="form-control" id="product_view" name="voucher_code" value="{{ old('product_view') }}" required>
+                                  </div>
+                                  <div class="col-md-2">
+                                      <label for="product_sold_count" class="form-label">Chỉ những sản phẩm có đã bán từ: </label>
+                                      <input type="text" class="form-control" id="product_sold_count" name="voucher_code" value="{{ old('product_sold_count') }}" required>
+                                  </div>
+                                  <div class="col-md-2">
+                                      <label for="product_sold_count" class="form-label">Áp dụng theo tỉ lệ xuất hiện trong giỏ hàng: </label>
+                                      <input type="text" class="form-control" id="product_sold_count" name="voucher_code" value="{{ old('product_sold_count') }}" required>
+                                  </div>
                                   <div class="col-md-12 ">
                                       <button type="submit" class="btn btn-primary mt-3">Thêm sự kiện</button>
                                   </div>

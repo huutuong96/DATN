@@ -441,3 +441,5 @@ Route::get('/search', function () {
 
         Route::get('main/config/client', [configController::class, 'index_client']);
         Route::get('shop_client/{id}', [ShopController::class, 'showClient']);
+
+
