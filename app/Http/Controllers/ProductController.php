@@ -45,6 +45,7 @@ use App\Models\update_product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Imports\UsersImport;
+use App\Models\Event;
 use App\Models\Follow_to_shop;
 use App\Models\OrderDetailsModel;
 use App\Models\OrdersModel;
@@ -1468,7 +1469,21 @@ public function ProductAll(Request $request)
 
     public function recommendProducts()
     {
-        try {
+       
+
+        $events = Event::where('status', 2)->first();
+        if ($events == null) {
+            $productIds = json_decode($events->product_apply);
+            $products = Product::whereIn('id', $productIds)->select('id','name','slug','image','sold_count','show_price')->get();
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => "Lấy dữ liệu thành công",
+                    'data' => $products,
+                ]
+            );
+        }else {
+             try {
             try {
                 $user = JWTAuth::parseToken()->authenticate();
             } catch (\Exception $e) {
@@ -1522,6 +1537,8 @@ public function ProductAll(Request $request)
                 'error' => $th->getMessage(),
             ]);
         }
+        }
+        
     }
 }
 

@@ -121,24 +121,20 @@
                                   <h5>Áp dụng cho sản sản phẩm</h5>
                                   <div class="col-md-2">
                                       <label for="product_view" class="form-label">Chỉ những sản phẩm có lượt xem từ: </label>
-                                      <input type="text" class="form-control" id="product_view" name="product_view" value="{{ old('product_view') }}" required>
+                                      <input type="text" class="form-control" id="product_view" name="product_view" value="{{ old('product_view') }}">
                                   </div>
                                   <div class="col-md-2">
-                                      <label for="product_sold_count" class="form-label">Chỉ những sản phẩm có đã bán từ: </label>
-                                      <input type="text" class="form-control" id="product_sold_count" name="product_sold_count" value="{{ old('product_sold_count') }}" required>
-                                  </div>
-                                  <div class="col-md-2">
-                                      <label for="product_exist_in_cart" class="form-label">Áp dụng theo tỉ lệ xuất hiện trong giỏ hàng: </label>
-                                      <input type="text" class="form-control" id="product_exist_in_cart" name="product_exist_in_cart" value="{{ old('product_exist_in_cart') }}" required>
+                                      <label for="product_sold_count" class="form-label">Chỉ những sản phẩm có lượt bán từ: </label>
+                                      <input type="text" class="form-control" id="product_sold_count" name="product_sold_count" value="{{ old('product_sold_count') }}">
                                   </div>
                                   <h5>Áp dụng cho cửa hàng</h5>
                                   <div class="col-md-2">
                                       <label for="shop_where_visits" class="form-label">Áp dụng cửa hàng theo lượt truy cập: </label>
-                                      <input type="text" class="form-control" id="shop_where_visits" name="shop_where_visits" value="{{ old('shop_where_visits') }}" required>
+                                      <input type="text" class="form-control" id="shop_where_visits" name="shop_where_visits" value="{{ old('shop_where_visits') }}">
                                   </div>
                                   <div class="col-md-2">
                                       <label for="shop_where_product_sold_count" class="form-label">Áp dụng cửa hàng theo lượt bán (tổng sản phẩm): </label>
-                                      <input type="text" class="form-control" id="shop_where_product_sold_count" name="shop_where_product_sold_count" value="{{ old('shop_where_product_sold_count') }}" required>
+                                      <input type="text" class="form-control" id="shop_where_product_sold_count" name="shop_where_product_sold_count" value="{{ old('shop_where_product_sold_count') }}">
                                   </div>
                                   <div class="col-md-12 ">
                                       <button type="submit" class="btn btn-primary mt-3">Thêm sự kiện</button>

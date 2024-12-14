@@ -61,6 +61,7 @@ use App\Jobs\UpdateImageAllVariant;
 
 use App\Models\update_product;
 use App\Models\Event;
+use App\Models\ProducttocartModel;
 use GuzzleHttp\Client;
 
 class VnshopController extends Controller
@@ -1801,19 +1802,29 @@ public function store_events(Request $request)
             }
         }
         $query = Product::where('status', 2);
-        // $categoryForProduct = CategoriesModel::where('id', )
-
-
-
-
+        $categoryForProduct = CategoriesModel::whereIn('id', $query->pluck('category_id'))->select('id')->get();
+        $tax_category = tax_category::whereIn('category_id', $categoryForProduct->pluck('id'))->select('category_id')->get();
+        $query->whereIn('category_id', $tax_category->pluck('category_id'));
+        $shopForProduct = Shop::whereIn('id', $query->pluck('shop_id'))->where('status', 2)->select('id')->get();
+        $query->whereIn('shop_id', $shopForProduct->pluck('id'));
         $product_apply = [];
-        if ($request->product_view) {
-            $product_apply[] = $query->where('view_count' ,'>', $request->product_view)
-            ->where('status', 2)
-            ->select('id')->get();
+        $shop_apply = [];
+        $query2 = Shop::where('status', 2);
+        if ($request->shop_where_visits) {
+            $query2->where('visits', '>=', $request->shop_where_visits);
         }
-        dd($product_apply);
-
+        if ($request->shop_where_product_sold_count) {
+            $shopHasProActive = Product::whereIn('shop_id', $query2->pluck('id'))->where('status', 2)->select('shop_id')->get();
+            $query2->whereIn('id', $shopHasProActive->pluck('shop_id'));
+        }
+        if ($request->product_view) {
+            $query->where('view_count' ,'>=', $request->product_view);
+        }
+        if ($request->product_sold_count) {
+            $query->where('sold_count' ,'>=', $request->product_sold_count);
+        }
+        $product_apply = $query->pluck('id');
+        $shop_apply = $query2->pluck('id');
         $event = new Event();
         $event->event_title = $request->input('event_title', $event->event_title);
         $event->event_day = $request->input('event_day', $event->event_day);
@@ -1833,7 +1844,8 @@ public function store_events(Request $request)
         $event->status = $request->input('status', $event->status);
         $event->description = $request->input('description', $event->description);
         $event->images = json_encode($images);
-        // $event->
+        $event->product_apply = json_encode($product_apply);
+        $event->shop_apply = json_encode($shop_apply);
         $event->save();
         DB::commit();
         return redirect()

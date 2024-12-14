@@ -60,8 +60,6 @@ Route::get('/search', function () {
 }) ;
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
-
-
     Route::post('/client/search', [SearchController::class, "searchClient"]);
     // Route không áp dụng middleware
     Route::get('banners/client', [BannerController::class, "index"]);
@@ -432,16 +430,11 @@ Route::get('/search', function () {
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
         Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
         Route::get('check_time_event', [NotificationController::class, "check_time_event"])->name('check_time_event');
-
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
         Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
         Route::post('login_test', [AuthenController::class, "login_test"])->name('login_test');
         // Route::get('/check_product', [ProductController::class, 'check_product']);
-
-        
         Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
-
-
         Route::get('main/config/client', [configController::class, 'index_client']);
         Route::get('shop_client/{id}', [ShopController::class, 'showClient']);
 
