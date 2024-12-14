@@ -42,7 +42,10 @@
                                                 <div>Tên sản phẩm:{{\Illuminate\Support\Str::words($product->name ?? '', 7, '...')}} </div>
                                                 <div>Số lượng: {{$orderDetail->quantity ?? null}}</div>
                                             </div>
+                                            <div class="p-2">
                                                 <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
+                                            </div>
+                                               
                                             </li>
                                         @endif
                                     @endforeach
@@ -58,7 +61,10 @@
                                             <div>Số Lượng: {{$orderDetail->quantity ?? null}}</div>
                                                 <div>Phân loại: {{$variant->name}}</div>
                                                 </div>
-                                                <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
+                                                <div class="p-2">
+                                                    <span style="font-weight: bold;">{{number_format($orderDetail->subtotal ?? 0)}} đ</span>
+                                                </div>
+                                               
                                             </li>
                                         @endif
                                 @endforeach 
