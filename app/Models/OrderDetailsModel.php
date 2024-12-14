@@ -26,6 +26,7 @@ class OrderDetailsModel extends Model
         'length',
         'weight',
         'width',
+        'shop_id',
     ];
 
     public function product()
