@@ -34,15 +34,17 @@ class EventMail implements ShouldQueue
     public function handle(): void
     {
         try {
+           
                 DB::beginTransaction();
                 DB::table('log_jobs')->insert([
                     'log' => 'EventMail ',
                 ]);
-                $events = events::where('event_day', date('d'))->where('event_month', date('m'))->where('status', 2 )->first();
+                $events = events::where('event_day', date('d'))->where('event_month', date('m'))->where('status', 2)->first();
                 if (!$events) {
                     check_var('Không có sự kiện nào', 404);
                     return;
                 }
+                check_var($events->event_title . "Đã Bắt Đầu Chạy...", 200);
                 $voucherData = json_decode($events->voucher_apply);
                 $images = json_decode($events->images);
                 $queryUser = UsersModel::query();

@@ -61,6 +61,7 @@ use App\Jobs\UpdateImageAllVariant;
 
 use App\Models\update_product;
 use App\Models\Event;
+use App\Models\ProducttocartModel;
 use GuzzleHttp\Client;
 
 class VnshopController extends Controller
@@ -1113,7 +1114,7 @@ public function statistByQuantity(Request $request)
     $listShop = [];
 
     foreach ($listShopId as $shopId) {
-        $shop = Shop::where('id', $shopId)->with('user')->first();
+        $shop = Shop::where('id', $shopId)->with(relations: 'user')->first();
         $shopQuantity = OrderDetailsModel::where('shop_id', $shopId)
             ->whereMonth('created_at', Carbon::now()->month)
             ->sum('quantity');
@@ -1121,7 +1122,7 @@ public function statistByQuantity(Request $request)
         $shop['soluong'] = $shopQuantity; // Gắn thêm trường số lượng vào thông tin cửa hàng
         $listShop[] = $shop;
     }
-
+    dd($listShop);
     // Sắp xếp các cửa hàng theo số lượng bán ra (giảm dần)
     usort($listShop, function ($a, $b) {
         return $b['soluong'] <=> $a['soluong'];
@@ -1800,6 +1801,30 @@ public function store_events(Request $request)
                 $images[] = $this->storeImage($image);
             }
         }
+        // $query = Product::where('status', 2);
+        // $categoryForProduct = CategoriesModel::whereIn('id', $query->pluck('category_id'))->select('id')->get();
+        // $tax_category = tax_category::whereIn('category_id', $categoryForProduct->pluck('id'))->select('category_id')->get();
+        // $query->whereIn('category_id', $tax_category->pluck('category_id'));
+        // $shopForProduct = Shop::whereIn('id', $query->pluck('shop_id'))->where('status', 2)->select('id')->get();
+        // $query->whereIn('shop_id', $shopForProduct->pluck('id'));
+        // $product_apply = [];
+        // $shop_apply = [];
+        // $query2 = Shop::where('status', 2);
+        // if ($request->shop_where_visits) {
+        //     $query2->where('visits', '>=', $request->shop_where_visits);
+        // }
+        // if ($request->shop_where_product_sold_count) {
+        //     $shopHasProActive = Product::whereIn('shop_id', $query2->pluck('id'))->where('status', 2)->select('shop_id')->get();
+        //     $query2->whereIn('id', $shopHasProActive->pluck('shop_id'));
+        // }
+        // if ($request->product_view) {
+        //     $query->where('view_count' ,'>=', $request->product_view);
+        // }
+        // if ($request->product_sold_count) {
+        //     $query->where('sold_count' ,'>=', $request->product_sold_count);
+        // }
+        // $product_apply = $query->pluck('id');
+        // $shop_apply = $query2->pluck('id');
         $event = new Event();
         $event->event_title = $request->input('event_title', $event->event_title);
         $event->event_day = $request->input('event_day', $event->event_day);
@@ -1819,6 +1844,8 @@ public function store_events(Request $request)
         $event->status = $request->input('status', $event->status);
         $event->description = $request->input('description', $event->description);
         $event->images = json_encode($images);
+        $event->product_apply = json_encode($product_apply ?? null);
+        $event->shop_apply = json_encode($shop_apply ?? null);
         $event->save();
         DB::commit();
         return redirect()

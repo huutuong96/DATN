@@ -45,6 +45,8 @@ class CancelOrderS implements ShouldQueue
             $shop = Shop::find($order->shop_id); 
             if ($shop) {
                 sendNotiWhenCanceledOrderForSeller::dispatch($shop->owner_id, $order->id); 
+                $shop->cancel_order_count = $shop->cancel_order_count + 1;
+                $shop->save();
                 DB::table('log_jobs')->insert([
                     'log' => 'sendNotiWhenCanceledOrderForSeller for Order  '
                 ]);

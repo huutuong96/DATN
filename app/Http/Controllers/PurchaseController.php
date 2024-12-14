@@ -206,7 +206,6 @@ class PurchaseController extends Controller
                         $discountShopVoucher = $totalAdded;
                         $shopTotalPrice -= $totalAdded;
                     }
-                    
                     $order->net_amount -= $totalAdded;
                     $shopData->wallet = $shopData->wallet + $order->net_amount;
                     $order->total_amount = $shopTotalPrice;
@@ -224,6 +223,9 @@ class PurchaseController extends Controller
                     $this->order_update_infomaion($order, $service, $productForShip, $shopData, $addressUser, $shipFee , $shopOrder['orderDetails'], $total_amount);
                     $order->save();
                     $shopData->save();
+                    if ($voucherToShopCode != null) {
+                        Voucher::where('code', $voucherToShopCode)->delete();
+                    }
                 }
 
                 // return $ordersByShop;
@@ -259,7 +261,7 @@ class PurchaseController extends Controller
                         'ship_fee' => $shipFee,
                         'email' => auth()->user()->email,
                     ]);
-                    // ProducttocartModel::whereIn('id', $request->carts)->delete();
+                    ProducttocartModel::whereIn('id', $request->carts)->delete();
                     $url = $PaymentsController->vnpay_payment($request, $total_amount, $groupOrderIds);
                     return response()->json([
                         'status' => true,
@@ -272,6 +274,9 @@ class PurchaseController extends Controller
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
                 ProducttocartModel::whereIn('id', $request->carts)->delete();
+                if ($voucherToMainCode != null) {
+                    Voucher::where('code', $voucherToMainCode)->delete();
+                }
                 // deleteProductToCart::dispatch($request->carts);   
                 return response()->json([
                     'status' => true,

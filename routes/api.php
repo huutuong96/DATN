@@ -60,6 +60,7 @@ Route::get('/search', function () {
 }) ;
     Route::post('/test/search', [SearchController::class, "search"]);
     Route::post('/test/searchshop', [SearchController::class, "searchShop"]);
+    Route::get('/client/search', [SearchController::class, "searchClient"]);
     // Route không áp dụng middleware
     Route::get('banners/client', [BannerController::class, "index"]);
     Route::get('banners/client/{id}', [BannerController::class, "show"]);
@@ -96,9 +97,14 @@ Route::get('/search', function () {
                     Route::resource('voucher_shop', VoucherToShopController::class)->except(['index']);
                    
                 });
+                Route::get('blogs/{id}', [BlogsController::class, "show"]);
+                Route::get('post/{id}', [PostController::class, "show"]);
+
                 Route::middleware('CheckPremission:handle_blog')->group(function () {
+                    
                     Route::resource('posts', PostController::class)->except(['index']);
-                    Route::resource('blogs', BlogsController::class)->except(['index']);
+                    Route::resource('blogs', BlogsController::class)->except(['index', 'show']);
+                   
                 });
                 
                
@@ -429,10 +435,8 @@ Route::get('/search', function () {
         Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
         Route::post('login_test', [AuthenController::class, "login_test"])->name('login_test');
         // Route::get('/check_product', [ProductController::class, 'check_product']);
-
-        
         Route::get('recommendProducts', [ProductController::class, "recommendProducts"]);
-
-
         Route::get('main/config/client', [configController::class, 'index_client']);
         Route::get('shop_client/{id}', [ShopController::class, 'showClient']);
+
+

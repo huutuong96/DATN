@@ -43,7 +43,8 @@ class Shop extends Model
         'account_number',
         'bank_name',
         'owner_bank',
-        'owner_id'
+        'owner_id',
+        'cancel_order_count',
     ];
     public function learns()
     {
