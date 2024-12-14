@@ -51,7 +51,7 @@ class NotificationController extends Controller
         $notification->type = $request->type;
         $notification->user_id = $request->user_id;
 
-        if ($request->image) {
+        if ($request->hasFile('image')) {
             $image = $request->file('image');
             $cloudinary = new Cloudinary();
             $uploadedImage = $cloudinary->uploadApi()->upload($image->getRealPath());
@@ -61,7 +61,7 @@ class NotificationController extends Controller
             $notificationToMain = new Notification_to_mainModel();
             $notificationToMain->title = $request->title;
             $notificationToMain->description = $request->description;
-            $notificationToMain->image = $image ?? null;
+            $notificationToMain->image = $image ?? $request->image ?? null;
             $notificationToMain->shop_id = $request->shop_id;
             $notificationToMain->save();
 

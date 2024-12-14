@@ -200,7 +200,7 @@ class CartController extends Controller
                 'status' => 1,
             ]);
         }
-        $shop = Shop::where('id', $request->shop_id)->first();
+        $shop = Shop::where('id', $request->shop_id)->where('status', 2)->first();
         $product = Product::where('id', $request->product_id)->where('status', 2)->where('shop_id', $request->shop_id)->first();
         
         if (!$product) {

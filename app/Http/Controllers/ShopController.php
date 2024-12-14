@@ -1065,11 +1065,11 @@ class ShopController extends Controller
 
     public function VoucherToShop(Request $request, $shop_id)
     {
-        
+        $shop = Shop::where('id', $shop_id)->select('id', 'image')->first();
         $dataInsert = [
             'title' => $request->title,
             'description' => $request->description,
-            'image' => $request->image,
+            'image' => $request->image ?? $shop->image,
             'quantity' => $request->quantity,
             'limitValue' => $request->limitValue,
             'code' => $request->code,
