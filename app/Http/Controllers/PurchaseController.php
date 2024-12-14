@@ -844,6 +844,7 @@ class PurchaseController extends Controller
                 'length' => $variant->length,
                 'weight' => $variant->weight,
                 'width' => $variant->width,
+                'shop_id' => $shop_id,
             ]);
         }
         
