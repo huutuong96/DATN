@@ -1472,9 +1472,9 @@ public function ProductAll(Request $request)
        
 
         $events = Event::where('status', 2)->first();
-        if ($events == null) {
+        if ($events != null) {
             $productIds = json_decode($events->product_apply);
-            $products = Product::whereIn('id', $productIds)->select('id','name','slug','image','sold_count','show_price')->take(1)->get();
+            $products = Product::whereIn('id', $productIds)->select('id','name','slug','image','sold_count','show_price')->get();
             return response()->json(
                 [
                     'status' => true,
