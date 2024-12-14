@@ -26,6 +26,7 @@ class CommentsController extends Controller
         $productId = $request->product_id;
         $perPage = $request->per_page;
         $type = $request->type;
+        $sort = $request->sort;
         $ratecomment = $request->rate;
     
         $query = CommentsModel::with(['parent']) 
@@ -37,11 +38,15 @@ class CommentsController extends Controller
         } elseif ($type === 'rating') {
             $query->whereNotNull('rate'); 
         }
-    
+        
+        if ($sort === 'created_at') {
+            $query->orderBy('created_at', 'asc'); 
+        } elseif ($sort === '-created_at') {
+            $query->orderBy('created_at', 'desc'); 
+        }
         if ($ratecomment !== null) {
             $query->where('rate', $ratecomment);
         }
-    
         $comments = $query->paginate($perPage);
     
         $defaultAvatar = 'https://res.cloudinary.com/dg5xvqt5i/image/upload/v1733579249/sgmqtbmzayyhc4hst1pd.jpg'; 
@@ -50,7 +55,7 @@ class CommentsController extends Controller
            
                 $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
         
-            // $comment->parent->load('parent');
+            $comment->parent->load('parent');
         }
     
         return response()->json([
