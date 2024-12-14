@@ -1130,18 +1130,19 @@ class ProductController extends Controller
     }
     
     public function approve_product(Request $request, $id){
+        $user = JWTAuth::parseToken()->authenticate();
         $product = Product::find($id);
         if(!$product){
             return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
         }
         $product->status = 2;
         $product->save();
-         $user_id = $product->shop->owner_id;
+        $user_id = $product->shop->owner_id;
         $notificationRequest = new Request([
             'type' => 'main',
             'user_id' => $user_id,
-            'title' => 'Sản phẩm đã bị từ chối',
-            'description' => ' sản phẩm'.$product->name.' của bạn đã bị từ chối với lý do'.$product->admin_note,
+            'title' => 'Sản phẩm đã được phê duyệt',
+            'description' => ' sản phẩm'.$product->name.' của bạn đã được phê duyệt bởi nhân viên ' . $user->fullname,
             'shop_id' => $product->shop_id
         ]);
         $notificationController = new NotificationController();
