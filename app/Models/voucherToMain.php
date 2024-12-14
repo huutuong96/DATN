@@ -26,6 +26,7 @@ class voucherToMain extends Model
         'updated_at',
         'min',
         'is_event',
+        'user_geted',
     ];
     public function user()
 {
