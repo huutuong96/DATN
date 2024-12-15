@@ -295,16 +295,8 @@ public function storeRate(Request $request)
 {
     $user = JWTAuth::parseToken()->authenticate();
     $rate = $request->rate ?? null;
-    if(!$request->product_id){
-        $dataDone = [
-            'status' => false,
-            'message' => "Sản phẩm không tồn tại",
-            'data' => []
-        ];
     
-        return response()->json($dataDone, 404);
-    }
-    $order = OrdersModel::where('id',$request->order_id)->select("is_feedbacked")->first();
+    $order = OrdersModel::where('id',$request->order_id)->first();
     if($order->is_feedbacked == 1){
         $dataDone = [
             'status' => false,
@@ -314,10 +306,18 @@ public function storeRate(Request $request)
     
         return response()->json($dataDone, 400);
     }
-    $order->is_feedbacked=1;
+    $order->is_feedbacked = 1;
     $order->save();
-
    foreach ($request->data as $dataRate) {
+    if(!$dataRate['product_id']){
+        $dataDone = [
+            'status' => false,
+            'message' => "Sản phẩm không tồn tại",
+            'data' => []
+        ];
+    
+        return response()->json($dataDone, 404);
+    }
     $dataInsert = [
         "title" => $dataRate->title ?? 'rating',
         "content" =>$dataRate['content'] ?? '',
