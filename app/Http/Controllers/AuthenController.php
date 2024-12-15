@@ -203,11 +203,9 @@ class AuthenController extends Controller
                 return response()->json(['error' => 'Tài khoản đã bị khóa'], 401);
             }
             $token = JWTAuth::fromUser($user);
-            // return $user;
-            // $user->refesh_token = $token;
-            // $user->save();
+            $user->refesh_token = $token;
+            $user->save();
             // return $credentials;
-            
             return response()->json([
                 'status' => true,
                 'message' => 'Đăng nhập thành công',
