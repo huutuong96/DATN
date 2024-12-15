@@ -10,6 +10,7 @@ use App\Models\CommentsModel;
 use App\Http\Requests\CommentsRequest;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
 
 use App\Models\Product;
 
@@ -55,9 +56,21 @@ class CommentsController extends Controller
            
                 $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
         
-            $comment->parent->load('parent');
+                if($comment->parent){
+                    foreach ($comment->parent as $dataParent) {
+                        $user = User::where('id', $dataParent->user_id)->get(['fullname', 'avatar']);
+                        if(!$user[0]->avatar){
+                            $user[0]->avatar = $defaultAvatar;
+                        }
+                        // $user["0]->"avatar = $user->avatar ?? $defaultAvatar;
+                        $dataParent["user"]= $user ? $user->toArray() : [];
+                    }
+                }
+
+               
+            // $comment->parent->load('parent');
         }
-    
+        // dd($comments, $comments[1]->parent[0]->id);
         return response()->json([
             'message' => 'Lấy bình luận sản phẩm thành công',
             'comments' => $comments,
@@ -211,7 +224,7 @@ class CommentsController extends Controller
                 'user_id' => $user->id,
                 'title' => 'Thông báo từ Sản Phẩm',
                 'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
-                'shop_id' => $product->shop_id
+                'shop_id' => $product->shop_id,
             ]);
             $notificationController = new NotificationController();
             $notificationController->store($notificationRequest);
@@ -262,15 +275,18 @@ class CommentsController extends Controller
         "user_id" => $user->id,
         "created_at" => now()
     ];
-
-    $comment = CommentsModel::create($dataInsert,);
+    $comment = CommentsModel::create($dataInsert);
     
+    $dataInsert["user"] = (object) [
+        "fullname" => $user->fullname,
+        "avatar" => $user->avatar,
+    ];
    
    
     $dataDone = [
         'status' => true,
         'message' => "Đã lưu comment",
-        'data' => $dataInsert,
+        'data' => $dataInsert
     ];
 
     return response()->json($dataDone, 200);
