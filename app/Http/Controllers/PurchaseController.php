@@ -275,7 +275,7 @@ class PurchaseController extends Controller
                 // return view('emails.test',compact('orders','total_amount','carts','orderDetails','shipFee','products','variants','discountMainVoucher','user','payment'));
                 SendMail::dispatch($orders, $total_amount, $carts, $orderDetails, $shipFee, $products, $variants, auth()->user()->email, $payment->name, $user, $discountMainVoucher);
                 SendNotification::dispatch('Đặt hàng thành công', "Mã đơn hàng: $groupOrderIds", auth()->id(), $groupOrderIds, null);
-                // ProducttocartModel::whereIn('id', $request->carts)->delete();
+                ProducttocartModel::whereIn('id', $request->carts)->delete();
                 if ($voucherToMainCode != null) {
                     Voucher::where('code', $voucherToMainCode)->delete();
                 }

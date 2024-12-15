@@ -270,6 +270,9 @@ class OrdersController extends Controller
         ]);
         try {
             $order->update($dataUpdate);
+            if ($order->order_status == 8) {
+                $order->update(['status' => 1]);
+            }
             return $this->successResponse("Order đã được cập nhật", $order);
         } catch (\Throwable $th) {
             return $this->errorResponse("Cập nhật Order không thành công", $th->getMessage());

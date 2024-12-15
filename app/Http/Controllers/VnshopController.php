@@ -493,6 +493,7 @@ class VnshopController extends Controller
                         'type' => 'main',
                         'user_id' => $user_id,
                         'title' => 'Tài khoản của bạn bị khóa',
+                        'image' => "https://down-vn.img.susercontent.com/file/sg-11134004-7rfgy-m3q0hdin6yea8c_tn",
                         'description' => 'Tài khoản '.$shop->shop_name.' đã bị khóa',
                         'shop_id' => $shop->id 
                     ]);
@@ -504,6 +505,7 @@ class VnshopController extends Controller
                         'type' => 'main',
                         'user_id' => $user_id,
                         'title' => 'Tài khoản của bạn đã vi phạm',
+                        'image' => "https://down-vn.img.susercontent.com/file/sg-11134004-7rfgy-m3q0hdin6yea8c_tn",
                         'description' => 'Tài khoản ' .$shop->shop_name.' đã bị vi phạm',
                         'shop_id' => $shop->id 
                     ]);
@@ -515,6 +517,7 @@ class VnshopController extends Controller
                         'type' => 'main',
                         'user_id' => $user_id,
                         'title' => 'Tài khoản của bạn bị xóa',
+                        'image' => "https://down-vn.img.susercontent.com/file/sg-11134004-7rfgy-m3q0hdin6yea8c_tn",
                         'description' => 'Tài khoản '.$shop->shop_name.' đã bị xóa',
                         'shop_id' => $shop->id 
                     ]);
