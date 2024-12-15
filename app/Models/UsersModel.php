@@ -36,7 +36,6 @@ class UsersModel extends Authenticatable implements JWTSubject {
 
     protected $hidden = [
         'password',
-        'refesh_token',
         'created_at',
         'updated_at',
         'update_version',

@@ -40,6 +40,7 @@ class EventMail implements ShouldQueue
                     'log' => 'EventMail ',
                 ]);
                 $events = events::where('event_day', date('d'))->where('event_month', date('m'))->where('status', 2)->first();
+                // dd($events);
                 if (!$events) {
                     check_var('Không có sự kiện nào', 404);
                     return;
