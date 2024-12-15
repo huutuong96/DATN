@@ -326,7 +326,7 @@ public function storeRate(Request $request)
         "content" =>$dataRate['content'] ?? '',
         "variant" =>$dataRate['variant'] ?? null,
         "rate" => $rate, 
-        "images" =>json_encode($dataRate['imageUrls']) ?? null,
+        "images" =>json_decode($dataRate['images']) ?? null,
         "product_id" => $dataRate['product_id'],
         "user_id" => $user->id,
         "created_at" => now()
