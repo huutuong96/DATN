@@ -231,23 +231,23 @@ class CommentsController extends Controller
     
     }
     $rate = null;
-    if ($request->has('rate')) {
-        $order = OrdersModel::where('user_id', $user->id)
-            ->whereHas('orderDetails', function ($query) use ($request) {
-                $query->where('product_id', $request->product_id);
-            })
-            ->where('status', '8') 
-            ->exists();
+    // if ($request->has('rate')) {
+    //     $order = OrdersModel::where('user_id', $user->id)
+    //         ->whereHas('orderDetails', function ($query) use ($request) {
+    //             $query->where('product_id', $request->product_id);
+    //         })
+    //         ->where('status', '8') 
+    //         ->exists();
 
-        if ($order) {
-            $rate = $request->rate; 
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Bạn cần mua sản phẩm để đánh giá.'
-            ], 403);
-        }
-    }
+    //     if ($order) {
+    //         $rate = $request->rate; 
+    //     } else {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Bạn cần mua sản phẩm để đánh giá.'
+    //         ], 403);
+    //     }
+    // }
     $cloudinary = new Cloudinary();
     $imageUrls = [];
     if ($request->hasFile('images')) {
@@ -291,6 +291,63 @@ class CommentsController extends Controller
     return response()->json($dataDone, 200);
 }
 
+public function storeRate(Request $request)
+{
+    $user = JWTAuth::parseToken()->authenticate();
+    $rate = $request->rate ?? null;
+    if(!$request->product_id){
+        $dataDone = [
+            'status' => false,
+            'message' => "Sản phẩm không tồn tại",
+            'data' => []
+        ];
+    
+        return response()->json($dataDone, 404);
+    }
+    $order = OrdersModel::where('id',$request->order_id)->select("is_feedbacked")->first();
+    if($order->is_feedbacked == 1){
+        $dataDone = [
+            'status' => false,
+            'message' => "Bạn đã đánh giá",
+            'data' => []
+        ];
+    
+        return response()->json($dataDone, 400);
+    }
+    $order->is_feedbacked=1;
+    $order->save();
+
+   foreach ($request->data as $dataRate) {
+    $dataInsert = [
+        "title" => $dataRate->title ?? 'rating',
+        "content" =>$dataRate['content'] ?? '',
+        "rate" => $rate, 
+        "images" =>json_encode($dataRate['imageUrls']) ?? null,
+        "product_id" => $dataRate['product_id'],
+        "user_id" => $user->id,
+        "created_at" => now()
+    ];
+    $comment = CommentsModel::create($dataInsert);
+    
+    $dataInsert["user"] = (object) [
+        "fullname" => $user->fullname,
+        "avatar" => $user->avatar,
+    ];
+    $dataInsert["id"] = $comment->id;
+   }
+
+
+    
+   
+   
+    $dataDone = [
+        'status' => true,
+        'message' => "Đã lưu đánh giá",
+        'data' => $dataInsert
+    ];
+
+    return response()->json($dataDone, 200);
+}
 
 
 
