@@ -174,7 +174,7 @@ class VnshopController extends Controller
         ));
     }
     public function store($limit = 5)
-    {    $shops = Shop::whereIn("status", [1, 2, 4])->with('user')->paginate($limit);
+    {    $shops = Shop::whereIn("status", [1, 2, 4])->with('user')->orderBy("created_at", "Desc")->paginate($limit);
          foreach ($shops as $Key => $shop) {
             $doanhthu = OrdersModel::whereMonth('created_at', Carbon::now()->month)
                                     ->where('shop_id', $shop->id)->sum('net_amount');
@@ -884,8 +884,8 @@ class VnshopController extends Controller
     public function taxall(request $request)
 {    $tab = $request->query('tab',1);
     // dd($tab);
-    $taxes = Tax::where('status',2)->get();
-    $taxeOFF = Tax::where('status',3)->get();
+    $taxes = Tax::where('status',2)->orderBy('created_at', 'desc')->get();
+    $taxeOFF = Tax::where('status',3)->orderBy('updated_at', 'desc')->get();
 
     if ($taxes->isEmpty()) {
         return view('rank.tax')->with('message', 'Không tồn tại thuế nào');
@@ -979,8 +979,8 @@ public function changeStatusTax(Request $request, string $id)
 public function bannerall(Request $request)
 {
     $tab = $request->input('tab', 1); 
-    $banners = Banner::where('status',2)->paginate(10);
-    $banners0ff = Banner::where('status',3)->paginate(10);
+    $banners = Banner::where('status',2)->orderBy('created_at', 'desc')->paginate(10);
+    $banners0ff = Banner::where('status',3)->orderBy('created_at', 'desc')->paginate(10);
 
    
 
@@ -1375,8 +1375,9 @@ public function statistByRevenue(Request $request)
     }
     // dd($listShop);
     usort($listShop, function($a, $b) {
-        return $b->doanhthu <=> $a->doanhthu;
+        return $b->luotban <=> $a->luotban;
     });
+    // dd($listShop);
     return view('statist.sales',compact(
         'luongtrahangJson',
         'luotmuaJson',
@@ -1424,6 +1425,7 @@ public function list_notification(Request $request){
         $user = JWTAuth::parseToken()->authenticate();
         $notificationIds = Notification::where('user_id', $user->id)
         ->orderBy('created_at', 'desc')
+        ->where('status', 1)
         ->pluck('id_notification');
         $notificationMain = Notification_to_mainModel::whereIn('id', $notificationIds)
         ->orderBy('created_at', 'desc') // Thêm sắp xếp nếu cần
@@ -1431,11 +1433,19 @@ public function list_notification(Request $request){
         return view('notification.list_notification', compact('notificationMain'));
 }
 
+public function delete_notification(Request $request, $id)
+{
+    $notifi = Notification::where('id_notification', $id)->first();
+    $notifi->status = 2;
+    $notifi->save();
+    return back()->with('message', 'Xóa thông báo thành công');
+
+}
 public function rankall(Request $request)
 {
     $tab = $request->input('tab', 1); 
-    $ranks = RanksModel::where('status',2)->paginate(10);
-    $ranks0ff = RanksModel::where('status',0)->paginate(10);
+    $ranks = RanksModel::where('status',2)->orderBy('created_at', 'desc')->paginate(10);
+    $ranks0ff = RanksModel::where('status',0)->orderBy('updated_at', 'desc')->paginate(10);
 
     return view('ranks.list_rank', compact('ranks', 'ranks0ff', 'tab'));  
 
@@ -1557,8 +1567,8 @@ public function destroyrank(Request $request, string $id)
 public function payment_method(Request $request)
 {
     $tab = $request->input('tab', 1); 
-    $payment_method = PaymentsModel::where('status',1)->paginate(10);
-    $payment_method0ff = PaymentsModel::where('status',0)->paginate(10);
+    $payment_method = PaymentsModel::where('status',1)->orderBy('created_at', 'desc')->paginate(10);
+    $payment_method0ff = PaymentsModel::where('status',0)->orderBy('updated_at', 'desc')->paginate(10);
 
     return view('payment_method.payment_method_list', compact('payment_method', 'payment_method0ff', 'tab'));  
 
@@ -1739,7 +1749,7 @@ public function listEvent(Request $request)
 {
     $token = $request->token; 
     try {
-        $events = Event::whereIn('status', [1, 2])->paginate(10);
+        $events = Event::whereIn('status', [1, 2])->orderBy('created_at', 'desc')->paginate(10);
         foreach ($events as &$event) {
             $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
         }

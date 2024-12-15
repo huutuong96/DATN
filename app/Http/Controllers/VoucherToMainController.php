@@ -28,8 +28,8 @@ class VoucherToMainController extends Controller
     public function voucherall(Request $request)
     {
         $tab = $request->input('tab', 1); 
-        $voucherMains = voucherToMain::where('status',2)->paginate(10);
-        $inactiveVoucher = voucherToMain::where('status',0)->paginate(10);
+        $voucherMains = voucherToMain::where('status',2)->orderBy('created_at', 'desc')->paginate(10);
+        $inactiveVoucher = voucherToMain::where('status',0)->orderBy('updated_at', 'desc')->paginate(10);
     
        
     
