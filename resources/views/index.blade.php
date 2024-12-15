@@ -192,7 +192,7 @@
                                                 class="col-auto dropdown-tabs">
                                                 <span
                                                     class="badge bg-light text-body fs-13">
-                                                    {{ count($notifyMain) }} New</span>
+                                                    {{ count($notifyMain) }} Mới</span>
                                             </div>
                                         </div>
                                     </div>
@@ -211,7 +211,7 @@
                                                     href="#all-noti-tab"
                                                     role="tab"
                                                     aria-selected="true">
-                                                    All ({{ count($notifyMain) }})
+                                                   Tất cả ({{ count($notifyMain) }})
                                                 </a>
                                             </li>
                                            

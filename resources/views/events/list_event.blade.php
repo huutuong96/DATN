@@ -38,11 +38,11 @@
                                       <label for="event_year" class="form-label">Năm</label>
                                       <input type="number" class="form-control" id="event_year" name="event_year" min="1900" max="2100" value="{{ old('event_year') }}" required>
                                   </div>
-                                  <div class="col-md-6">
+                                  {{-- <div class="col-md-6">
                                       <label for="qualifier" class="form-label">Điều kiện</label>
                                       <input type="text" class="form-control" id="qualifier" name="qualifier" min="1" value="{{ old('qualifier') }}" required title="nhập lớn hơn 0">
-                                  </div>
-                                  <div class="col-md-6">
+                                  </div> --}}
+                                  <div class="col-md-4">
                                       <label for="voucher_apply" class="form-label">Tiêu Đề Mã Giảm Giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_apply" value="{{ old('voucher_apply') }}">
                                   </div>
@@ -50,74 +50,81 @@
                                       <label for="voucher_apply" class="form-label">Mô Tả Cho Giảm Giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_description" value="{{ old('voucher_apply') }}">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-4">
                                       <label for="voucher_apply" class="form-label">Số lượng mã giảm giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" min="1" name="voucher_quantity" value="{{ old('voucher_apply') }}" required title="Nhập lớn hơn 0">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-3">
                                       <label for="voucher_apply" class="form-label">Số tiền giới hạn</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_limit" min="1" value="{{ old('voucher_apply') }}"required title="Nhập lớn hơn 0">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-3">
                                       <label for="voucher_apply" class="form-label">% Giảm giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_ratio" min="0" value="{{ old('voucher_apply') }}"required title="Nhập lớn hơn 0">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-3">
                                       <label for="voucher_apply" class="form-label">Mã Giảm Giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_code" value="{{ old('voucher_apply') }}" required>
                                   </div>
                                   <div class="col-md-3">
-                                    <div class="form-check mt-4">
-                                        <input type="checkbox" class="form-check-input" id="is_share_facebook" name="is_share_facebook" value="1" {{ old('is_share_facebook') ? 'checked' : '' }}>
-                                        <label for="is_share_facebook" class="form-check-label">Chia sẻ Facebook</label>
-                                    </div>
-                                    <div class="form-check mt-4">
-                                      <input type="checkbox" class="form-check-input" id="is_share_zalo" name="is_share_zalo" value="1" {{ old('is_share_zalo') ? 'checked' : '' }}>
-                                      <label for="is_share_zalo" class="form-check-label">Chia sẻ Zalo</label>
-                                  </div>
-                                  <div class="form-check mt-4">
-                                      <input type="checkbox" class="form-check-input" id="is_mail" name="is_mail" value="1" {{ old('is_mail') ? 'checked' : '' }}>
-                                      <label for="is_mail" class="form-check-label">Gửi email</label>
-                                  </div>
+                                    <label for="point" class="form-label">Áp dụng theo điểm</label>
+                                    <input type="number" class="form-control" id="point" name="point" value="{{ old('point', 0) }}" min="0" required title="Nhập lớn hơn 0">
                                 </div>
-                                  <div class="col-md-3">
-                                      <label for="point" class="form-label">Áp dụng theo điểm</label>
-                                      <input type="number" class="form-control" id="point" name="point" value="{{ old('point', 0) }}" min="0" required title="Nhập lớn hơn 0">
-                                  </div>
-                                
-                                  <div class="col-md-3">
-                                      <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
-                                      <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', 0) }}" min="0" required title="Nhập lớn hơn 0">
-                                  </div>
-                                  <div class="col-md-3">
-                                      <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
-                                      <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" value="{{ old('where_price', 0) }}" min="0" required title="Nhập lớn hơn 0">
-                                  </div>
-
-                                  <div class="col-md-3">
-                                      <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
-                                      <input type="date" class="form-control" id="from" name="from" value="{{ old('from') }}">
-                                  </div>
-                                  <div class="col-md-3">
-                                      <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
-                                      <input type="date" class="form-control" id="to" name="to" value="{{ old('to') }}">
-                                  </div>
+                                  <div class="row ps-4">
+                                       
+                                            <div class=" col-2 form-check mt-4">
+                                                <input type="checkbox" class="form-check-input" id="is_share_facebook" name="is_share_facebook" value="1" {{ old('is_share_facebook') ? 'checked' : '' }}>
+                                                <label for="is_share_facebook" class="form-check-label">Chia sẻ Facebook</label>
+                                            </div>
+                                        
+                                       <div class=" col-2 form-check mt-4">
+                                            <input type="checkbox" class="form-check-input" id="is_share_zalo" name="is_share_zalo" value="1" {{ old('is_share_zalo') ? 'checked' : '' }}>
+                                            <label for="is_share_zalo" class="form-check-label">Chia sẻ Zalo</label>
+                                        </div>
+                                    
+                                       <div class=" col-2 form-check mt-4">
+                                            <input type="checkbox" class="form-check-input" id="is_mail" name="is_mail" value="1" {{ old('is_mail') ? 'checked' : '' }}>
+                                            <label for="is_mail" class="form-check-label">Gửi email</label>
+                                        </div>
+                                </div>
+                                 
+                                <div class="row pt-4">
+                                    <div class="col-md-3">
+                                        <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
+                                        <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', 0) }}" min="0" required title="Nhập lớn hơn 0">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
+                                        <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" value="{{ old('where_price', 0) }}" min="0" required title="Nhập lớn hơn 0">
+                                    </div>
+  
+                                    <div class="col-md-3">
+                                        <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
+                                        <input type="date" class="form-control" id="from" name="from" value="{{ old('from') }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
+                                        <input type="date" class="form-control" id="to" name="to" value="{{ old('to') }}">
+                                    </div>
+                                </div>
+                                 
                                   <div class="col-md-6">
                                       <label for="status" class="form-label">Trạng thái</label>
                                       <select style="width: 507px;left: 2rem; margin-top: 1px " style="width: 130px" class="form-control" id="status" name="status" required>
                                           <option value="" disabled selected>Chọn trạng thái</option>
                                           <option value="2">Hoạt động</option>
-                                          <option value="3">Không hoạt động</option>
+                                          <option value="5">Không hoạt động</option>
                                       </select>
                                   </div>
                                   <div class="col-md-6">
+                                    <label for="from" class="form-label">Hình ảnh</label>
+                                    <input type="file" class="form-control" id="from" name="event_image[]" multiple>
+                                </div>
+                                  <div class="col-md-">
                                       <label for="description" class="form-label">Mô tả</label>
                                       <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
                                   </div>
-                                  <div class="col-md-6">
-                                      <label for="from" class="form-label">Hình ảnh</label>
-                                      <input type="file" class="form-control" id="from" name="event_image[]" multiple>
-                                  </div>
+                                
                                   <!-- <h5>Áp dụng cho sản sản phẩm</h5>
                                   <div class="col-md-2">
                                       <label for="product_view" class="form-label">Chỉ những sản phẩm có lượt xem từ: </label>
@@ -225,7 +232,7 @@
                                                                         <div class="modal-content" style="width:1000px">
                                                                             <div class="modal-body text-center p-5" style="width:1000px">
                                                                                 <form id="editEventForm" 
-                                                                                action="{{ route('update_events', ['token' => auth()->user()->refesh_token, 'id' => $event->id]) }}" 
+                                                                                action="{{ route('update_events', ['token' => auth()->user()->refesh_token, 'id' => $event->id ,]) }}" 
                                                                                 method="POST" enctype="multipart/form-data">
                                                                               @csrf
                                                                               @method('PUT')
@@ -250,12 +257,7 @@
                                                                                       <input type="number" class="form-control" id="event_year" name="event_year" 
                                                                                              min="1900" max="2100" value="{{ old('event_year', $event->event_year) }}" required>
                                                                                   </div>
-                                                                                  <div class="col-md-6">
-                                                                                    <label for="qualifier" class="form-label">Điều kiện</label>
-                                                                                    <input type="text" class="form-control" id="qualifier" name="qualifier" 
-                                                                                           value="{{ old('qualifier', $event->qualifier) }}" min="0" required title="Nhập lớn hơn 0">
-                                                                                </div>
-                                                                                <div class="col-md-6">
+                                                                                <div class="col-md-4">
                                                                                     <label for="voucher_title" class="form-label">Tiêu Đề Mã Giảm Giá</label>
                                                                                     <input type="text" class="form-control" id="voucher_apply" name="voucher_title" 
                                                                                            value="{{ old('voucher_title', $event['voucher_apply']['voucher_title'] ?? 'N/A') }}">
@@ -265,86 +267,108 @@
                                                                                     <input type="text" class="form-control" id="voucher_description" name="voucher_description" 
                                                                                            value="{{ old('voucher_description', $event->voucher_apply['voucher_description'] ?? '1') }}">
                                                                                 </div>
-                                                                                <div class="col-md-2">
+                                                                                <div class="col-md-4">
                                                                                     <label for="voucher_quantity" class="form-label">Số lượng mã giảm giá</label>
                                                                                     <input type="number" class="form-control" id="voucher_quantity" name="voucher_quantity" 
                                                                                            value="{{ old('voucher_quantity', $event['voucher_apply']['voucher_quantity'] ?? 'N/A') }}" min="0" required title="Nhập lớn hơn 0">
                                                                                 </div>
-                                                                                <div class="col-md-2">
+                                                                                <div class="col-md-3">
                                                                                     <label for="voucher_limit" class="form-label">Số tiền giới hạn</label>
                                                                                     <input type="number" class="form-control" id="voucher_limit" name="voucher_limit" 
                                                                                            value="{{ old('voucher_limit', $event['voucher_apply']['voucher_limit'] ?? 'N/A') }}" min="0" required title="Nhập lớn hơn 0">
                                                                                 </div>
-                                                                                <div class="col-md-2">
+                                                                                <div class="col-md-3">
                                                                                     <label for="voucher_ratio" class="form-label">% Giảm giá</label>
                                                                                     <input type="number" step="0.01" class="form-control" id="voucher_ratio" name="voucher_ratio" 
                                                                                            value="{{ old('voucher_ratio', $event['voucher_apply']['voucher_ratio'] ?? 'N/A') }}" min="0" required title="Nhập lớn hơn 0">
                                                                                 </div>
-                                                                                <div class="col-md-2">
+                                                                                <div class="col-md-3">
                                                                                     <label for="voucher_code" class="form-label">Mã Giảm Giá</label>
                                                                                     <input type="text" class="form-control" id="voucher_code" name="voucher_code" 
                                                                                      min="0" value="{{ old('voucher_code', $event['voucher_apply']['voucher_code'] ?? 'N/A') }}" required>
                                                                                 </div>
-                                                                                
-                                                                                  <div class="col-md-3">
-                                                                                      <div class="form-check mt-4">
+                                                                                <div class="col-md-3">
+                                                                                    <label for="point" class="form-label">Áp dụng theo điểm</label>
+                                                                                    <input type="number" class="form-control" id="point" name="point" 
+                                                                                           value="{{ old('point', $event->point) }}" min="0" required title="Nhập lớn hơn 0">
+                                                                                </div>
+                                                                                <div class="row ps-4">
+                                                                              
+                                                                                      <div class="col-2 form-check mt-4">
                                                                                           <input type="checkbox" class="form-check-input" id="is_share_facebook" name="is_share_facebook" value="1" 
                                                                                                  {{ old('is_share_facebook', $event->is_share_facebook) ? 'checked' : '' }}>
                                                                                           <label for="is_share_facebook" class="form-check-label">Chia sẻ Facebook</label>
                                                                                       </div>
-                                                                                      <div class="form-check mt-4">
+                                                                                      <div class="col-2 form-check mt-4">
                                                                                           <input type="checkbox" class="form-check-input" id="is_share_zalo" name="is_share_zalo" value="1" 
                                                                                                  {{ old('is_share_zalo', $event->is_share_zalo) ? 'checked' : '' }}>
                                                                                           <label for="is_share_zalo" class="form-check-label">Chia sẻ Zalo</label>
                                                                                       </div>
-                                                                                      <div class="form-check mt-4">
+                                                                                      <div class="col-2 form-check mt-4">
                                                                                           <input type="checkbox" class="form-check-input" id="is_mail" name="is_mail" value="1" 
                                                                                                  {{ old('is_mail', $event->is_mail) ? 'checked' : '' }}>
                                                                                           <label for="is_mail" class="form-check-label">Gửi email</label>
                                                                                       </div>
-                                                                                  </div>
-                                                                                  <div class="col-md-3">
-                                                                                      <label for="point" class="form-label">Áp dụng theo điểm</label>
-                                                                                      <input type="number" class="form-control" id="point" name="point" 
-                                                                                             value="{{ old('point', $event->point) }}" min="0" required title="Nhập lớn hơn 0">
-                                                                                  </div>
-                                                                                  <div class="col-md-3">
-                                                                                      <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
-                                                                                      <input type="number" class="form-control" id="where_order" name="where_order" 
-                                                                                             value="{{ old('where_order', $event->where_order) }}" min="0" required title="Nhập lớn hơn 0">
-                                                                                  </div>
-                                                                                  <div class="col-md-3">
-                                                                                      <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
-                                                                                      <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" 
-                                                                                             value="{{ old('where_price', $event->where_price) }}" min="0" required title="Nhập lớn hơn 0">
-                                                                                  </div>
-                                                                                  <div class="col-md-3">
-                                                                                      <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
-                                                                                      <input type="date" class="form-control" id="from" name="from" 
-                                                                                             value="{{ old('from', $event->from) }}">
-                                                                                  </div>
-                                                                                  <div class="col-md-3">
-                                                                                      <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
-                                                                                      <input type="date" class="form-control" id="to" name="to" 
-                                                                                             value="{{ old('to', $event->to) }}">
-                                                                                  </div>
-                                                                                  <div class="col-md-6">
-                                                                                      <label for="status" class="form-label">Trạng thái</label>
-                                                                                      <select class="form-control" style="width: 450px;left: 2rem; margin-top: 1px "  id="status" name="status" required>
-                                                                                          <option value="" disabled {{ !$event->status ? 'selected' : '' }}>Chọn trạng thái</option>
-                                                                                          <option value="2" {{ $event->status == 2 ? 'selected' : '' }}>Hoạt động</option>
-                                                                                          <option value="3" {{ $event->status == 1 ? 'selected' : '' }}>Không hoạt động</option>
-                                                                                      </select>
-                                                                                  </div>
-                                                                                  <div class="col-md-6">
-                                                                                      <label for="description" class="form-label">Mô tả</label>
-                                                                                      <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $event->description) }}</textarea>
-                                                                                  </div>
-                                                                                  <div class="col-md-6">
-                                                                                      <label for="event_image" class="form-label">Hình ảnh</label>
-                                                                                      <input type="file" class="form-control" id="event_image" name="event_image[]" multiple>
-                                                                                  </div>
-                                                                                  <div class="col-md-12 ">
+                                                                                
+                                                                                </div>
+                                                                                  
+                                                                                <div class="row pt-3">
+                                                                                    <div class="col-md-3">
+                                                                                        <label for="where_order" class="form-label">Áp dụng theo số lượng đơn hàng</label>
+                                                                                        <input type="number" class="form-control" id="where_order" name="where_order" 
+                                                                                               value="{{ old('where_order', $event->where_order) }}" min="0" required title="Nhập lớn hơn 0">
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
+                                                                                        <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" 
+                                                                                               value="{{ old('where_price', $event->where_price) }}" min="0" required title="Nhập lớn hơn 0">
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
+                                                                                        <input type="date" class="form-control" id="from" name="from" 
+                                                                                               value="{{ old('from', $event->from) }}">
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
+                                                                                        <input type="date" class="form-control" id="to" name="to" 
+                                                                                               value="{{ old('to', $event->to) }}">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-12">
+                                                                                    <label for="description" class="form-label">Mô tả</label>
+                                                                                    <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $event->description) }}</textarea>
+                                                                                </div>
+                                                                                <div class="col-md-6 pt-2">
+                                                                                    <label class="form-label">Ảnh đã tải lên</label>
+                                                                                    <div class="d-flex flex-wrap">
+                                                                                        @foreach ($event->images as $image)
+                                                                                        <div class="me-2 mb-2">
+                                                                                            <img src="{{$image}}" alt="Event Image" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px;">
+                                                                                        </div>
+                                                                                        @endforeach
+                                                                                    </div>
+                                                                                </div>
+                                                                                 
+                                                                                  <div class="col-md-6 pt-2">
+                                                                                    <label for="event_image" class="form-label">Hình ảnh</label>
+                                                                                    <input type="file" class="form-control" id="event_image" name="event_image[]"  multiple>
+                                                                                       
+                                                                                </div>
+                                                                                
+                                                                             
+                                                                                <div class="col-md-6">
+                                                                                    <label for="status" class="form-label">Trạng thái</label>
+                                                                                    <select class="form-control mt-3" style="width: 450px; left: 2rem;" id="status" name="status" required>
+                                                                                        <option value="" disabled {{ old('status', $event->status) === null ? 'selected' : '' }}>Chọn trạng thái</option>
+                                                                                        <option value="2" {{ old('status', $event->status) == 2 ? 'selected' : '' }}>Hoạt động</option>
+                                                                                        <option value="5" {{ old('status', $event->status) == 5 ? 'selected' : '' }}>Không hoạt động</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                
+                                                                                
+                                                                                
+                                                                                  
+                                                                                  <div class="col-md-12 pt-4 ">
                                                                                       <button type="submit" class="btn btn-primary mt-3">Cập nhật sự kiện</button>
                                                                                   </div>
                                                                               </div>
@@ -386,7 +410,13 @@
                                                                                         <p><strong>Ngày:</strong> {{ $event->event_day }}/{{ $event->event_month }}/{{ $event->event_year }}</p>
                                                                                         <p><strong>Trạng thái:</strong> {{ $event->status == 1 ? 'Hoạt động' : 'Không hoạt động' }}</p>
                                                                                         <p><strong>Mô tả:</strong> {!! $event->description !!}</p>
-                                                                                        <p><strong>Điều kiện:</strong> {{ $event->qualifier }}</p>
+                                                                                        <p><strong>Hình ảnh</strong>
+                                                                                            @foreach ($event->images as $image)
+                                                                                            <div class="me-2 mb-2">
+                                                                                                <img src="{{$image}}" alt="Event Image" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px;">
+                                                                                            </div>
+                                                                                            @endforeach
+                                                                                        </p>
                                                                                         <p><strong>Áp dụng voucher:</strong></p>
                                                                                         <ul>
                                                                                             <li><strong>Tiêu đề:</strong> {{ $event->voucher_apply['voucher_title'] ?? 'Không có' }}</li>
@@ -396,9 +426,10 @@
                                                                                             <li><strong>Phần trăm giảm:</strong> {{ $event->voucher_apply['voucher_ratio'] ?? 'Không có' }}</li>
                                                                                             <li><strong>Mã giảm giá:</strong> {{ $event->voucher_apply['voucher_code'] ?? 'Không có' }}</li>
                                                                                         </ul>
-                                                                                        <p><strong>Điểm:</strong> {{ $event->point }}</p>
+                                                                                       
                                                                                     </div>
                                                                                     <div class="col-md-6">
+                                                                                        <p><strong>Điểm:</strong> {{ $event->point }}</p>
                                                                                         <p><strong>Vị trí đơn hàng:</strong> {{ $event->where_order }}</p>
                                                                                         <p><strong>Giá đơn hàng:</strong> {{ $event->where_price }}</p>
                                                                                         <p><strong>Ngày:</strong> {{ $event->date ?? 'N/A' }}</p>

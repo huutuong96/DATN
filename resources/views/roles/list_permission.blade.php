@@ -10,6 +10,14 @@
             <div class="card">
                 <div class="card-header align-items-center d-flex">
                     <h4 class="card-title mb-0 flex-grow-1">Cấp quyền cho vai trò: {{ $role->title }}</h4>
+                    <a
+                    href="{{ route('list_role',['token' => auth()->user()->refesh_token]) }}"
+                    class="nav-link text-primary"
+                    style="font-weight: bold;"
+                    data-key="t-ecommerce"
+                >
+                    Danh sách roles
+                </a>
                 </div><!-- end card header -->
                 <div class="card-body">
                     <div class="live-preview">
