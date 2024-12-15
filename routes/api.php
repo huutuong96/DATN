@@ -69,6 +69,7 @@ Route::get('/search', function () {
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
     Route::get('Comment', [CommentsController::class,"index"]);
+    Route::get('rating/{id}', [CommentsController::class, "countRanting"]);
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
