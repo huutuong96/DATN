@@ -324,7 +324,7 @@ public function storeRate(Request $request)
         
         "title" =>$dataRate['title'] ?? 'rating',
         "content" =>$dataRate['content'] ?? '',
-        "varant" =>$dataRate['varant'] ?? null,
+        "variant" =>$dataRate['variant'] ?? null,
         "rate" => $rate, 
         "images" =>json_encode($dataRate['imageUrls']) ?? null,
         "product_id" => $dataRate['product_id'],
