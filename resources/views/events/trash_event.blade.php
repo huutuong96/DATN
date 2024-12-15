@@ -64,7 +64,7 @@
                                                                         <div class="modal-content" style="width:1000px">
                                                                             <div class="modal-body text-center p-5" style="width:1000px">
                                                                                 <form id="editEventForm" 
-                                                                                action="{{ route('update_events', ['token' => auth()->user()->refesh_token, 'id' => $event->id]) }}" 
+                                                                                action="{{ route('update_events', ['token' => auth()->user()->refesh_token, 'id' => $event->id ]) }}" 
                                                                                 method="POST" enctype="multipart/form-data">
                                                                               @csrf
                                                                               @method('PUT')
@@ -187,14 +187,15 @@
                                                                                 </div>
                                                                                 
                                                                              
-                                                                                <div class="col-md-6 ">
+                                                                                <div class="col-md-6">
                                                                                     <label for="status" class="form-label">Trạng thái</label>
-                                                                                    <select class="form-control mt-3" style="width: 450px;left: 2rem; "  id="status" name="status" required>
-                                                                                        <option value="" disabled {{ !$event->status ? 'selected' : '' }}>Chọn trạng thái</option>
-                                                                                        <option value="2" {{ $event->status == 2 ? 'selected' : '' }}>Hoạt động</option>
-                                                                                        <option value="3" {{ $event->status == 1 ? 'selected' : '' }}>Không hoạt động</option>
+                                                                                    <select class="form-control mt-3" style="width: 450px; left: 2rem;" id="status" name="status" required>
+                                                                                        <option value="" disabled {{ old('status', $event->status) === null ? 'selected' : '' }}>Chọn trạng thái</option>
+                                                                                        <option value="2" {{ old('status', $event->status) === 2 ? 'selected' : '' }}>Hoạt động</option>
+                                                                                        <option value="5" {{ old('status', $event->status) == 5? 'selected' : '' }}>Không hoạt động</option>
                                                                                     </select>
                                                                                 </div>
+                                                                                
                                                                                 
                                                                                 
                                                                                   

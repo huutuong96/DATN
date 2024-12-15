@@ -1819,7 +1819,7 @@ public function store_events(Request $request)
             'voucher_ratio' => $request->voucher_ratio ?? null,
             'voucher_code' => $request->voucher_code ?? null,
         ];
-        if ($request->event_image) {
+        if ($request->event_image  ) {
             $images = [];
             foreach ($request->event_image as $image) {
                 $images[] = $this->storeImage($image);
@@ -1884,7 +1884,6 @@ public function store_events(Request $request)
             ->with('error', 'Thêm sự kiện không thành công: ' . $th->getMessage());
     }
 }
-
 public function update_events(Request $request, $id)
 {
     $token = $request->input('token'); 
@@ -1893,6 +1892,8 @@ public function update_events(Request $request, $id)
     if (!$event) {
         return redirect()->back()->with('error', 'Không tìm thấy sự kiện.');
     }
+
+    // Xử lý voucher
     $voucher_apply = [
         'voucher_title' => $request->input('voucher_title'),
         'voucher_description' => $request->input('voucher_description'),
@@ -1904,14 +1905,20 @@ public function update_events(Request $request, $id)
     $voucher_apply = array_filter($voucher_apply, function ($value) {
         return !is_null($value);
     });
+    $existingImages = json_decode($event->images, true) ?? []; 
+    $newImages = [];
+    if ($request->hasFile('event_image')) {
+        foreach ($request->file('event_image') as $image) {
+            $newImages[] = $this->storeImage($image); 
+        }
+    }
+    $event->images = json_encode(!empty($newImages) ? $newImages : $existingImages);
 
     try {
-
         $event->event_title = $request->input('event_title', $event->event_title);
         $event->event_day = $request->input('event_day', $event->event_day);
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
-        // $event->qualifier = $request->input('qualifier', $event->qualifier);
         $event->voucher_apply = !empty($voucher_apply) ? json_encode($voucher_apply) : $event->voucher_apply;
         $event->is_mail = $request->has('is_mail') ? $request->boolean('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
@@ -1925,14 +1932,17 @@ public function update_events(Request $request, $id)
         $event->status = $request->input('status', $event->status);
         $event->description = $request->input('description', $event->description);
         $event->save();
+        return back()->with('message', 'Cập nhật sự kiện thành công.');
+   
 
-        return redirect()
-            ->route('events', ['token' => $token])
-            ->with('success', 'Cập nhật sự kiện thành công.');
+        // return redirect()
+        //     ->route('events', ['token' => $token])
+        //     ->with('success', 'Cập nhật sự kiện thành công.');
     } catch (\Throwable $th) {
         return redirect()->back()->with('error', 'Cập nhật sự kiện không thành công: ' . $th->getMessage());
     }
 }
+
 
 
 // public function changeStatuspayment(Request $request, string $id)
