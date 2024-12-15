@@ -805,7 +805,8 @@ class ProductController extends Controller
             }     
             if ($request->has('min_rate') && $request->has('max_rate')) {
                 $query->whereHas('comments', function ($q) use ($request) {
-                    $q->wherebetween('rate', [$request->min_rate, $request->max_rate]);
+                    $q->havingRaw('AVG(rate) BETWEEN ? AND ?', [$request->min_rate, $request->max_rate])
+                      ->whereNotNull('rate');
                 });
             }
             $products = $query->where('status', 2)->paginate($limit);
