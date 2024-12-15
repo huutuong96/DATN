@@ -799,6 +799,9 @@ class ProductController extends Controller
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
             }
+            foreach ($query as $product) {
+                $product->rateAvg = rateAvg($product->id);
+            }
             $products = $query->where('status', 2)->paginate($limit);
 
 
@@ -1509,6 +1512,9 @@ public function ProductAll(Request $request)
                 ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')
                 ->get();            }else {
                 $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
+            }
+            foreach ($products as $product) {
+                $product->rateAvg = rateAvg($product->id);
             }
             return response()->json(
                 [

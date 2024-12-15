@@ -45,4 +45,5 @@ return array(
     '97266e347e26a0f49e48c4ceb769bdde' => $baseDir . '/app/Helpers/log.php',
     '4eb1262a0a645b109aafb0fa32522bcd' => $baseDir . '/app/Helpers/beta.php',
     'bf727355f3f1327711a5aa6e6e43526a' => $baseDir . '/app/Helpers/alpha.php',
+    '0478fff4c8b185cc422ed134fbb05316' => $baseDir . '/app/Helpers/rateAvg.php',
 );

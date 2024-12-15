@@ -74,6 +74,7 @@ return array(
     'App\\Http\\Controllers\\webAppController' => $baseDir . '/app/Http/Controllers/webAppController.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
     'App\\Http\\Middleware\\Authenticate' => $baseDir . '/app/Http/Middleware/Authenticate.php',
+    'App\\Http\\Middleware\\CheckAdminPremission' => $baseDir . '/app/Http/Middleware/CheckAdminPremission.php',
     'App\\Http\\Middleware\\CheckPermission' => $baseDir . '/app/Http/Middleware/CheckPermission.php',
     'App\\Http\\Middleware\\CheckPremission' => $baseDir . '/app/Http/Middleware/CheckPremission.php',
     'App\\Http\\Middleware\\CheckRole' => $baseDir . '/app/Http/Middleware/CheckRole.php',

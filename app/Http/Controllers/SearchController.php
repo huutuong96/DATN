@@ -125,6 +125,9 @@ class SearchController extends Controller
                 $query->orderby('view_count', 'desc');
             }
             $products = $query->where('status', 2)->paginate($limit);
+            foreach ($products as $product) {
+                $product->rateAvg = rateAvg($product->id);
+            }
             return response()->json([
                 'status' => 200,
                 'message' => 'Lấy dữ liệu thành công',
