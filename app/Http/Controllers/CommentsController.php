@@ -272,7 +272,7 @@ class CommentsController extends Controller
         "parent_id" => $request->parent_id,
         "level" => $level,
         "product_id" => $request->product_id,
-        "user_id" => $user->id,
+        "user" => $user,
         "created_at" => now()
     ];
 
@@ -283,8 +283,7 @@ class CommentsController extends Controller
     $dataDone = [
         'status' => true,
         'message' => "Đã lưu comment",
-        'data' => $dataInsert,
-        'user'=> $user,
+        'data' => $dataInsert
     ];
 
     return response()->json($dataDone, 200);
