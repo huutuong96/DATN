@@ -124,6 +124,11 @@ class SearchController extends Controller
             if ($request->sort == '-view_count') {
                 $query->orderby('view_count', 'desc');
             }
+            if ($request->has('min_rate') && $request->has('max_rate')) {
+                $query->whereHas('comments', function ($q) use ($request) {
+                    $q->wherebetween('rate', [$request->min_rate, $request->max_rate]);
+                });
+            }
             $products = $query->where('status', 2)->paginate($limit);
             foreach ($products as $product) {
                 $product->rateAvg = rateAvg($product->id);
