@@ -71,6 +71,7 @@ Route::get('/search', function () {
     Route::get('Comment', [CommentsController::class,"index"]);
     Route::get('rating/{id}', [CommentsController::class, "countRanting"]);
 
+
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
                 Route::post('categories', [CategoriesController::class, 'store']);
@@ -102,7 +103,7 @@ Route::get('/search', function () {
                 });
                 Route::get('blogs/{id}', [BlogsController::class, "show"]);
                 Route::get('post/{id}', [PostController::class, "show"]);
-
+                
                 Route::middleware('CheckPremission:handle_blog')->group(function () {
                     
                     Route::resource('posts', PostController::class)->except(['index']);
@@ -113,6 +114,7 @@ Route::get('/search', function () {
                     Route::resource('Comments', CommentsController::class)->except(['index']);
                    
                 });
+                Route::post('feedback', [CommentsController::class, "storeRate"]);
                 
                
   

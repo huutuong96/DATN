@@ -53,6 +53,7 @@ class CommentsController extends Controller
         $defaultAvatar = 'https://res.cloudinary.com/dg5xvqt5i/image/upload/v1733579249/sgmqtbmzayyhc4hst1pd.jpg'; 
     
         foreach ($comments as $comment) {
+            $comment->images = json_decode($comment->images);
            
                 $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
         
@@ -231,23 +232,23 @@ class CommentsController extends Controller
     
     }
     $rate = null;
-    if ($request->has('rate')) {
-        $order = OrdersModel::where('user_id', $user->id)
-            ->whereHas('orderDetails', function ($query) use ($request) {
-                $query->where('product_id', $request->product_id);
-            })
-            ->where('status', '8') 
-            ->exists();
+    // if ($request->has('rate')) {
+    //     $order = OrdersModel::where('user_id', $user->id)
+    //         ->whereHas('orderDetails', function ($query) use ($request) {
+    //             $query->where('product_id', $request->product_id);
+    //         })
+    //         ->where('status', '8') 
+    //         ->exists();
 
-        if ($order) {
-            $rate = $request->rate; 
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Bạn cần mua sản phẩm để đánh giá.'
-            ], 403);
-        }
-    }
+    //     if ($order) {
+    //         $rate = $request->rate; 
+    //     } else {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Bạn cần mua sản phẩm để đánh giá.'
+    //         ], 403);
+    //     }
+    // }
     $cloudinary = new Cloudinary();
     $imageUrls = [];
     if ($request->hasFile('images')) {
@@ -291,6 +292,67 @@ class CommentsController extends Controller
     return response()->json($dataDone, 200);
 }
 
+public function storeRate(Request $request)
+{
+    $user = JWTAuth::parseToken()->authenticate();
+  
+    
+    $order = OrdersModel::where('id',$request->order_id)->first();
+    if($order->is_feedbacked == 1){
+        $dataDone = [
+            'status' => false,
+            'message' => "Bạn đã đánh giá",
+            'data' => []
+        ];
+    
+        return response()->json($dataDone, 400);
+    }
+    $order->is_feedbacked = 1;
+    $order->save();
+   foreach ($request->data as $dataRate) {
+    // return $dataRate;
+    // dd($dataRate['images']);
+    $rate = $dataRate['rate'] ?? null;
+    if(!$dataRate['product_id']){
+        $dataDone = [
+            'status' => false,
+            'message' => "Sản phẩm không tồn tại",
+            'data' => []
+        ];
+    
+        return response()->json($dataDone, 404);
+    }
+    $dataInsert = [
+        "title" =>$dataRate['title'] ?? 'rating',
+        "content" =>$dataRate['content'] ?? '',
+        "variant" =>$dataRate['variant'] ?? null,
+        "rate" => $rate, 
+        "images" => json_encode($dataRate['images'] ?? []),
+        "product_id" => $dataRate['product_id'],
+        "user_id" => $user->id,
+        "created_at" => now()
+    ];
+    $comment = CommentsModel::create($dataInsert);
+    
+    $dataInsert["user"] = (object) [
+        "fullname" => $user->fullname,
+        "avatar" => $user->avatar,
+    ];
+    $dataInsert["id"] = $comment->id;
+   }
+
+
+    
+   
+   
+    $dataDone = [
+        'status' => true,
+        'message' => "Đã lưu đánh giá",
+        'data' => $dataInsert
+    ];
+
+    return response()->json($dataDone, 200);
+}
 
 
 

@@ -23,6 +23,7 @@ class CommentsModel extends Model
         'product_id',
         'level',
         'user_id',
+        'variant'
 
     ];
     protected $casts = [
