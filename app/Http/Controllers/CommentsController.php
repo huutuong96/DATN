@@ -30,7 +30,7 @@ class CommentsController extends Controller
         $sort = $request->sort;
         $ratecomment = $request->rate;
     
-        $query = CommentsModel::with(['parent']) 
+        $query = CommentsModel::with(['chill']) 
             ->where('product_id', $productId)
             ->where('parent_id', null);
     
@@ -56,8 +56,8 @@ class CommentsController extends Controller
            
                 $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
         
-                if($comment->parent){
-                    foreach ($comment->parent as $dataParent) {
+                if($comment->chill){
+                    foreach ($comment->chill as $dataParent) {
                         $user = User::where('id', $dataParent->user_id)->get(['fullname', 'avatar']);
                         if(!$user[0]->avatar){
                             $user[0]->avatar = $defaultAvatar;
