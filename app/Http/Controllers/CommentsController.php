@@ -377,17 +377,6 @@ public function storeRate(Request $request)
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(CommentsRequest $request, $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
