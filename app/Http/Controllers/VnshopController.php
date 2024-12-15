@@ -1071,6 +1071,7 @@ public function statistByQuantity(Request $request)
         // Tổng số lượng sản phẩm trong ngày tương ứng
         $dailyQuantity = OrderDetailsModel::where('order_id', $order->id)
             ->whereDay('created_at', $day)
+            ->whereYear('created_at', Carbon::now()->year)
             ->sum('quantity');
 
         $soluong[$day] += $dailyQuantity;
@@ -1120,6 +1121,9 @@ public function statistByQuantity(Request $request)
         $shop = Shop::where('id', $shopId)->with(relations: 'user')->first();
         $shopQuantity = OrderDetailsModel::where('shop_id', $shopId)
             ->whereMonth('created_at', Carbon::now()->month)
+            ->whereHas('order', function ($query) {
+                $query->where('status', 2); // Điều kiện status của bảng orders
+            })
             ->sum('quantity');
 
         $shop['soluong'] = $shopQuantity; // Gắn thêm trường số lượng vào thông tin cửa hàng
@@ -1129,6 +1133,7 @@ public function statistByQuantity(Request $request)
     usort($listShop, function ($a, $b) {
         return $b['soluong'] <=> $a['soluong'];
     });
+    
     // 5. Trả về view với dữ liệu đã tính toán
     return view('statist.quantity_sold', compact(
         'soluongJson',
@@ -1367,6 +1372,7 @@ public function statistByRevenue(Request $request)
         $shop = Shop::where("id", $shopId)->with('user')->first();
         $shop["luotban"] = OrdersModel::whereMonth('created_at', Carbon::now()->month)
         ->whereYear('created_at', Carbon::now()->year)
+        ->where('status', 2)
         ->where("shop_id", $shopId)->count();
         $listShop[] = $shop;
     }
