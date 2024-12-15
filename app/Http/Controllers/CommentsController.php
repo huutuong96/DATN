@@ -304,7 +304,7 @@ public function storeRate(Request $request)
     
         return response()->json($dataDone, 404);
     }
-    $order = OrdersModel::where('id',$request->order_id)->select("is_feedbacked")->get();
+    $order = OrdersModel::where('id',$request->order_id)->select("is_feedbacked")->first();
     if($order->is_feedbacked == 1){
         $dataDone = [
             'status' => false,
@@ -317,14 +317,13 @@ public function storeRate(Request $request)
     $order->is_feedbacked=1;
     $order->save();
 
-   foreach ($request->data as $dateRate) {
-
+   foreach ($request->data as $dataRate) {
     $dataInsert = [
-        "title" => $dateRate->title ?? 'rating',
-        "content" => $dateRate->content ?? '',
+        "title" => $dataRate->title ?? 'rating',
+        "content" =>$dataRate['content'] ?? '',
         "rate" => $rate, 
-        "images" =>json_encode($dateRate->imageUrls) ?? null,
-        "product_id" => $dateRate->product_id,
+        "images" =>json_encode($dataRate['imageUrls']) ?? null,
+        "product_id" => $dataRate['product_id'],
         "user_id" => $user->id,
         "created_at" => now()
     ];
@@ -343,7 +342,7 @@ public function storeRate(Request $request)
    
     $dataDone = [
         'status' => true,
-        'message' => "Đã lưu comment",
+        'message' => "Đã lưu đánh giá",
         'data' => $dataInsert
     ];
 
