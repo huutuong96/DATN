@@ -250,20 +250,8 @@ class CommentsController extends Controller
     //     }
     // }
     $cloudinary = new Cloudinary();
-    $imageUrls = [];
-    if ($request->hasFile('images')) {
-        foreach ($request->file('images') as $image) {
-            try {
-                $uploadedFileUrl =  $cloudinary->uploadApi()->upload($image->getRealPath());
-                $imageUrls[] = $uploadedFileUrl['url'];
-            } catch (\Exception $e) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Failed to upload image: ' . $e->getMessage()
-                ], 500);
-            }
-        }
-    }
+    $imageUrls = json_encode($dataRate['images'] ?? []);
+    
     $dataInsert = [
         "title" => $request->title,
         "content" => $request->content,
