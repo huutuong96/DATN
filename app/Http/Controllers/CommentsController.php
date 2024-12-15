@@ -10,6 +10,7 @@ use App\Models\CommentsModel;
 use App\Http\Requests\CommentsRequest;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
 
 use App\Models\Product;
 
@@ -55,12 +56,21 @@ class CommentsController extends Controller
            
                 $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
         
-                if($comment->id == 72){
-                    dd($comment->parent);
+                if($comment->parent){
+                    foreach ($comment->parent as $dataParent) {
+                        $user = User::where('id', $dataParent->user_id)->get(['fullname', 'avatar']);
+                        if(!$user[0]->avatar){
+                            $user[0]->avatar = $defaultAvatar;
+                        }
+                        // $user["0]->"avatar = $user->avatar ?? $defaultAvatar;
+                        $dataParent["user"]= $user ? $user->toArray() : [];
+                    }
                 }
+
+               
             // $comment->parent->load('parent');
         }
-        dd($comments, $comments[1]->parent[0]->id);
+        // dd($comments, $comments[1]->parent[0]->id);
         return response()->json([
             'message' => 'Lấy bình luận sản phẩm thành công',
             'comments' => $comments,
