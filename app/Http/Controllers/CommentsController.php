@@ -294,7 +294,7 @@ class CommentsController extends Controller
 public function storeRate(Request $request)
 {
     $user = JWTAuth::parseToken()->authenticate();
-    $rate = $request->rate ?? null;
+  
     
     $order = OrdersModel::where('id',$request->order_id)->first();
     if($order->is_feedbacked == 1){
@@ -309,6 +309,8 @@ public function storeRate(Request $request)
     $order->is_feedbacked = 1;
     $order->save();
    foreach ($request->data as $dataRate) {
+    // return $dataRate;
+    $rate = $dataRate['rate'] ?? null;
     if(!$dataRate['product_id']){
         $dataDone = [
             'status' => false,
@@ -319,6 +321,7 @@ public function storeRate(Request $request)
         return response()->json($dataDone, 404);
     }
     $dataInsert = [
+        
         "title" => $dataRate->title ?? 'rating',
         "content" =>$dataRate['content'] ?? '',
         "rate" => $rate, 
