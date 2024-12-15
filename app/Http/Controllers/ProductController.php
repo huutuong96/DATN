@@ -802,16 +802,14 @@ class ProductController extends Controller
             }
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
-            }
-            foreach ($query as $product) {
+            }     
+            $products = $query->where('status', 2)->paginate($limit);
+            foreach ($products as $product) {
                 $product->rateAvg = rateAvg($product->id);
             }
-            $products = $query->where('status', 2)->paginate($limit);
-
-
-
-        return response()->json($products);
+            return response()->json($products);
     }
+
     
 
 
