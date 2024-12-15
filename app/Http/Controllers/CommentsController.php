@@ -280,7 +280,7 @@ class CommentsController extends Controller
         "fullname" => $user->fullname,
         "avatar" => $user->avatar,
     ];
-    $dataInsert["comment_id"] = $comment->id;
+    $dataInsert["id"] = $comment->id;
    
     $dataDone = [
         'status' => true,
