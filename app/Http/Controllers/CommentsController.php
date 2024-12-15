@@ -280,11 +280,10 @@ class CommentsController extends Controller
         "fullname" => $user->fullname,
         "avatar" => $user->avatar,
     ];
-   
+    $dataInsert["comment_id"] = $comment->id;
    
     $dataDone = [
         'status' => true,
-        'comment_id'=>$comment->id,
         'message' => "Đã lưu comment",
         'data' => $dataInsert
     ];
