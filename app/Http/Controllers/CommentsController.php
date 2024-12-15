@@ -284,6 +284,7 @@ class CommentsController extends Controller
    
     $dataDone = [
         'status' => true,
+        'comment_id'=>$comment->id,
         'message' => "Đã lưu comment",
         'data' => $dataInsert
     ];
