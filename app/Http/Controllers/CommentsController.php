@@ -272,12 +272,12 @@ class CommentsController extends Controller
         "parent_id" => $request->parent_id,
         "level" => $level,
         "product_id" => $request->product_id,
-        "user" => $user,
+        "user_id" => $user->id,
         "created_at" => now()
     ];
 
     $comment = CommentsModel::create($dataInsert);
-    
+    $dataInsert["user" ]= $user;
    
    
     $dataDone = [
