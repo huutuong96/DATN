@@ -483,7 +483,8 @@ public function storeRate(Request $request)
                 "4"=> 0,
                 "5"=> 0,
             ];
-            $Comments = CommentsModel::where('rate', '!=', null)->where('product_id', $id)->get();
+            $Comments = CommentsModel::where('rate', '!=', null)
+            ->where('product_id', $id)->get();
             
             foreach ($Comments as $key => $Comment) {
                 $data[$Comment->rate] += $Comment->rate;
