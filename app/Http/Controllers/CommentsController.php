@@ -275,9 +275,12 @@ class CommentsController extends Controller
         "user_id" => $user->id,
         "created_at" => now()
     ];
-
     $comment = CommentsModel::create($dataInsert);
-    $dataInsert["user" ]= $user;
+    
+    $dataInsert["user"] = (object) [
+        "fullname" => $user->fullname,
+        "avatar" => $user->avatar,
+    ];
    
    
     $dataDone = [
