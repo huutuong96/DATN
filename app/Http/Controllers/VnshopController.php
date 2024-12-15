@@ -1932,7 +1932,7 @@ public function update_events(Request $request, $id)
         $event->status = $request->input('status', $event->status);
         $event->description = $request->input('description', $event->description);
         $event->save();
-        return back()->with('message', 'Cập nhật sự kiện thành công.');
+      return back()->with('message', 'Cập nhật sự kiện thành công.');
    
 
         // return redirect()

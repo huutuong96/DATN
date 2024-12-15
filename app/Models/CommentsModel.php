@@ -28,7 +28,7 @@ class CommentsModel extends Model
     protected $casts = [
         'images' => 'array', // Tự động convert JSON thành mảng khi lấy từ DB
     ];
-    public function parent()
+    public function chill()
     {
         return $this->hasMany(CommentsModel::class, 'parent_id'); 
     }
