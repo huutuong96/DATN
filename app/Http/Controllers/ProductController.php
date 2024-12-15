@@ -56,6 +56,7 @@ use Phpml\FeatureExtraction\TokenCountVectorizer;
 use Phpml\Tokenization\WhitespaceTokenizer;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
+use App\Models\CommentsModel;
 
 class ProductController extends Controller
 {
@@ -148,9 +149,12 @@ class ProductController extends Controller
                 'message' => 'không tìm thấy sản phẩm nào'
             ], 404);
         }
+        $data = $products->first();
+        $data->countRanting = CommentsModel::where('product_id', $data->id)->get()->count();
+        
         return response()->json([
             'status' => 'success',
-            'data' => $products->first()
+            'data' => $data
         ], 200);
     }
 
