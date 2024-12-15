@@ -59,11 +59,10 @@ class CommentsController extends Controller
                 if($comment->parent){
                     foreach ($comment->parent as $dataParent) {
                         $user = User::where('id', $dataParent->user_id)->get(['fullname', 'avatar']);
-                        if(!$user[0]->avatar){
-                            $user[0]->avatar = $defaultAvatar;
-                        }
-                        // $user["0]->"avatar = $user->avatar ?? $defaultAvatar;
-                        $dataParent["user"]= $user ? $user->toArray() : [];
+                        $dataParent->user = (object) [
+                            "fullname" => $user[0]->fullname,
+                            "avatar" => $user[0]->avatar ?? $defaultAvatar
+                        ];
                     }
                 }
 
