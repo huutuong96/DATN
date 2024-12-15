@@ -53,6 +53,7 @@ class CommentsController extends Controller
         $defaultAvatar = 'https://res.cloudinary.com/dg5xvqt5i/image/upload/v1733579249/sgmqtbmzayyhc4hst1pd.jpg'; 
     
         foreach ($comments as $comment) {
+            $comment->images = json_decode($comment->images);
            
                 $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
         
@@ -326,7 +327,7 @@ public function storeRate(Request $request)
         "content" =>$dataRate['content'] ?? '',
         "variant" =>$dataRate['variant'] ?? null,
         "rate" => $rate, 
-        "images" => json_encode($dataRate['images']),
+        "images" => json_encode($dataRate['images'] ?? []),
         "product_id" => $dataRate['product_id'],
         "user_id" => $user->id,
         "created_at" => now()
