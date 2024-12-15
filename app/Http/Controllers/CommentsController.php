@@ -322,8 +322,9 @@ public function storeRate(Request $request)
     }
     $dataInsert = [
         
-        "title" => $dataRate->title ?? 'rating',
+        "title" =>$dataRate['title'] ?? 'rating',
         "content" =>$dataRate['content'] ?? '',
+        "varant" =>$dataRate['varant'] ?? null,
         "rate" => $rate, 
         "images" =>json_encode($dataRate['imageUrls']) ?? null,
         "product_id" => $dataRate['product_id'],
