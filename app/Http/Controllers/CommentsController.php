@@ -310,6 +310,7 @@ public function storeRate(Request $request)
     $order->save();
    foreach ($request->data as $dataRate) {
     // return $dataRate;
+    // dd($dataRate['images']);
     $rate = $dataRate['rate'] ?? null;
     if(!$dataRate['product_id']){
         $dataDone = [
@@ -321,12 +322,11 @@ public function storeRate(Request $request)
         return response()->json($dataDone, 404);
     }
     $dataInsert = [
-        
         "title" =>$dataRate['title'] ?? 'rating',
         "content" =>$dataRate['content'] ?? '',
         "variant" =>$dataRate['variant'] ?? null,
         "rate" => $rate, 
-        "images" =>json_decode($dataRate['images']) ?? null,
+        "images" => json_encode($dataRate['images']),
         "product_id" => $dataRate['product_id'],
         "user_id" => $user->id,
         "created_at" => now()
