@@ -116,6 +116,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::get('/products/{id}', [ProductController::class, 'showproduct'])->name('products.show');
     Route::get('/profile', [AuthenController::class, 'admin_profile'])->name('admin_profile');
     Route::get('/list_notification', [VnshopController::class, 'list_notification'])->name('list_notification');
+    Route::get('/delete_notification/{id}', [VnshopController::class, 'delete_notification'])->name('delete_notification');
     Route::get('/list_app', [webAppController::class, 'index'])->name('list_app');
     Route::get('/setting_admin', [webAppController::class, 'setting_admin'])->name('setting_admin');
     Route::post('/delete_all', [webAppController::class, 'delete_all'])->name('delete_all');

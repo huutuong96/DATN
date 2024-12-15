@@ -41,20 +41,10 @@
                                                     <td class="col-2"><img class="col-4" src="{{$noti->image}}"></td>
                                                     <td><a href="#!">{{$noti->description}}</a></td>
                                                     <td>
-                                                        <div class="dropdown d-inline-block">
-                                                            <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <i class="ri-more-fill align-middle"></i>
-                                                            </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a href="#!" class="dropdown-item"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> View</a></li>
-                                                                <li><a class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
-                                                                <li>
-                                                                    <a class="dropdown-item remove-item-btn">
-                                                                        <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Delete
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                                        <a class="btn btn-soft-secondary btn-sm" href="{{route('delete_notification', ['id' => $noti->id, 'token' => auth()->user()->refesh_token])}}" >
+                                                            <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Delete
+                                                        </a>
+                                                    
                                                     </td>
                                                 </tr>
                                             @endforeach
