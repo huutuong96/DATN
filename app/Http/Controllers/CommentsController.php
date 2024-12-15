@@ -263,7 +263,7 @@ class CommentsController extends Controller
         "created_at" => now()
     ];
 
-    $comment = CommentsModel::create($dataInsert);
+    $comment = CommentsModel::create($dataInsert,);
     
    
    
