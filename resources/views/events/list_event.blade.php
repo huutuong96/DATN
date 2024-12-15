@@ -38,11 +38,11 @@
                                       <label for="event_year" class="form-label">Năm</label>
                                       <input type="number" class="form-control" id="event_year" name="event_year" min="1900" max="2100" value="{{ old('event_year') }}" required>
                                   </div>
-                                  <div class="col-md-6">
+                                  {{-- <div class="col-md-6">
                                       <label for="qualifier" class="form-label">Điều kiện</label>
                                       <input type="text" class="form-control" id="qualifier" name="qualifier" min="1" value="{{ old('qualifier') }}" required title="nhập lớn hơn 0">
-                                  </div>
-                                  <div class="col-md-6">
+                                  </div> --}}
+                                  <div class="col-md-4">
                                       <label for="voucher_apply" class="form-label">Tiêu Đề Mã Giảm Giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_apply" value="{{ old('voucher_apply') }}">
                                   </div>
@@ -50,58 +50,64 @@
                                       <label for="voucher_apply" class="form-label">Mô Tả Cho Giảm Giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_description" value="{{ old('voucher_apply') }}">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-4">
                                       <label for="voucher_apply" class="form-label">Số lượng mã giảm giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" min="1" name="voucher_quantity" value="{{ old('voucher_apply') }}" required title="Nhập lớn hơn 0">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-3">
                                       <label for="voucher_apply" class="form-label">Số tiền giới hạn</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_limit" min="1" value="{{ old('voucher_apply') }}"required title="Nhập lớn hơn 0">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-3">
                                       <label for="voucher_apply" class="form-label">% Giảm giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_ratio" min="0" value="{{ old('voucher_apply') }}"required title="Nhập lớn hơn 0">
                                   </div>
-                                  <div class="col-md-2">
+                                  <div class="col-md-3">
                                       <label for="voucher_apply" class="form-label">Mã Giảm Giá</label>
                                       <input type="text" class="form-control" id="voucher_apply" name="voucher_code" value="{{ old('voucher_apply') }}" required>
                                   </div>
                                   <div class="col-md-3">
-                                    <div class="form-check mt-4">
-                                        <input type="checkbox" class="form-check-input" id="is_share_facebook" name="is_share_facebook" value="1" {{ old('is_share_facebook') ? 'checked' : '' }}>
-                                        <label for="is_share_facebook" class="form-check-label">Chia sẻ Facebook</label>
-                                    </div>
-                                    <div class="form-check mt-4">
-                                      <input type="checkbox" class="form-check-input" id="is_share_zalo" name="is_share_zalo" value="1" {{ old('is_share_zalo') ? 'checked' : '' }}>
-                                      <label for="is_share_zalo" class="form-check-label">Chia sẻ Zalo</label>
-                                  </div>
-                                  <div class="form-check mt-4">
-                                      <input type="checkbox" class="form-check-input" id="is_mail" name="is_mail" value="1" {{ old('is_mail') ? 'checked' : '' }}>
-                                      <label for="is_mail" class="form-check-label">Gửi email</label>
-                                  </div>
+                                    <label for="point" class="form-label">Áp dụng theo điểm</label>
+                                    <input type="number" class="form-control" id="point" name="point" value="{{ old('point', 0) }}" min="0" required title="Nhập lớn hơn 0">
                                 </div>
-                                  <div class="col-md-3">
-                                      <label for="point" class="form-label">Áp dụng theo điểm</label>
-                                      <input type="number" class="form-control" id="point" name="point" value="{{ old('point', 0) }}" min="0" required title="Nhập lớn hơn 0">
-                                  </div>
-                                
-                                  <div class="col-md-3">
-                                      <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
-                                      <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', 0) }}" min="0" required title="Nhập lớn hơn 0">
-                                  </div>
-                                  <div class="col-md-3">
-                                      <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
-                                      <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" value="{{ old('where_price', 0) }}" min="0" required title="Nhập lớn hơn 0">
-                                  </div>
-
-                                  <div class="col-md-3">
-                                      <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
-                                      <input type="date" class="form-control" id="from" name="from" value="{{ old('from') }}">
-                                  </div>
-                                  <div class="col-md-3">
-                                      <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
-                                      <input type="date" class="form-control" id="to" name="to" value="{{ old('to') }}">
-                                  </div>
+                                  <div class="row ps-4">
+                                       
+                                            <div class=" col-2 form-check mt-4">
+                                                <input type="checkbox" class="form-check-input" id="is_share_facebook" name="is_share_facebook" value="1" {{ old('is_share_facebook') ? 'checked' : '' }}>
+                                                <label for="is_share_facebook" class="form-check-label">Chia sẻ Facebook</label>
+                                            </div>
+                                        
+                                       <div class=" col-2 form-check mt-4">
+                                            <input type="checkbox" class="form-check-input" id="is_share_zalo" name="is_share_zalo" value="1" {{ old('is_share_zalo') ? 'checked' : '' }}>
+                                            <label for="is_share_zalo" class="form-check-label">Chia sẻ Zalo</label>
+                                        </div>
+                                    
+                                       <div class=" col-2 form-check mt-4">
+                                            <input type="checkbox" class="form-check-input" id="is_mail" name="is_mail" value="1" {{ old('is_mail') ? 'checked' : '' }}>
+                                            <label for="is_mail" class="form-check-label">Gửi email</label>
+                                        </div>
+                                </div>
+                                 
+                                <div class="row pt-4">
+                                    <div class="col-md-3">
+                                        <label for="where_order" class="form-label">Áp dụng theo số lượng đơn đã đặt</label>
+                                        <input type="number" class="form-control" id="where_order" name="where_order" value="{{ old('where_order', 0) }}" min="0" required title="Nhập lớn hơn 0">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="where_price" class="form-label">Áp dụng theo tổng tiền đặt hàng</label>
+                                        <input type="number" step="0.01" class="form-control" id="where_price" name="where_price" value="{{ old('where_price', 0) }}" min="0" required title="Nhập lớn hơn 0">
+                                    </div>
+  
+                                    <div class="col-md-3">
+                                        <label for="from" class="form-label">Áp Dụng Từ Ngày</label>
+                                        <input type="date" class="form-control" id="from" name="from" value="{{ old('from') }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="to" class="form-label">Áp Dụng Đến Hết Ngày</label>
+                                        <input type="date" class="form-control" id="to" name="to" value="{{ old('to') }}">
+                                    </div>
+                                </div>
+                                 
                                   <div class="col-md-6">
                                       <label for="status" class="form-label">Trạng thái</label>
                                       <select style="width: 507px;left: 2rem; margin-top: 1px " style="width: 130px" class="form-control" id="status" name="status" required>
@@ -111,13 +117,14 @@
                                       </select>
                                   </div>
                                   <div class="col-md-6">
+                                    <label for="from" class="form-label">Hình ảnh</label>
+                                    <input type="file" class="form-control" id="from" name="event_image[]" multiple>
+                                </div>
+                                  <div class="col-md-">
                                       <label for="description" class="form-label">Mô tả</label>
                                       <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
                                   </div>
-                                  <div class="col-md-6">
-                                      <label for="from" class="form-label">Hình ảnh</label>
-                                      <input type="file" class="form-control" id="from" name="event_image[]" multiple>
-                                  </div>
+                                
                                   <!-- <h5>Áp dụng cho sản sản phẩm</h5>
                                   <div class="col-md-2">
                                       <label for="product_view" class="form-label">Chỉ những sản phẩm có lượt xem từ: </label>
@@ -250,11 +257,6 @@
                                                                                       <input type="number" class="form-control" id="event_year" name="event_year" 
                                                                                              min="1900" max="2100" value="{{ old('event_year', $event->event_year) }}" required>
                                                                                   </div>
-                                                                                  <div class="col-md-6">
-                                                                                    <label for="qualifier" class="form-label">Điều kiện</label>
-                                                                                    <input type="text" class="form-control" id="qualifier" name="qualifier" 
-                                                                                           value="{{ old('qualifier', $event->qualifier) }}" min="0" required title="Nhập lớn hơn 0">
-                                                                                </div>
                                                                                 <div class="col-md-6">
                                                                                     <label for="voucher_title" class="form-label">Tiêu Đề Mã Giảm Giá</label>
                                                                                     <input type="text" class="form-control" id="voucher_apply" name="voucher_title" 

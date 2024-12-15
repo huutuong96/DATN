@@ -21,6 +21,7 @@
                         </div>
                     @endif -->
                     <h4 class="card-title mb-0 flex-grow-1">Danh sách phân quyền</h4>
+                    
                     <!-- Toggle Between Modals -->
                     <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#firstmodal">Thêm phân quyền</button>
                     <!-- First modal dialog -->
@@ -74,6 +75,9 @@
 
                                     @foreach($roles as $role)
                                     <tr>
+                                        @if ($role->title!="CUSTOMER")
+                                            
+                                        
                                         <th scope="row"><a href="#" class="fw-medium">{{$role->id}}</a></th>
                                         <td>{{$role->title}}</td>
                                         <td>{{$role->description ?? "Không có mô tả"}}</td>
@@ -189,6 +193,7 @@
                                             @endif
                                         </td>
                                     </tr>
+                                    @endif
                                     @endforeach
                                 </tbody>
 

@@ -1838,7 +1838,7 @@ public function store_events(Request $request)
         $event->event_day = $request->input('event_day', $event->event_day);
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
-        $event->qualifier = $request->input('qualifier', $event->qualifier);
+        $event->qualifier = $request->input('qualifier', $event->qualifier?? null);
         $event->voucher_apply = json_encode($voucher_apply);
         $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
@@ -1895,7 +1895,7 @@ public function update_events(Request $request, $id)
         $event->event_day = $request->input('event_day', $event->event_day);
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
-        $event->qualifier = $request->input('qualifier', $event->qualifier);
+        // $event->qualifier = $request->input('qualifier', $event->qualifier);
         $event->voucher_apply = !empty($voucher_apply) ? json_encode($voucher_apply) : $event->voucher_apply;
         $event->is_mail = $request->has('is_mail') ? $request->boolean('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
