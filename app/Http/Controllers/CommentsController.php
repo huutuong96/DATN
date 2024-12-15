@@ -23,16 +23,41 @@ class CommentsController extends Controller
      */
     public function index(Request $request)
     {
-
-        $productId = $request->product_id; 
+        $productId = $request->product_id;
         $perPage = $request->per_page;
-        $comments = CommentsModel::with('parent') 
-            ->where('product_id', $productId) 
-            ->where('parent_id', null) 
-            ->paginate($perPage);
-        foreach ($comments as $comment) {
-            $comment->parent->load('parent'); 
+        $type = $request->type;
+        $sort = $request->sort;
+        $ratecomment = $request->rate;
+    
+        $query = CommentsModel::with(['parent']) 
+            ->where('product_id', $productId)
+            ->where('parent_id', null);
+    
+        if ($type === 'comment') {
+            $query->whereNull('rate'); 
+        } elseif ($type === 'rating') {
+            $query->whereNotNull('rate'); 
         }
+        
+        if ($sort === 'created_at') {
+            $query->orderBy('created_at', 'asc'); 
+        } elseif ($sort === '-created_at') {
+            $query->orderBy('created_at', 'desc'); 
+        }
+        if ($ratecomment !== null) {
+            $query->where('rate', $ratecomment);
+        }
+        $comments = $query->paginate($perPage);
+    
+        $defaultAvatar = 'https://res.cloudinary.com/dg5xvqt5i/image/upload/v1733579249/sgmqtbmzayyhc4hst1pd.jpg'; 
+    
+        foreach ($comments as $comment) {
+           
+                $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
+        
+            $comment->parent->load('parent');
+        }
+    
         return response()->json([
             'message' => 'Lấy bình luận sản phẩm thành công',
             'comments' => $comments,
@@ -40,6 +65,7 @@ class CommentsController extends Controller
     }
     
     
+   
 
     /**
      * Show the form for creating a new resource.

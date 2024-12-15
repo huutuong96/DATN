@@ -100,24 +100,39 @@ class VoucherController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $voucher_added = Voucher::where('code', $request->code)->where('user_id', $user->id)->first();
         if ($voucher_added) {
-            return $this->errorResponse("Bạn đã thêm voucher này rồi, Tham lam quá");
+            return $this->errorResponse("Bạn đã thêm voucher này rồi, Tham lam quá" , [] , 404);
         }
         $voucherMain = voucherToMain::where('code', $request->code)->where('status', 2)->first();
+        
         if ($voucherMain) {
+            $user_geted = json_decode($voucherMain->user_geted, true) ?? [];
+            if (in_array($user->id, $user_geted)) {
+                return $this->errorResponse("Mỗi người chỉ được lấy 1 lần, Bạn đã lấy trước đây rồi"  , [] , 404);
+            }
             $voucherMain->quantity = $voucherMain->quantity - 1;
+            $user_geted = json_decode($voucherMain->user_geted, true) ?? [];
+            $user_geted[] = $user->id;
+            $voucherMain->user_geted = json_encode($user_geted);
             $voucherMain->save();
         }
         if (!$voucherMain) {
             $voucherShop = VoucherToShop::where('code', $request->code)->where('status', 2)->first();
+            $user_geted = json_decode($voucherShop->user_geted, true) ?? [];
+            if (in_array($user->id, $user_geted)) {
+                return $this->errorResponse("Mỗi người chỉ được lấy 1 lần, Bạn đã lấy trước đây rồi" , [] , 404);
+            }
             if ($voucherShop) {
                 $voucherShop->quantity = $voucherShop->quantity - 1;
+                $user_geted = json_decode($voucherShop->user_geted, true) ?? [];
+                $user_geted[] = $user->id;
+                $voucherShop->user_geted = json_encode($user_geted);
                 $voucherShop->save();
             }
         }
         if (!$voucherMain && !$voucherShop) {
-            return $this->errorResponse("Mã voucher không tồn tại hoặc đã hết hạn");
+            return $this->errorResponse("Mã voucher không tồn tại hoặc đã hết hạn" , [] , 404);
         }
-        // dd($voucherMain);
+
         Voucher::create([
             'type' => $voucherMain ? 'main' : 'shop',
             'status' => 2,

@@ -68,6 +68,7 @@ Route::get('/search', function () {
     Route::get('voucher_shop', [VoucherToShopController::class, "index"]);
     Route::get('blogs', [BlogsController::class, "index"]);
     Route::get('posts', [PostController::class, "index"]);
+    Route::get('Comment', [CommentsController::class,"index"]);
 
     Route::group(['middleware' => ['checkToken', 'CheckStatusUser']], function () {
 
@@ -89,6 +90,7 @@ Route::get('/search', function () {
                     Route::resource('banners', BannerController::class)->except(['index']);
                    
                 });
+               
                 Route::middleware('CheckPremission:handle_voucher_main')->group(function () {
                     Route::resource('voucher_main', VoucherToMainController::class)->except(['index']);
                    
@@ -104,6 +106,10 @@ Route::get('/search', function () {
                     
                     Route::resource('posts', PostController::class)->except(['index']);
                     Route::resource('blogs', BlogsController::class)->except(['index', 'show']);
+                   
+                });
+                Route::middleware('CheckPremission:handle_comment')->group(function () {
+                    Route::resource('Comments', CommentsController::class)->except(['index']);
                    
                 });
                 
