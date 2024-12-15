@@ -72,7 +72,6 @@ class OrdersModel extends Model
         'ship_fee',
         'updated_by',
         'is_feedbacked',
-        'variant'
     ];
 
     protected $hidden = [
