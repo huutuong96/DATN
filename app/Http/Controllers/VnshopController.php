@@ -891,7 +891,7 @@ class VnshopController extends Controller
     $taxeOFF = Tax::where('status',3)->orderBy('updated_at', 'desc')->get();
 
     if ($taxes->isEmpty()) {
-        return view('rank.tax')->with('message', 'Không tồn tại thuế nào');
+        return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
     }
 
     return view('tax.tax', compact('taxes' ,'taxeOFF', 'tab'));
@@ -1756,6 +1756,7 @@ public function listEvent(Request $request)
         $events = Event::whereIn('status', [1, 2])->orderBy('id', 'desc')->paginate(10);
         foreach ($events as &$event) {
             $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
+            $event->images = json_decode($event->images, true);
         }
         return view('events.list_event',compact('events'));
     } catch (\Throwable $th) {
@@ -1771,6 +1772,10 @@ public function listEvent_trash(Request $request)
     try {
       
         $trash_events = Event::whereIn('status', [5])->paginate(10);
+        foreach ($trash_events as &$event) {
+            $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
+            $event->images = json_decode($event->images, true);
+        }
         return view('events.trash_event',compact('trash_events'));
     } catch (\Throwable $th) {
         return redirect()->route('trash_events', [
@@ -1849,7 +1854,7 @@ public function store_events(Request $request)
         $event->event_day = $request->input('event_day', $event->event_day);
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
-        $event->qualifier = $request->input('qualifier', $event->qualifier);
+        $event->qualifier = $request->input('qualifier', $event->qualifier?? null);
         $event->voucher_apply = json_encode($voucher_apply);
         $event->is_mail = $request->has('is_mail') ? $request->input('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
@@ -1906,7 +1911,7 @@ public function update_events(Request $request, $id)
         $event->event_day = $request->input('event_day', $event->event_day);
         $event->event_month = $request->input('event_month', $event->event_month);
         $event->event_year = $request->input('event_year', $event->event_year);
-        $event->qualifier = $request->input('qualifier', $event->qualifier);
+        // $event->qualifier = $request->input('qualifier', $event->qualifier);
         $event->voucher_apply = !empty($voucher_apply) ? json_encode($voucher_apply) : $event->voucher_apply;
         $event->is_mail = $request->has('is_mail') ? $request->boolean('is_mail') : $event->is_mail;
         $event->point = $request->input('point', $event->point);
