@@ -55,9 +55,9 @@ class CommentsController extends Controller
            
                 $comment->user->avatar = $comment->user->avatar ?? $defaultAvatar; 
         
-            $comment->parent->load('parent');
+            // $comment->parent->load('parent');
         }
-    
+        dd($comments, $comments[1]->parent[0]->id);
         return response()->json([
             'message' => 'Lấy bình luận sản phẩm thành công',
             'comments' => $comments,
@@ -208,10 +208,10 @@ class CommentsController extends Controller
         if ($product && $product->shop_id) {
             $notificationRequest = new Request([
                 'type' => 'main',
-                'user_id' => $user->id,
+                'user' => $user,
                 'title' => 'Thông báo từ Sản Phẩm',
                 'description' => $user->fullname . ' đã gửi một bình luận đến sản phẩm của bạn.',
-                'shop_id' => $product->shop_id
+                'shop_id' => $product->shop_id,
             ]);
             $notificationController = new NotificationController();
             $notificationController->store($notificationRequest);
