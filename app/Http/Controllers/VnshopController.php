@@ -891,7 +891,7 @@ class VnshopController extends Controller
     $taxeOFF = Tax::where('status',3)->get();
 
     if ($taxes->isEmpty()) {
-        return view('rank.tax')->with('message', 'Không tồn tại thuế nào');
+        return view('tax.tax')->with('message', 'Không tồn tại thuế nào');
     }
 
     return view('tax.tax', compact('taxes' ,'taxeOFF', 'tab'));
@@ -1743,8 +1743,11 @@ public function listEvent(Request $request)
     $token = $request->token; 
     try {
         $events = Event::whereIn('status', [1, 2])->paginate(10);
+      
+
         foreach ($events as &$event) {
             $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
+            $event->images = json_decode($event->images, true);
         }
         return view('events.list_event',compact('events'));
     } catch (\Throwable $th) {
@@ -1760,6 +1763,10 @@ public function listEvent_trash(Request $request)
     try {
       
         $trash_events = Event::whereIn('status', [5])->paginate(10);
+        foreach ($trash_events as &$event) {
+            $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
+            $event->images = json_decode($event->images, true);
+        }
         return view('events.trash_event',compact('trash_events'));
     } catch (\Throwable $th) {
         return redirect()->route('trash_events', [

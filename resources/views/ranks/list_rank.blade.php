@@ -121,12 +121,13 @@
                                                 <tr>
                                                     <th scope="col">ID</th>
                                                     <th scope="col">tiêu đề</th>
+                                                    <th scope="col">Hình ảnh</th>
                                                     <th scope="col">Mô tả</th>
                                                     <th scope="col">Số điểm áp dụng</th>
                                                     <th scope="col">phầm trăm rank</th>
                                                     <th scope="col">Số tiền tối đa được giảm</th>
                                                     <th scope="col">trạng thái</th>
-                                                    <th scope="col">Người tạo</th>
+                                                  
                                                     <th scope="col">Hành động</th>
                                                 </tr>
                                             </thead>
@@ -140,6 +141,11 @@
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             {{ $rank->title }}</td>
+                                                        <td>
+                                                            <img src="{{ $rank->image }}" alt="{{ $rank->name }}" style="width: 50px; height: 50px;">
+                                                            
+                                                            
+                                                        </td>
                                                         <td
                                                             style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                             {{ $rank->description }}</td>
@@ -160,11 +166,6 @@
                                                         @elseif($rank->status == 0)
                                                             Không hoạt động
                                                         @endif</td>
-                                                        <td
-                                                            style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                           
-                                                            {{ $rank->user->fullname  }}
-                                                            </td>
                                                         <td>
                                                             <a href="#" data-bs-toggle="modal"
                                                                 data-bs-target="#editModal-{{ $rank->id }}">
@@ -311,12 +312,13 @@
                                                 <tr>
                                                     <th scope="col">ID</th>
                                                     <th scope="col">tiêu đề</th>
+                                                    <th scope="col">Hình ảnh</th>
                                                     <th scope="col">Mô tả</th>
                                                     <th scope="col">Số điểm áp dụng</th>
                                                     <th scope="col">phầm trăm rank</th>
                                                     <th scope="col">Số tiền tối đa được giảm</th>
                                                     <th scope="col">trạng thái</th>
-                                                    <th scope="col">Người tạo</th>
+                                                   
                                                     <th scope="col">Hành động</th>
                                                 </tr>
                                             </thead>
@@ -330,6 +332,11 @@
                                                     <td
                                                         style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                         {{ $rank->title }}</td>
+                                                    <td>
+                                                        <img src="{{ $rank->image }}" alt="{{ $rank->name }}" style="width: 50px; height: 50px;">
+                                                        
+                                                        
+                                                    </td>
                                                     <td
                                                         style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
                                                         {{ $rank->description }}</td>
@@ -350,11 +357,7 @@
                                                     @elseif($rank->status == 0)
                                                         Không hoạt động
                                                     @endif</td>
-                                                    <td
-                                                        style="max-width: 150px; white-space: normal; overflow: hidden; text-overflow: ellipsis;">
-                                                       
-                                                        {{ $rank->user->fullname  }}
-                                                        </td>
+                                                    
                                                     <td>
                                                         <a href="#" data-bs-toggle="modal"
                                                             data-bs-target="#editModal-{{ $rank->id }}">

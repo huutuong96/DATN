@@ -41,12 +41,6 @@
                                 Thông báo
                             </h6>
                         </div>
-                        <div
-                            class="col-auto dropdown-tabs">
-                            <span
-                                class="badge bg-light text-body fs-13">
-                                4 New</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -65,7 +59,7 @@
                             href="#all-noti-tab"
                             role="tab"
                             aria-selected="true">
-                            All (4)
+                            Tất cả (4)
                         </a>
                     </li>
                     <li
