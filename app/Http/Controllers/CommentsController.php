@@ -461,4 +461,32 @@ public function storeRate(Request $request)
             ], 500);
         }
     }
+    public function countRanting(Request $rqt, string $id)
+    {
+        try {
+            $data = [
+                "1" => 0,
+                "2"=> 0,
+                "3"=> 0,
+                "4"=> 0,
+                "5"=> 0,
+            ];
+            $Comments = CommentsModel::where('rate', '!=', null)->where('product_id', $id)->get();
+            
+            foreach ($Comments as $key => $Comment) {
+                $data[$Comment->rate] += $Comment->rate;
+            }
+            return response()->json([
+                'status' => "success",
+                'message' => 'Lấy thành côngcông',
+                'data' => array_values($data),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 500);
+        }
+    }
 }
