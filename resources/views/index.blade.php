@@ -912,21 +912,34 @@
         <div class="main-content">
             <div class="page-content">
                 @if (session('message'))
-                <div class="alert alert-success">
+                <div class="alert alert-success" id="success-message">
                     {{ session('message') }}
                 </div>
                 @endif
 
                 @if (session('error'))
-                <div class="alert alert-danger">
+                <div class="alert alert-danger" id="error-message">
                     {{ session('error') }}
                 </div>
                 @endif
+
+                <script> 
+                    setTimeout(function() {
+                        const successMessage = document.getElementById('success-message');
+                        const errorMessage = document.getElementById('error-message');
+
+                        if (successMessage) {
+                            successMessage.style.display = 'none';
+                        }
+
+                        if (errorMessage) {
+                            errorMessage.style.display = 'none';
+                        }
+                    }, 5000);
+                </script>
                 @yield('main')
                 
-            </div>
-            <!-- End Page-content -->
-
+            </div> 
             <footer class="footer">
                 <div class="container-fluid">
                     <div class="row">
