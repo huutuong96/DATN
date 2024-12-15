@@ -1750,9 +1750,10 @@ public function handleUpdateProduct(Request $request, string $id)
 //events -------------------------------------------------------------------------------------
 public function listEvent(Request $request)
 {
+    // dd("ok");
     $token = $request->token; 
     try {
-        $events = Event::whereIn('status', [1, 2])->orderBy('created_at', 'desc')->paginate(10);
+        $events = Event::whereIn('status', [1, 2])->orderBy('id', 'desc')->paginate(10);
         foreach ($events as &$event) {
             $event['voucher_apply'] = json_decode($event['voucher_apply'], true); // Giải mã JSON
         }
