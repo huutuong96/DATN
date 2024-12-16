@@ -125,23 +125,7 @@ class NotificationController extends Controller
         ], 200);
     }
 
-    public function send_mail_event()
-    {
-        EventMail::dispatch();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Đang khởi tạo...'
-        ], 200);
-    }
-
-    public function check_time_event()
-    {
-        check_time_event::dispatch();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Đang kiểm tra thời gian Event'
-        ], 200);
-    }
+   
 
 
 }

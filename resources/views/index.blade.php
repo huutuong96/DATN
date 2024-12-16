@@ -862,7 +862,7 @@
                                 href="{{ route('events', ['token' => auth()->user()->refesh_token]) }}"
                                 data-key="t-crm">
                                 <i class="ri-gift-line"></i> 
-                                <span data-key="t-dashboards">Quản lý events</span>
+                                <span data-key="t-dashboards">Quản lý sự kiện</span>
                             </a>
                         </li>
                         <li class="nav-item">

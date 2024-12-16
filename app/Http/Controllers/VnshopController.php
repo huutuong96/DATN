@@ -43,7 +43,10 @@ use App\Http\Requests\PaymentRequest;
 
 use App\Models\Image;
 use App\Http\Requests\ProductRequest;
+use App\Jobs\check_time_event;
+use App\Jobs\check_time_event_hand;
 use App\Jobs\checkWebDie;
+use App\Jobs\EventMail;
 
 ;
 use App\Models\ColorsModel;
@@ -1996,6 +1999,37 @@ public function update_events(Request $request, $id)
         // } 
 
     }
+    public function loinhuan(Request $request,)
+    {
+        $listShop = Shop::whereIn("status", [1, 2, 4])->with('user')->get();
+        foreach ($listShop as $key => $shop) {
+            $orders = OrdersModel::where("shop_id", $shop->id)->get();
+            $fee = 0;
+            foreach ($orders as $order) {
+                $fee += order_fee_details::where("order_id", $order->id)->sum('amount');
+            }
+            $shop['fee'] = $fee;
+        }
+        return view('loinhuan.loinhuan', compact('listShop'));
+    }
+    public function send_mail_event()
+    {
+        EventMail::dispatch();
+        return back()->with('message','Chương trình đã được kích hoạt');
+    }
+    public function check_time_event()
+    {
+        check_time_event::dispatch();
+       return back()->with('message','Chương trình đã dừng');
+    }
+
+    public function check_time_event_hand(Request $request)
+    {
+        check_time_event_hand::dispatch($request->id);
+       return back()->with('message','Chương trình đã dừng');
+    }
+    
+
 
 
 }

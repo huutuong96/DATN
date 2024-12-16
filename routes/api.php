@@ -437,8 +437,7 @@ Route::get('/search', function () {
 
         // Route::post('import/data', [ProductController::class, "importProducts"])->name('importProducts');
         Route::get('export/data', [ProductController::class, "exportdata"])->name('exportdata');
-        Route::get('send_mail_event', [NotificationController::class, "send_mail_event"])->name('send_mail_event');
-        Route::get('check_time_event', [NotificationController::class, "check_time_event"])->name('check_time_event');
+       
 
         Route::get('cancel_order_auto', [OrdersController::class, "cancel_order_auto"])->name('cancel_order_auto');
         Route::get('login_with_token', [AuthenController::class, "login_with_token"])->name('login_with_token');
