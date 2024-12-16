@@ -1490,58 +1490,68 @@ public function ProductAll(Request $request)
         try {
             try {
                 $user = JWTAuth::parseToken()->authenticate();
-            } catch (\Exception $e) {
-                $user = null;
-            }
-            if ($user) {
-                $allProducts = Product::pluck('id')->toArray();
-                $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
-                $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->unique()->toArray();
-
-                $trainingData = [];
-                $labels = [];
-                $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
-                foreach ($orders as $order) {
-                    $products = $order->orderDetails->pluck('product_id')->toArray();
-                    $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
-                    $trainingData[] = $vector;
-                    $labels = array_merge($labels, $products);
+                } catch (\Exception $e) {
+                    $user = null;
                 }
+                if ($user) {
+                    $viewSession = session('viewed_products', []);
+                    $viewedProducts = Product::whereIn('id', $viewSession)
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(10)
+                        ->get();
+                    $allProducts = Product::pluck('id')->toArray();
+                    $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
+                    $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->unique()->toArray();
 
-                $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
-                $service = new RecommendationService();
-                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+                    $trainingData = [];
+                    $labels = [];
+                    $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
+                    foreach ($orders as $order) {
+                        $products = $order->orderDetails->pluck('product_id')->toArray();
+                        $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
+                        $trainingData[] = $vector;
+                        $labels = array_merge($labels, $products);
+                    }
 
-                $productsGetCategory = Product::whereIn('id', $userPurchasedProducts)->pluck('category_id')->toArray();
-                $categories = CategoriesModel::whereIn('id', $productsGetCategory)->pluck('id')->toArray();
+                    $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
+                    $service = new RecommendationService();
+                    $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+                    if ($recommendation == []) {
+                        # code...
+                    }
+                    if (empty($recommendation)) {
+                        $recommendedProducts = $viewedProducts;
+                        // Product::inRandomOrder()
+                        //     ->where('status', 2)
+                        //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        //     ->limit(10)
+                        //     ->get();
+                    }
+                    $productsGetCategory = Product::whereIn('id', $userPurchasedProducts)->pluck('category_id')->toArray();
+                    $categories = CategoriesModel::whereIn('id', $productsGetCategory)->pluck('id')->toArray();
+                    
+                    $recommendedProducts = Product::whereIn('id', $recommendation)
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(10)
+                        ->get();
+                    
+                    $categoryProducts = Product::whereIn('category_id', $categories)
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(10)
+                        ->get();
 
-                $recommendedProducts = Product::whereIn('id', $recommendation)
-                    ->where('status', 2)
-                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    ->limit(10)
-                    ->get();
-
-                $categoryProducts = Product::whereIn('category_id', $categories)
-                    ->where('status', 2)
-                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    ->limit(10)
-                    ->get();
-
-                $viewSession = session('viewed_products', []);
-                $viewedProducts = Product::whereIn('id', $viewSession)
-                    ->where('status', 2)
-                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    ->limit(10)
-                    ->get();
-
-                $products = $recommendedProducts->merge($categoryProducts);
-                $products = $products->merge($viewedProducts);
-            } else {
-                $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
-            }
-            foreach ($products as $product) {
-                $product->rateAvg = rateAvg($product->id);
-            }
+                
+                    $products = $recommendedProducts->merge($categoryProducts);
+                    $products = $products->merge($viewedProducts);
+                } else {
+                    $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
+                }
+                foreach ($products as $product) {
+                    $product->rateAvg = rateAvg($product->id);
+                }
             return response()->json(
                 [
                     'status' => true,
