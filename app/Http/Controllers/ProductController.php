@@ -1563,8 +1563,11 @@ public function ProductAll(Request $request)
 
 
         try {
-            $user = JWTAuth::parseToken()->authenticate();
-    
+            try {
+                $user = JWTAuth::parseToken()->authenticate();
+                } catch (\Exception $e) {
+                    $user = null;
+                }
             if ($user) {
                 $cacheKey = 'user_recommendations_' . $user->id;
                 $cachedData = Cache::get($cacheKey);
@@ -1616,6 +1619,8 @@ public function ProductAll(Request $request)
                     'message' => 'Lấy dữ liệu thành công.',
                     'data' => $products,
                 ]);
+            }else {
+                $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
             }
     
             return response()->json([
