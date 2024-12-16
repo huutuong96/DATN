@@ -150,7 +150,7 @@ class ProductController extends Controller
             ], 404);
         }
         $data = $products->first();
-        $data->countRanting = CommentsModel::where('product_id', $data->id)->get()->count();
+        $data->countRanting = CommentsModel::where('rate', '!=', null)->where('product_id', $data->id)->get()->count();
         
         return response()->json([
             'status' => 'success',
@@ -1514,11 +1514,12 @@ public function ProductAll(Request $request)
                 }
                 $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
                 $service = new RecommendationService();
-                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10, $userPurchasedProducts);
                 $products = Product::whereIn('id', $recommendation)
-                ->where('status', 2)
-                ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')
-                ->get();            }else {
+                // ->where('status', 2)
+                ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count' , 'category_id')
+                ->get();           
+             }else {
                 $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
             }
             foreach ($products as $product) {

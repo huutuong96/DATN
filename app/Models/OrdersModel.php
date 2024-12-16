@@ -183,6 +183,10 @@ public function orderDetails()
 {
     return $this->hasMany(OrderDetailsModel::class, 'order_id');
 }
+public function feeOrder()
+{
+    return $this->belongsTo(order_fee_details::class, 'order_id'); // `user_id` là khóa ngoại trong bảng `orders`
+}
 
 }
 

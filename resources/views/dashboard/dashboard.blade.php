@@ -159,7 +159,7 @@
                                         <p
                                             class="text-uppercase fw-medium text-muted text-truncate mb-0"
                                         >
-                                        Lợi nhận của sàn trong tháng
+                                        Lợi nhuận của sàn trong tháng
                                         </p>
                                     </div>
                                     <!-- <div
@@ -186,7 +186,11 @@
                                         {{ number_format($monthlyRevenue)}} vnđ
                                         </span>
                                         </h4>
-                                        Lợi nhận của sàn trong tháng 
+                                        <a
+                                            href="{{route('loinhuan',['token' => auth()->user()->refesh_token])}}"
+                                            class="text-decoration-underline"
+                                            >Lợi nhuận của sàn trong tháng</a
+                                        >
                                     </div>
                                     <div
                                         class="avatar-sm flex-shrink-0"
