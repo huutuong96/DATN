@@ -150,6 +150,7 @@ return array(
     'App\\Jobs\\changeConfig' => $baseDir . '/app/Jobs/changeConfig.php',
     'App\\Jobs\\checkWebDie' => $baseDir . '/app/Jobs/checkWebDie.php',
     'App\\Jobs\\check_time_event' => $baseDir . '/app/Jobs/check_time_event.php',
+    'App\\Jobs\\check_time_event_hand' => $baseDir . '/app/Jobs/check_time_event_hand.php',
     'App\\Jobs\\deleteProductToCart' => $baseDir . '/app/Jobs/deleteProductToCart.php',
     'App\\Jobs\\sendMailBirthDay' => $baseDir . '/app/Jobs/sendMailBirthDay.php',
     'App\\Jobs\\sendNotiPrepareCancelOrderForSeller' => $baseDir . '/app/Jobs/sendNotiPrepareCancelOrderForSeller.php',

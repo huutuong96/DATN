@@ -922,6 +922,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'App\\Jobs\\changeConfig' => __DIR__ . '/../..' . '/app/Jobs/changeConfig.php',
         'App\\Jobs\\checkWebDie' => __DIR__ . '/../..' . '/app/Jobs/checkWebDie.php',
         'App\\Jobs\\check_time_event' => __DIR__ . '/../..' . '/app/Jobs/check_time_event.php',
+        'App\\Jobs\\check_time_event_hand' => __DIR__ . '/../..' . '/app/Jobs/check_time_event_hand.php',
         'App\\Jobs\\deleteProductToCart' => __DIR__ . '/../..' . '/app/Jobs/deleteProductToCart.php',
         'App\\Jobs\\sendMailBirthDay' => __DIR__ . '/../..' . '/app/Jobs/sendMailBirthDay.php',
         'App\\Jobs\\sendNotiPrepareCancelOrderForSeller' => __DIR__ . '/../..' . '/app/Jobs/sendNotiPrepareCancelOrderForSeller.php',
