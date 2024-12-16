@@ -16,5 +16,9 @@ class order_fee_details extends Model
         'platform_fee_id',
         'amount'
     ];
+    public function orders()
+    {
+        return $this->hasMany(OrdersModel::class, 'order_id', 'id');
+    }
 
 }

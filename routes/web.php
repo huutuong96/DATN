@@ -150,11 +150,12 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
     Route::post('/api/permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckAdminPremission:role');
     Route::get('/api/permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access')->middleware('CheckAdminPremission:role');
+    Route::get('/loi-nhuan', [VnshopController::class, 'loinhuan'])->name('loinhuan');
+
 });
 
 
 Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mail');
-
 
 
 

@@ -150,7 +150,7 @@ class ProductController extends Controller
             ], 404);
         }
         $data = $products->first();
-        $data->countRanting = CommentsModel::where('product_id', $data->id)->get()->count();
+        $data->countRanting = CommentsModel::where('rate', '!=', null)->where('product_id', $data->id)->get()->count();
         
         return response()->json([
             'status' => 'success',
