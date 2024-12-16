@@ -1517,10 +1517,10 @@ public function ProductAll(Request $request)
                 $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10, $userPurchasedProducts);
                 $products = Product::whereIn('id', $recommendation)
                 // ->where('status', 2)
-                ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count' , 'category_id')
+                ->select('id', 'name', 'slug', 'show_price', 'image',  'category_id')
                 ->get();           
              }else {
-                $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
+                // $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
             }
             foreach ($products as $product) {
                 $product->rateAvg = rateAvg($product->id);
