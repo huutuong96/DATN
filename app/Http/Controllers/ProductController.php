@@ -63,6 +63,7 @@ class ProductController extends Controller
     public function __construct()
     {
         $this->middleware('checkShip')->only('store');
+        $this->middleware('web'); // Ensure session middleware is applied
     }
 
     public function index(Request $request)
@@ -156,7 +157,6 @@ class ProductController extends Controller
             $viewedProducts[] = $data->id;
             $request->session()->put('viewed_products', $viewedProducts);
         }
-        
         return response()->json([
             'status' => 'success',
             'data' => $data
@@ -1533,8 +1533,14 @@ public function ProductAll(Request $request)
                     ->limit(10)
                     ->get();
 
+                $viewedProducts = session('viewed_products', []);
+                $productsSession = Product::whereIn('id', $viewedProducts)
+                    ->where('status', 2)
+                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                    ->get();
+            
                 $products = $recommendedProducts->merge($categoryProducts);
-                // $products = $categoryProducts;
+                $products = $recommendedProducts->merge($productsSession);
             } else {
                 $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
             }
