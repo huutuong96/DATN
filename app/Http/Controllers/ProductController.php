@@ -1539,7 +1539,7 @@ public function ProductAll(Request $request)
                         ->get();
                     $products = $recommendedProducts->merge($categoryProducts);
                 } else {
-                    $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(5)->get();
+                    $products = Product::inRandomOrder()->where('status', 2)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(5)->get();
                 }
                 foreach ($products as $product) {
                     $product->rateAvg = rateAvg($product->id);
