@@ -1507,17 +1507,21 @@ public function ProductAll(Request $request)
                     $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
                     $service = new RecommendationService();
                     $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
-                    if ($recommendation == []) {
-                        # code...
+                    if (count($recommendation) < 1) {
+                        $recommendedProducts = Product::inRandomOrder()
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(10)
+                        ->get();
+                        return response()->json(
+                            [
+                                'status' => true,
+                                'message' => "Lấy dữ liệu thành công",
+                                'data' => $recommendedProducts,
+                            ]
+                        );
                     }
-                    if (empty($recommendation)) {
-                        $recommendedProducts =
-                        Product::inRandomOrder()
-                            ->where('status', 2)
-                            ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                            ->limit(10)
-                            ->get();
-                    }
+                        
                     $productsGetCategory = Product::whereIn('id', $userPurchasedProducts)->pluck('category_id')->toArray();
                     $categories = CategoriesModel::whereIn('id', $productsGetCategory)->pluck('id')->toArray();
                     
