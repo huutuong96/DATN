@@ -209,17 +209,12 @@
                                                         <button type="button" class="btn btn-success" title="mở"> <i class="ri-check-line align-middle"></i></button>
                                                             </a>
                                                             @elseif ($event->status == 2)
-                                                                
-                                                              
                                                                 <a 
-                                                                href="{{ route('change_status_events', [
-                                                                                                    'token' => auth()->user()->refesh_token,
-                                                                                                    'id' => $event->id,
-                                                                                                    'status' => 1,
-                                                                                                    ]) }}"
+                                                                href="{{ route('send_mail_event') }}"
                                                             >
-                                                            <button type="button" class="btn btn-secondary" title="Khóa">
-                                                                <i class="ri-lock-line align-middle"></i>
+                                                            <button type="button" class="btn btn-secondary" title="ÁP dụng ngay">
+                                                                <i class="ri-run-line align-middle"></i>
+
                                                             </button>
                                                             </a>
                                                              
@@ -382,13 +377,9 @@
                                                             </div> 
                                                             <div class="mt-2">
                                                                 <a 
-                                                                    href="{{ route('change_status_events', [
-                                                                                                        'token' => auth()->user()->refesh_token,
-                                                                                                        'id' => $event->id,
-                                                                                                        'status' => 5,
-                                                                                                        ]) }}"
+                                                                    href="{{ route('check_time_event_hand',['id' => $event->id])}}"
                                                                 >
-                                                                <button type="button" class="btn btn-danger" title="xóa"> <i class=" ri-close-line align-middle"></i></button>
+                                                                <button type="button" class="btn btn-danger" title="Tắt"> <i class=" ri-close-line align-middle"></i></button>
                                         
                                                                
                                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#eventDetailsModal-{{ $event->id }}">

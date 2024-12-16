@@ -146,7 +146,7 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
     Route::post('/api/roles', [RolesController::class, 'store'])->name('role_store')->middleware('CheckAdminPremission:role');
     Route::get('/api/change_role', [RolesController::class, 'change_role'])->name('change_role')->middleware('CheckAdminPremission:role');
     Route::put('/user/change_role', [VnshopController::class, 'userChangeRole'])->name('user_change_role')->middleware('CheckAdminPremission:role');
-
+    
     // Route::resource('permission', PremissionsController::class)->middleware('CheckRole');
     Route::post('/api/permission/grant_access', [PremissionsController::class, "grant_access"])->name('grant_access')->middleware('CheckAdminPremission:role');
     Route::get('/api/permission/delete_access', [PremissionsController::class, "delete_access"])->name('delete_access')->middleware('CheckAdminPremission:role');
@@ -154,7 +154,9 @@ Route::group(['middleware' => ['checkToken', 'CheckRole']], function () {
 
 });
 
-
+Route::get('send_mail_event', [VnshopController::class, "send_mail_event"])->name('send_mail_event');
+Route::get('check_time_event', [VnshopController::class, "check_time_event"])->name('check_time_event');
+Route::get('check_time_event_hand', [VnshopController::class, "check_time_event_hand"])->name('check_time_event_hand');
 Route::get('/test_mail', [VnshopController::class, 'test_mail'])->name('test_mail');
 
 
