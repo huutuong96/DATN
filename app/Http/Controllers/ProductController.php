@@ -152,11 +152,6 @@ class ProductController extends Controller
         }
         $data = $products->first();
         $data->countRanting = CommentsModel::where('rate', '!=', null)->where('product_id', $data->id)->get()->count();
-        $viewedProducts = $request->session()->get('viewed_products', []);
-        if (!in_array($data->id, $viewedProducts)) {
-            $viewedProducts[] = $data->id;
-            $request->session()->put('viewed_products', $viewedProducts);
-        }
         return response()->json([
             'status' => 'success',
             'data' => $data
@@ -1486,14 +1481,10 @@ public function ProductAll(Request $request)
     }
 
 
-    public function recommendProducts()
+    public function recommendProducts(Request $request)
     {
-        try {
-            try {
                 $user = JWTAuth::parseToken()->authenticate();
-            } catch (\Exception $e) {
-                $user = null;
-            }
+
             if ($user) {
                 $allProducts = Product::pluck('id')->toArray();
                 $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
@@ -1533,17 +1524,13 @@ public function ProductAll(Request $request)
                     ->limit(10)
                     ->get();
 
-                $viewedProducts = session('viewed_products', []);
-                $productsSession = Product::whereIn('id', $viewedProducts)
-                    ->where('status', 2)
-                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    ->get();
+                
             
                 $products = $recommendedProducts->merge($categoryProducts);
-                $products = $recommendedProducts->merge($productsSession);
-            } else {
-                $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
-            }
+            } 
+            // else {
+            //     $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
+            // }
             foreach ($products as $product) {
                 $product->rateAvg = rateAvg($product->id);
             }
@@ -1555,14 +1542,14 @@ public function ProductAll(Request $request)
                 ]
             );
             
-        } catch (\Throwable $th) {
+
             log_debug($th->getMessage());
             return response()->json([
                 'status' => false,
                 'message' => "Lấy dữ liệu không thành công",
                 'error' => $th->getMessage(),
             ]);
-        }
+        
 
         // $events = Event::where('status', 2)->first();
         // if ($events != null) {
