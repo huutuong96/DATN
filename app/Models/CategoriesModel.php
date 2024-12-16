@@ -35,4 +35,16 @@ class CategoriesModel extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    
+    public static function getParentCategories($categoryId, &$categories = [])
+    {
+        $category = self::find($categoryId);
+        if ($category && $category->parent_id) {
+            $categories[] = $category->parent_id;
+            self::getParentCategories($category->parent_id, $categories);
+        }
+        return $categories;
+    }
+    
 }
