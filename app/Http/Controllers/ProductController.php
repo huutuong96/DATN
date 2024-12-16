@@ -1516,7 +1516,7 @@ public function ProductAll(Request $request)
                 $service = new RecommendationService();
                 $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10, $userPurchasedProducts);
                 $products = Product::whereIn('id', $recommendation)
-                ->where('status', 2)
+                // ->where('status', 2)
                 ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count' , 'category_id')
                 ->get();           
              }else {
