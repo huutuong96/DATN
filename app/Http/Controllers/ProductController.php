@@ -1575,7 +1575,11 @@ class ProductController extends Controller
 
 
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            try {
+                $user = JWTAuth::parseToken()->authenticate();
+            } catch (\Exception $e) {
+                $user = null;
+            }
             if ($user) {
                 $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
                 $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)
@@ -1609,8 +1613,6 @@ class ProductController extends Controller
                 ->limit(10)
                 ->get();
                  $products = $recommendedProducts->merge($categoryProducts);
-   
-
                 return response()->json([
                     'status' => true,
                     'message' => 'Lấy dữ liệu thành công.',
