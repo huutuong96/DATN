@@ -1594,18 +1594,18 @@ public function ProductAll(Request $request)
                     $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
 
                     // Trả về dữ liệu sản phẩm
-                    $recommendedProducts = Product::whereIn('id', $recommendation)
-                        ->where('status', 2)
-                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                        ->get();
-                    $categories = $recommendedProducts->pluck('category_id')->unique();
-                    $categoryProducts = Product::whereIn('category_id', $categories)
-                        ->whereNotIn('id', $recommendation)
-                        ->where('status', 2)
-                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                        ->limit(10)
-                        ->get();
-                    $products = $recommendedProducts->merge($categoryProducts);
+                    // $recommendedProducts = Product::whereIn('id', $recommendation)
+                    //     ->where('status', 2)
+                    //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                    //     ->get();
+                    // $categories = $recommendedProducts->pluck('category_id')->unique();
+                    // $categoryProducts = Product::whereIn('category_id', $categories)
+                    //     ->whereNotIn('id', $recommendation)
+                    //     ->where('status', 2)
+                    //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                    //     ->limit(10)
+                    //     ->get();
+                    // $products = $recommendedProducts->merge($categoryProducts);
 
                     // Lưu vào cache
                     Cache::put($cacheKey, json_encode($products), now()->addMinutes(30));
