@@ -39,7 +39,8 @@
         "files": [
             "app/Helpers/log.php",
             "app/Helpers/beta.php",
-            "app/Helpers/alpha.php"
+            "app/Helpers/alpha.php",
+            "app/Helpers/rateAvg.php"
             ]
     },
     "autoload-dev": {

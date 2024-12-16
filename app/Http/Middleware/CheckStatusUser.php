@@ -33,6 +33,10 @@ class CheckStatusUser
         if ($user->status == 1) {
             return $next($request);
         }
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Không xác định trạng thái tài khoản',
+        ], 400);
 
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CommentsModel;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -124,7 +125,16 @@ class SearchController extends Controller
             if ($request->sort == '-view_count') {
                 $query->orderby('view_count', 'desc');
             }
+            if ($request->has('min_rate') && $request->has('max_rate')) {
+                $query->whereHas('comments', function ($q) use ($request) {
+                    $q->havingRaw('AVG(rate) BETWEEN ? AND ?', [$request->min_rate, $request->max_rate])
+                      ->whereNotNull('rate');
+                });
+            }
             $products = $query->where('status', 2)->paginate($limit);
+            foreach ($products as $product) {
+                $product->rateAvg = rateAvg($product->id);
+            }
             return response()->json([
                 'status' => 200,
                 'message' => 'Lấy dữ liệu thành công',

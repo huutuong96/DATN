@@ -46,6 +46,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         '97266e347e26a0f49e48c4ceb769bdde' => __DIR__ . '/../..' . '/app/Helpers/log.php',
         '4eb1262a0a645b109aafb0fa32522bcd' => __DIR__ . '/../..' . '/app/Helpers/beta.php',
         'bf727355f3f1327711a5aa6e6e43526a' => __DIR__ . '/../..' . '/app/Helpers/alpha.php',
+        '0478fff4c8b185cc422ed134fbb05316' => __DIR__ . '/../..' . '/app/Helpers/rateAvg.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -845,6 +846,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'App\\Http\\Controllers\\webAppController' => __DIR__ . '/../..' . '/app/Http/Controllers/webAppController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
+        'App\\Http\\Middleware\\CheckAdminPremission' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckAdminPremission.php',
         'App\\Http\\Middleware\\CheckPermission' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckPermission.php',
         'App\\Http\\Middleware\\CheckPremission' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckPremission.php',
         'App\\Http\\Middleware\\CheckRole' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckRole.php',

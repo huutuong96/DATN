@@ -83,6 +83,10 @@ class Product extends Model
     {
         return $this->belongsTo(BrandsModel::class);
     }
+    public function comments()
+    {
+        return $this->hasMany(CommentsModel::class);
+    }
 
     public function scopeSearch(Builder $query, array $filters)
     {

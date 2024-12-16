@@ -802,13 +802,20 @@ class ProductController extends Controller
             }
             if ($request->sort == '-price') {
                 $query->orderByRaw('CASE WHEN show_price LIKE "% - %" THEN CAST(SUBSTRING_INDEX(show_price, " - ", 1) AS UNSIGNED) ELSE CAST(show_price AS UNSIGNED) END DESC');
+            }     
+            if ($request->has('min_rate') && $request->has('max_rate')) {
+                $query->whereHas('comments', function ($q) use ($request) {
+                    $q->havingRaw('AVG(rate) BETWEEN ? AND ?', [$request->min_rate, $request->max_rate])
+                      ->whereNotNull('rate');
+                });
             }
             $products = $query->where('status', 2)->paginate($limit);
-
-
-
-        return response()->json($products);
+            foreach ($products as $product) {
+                $product->rateAvg = rateAvg($product->id);
+            }
+            return response()->json($products);
     }
+
     
 
 
@@ -1507,12 +1514,16 @@ public function ProductAll(Request $request)
                 }
                 $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
                 $service = new RecommendationService();
-                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10, $userPurchasedProducts);
                 $products = Product::whereIn('id', $recommendation)
-                ->where('status', 2)
-                ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')
-                ->get();            }else {
+                // ->where('status', 2)
+                ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count' , 'category_id')
+                ->get();           
+             }else {
                 $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
+            }
+            foreach ($products as $product) {
+                $product->rateAvg = rateAvg($product->id);
             }
             return response()->json(
                 [
