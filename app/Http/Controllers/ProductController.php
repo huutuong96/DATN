@@ -156,7 +156,7 @@ class ProductController extends Controller
             $viewedProducts[] = $data->id;
             $request->session()->put('viewed_products', $viewedProducts);
         }
-        return $viewedProducts;
+        
         return response()->json([
             'status' => 'success',
             'data' => $data
