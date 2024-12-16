@@ -1495,7 +1495,7 @@ class ProductController extends Controller
     }
 
 
-    public function recommendProducts()
+    public function recommendProducts(Request $request)
     {
         // try {
         //     try {
@@ -1575,11 +1575,7 @@ class ProductController extends Controller
 
 
         try {
-            try {
             $user = JWTAuth::parseToken()->authenticate();
-            } catch (\Exception $e) {
-            $user = null;
-            }
             if ($user) {
                 $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
                 $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)
@@ -1615,18 +1611,18 @@ class ProductController extends Controller
                  $products = $recommendedProducts->merge($categoryProducts);
    
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Lấy dữ liệu thành công.',
-                'data' => $products,
-            ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Lấy dữ liệu thành công.',
+                    'data' => $products,
+                ]);
             } else {
-            $products = Product::inRandomOrder()->where('status', 2)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
-            return response()->json([
-                'status' => true,
-                'message' => 'Lấy dữ liệu thành công.',
-                'data' => $products,
-            ]);
+                $products = Product::inRandomOrder()->where('status', 2)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Lấy dữ liệu thành công.',
+                    'data' => $products,
+                ]);
             }
         } catch (\Throwable $th) {
             return response()->json([
