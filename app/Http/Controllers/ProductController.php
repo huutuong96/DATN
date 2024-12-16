@@ -1484,107 +1484,20 @@ public function ProductAll(Request $request)
 
     public function recommendProducts()
     {
-        // try {
-        //     try {
-        //         $user = JWTAuth::parseToken()->authenticate();
-        //         } catch (\Exception $e) {
-        //             $user = null;
-        //         }
-        //         if ($user) {
-        //             $allProducts = Product::pluck('id')->toArray();
-        //             $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
-        //             $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->unique()->toArray();
-
-        //             $trainingData = [];
-        //             $labels = [];
-        //             $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
-        //             foreach ($orders as $order) {
-        //                 $products = $order->orderDetails->pluck('product_id')->toArray();
-        //                 $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
-        //                 $trainingData[] = $vector;
-        //                 $labels = array_merge($labels, $products);
-        //             }
-
-        //             $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
-        //             $service = new RecommendationService();
-        //             $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
-        //             if (count($recommendation) < 1) {
-        //                 $recommendedProducts = Product::inRandomOrder()
-        //                 ->where('status', 2)
-        //                 ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-        //                 ->limit(10)
-        //                 ->get();
-        //                 return response()->json(
-        //                     [
-        //                         'status' => true,
-        //                         'message' => "Lấy dữ liệu thành công",
-        //                         'data' => $recommendedProducts,
-        //                     ]
-        //                 );
-        //             }
-                        
-        //             $productsGetCategory = Product::whereIn('id', $userPurchasedProducts)->pluck('category_id')->toArray();
-        //             $categories = CategoriesModel::whereIn('id', $productsGetCategory)->pluck('id')->toArray();
-                    
-        //             $recommendedProducts = Product::whereIn('id', $recommendation)
-        //                 ->where('status', 2)
-        //                 ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-        //                 ->limit(10)
-        //                 ->get();
-                    
-        //             $categoryProducts = Product::whereIn('category_id', $categories)
-        //                 ->where('status', 2)
-        //                 ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-        //                 ->limit(10)
-        //                 ->get();
-        //             $products = $recommendedProducts->merge($categoryProducts);
-        //         } else {
-        //             $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
-        //         }
-        //         foreach ($products as $product) {
-        //             $product->rateAvg = rateAvg($product->id);
-        //         }
-        //     return response()->json(
-        //         [
-        //             'status' => true,
-        //             'message' => "Lấy dữ liệu thành công",
-        //             'data' => $products,
-        //         ]
-        //     );
-            
-        // } catch (\Throwable $th) {
-        //     log_debug($th->getMessage());
-        //     return response()->json([
-        //         'status' => false,
-        //         'message' => "Lấy dữ liệu không thành công",
-        //         'error' => $th->getMessage(),
-        //     ]);
-        // }
-
-
         try {
             try {
                 $user = JWTAuth::parseToken()->authenticate();
                 } catch (\Exception $e) {
                     $user = null;
                 }
-            if ($user) {
-                $cacheKey = 'user_recommendations_' . $user->id;
-                $cachedData = Cache::get($cacheKey);
-
-                if ($cachedData) {
-                    $products = json_decode($cachedData, true);
-                } else {
-                    // đây là tính toán gợi ý ngay lập tức mà không cần cache
-                    $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
-                    $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)
-                        ->pluck('product_id')->unique()->toArray();
-
+                if ($user) {
                     $allProducts = Product::pluck('id')->toArray();
+                    $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
+                    $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->unique()->toArray();
+
                     $trainingData = [];
                     $labels = [];
                     $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
-
                     foreach ($orders as $order) {
                         $products = $order->orderDetails->pluck('product_id')->toArray();
                         $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
@@ -1595,45 +1508,132 @@ public function ProductAll(Request $request)
                     $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
                     $service = new RecommendationService();
                     $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
-
-                    // Trả về dữ liệu sản phẩm
-                    // $recommendedProducts = Product::whereIn('id', $recommendation)
-                    //     ->where('status', 2)
-                    //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    //     ->get();
-                    // $categories = $recommendedProducts->pluck('category_id')->unique();
-                    // $categoryProducts = Product::whereIn('category_id', $categories)
-                    //     ->whereNotIn('id', $recommendation)
-                    //     ->where('status', 2)
-                    //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    //     ->limit(10)
-                    //     ->get();
-                    // $products = $recommendedProducts->merge($categoryProducts);
-
-                    // Lưu vào cache
-                    Cache::put($cacheKey, json_encode($products), now()->addMinutes(30));
+                    if (count($recommendation) < 1) {
+                        $recommendedProducts = Product::inRandomOrder()
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(5)
+                        ->get();
+                        return response()->json(
+                            [
+                                'status' => true,
+                                'message' => "Lấy dữ liệu thành công",
+                                'data' => $recommendedProducts,
+                            ]
+                        );
+                    }
+                        
+                    $productsGetCategory = Product::whereIn('id', $userPurchasedProducts)->pluck('category_id')->toArray();
+                    $categories = CategoriesModel::whereIn('id', $productsGetCategory)->pluck('id')->toArray();
+                    
+                    $recommendedProducts = Product::whereIn('id', $recommendation)
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(5)
+                        ->get();
+                    
+                    $categoryProducts = Product::whereIn('category_id', $categories)
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(5)
+                        ->get();
+                    $products = $recommendedProducts->merge($categoryProducts);
+                } else {
+                    $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(5)->get();
                 }
-
-                return response()->json([
+                foreach ($products as $product) {
+                    $product->rateAvg = rateAvg($product->id);
+                }
+            return response()->json(
+                [
                     'status' => true,
-                    'message' => 'Lấy dữ liệu thành công.',
+                    'message' => "Lấy dữ liệu thành công",
                     'data' => $products,
-                ]);
-            }else {
-                $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
-            }
-    
-            return response()->json([
-                'status' => false,
-                'message' => 'Không thể xác thực người dùng.',
-            ]);
+                ]
+            );
+            
         } catch (\Throwable $th) {
+            log_debug($th->getMessage());
             return response()->json([
                 'status' => false,
-                'message' => 'Đã xảy ra lỗi.',
+                'message' => "Lấy dữ liệu không thành công",
                 'error' => $th->getMessage(),
             ]);
         }
+
+
+        // try {
+        //     try {
+        //         $user = JWTAuth::parseToken()->authenticate();
+        //         } catch (\Exception $e) {
+        //             $user = null;
+        //         }
+        //     if ($user) {
+        //         $cacheKey = 'user_recommendations_' . $user->id;
+        //         $cachedData = Cache::get($cacheKey);
+
+        //         if ($cachedData) {
+        //             $products = json_decode($cachedData, true);
+        //         } else {
+        //             // đây là tính toán gợi ý ngay lập tức mà không cần cache
+        //             $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
+        //             $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)
+        //                 ->pluck('product_id')->unique()->toArray();
+
+        //             $allProducts = Product::pluck('id')->toArray();
+        //             $trainingData = [];
+        //             $labels = [];
+        //             $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
+
+        //             foreach ($orders as $order) {
+        //                 $products = $order->orderDetails->pluck('product_id')->toArray();
+        //                 $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
+        //                 $trainingData[] = $vector;
+        //                 $labels = array_merge($labels, $products);
+        //             }
+
+        //             $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
+        //             $service = new RecommendationService();
+        //             $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+
+        //             // Trả về dữ liệu sản phẩm
+        //             // $recommendedProducts = Product::whereIn('id', $recommendation)
+        //             //     ->where('status', 2)
+        //             //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+        //             //     ->get();
+        //             // $categories = $recommendedProducts->pluck('category_id')->unique();
+        //             // $categoryProducts = Product::whereIn('category_id', $categories)
+        //             //     ->whereNotIn('id', $recommendation)
+        //             //     ->where('status', 2)
+        //             //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+        //             //     ->limit(10)
+        //             //     ->get();
+        //             // $products = $recommendedProducts->merge($categoryProducts);
+
+        //             // Lưu vào cache
+        //             Cache::put($cacheKey, json_encode($products), now()->addMinutes(30));
+        //         }
+
+        //         return response()->json([
+        //             'status' => true,
+        //             'message' => 'Lấy dữ liệu thành công.',
+        //             'data' => $products,
+        //         ]);
+        //     }else {
+        //         $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
+        //     }
+    
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Không thể xác thực người dùng.',
+        //     ]);
+        // } catch (\Throwable $th) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Đã xảy ra lỗi.',
+        //         'error' => $th->getMessage(),
+        //     ]);
+        // }
 
 
 
