@@ -57,7 +57,7 @@ use Phpml\Tokenization\WhitespaceTokenizer;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
 use App\Models\CommentsModel;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -1566,40 +1566,51 @@ public function ProductAll(Request $request)
             $user = JWTAuth::parseToken()->authenticate();
     
             if ($user) {
-                // đây là tính toán gợi ý ngay lập tức mà không cần cache
-                $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
-                $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)
-                    ->pluck('product_id')->unique()->toArray();
-    
-                $allProducts = Product::pluck('id')->toArray();
-                $trainingData = [];
-                $labels = [];
-                $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
-    
-                foreach ($orders as $order) {
-                    $products = $order->orderDetails->pluck('product_id')->toArray();
-                    $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
-                    $trainingData[] = $vector;
-                    $labels = array_merge($labels, $products);
+                $cacheKey = 'user_recommendations_' . $user->id;
+                $cachedData = Cache::get($cacheKey);
+
+                if ($cachedData) {
+                    $products = json_decode($cachedData, true);
+                } else {
+                    // đây là tính toán gợi ý ngay lập tức mà không cần cache
+                    $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
+                    $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)
+                        ->pluck('product_id')->unique()->toArray();
+
+                    $allProducts = Product::pluck('id')->toArray();
+                    $trainingData = [];
+                    $labels = [];
+                    $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
+
+                    foreach ($orders as $order) {
+                        $products = $order->orderDetails->pluck('product_id')->toArray();
+                        $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
+                        $trainingData[] = $vector;
+                        $labels = array_merge($labels, $products);
+                    }
+
+                    $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
+                    $service = new RecommendationService();
+                    $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+
+                    // Trả về dữ liệu sản phẩm
+                    $recommendedProducts = Product::whereIn('id', $recommendation)
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->get();
+                    $categories = $recommendedProducts->pluck('category_id')->unique();
+                    $categoryProducts = Product::whereIn('category_id', $categories)
+                        ->whereNotIn('id', $recommendation)
+                        ->where('status', 2)
+                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                        ->limit(10)
+                        ->get();
+                    $products = $recommendedProducts->merge($categoryProducts);
+
+                    // Lưu vào cache
+                    Cache::put($cacheKey, json_encode($products), now()->addMinutes(30));
                 }
-    
-                $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
-                $service = new RecommendationService();
-                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
-    
-                // Trả về dữ liệu sản phẩm
-                $recommendedProducts = Product::whereIn('id', $recommendation)
-                    ->where('status', 2)
-                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    ->get();
-                $categories = $recommendedProducts->pluck('category_id')->unique();
-                $categoryProducts = Product::whereIn('category_id', $categories)
-                    ->whereNotIn('id', $recommendation)
-                    ->where('status', 2)
-                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                    ->limit(10)
-                    ->get();
-                $products = $recommendedProducts->merge($categoryProducts);
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Lấy dữ liệu thành công.',
