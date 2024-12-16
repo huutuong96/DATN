@@ -152,10 +152,6 @@ class ProductController extends Controller
         }
         $data = $products->first();
         $data->countRanting = CommentsModel::where('rate', '!=', null)->where('product_id', $data->id)->get()->count();
-        $viewSession = session()->get('viewed_product', []);
-        if (!in_array($data->id, $viewSession)) {
-            session()->push('viewed_product', $data->id);
-        }
         return response()->json([
             'status' => 'success',
             'data' => $data
@@ -1494,12 +1490,6 @@ public function ProductAll(Request $request)
                     $user = null;
                 }
                 if ($user) {
-                    $viewSession = session('viewed_products', []);
-                    $viewedProducts = Product::whereIn('id', $viewSession)
-                        ->where('status', 2)
-                        ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                        ->limit(10)
-                        ->get();
                     $allProducts = Product::pluck('id')->toArray();
                     $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
                     $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->unique()->toArray();
@@ -1521,12 +1511,12 @@ public function ProductAll(Request $request)
                         # code...
                     }
                     if (empty($recommendation)) {
-                        $recommendedProducts = $viewedProducts;
-                        // Product::inRandomOrder()
-                        //     ->where('status', 2)
-                        //     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
-                        //     ->limit(10)
-                        //     ->get();
+                        $recommendedProducts =
+                        Product::inRandomOrder()
+                            ->where('status', 2)
+                            ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                            ->limit(10)
+                            ->get();
                     }
                     $productsGetCategory = Product::whereIn('id', $userPurchasedProducts)->pluck('category_id')->toArray();
                     $categories = CategoriesModel::whereIn('id', $productsGetCategory)->pluck('id')->toArray();
@@ -1545,7 +1535,6 @@ public function ProductAll(Request $request)
 
                 
                     $products = $recommendedProducts->merge($categoryProducts);
-                    $products = $products->merge($viewedProducts);
                 } else {
                     $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
                 }
