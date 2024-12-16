@@ -152,6 +152,10 @@ class ProductController extends Controller
         }
         $data = $products->first();
         $data->countRanting = CommentsModel::where('rate', '!=', null)->where('product_id', $data->id)->get()->count();
+        $viewSession = session()->get('viewed_product', []);
+        if (!in_array($data->id, $viewSession)) {
+            session()->push('viewed_product', $data->id);
+        }
         return response()->json([
             'status' => 'success',
             'data' => $data
@@ -1492,45 +1496,48 @@ public function ProductAll(Request $request)
             if ($user) {
                 $allProducts = Product::pluck('id')->toArray();
                 $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
-                $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->toArray();
-                $orderForUser = [];
-                foreach ($userPurchasedProducts as $value) {
-                    if(!in_array($value, $orderForUser)){
-                        $orderForUser[] = $value;
-                    }
-                }
-                $userPurchasedProducts = $orderForUser;
-                // matrix
+                $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)->pluck('product_id')->unique()->toArray();
+
                 $trainingData = [];
-                $labels = []; // nhãn matrix
+                $labels = [];
                 $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
                 foreach ($orders as $order) {
                     $products = $order->orderDetails->pluck('product_id')->toArray();
                     $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
                     $trainingData[] = $vector;
-                    foreach ($products as $productId) {
-                        $labels[] = $productId; // Gắn nhãn
-                    }
+                    $labels = array_merge($labels, $products);
                 }
+
                 $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
                 $service = new RecommendationService();
                 $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+
                 $productsGetCategory = Product::whereIn('id', $userPurchasedProducts)->pluck('category_id')->toArray();
                 $categories = CategoriesModel::whereIn('id', $productsGetCategory)->pluck('id')->toArray();
+
                 $recommendedProducts = Product::whereIn('id', $recommendation)
                     ->where('status', 2)
-                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count','category_id')
+                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                    ->limit(10)
                     ->get();
-                
+
                 $categoryProducts = Product::whereIn('category_id', $categories)
                     ->where('status', 2)
                     ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
                     ->limit(10)
                     ->get();
-            
+
+                $viewSession = session('viewed_products', []);
+                $viewedProducts = Product::whereIn('id', $viewSession)
+                    ->where('status', 2)
+                    ->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count', 'category_id')
+                    ->limit(10)
+                    ->get();
+
                 $products = $recommendedProducts->merge($categoryProducts);
+                $products = $products->merge($viewedProducts);
             } else {
-                $products = Product::inRandomOrder()->limit(10)->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->get();
+                $products = Product::inRandomOrder()->select('id', 'name', 'slug', 'show_price', 'image', 'view_count', 'sold_count')->limit(10)->get();
             }
             foreach ($products as $product) {
                 $product->rateAvg = rateAvg($product->id);
