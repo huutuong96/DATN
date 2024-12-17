@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             app(\App\Http\Controllers\VnshopController::class)->checkWebDie();
-        })->everyTenMinutes();
+        })->everyMinute();
     }
 
     /**
