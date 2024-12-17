@@ -1580,7 +1580,9 @@ class ProductController extends Controller
             } catch (\Exception $e) {
                 $user = null;
             }
+          
             if ($user) {
+                
                 $userOrders = OrdersModel::where('user_id', $user->id)->pluck('id')->toArray();
                 $userPurchasedProducts = OrderDetailsModel::whereIn('order_id', $userOrders)
                 ->pluck('product_id')->unique()->toArray();
@@ -1589,7 +1591,6 @@ class ProductController extends Controller
                 $trainingData = [];
                 $labels = [];
                 $orders = OrdersModel::where('user_id', $user->id)->with('orderDetails')->get();
-
                 foreach ($orders as $order) {
                 $products = $order->orderDetails->pluck('product_id')->toArray();
                 $vector = array_map(fn($id) => in_array($id, $products) ? 1 : 0, $allProducts);
@@ -1599,7 +1600,7 @@ class ProductController extends Controller
 
                 $userVector = array_map(fn($id) => in_array($id, $userPurchasedProducts) ? 1 : 0, $allProducts);
                 $service = new RecommendationService();
-                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 10);
+                $recommendation = $service->recommendTopN([$userVector], $trainingData, $labels, 30);
 
                 $recommendedProducts = Product::whereIn('id', $recommendation)
                 ->where('status', 2)
@@ -1613,6 +1614,7 @@ class ProductController extends Controller
                 ->limit(10)
                 ->get();
                  $products = $recommendedProducts->merge($categoryProducts);
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Lấy dữ liệu thành công.',

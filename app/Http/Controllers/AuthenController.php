@@ -35,6 +35,7 @@ use App\Models\Follow_to_shop;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
@@ -205,6 +206,7 @@ class AuthenController extends Controller
             $token = JWTAuth::fromUser($user);
             $user->refesh_token = $token;
             $user->save();
+            $user = auth::user();
             // return $credentials;
             return response()->json([
                 'status' => true,
